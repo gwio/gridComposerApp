@@ -1,6 +1,6 @@
 #include "ofApp.h"
 #define TILES 18
-#define TILESIZE 26
+#define TILESIZE 10
 #define TILEBORDER 0.15
 
 //--------------------------------------------------------------
@@ -14,7 +14,7 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofEnableDepthTest();
-   // ofDisableAntiAliasing();
+    // ofDisableAntiAliasing();
     ofSetVerticalSync(false);
     setupPickingGrid();
     
@@ -22,11 +22,11 @@ void ofApp::setup(){
     planeTemp.setPosition(0, 0, 0);
     intersecPlane.setFrom(planeTemp);
     
-   // glShadeModel(GL_FLAT);
+    glShadeModel(GL_FLAT);
     
-    cam.setPosition(0, 0, 450);
+    cam.setPosition(0, 0, 1570);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(40);
+    cam.setFov(10);
     ofBackground(11, 5, 5);
     
   //  selection.allocate(100,100, GL_RGB);
@@ -90,7 +90,7 @@ void ofApp::draw(){
     cam.begin();
     //ofDrawAxis(120);
     //ofRect(0, 0, 800, 800);
-    light.enable();
+   // light.enable();
     // planeTemp.draw();
     
     ofPushMatrix();

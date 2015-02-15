@@ -115,16 +115,16 @@ void Instrument::setup() {
 
             int indexex[] = {
                 indexOuter,indexOuter+1,(indexInner*4)+startInner+1,
-                (indexInner*4)+startInner+1,(indexInner*4)+startInner,indexOuter,
+                (indexInner*4)+startInner,indexOuter,(indexInner*4)+startInner+1,
                 
                 indexOuter+1,indexOuter+1+(gridTiles+1),(indexInner*4)+startInner+2,
-                (indexInner*4)+startInner+2,(indexInner*4)+startInner+1,indexOuter+1,
+                (indexInner*4)+startInner+1,indexOuter+1,(indexInner*4)+startInner+2,
                 
                 indexOuter+1+(gridTiles+1),indexOuter+1+gridTiles,(indexInner*4)+startInner+3,
-                (indexInner*4)+startInner+3,(indexInner*4)+startInner+2,indexOuter+1+(gridTiles+1),
+                (indexInner*4)+startInner+2,indexOuter+1+(gridTiles+1),(indexInner*4)+startInner+3,
                 
                 indexOuter+1+gridTiles,indexOuter,(indexInner*4)+startInner,
-                (indexInner*4)+startInner,(indexInner*4)+startInner+3,indexOuter+1+gridTiles,
+                (indexInner*4)+startInner+3,indexOuter+1+gridTiles,(indexInner*4)+startInner,
                 
                 (indexInner*4)+startInner,(indexInner*4)+startInner+1,(indexInner*4)+startInner+2,
                 (indexInner*4)+startInner+2,(indexInner*4)+startInner+3,(indexInner*4)+startInner,
@@ -169,7 +169,7 @@ void Instrument::update() {
             cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
             cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
             
-            cubes.setColor(cubeVector[j].vIndex0, cubeVector[j].cubeColor);
+           cubes.setColor(cubeVector[j].vIndex0, cubeVector[j].cubeColor);
             cubes.setColor(cubeVector[j].vIndex1, cubeVector[j].cubeColor);
             cubes.setColor(cubeVector[j].vIndex2, cubeVector[j].cubeColor);
             cubes.setColor(cubeVector[j].vIndex3, cubeVector[j].cubeColor);
@@ -201,7 +201,7 @@ void Instrument::addCube(int x_, int y_){
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH;
 
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::mediumVioletRed;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
    // cubeMap[pickColor.getHex()] = temp;
     // layerInfo.at(x_).at(y_).cubePtr = &cubes[cubes.size()-1];

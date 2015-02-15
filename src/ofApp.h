@@ -28,7 +28,7 @@ class ofApp : public ofBaseApp{
     bool pointInsideGrid(ofVec3f);
 		
     //3d scene
-    ofEasyCam cam;
+    ofCamera cam;
     ofVec3f globalTranslate;
     
     //Synthebenen
