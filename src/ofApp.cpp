@@ -1,7 +1,8 @@
 #include "ofApp.h"
 #define TILES 18
-#define TILESIZE 10
+#define TILESIZE 20
 #define TILEBORDER 0.15
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -14,33 +15,35 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofEnableDepthTest();
-    // ofDisableAntiAliasing();
+    //ofDisableAntiAliasing();
     ofSetVerticalSync(false);
-    setupPickingGrid();
     
     planeTemp.set(TILES*TILESIZE, TILES*TILESIZE);
     planeTemp.setPosition(0, 0, 0);
     intersecPlane.setFrom(planeTemp);
     
-    glShadeModel(GL_FLAT);
     
     cam.setPosition(0, 0, 1570);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(10);
+    cam.setFov(22);
     ofBackground(11, 5, 5);
+    fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
-  //  selection.allocate(100,100, GL_RGB);
-    fbo.allocate(1280,768, GL_RGB);
+    fbo.begin();
+    ofClear(0, 0, 0);
+    fbo.end();
     
     ofEnableLighting();
     light.setPosition(0, 0, 300);
     drawFboImage = false;
+    
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-   
+    
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
@@ -49,53 +52,33 @@ void ofApp::update(){
     intersectPlane();
     
     
-    fbo.begin();
-    ofClear(0);
-    cam.begin();
-    ofDisableLighting();
-    //ofDrawAxis(120);
-    //ofRect(0, 0, 800, 800);
-    
-    // planeTemp.draw();
-    
-    ofPushMatrix();
-    ofTranslate(globalTranslate);
-    
-    for (int i = 0; i < synths.size(); i++) {
-      //  synths[i].drawFbo();
-    }
-    
-    ofPopMatrix();
-    cam.end();
-    
-    fbo.end();
-    
-    fbo.getTextureReference().readToPixels(selection);
-    
-    fboImage.setFromPixels(selection);
-    fboImage.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    
+    ofDisableLighting();
+    
+    glShadeModel(GL_SMOOTH);
     
     ofPushStyle();
     ofDrawBitmapString(ofToString(ofGetFrameRate()), 20, 20);
     ofDrawBitmapString(ofToString(intersectPos), 20,40);
     ofDrawBitmapString(ofToString(vectorPosX), 20, 60);
     ofDrawBitmapString(ofToString(vectorPosY), 20, 80);
-    
+    ofDrawBitmapString(ofToString(int(RGB[0]))+" "+ofToString(int(RGB[1]))+" "+ofToString(int(RGB[2])), 20, 100);
     ofPopStyle();
+    
+    ofEnableLighting();
     
     cam.begin();
     //ofDrawAxis(120);
     //ofRect(0, 0, 800, 800);
-   // light.enable();
+    light.enable();
     // planeTemp.draw();
     
     ofPushMatrix();
     ofTranslate(globalTranslate);
-    //drawDebug();
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].draw();
@@ -103,13 +86,19 @@ void ofApp::draw(){
     }
     
     ofPopMatrix();
+    
     cam.end();
     
     
-    if (drawFboImage)
-    fboImage.draw(0, 0);
+    // mousePick.draw(ofGetMouseX(),ofGetMouseY());
     
     
+    //drawDebug();
+    
+    ofDisableLighting();
+    if(drawFboImage) {
+        fbo.draw(0, 0);
+    }
     
 }
 
@@ -154,24 +143,36 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-   
+    
     
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
-    if(pointInsideGrid(intersectPos)) {
-        //cout << " ssad"  << endl;
-        synths[activeSynth].clickEvent(vectorPosX, vectorPosY);
-        
-        
-        cout <<  selection.getColor(x, y).getHex() << endl;
+    updateFboMesh();
+    
+    ofColor tempC = ofColor(RGB[0],RGB[1],RGB[2]);
+    if (tempC != ofColor(0,0,0)) {
+        if (synths[activeSynth].cubeMap.find(tempC.getHex()) != synths[activeSynth].cubeMap.end() ) {
+            
+            
+            synths[activeSynth].clickEvent(
+                                           synths[activeSynth].cubeMap[tempC.getHex()].x,
+                                           synths[activeSynth].cubeMap[tempC.getHex()].y
+                                           );
+        }
         
     }
     
+    /*
+     if(pointInsideGrid(intersectPos)) {
+     //cout << " ssad"  << endl;
+     synths[activeSynth].clickEvent(vectorPosX, vectorPosY);
+     }
+     */
     
-  
+    
 }
 
 //--------------------------------------------------------------
@@ -194,49 +195,16 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
     
 }
 
-void ofApp::setupPickingGrid(){
-    pickingRaster.clear();
-    pickingRaster.setMode(OF_PRIMITIVE_TRIANGLES);
-    int rCounter = 1;
-    int gCounter = 1;
-    int bCounter = 1;
-    for (int i = 0; i < TILES+1; i++) {
-        for (int j = 0; j < TILES+1; j++) {
-            ofVec3f tPoint = ofVec3f(i*TILESIZE,j*TILESIZE,0);
-            pickingRaster.addVertex(tPoint);
-            pickingRaster.addColor(ofColor(rCounter,gCounter,bCounter));
-            if (rCounter%255==0) {
-                rCounter=1;
-                gCounter++;
-            }
-            
-            if (gCounter%255==0) {
-                gCounter=1;
-                bCounter++;
-            }
-            rCounter++;
-        }
-    }
-    
-    
-    for (int i = 0; i < TILES; i++) {
-        for (int j = 0; j < TILES; j++) {
-            int numVert = i*(TILES+1)+j;
-            
-            pickingRaster.addIndex(numVert);
-            pickingRaster.addIndex(numVert+1);
-            pickingRaster.addIndex(numVert+1+TILES);
-            
-            pickingRaster.addIndex(numVert+1);
-            pickingRaster.addIndex(numVert+1+(TILES+1));
-            pickingRaster.addIndex(numVert+1+TILES);
-            
-        }
-    }
-}
+
 
 void ofApp::drawDebug() {
-    pickingRaster.draw();
+    
+    cam.begin();
+    ofPushMatrix();
+    ofTranslate(globalTranslate);
+    synths[activeSynth].drawDebug();
+    ofPopMatrix();
+    cam.end();
 }
 
 void ofApp::intersectPlane(){
@@ -250,10 +218,36 @@ void ofApp::intersectPlane(){
     vectorPosX = (intersectPos.x/TILESIZE)+TILES/2;
     vectorPosY = (intersectPos.y/TILESIZE)+TILES/2;
     
-    
-
 }
 
+
+
+
+void ofApp::updateFboMesh(){
+    
+    synths[activeSynth].updateFboMesh();
+    
+    fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
+    fbo.begin();
+    ofDisableLighting();
+    ofClear(0,0,0);
+    glShadeModel(GL_FLAT);
+    
+    cam.begin();
+    ofDisableLighting();
+    light.disable();
+    
+    ofPushMatrix();
+    ofTranslate(globalTranslate);
+    synths[activeSynth].drawFbo();
+    ofPopMatrix();
+    cam.end();
+    
+    glReadPixels(ofGetMouseX(),ofGetMouseY(), 1,1, GL_RGB, GL_UNSIGNED_BYTE, RGB);
+    
+    fbo.end();
+    
+}
 bool ofApp::pointInsideGrid(ofVec3f p_) {
     bool rVal;
     if( (abs(p_.x) <= (TILES*TILESIZE/2) ) && (abs(p_.y) <= (TILES*TILESIZE/2)) ) {

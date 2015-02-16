@@ -12,11 +12,16 @@ Instrument::Instrument(int gTiles_, float gSize_, float border_) {
     verticesOuter.clear();
     verticesInner.clear();
     cubeVector.clear();
+    fboMesh.clear();
     
     gridTiles = gTiles_;
     gridSize = gSize_;
     borderSize = border_;
-   }
+    
+    rCounter = 1;
+    gCounter = 1;
+    bCounter = 1;
+}
 
 void Instrument::setup() {
     
@@ -31,7 +36,7 @@ void Instrument::setup() {
     for (int i = 0; i < gridTiles+1; i++) {
         for (int j = 0; j < gridTiles+1; j++) {
             ofVec3f tPoint = ofVec3f(i*gridSize,j*gridSize,0);
-            raster.addVertex(tPoint);
+            raster.addVertex(tPoint+ofVec3f(0,0,100));
             raster.addColor(ofColor(255,255,255));
             verticesOuter[indexCounter] = tPoint;
             indexCounter++;
@@ -54,7 +59,7 @@ void Instrument::setup() {
         for (int j = 0; j < gridTiles; j++) {
             int index = i*(gridTiles+1)+j;
             
-
+            
             ofVec3f temp;
             ofVec3f dir;
             dir = (ofVec3f(1,1,0) - ofVec3f(0,0,0))*borderRatio;
@@ -78,6 +83,21 @@ void Instrument::setup() {
             cubeVector[i*(gridTiles)+j].vec3Ptr = &verticesInner[indexCounter*4+3];
             
             indexCounter++;
+            
+            //add pickColor
+            ofColor tempColor = ofColor(rCounter,gCounter,bCounter);
+            cubeVector[i*(gridTiles)+j].pickColor = tempColor;
+            cubeMap[tempColor.getHex()] = ofVec2f(i,j);
+            if (rCounter%255==0) {
+                rCounter=1;
+                gCounter++;
+            }
+            
+            if (gCounter%255==0) {
+                gCounter=1;
+                bCounter++;
+            }
+            rCounter++;
         }
     }
     
@@ -111,8 +131,8 @@ void Instrument::setup() {
             cubeVector[indexInner].vIndex1 = (indexInner*4)+startInner+1;
             cubeVector[indexInner].vIndex2= (indexInner*4)+startInner+2;
             cubeVector[indexInner].vIndex3 = (indexInner*4)+startInner+3;
-
-
+            
+            
             int indexex[] = {
                 indexOuter,indexOuter+1,(indexInner*4)+startInner+1,
                 (indexInner*4)+startInner,indexOuter,(indexInner*4)+startInner+1,
@@ -150,9 +170,10 @@ void Instrument::setup() {
     gCounter = 1;
     bCounter = 1;
     
+    fboMesh = cubes;
     
     cout << cubes.getNumVertices() << endl;
-
+    
 }
 
 
@@ -163,18 +184,7 @@ void Instrument::update() {
     }
     
     
-        for (int j = 0; j < cubeVector.size(); j++) {
-            cubes.setVertex(cubeVector[j].vIndex0, *cubeVector[j].vec0Ptr);
-            cubes.setVertex(cubeVector[j].vIndex1, *cubeVector[j].vec1Ptr);
-            cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
-            cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
-            
-           cubes.setColor(cubeVector[j].vIndex0, cubeVector[j].cubeColor);
-            cubes.setColor(cubeVector[j].vIndex1, cubeVector[j].cubeColor);
-            cubes.setColor(cubeVector[j].vIndex2, cubeVector[j].cubeColor);
-            cubes.setColor(cubeVector[j].vIndex3, cubeVector[j].cubeColor);
-        }
-    
+    updateCubeMesh();
     
 }
 
@@ -182,41 +192,33 @@ void Instrument::draw() {
     ofPushMatrix();
     
     cubes.draw();
-  
+    
     ofPopMatrix();
 }
 
 void Instrument::drawFbo() {
-   
+    ofPushMatrix();
+    
+    fboMesh.draw();
+    
+    ofPopMatrix();
 }
 
 
 void Instrument::addCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = true;
-    ofColor pickColor = ofColor(rCounter,gCounter,bCounter);
     
     float zH = ofRandom(75);
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr->z = zH;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = zH;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH;
-
+    
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
-   // cubeMap[pickColor.getHex()] = temp;
-    // layerInfo.at(x_).at(y_).cubePtr = &cubes[cubes.size()-1];
-    //increase pickingcolor
     
-    if (rCounter%255==0) {
-        rCounter=1;
-        gCounter++;
-    }
     
-    if (gCounter%255==0) {
-        gCounter=1;
-        bCounter++;
-    }
-    rCounter++;
+    
 }
 
 void Instrument::removeCube(int x_, int y_){
@@ -225,9 +227,9 @@ void Instrument::removeCube(int x_, int y_){
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = 10;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = 10;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = 10;
-
+    
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
-
+    
 }
 
 void Instrument::play(){
@@ -235,15 +237,17 @@ void Instrument::play(){
 }
 
 void Instrument::drawDebug() {
+    ofPushMatrix();
     for (int i = 0; i < layerInfo.size(); i++) {
         for (int j = 0; j < layerInfo.at(i).size(); j++) {
             if (layerInfo.at(i).at(j).hasCube) {
                 //ofRect(i*gridSize, j*gridSize, 10, gridSize, gridSize);
-                ofRect(*cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr, gridSize*0.7, gridSize*0.7);
+                ofRect(cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y, 100, gridSize*0.7, gridSize*0.7);
             }
         }
     }
     
+    ofPopMatrix();
 }
 
 void Instrument::clickEvent(int x_,int y_) {
@@ -252,5 +256,36 @@ void Instrument::clickEvent(int x_,int y_) {
         removeCube(x_, y_);
     } else {
         addCube(x_, y_);
+    }
+}
+
+void Instrument::updateCubeMesh(){
+    
+    for (int j = 0; j < cubeVector.size(); j++) {
+        cubes.setVertex(cubeVector[j].vIndex0, *cubeVector[j].vec0Ptr);
+        cubes.setVertex(cubeVector[j].vIndex1, *cubeVector[j].vec1Ptr);
+        cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
+        cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
+        
+        cubes.setColor(cubeVector[j].vIndex0, cubeVector[j].cubeColor);
+        cubes.setColor(cubeVector[j].vIndex1, cubeVector[j].cubeColor);
+        cubes.setColor(cubeVector[j].vIndex2, cubeVector[j].cubeColor);
+        cubes.setColor(cubeVector[j].vIndex3, cubeVector[j].cubeColor);
+    }
+    
+}
+
+void Instrument::updateFboMesh(){
+    
+    for (int j = 0; j < cubeVector.size(); j++) {
+        fboMesh.setVertex(cubeVector[j].vIndex0, *cubeVector[j].vec0Ptr);
+        fboMesh.setVertex(cubeVector[j].vIndex1, *cubeVector[j].vec1Ptr);
+        fboMesh.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
+        fboMesh.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
+        
+        fboMesh.setColor(cubeVector[j].vIndex0, cubeVector[j].pickColor);
+        fboMesh.setColor(cubeVector[j].vIndex1, cubeVector[j].pickColor);
+        fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].pickColor);
+        fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].pickColor);
     }
 }

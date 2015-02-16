@@ -30,6 +30,8 @@ public:
     void removeCube(int,int);
     void drawDebug();
     void clickEvent(int,int);
+    void updateCubeMesh();
+    void updateFboMesh();
     
     int gridTiles;
     float gridSize;
@@ -44,9 +46,10 @@ public:
     vector<ofVec3f> verticesOuter;
     vector<ofVec3f> verticesInner;
     ofVboMesh raster;
+    ofVboMesh fboMesh;
     ofVboMesh cubes;
     
-    map<int,Cube> cubeMap;
+    map<int,ofVec2f> cubeMap;
     vector<Cube> cubeVector;
     
     
