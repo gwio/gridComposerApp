@@ -15,11 +15,14 @@ public:
     ofVec3f *vec0Ptr,*vec1Ptr,*vec2Ptr,*vec3Ptr;
     int vIndex0,vIndex1,vIndex2,vIndex3;
     
+    float zHeight;
+    
     void setup();
     void update();
     
     
     ofColor cubeColor;
+    ofColor altColor;
     ofColor pickColor;
     
     

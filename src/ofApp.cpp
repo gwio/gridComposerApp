@@ -146,6 +146,7 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
+    
     if  (!mouseDragging) {
         updateFboMesh();
         if (synths[activeSynth].cubeMap.find(lastPickColor.getHex()) != synths[activeSynth].cubeMap.end() ) {
@@ -158,7 +159,7 @@ void ofApp::mouseDragged(int x, int y, int button){
                 TapHelper temp = TapHelper(
                                            tapCounter,
                                            cordTemp,
-                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].vec0Ptr->z,
+                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].zHeight,
                                            synths[activeSynth].cubeVector[tempInfo.cubeVecNum].cubeColor
                                            );
                 
@@ -207,9 +208,9 @@ void ofApp::mousePressed(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
     
-    if (mouseDragging) {
+    if (mouseDragging && pointInsideGrid(intersectPos) ) {
         TapHelper* tempPtr = &tapMap[curMouseId];
-        
+
         if ( tempPtr->tapOrigin.x == vectorPosX  && tempPtr->tapOrigin.y == vectorPosY) {
             tempPtr->old = true;
             synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
@@ -220,8 +221,14 @@ void ofApp::mouseReleased(int x, int y, int button){
             synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
         }
         mouseDragging = false;
-        
+    } else {
+        TapHelper* tempPtr = &tapMap[curMouseId];
+
+        tempPtr->old = true;
+        synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
+
     }
+    
 }
 
 //--------------------------------------------------------------

@@ -213,7 +213,8 @@ void Instrument::addCube(int x_, int y_){
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = zH;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH;
-    
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH;
+
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
     
@@ -227,7 +228,8 @@ void Instrument::removeCube(int x_, int y_){
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = 10;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = 10;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = 10;
-    
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = 10;
+
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
     
 }
@@ -238,7 +240,8 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = zH_;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH_;
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH_;
-    
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH_;
+
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = c_;
 
 }
