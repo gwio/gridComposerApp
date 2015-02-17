@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxRay.h"
 #include "instrument.h"
+#include "tapHelper.h"
 
 class ofApp : public ofBaseApp{
     
@@ -25,10 +26,12 @@ public:
     void intersectPlane();
     void updateFboMesh();
     
+    void updateTapMap();
+    
     bool pointInsideGrid(ofVec3f);
     
     //3d scene
-    ofEasyCam cam;
+    ofCamera cam;
     ofVec3f globalTranslate;
     
     //Synthebenen
@@ -52,6 +55,7 @@ public:
     ofImage fboImage;
     bool drawFboImage;
     unsigned char RGB[3];
+    ofColor lastPickColor;
     
     
     ofTexture mousePick;
@@ -59,5 +63,11 @@ public:
     //light
     ofLight light;
     
+    //misc tap
+    unsigned long doubleClickTime, curTap, lastTap;
+    map<unsigned long,TapHelper> tapMap;
+    bool mouseDragging;
+    unsigned long tapCounter;
     
+    unsigned long curMouseId;
 };

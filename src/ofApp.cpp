@@ -1,7 +1,7 @@
 #include "ofApp.h"
-#define TILES 18
-#define TILESIZE 20
-#define TILEBORDER 0.15
+#define TILES 8
+#define TILESIZE 40
+#define TILEBORDER 0.10
 
 
 //--------------------------------------------------------------
@@ -23,9 +23,9 @@ void ofApp::setup(){
     intersecPlane.setFrom(planeTemp);
     
     
-    cam.setPosition(0, 0, 1570);
+    cam.setPosition(0, 0, 570);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(22);
+    cam.setFov(42);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -37,7 +37,11 @@ void ofApp::setup(){
     light.setPosition(0, 0, 300);
     drawFboImage = false;
     
-    
+    doubleClickTime = 300;
+    curTap = 0;
+    lastTap = 0;
+    mouseDragging = false;
+    tapCounter = 0;
 }
 
 //--------------------------------------------------------------
@@ -50,7 +54,6 @@ void ofApp::update(){
     }
     
     intersectPlane();
-    
     
 }
 
@@ -82,7 +85,7 @@ void ofApp::draw(){
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].draw();
-        //synths[i].drawDebug();
+       // synths[i].drawDebug();
     }
     
     ofPopMatrix();
@@ -143,28 +146,54 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-    
-    
+    if  (!mouseDragging) {
+        updateFboMesh();
+        if (synths[activeSynth].cubeMap.find(lastPickColor.getHex()) != synths[activeSynth].cubeMap.end() ) {
+            ofVec2f cordTemp = synths[activeSynth].cubeMap[lastPickColor.getHex()];
+            //copy cube info
+            synthInfo tempInfo = synths[activeSynth].layerInfo.at(cordTemp.x).at(cordTemp.y);
+            if (tempInfo.hasCube && !tempInfo.blocked) {
+                mouseDragging = true;
+                
+                TapHelper temp = TapHelper(
+                                           tapCounter,
+                                           cordTemp,
+                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].vec0Ptr->z,
+                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].cubeColor
+                                           );
+                
+                curMouseId = tapCounter;
+                tapMap[tapCounter] = temp;
+                synths[activeSynth].layerInfo.at(cordTemp.x).at(cordTemp.y).blocked = true;
+                tapCounter++;
+                
+                cout << "added" << tapCounter << " pos:" << cordTemp << endl;
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
-    updateFboMesh();
-    
-    ofColor tempC = ofColor(RGB[0],RGB[1],RGB[2]);
-    if (tempC != ofColor(0,0,0)) {
-        if (synths[activeSynth].cubeMap.find(tempC.getHex()) != synths[activeSynth].cubeMap.end() ) {
+    curTap = ofGetElapsedTimeMillis();
+    if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
+        
+        
+        updateFboMesh();
+        
+        if (lastPickColor != ofColor(0,0,0)) {
+            if (synths[activeSynth].cubeMap.find(lastPickColor.getHex()) != synths[activeSynth].cubeMap.end() ) {
+                
+                ofVec2f cordTemp = synths[activeSynth].cubeMap[lastPickColor.getHex()];
+                synths[activeSynth].tapEvent(cordTemp.x,cordTemp.y);
+            }
             
-            
-            synths[activeSynth].clickEvent(
-                                           synths[activeSynth].cubeMap[tempC.getHex()].x,
-                                           synths[activeSynth].cubeMap[tempC.getHex()].y
-                                           );
         }
         
     }
-    
+    lastTap = curTap;
+
     /*
      if(pointInsideGrid(intersectPos)) {
      //cout << " ssad"  << endl;
@@ -178,6 +207,21 @@ void ofApp::mousePressed(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
     
+    if (mouseDragging) {
+        TapHelper* tempPtr = &tapMap[curMouseId];
+        
+        if ( tempPtr->tapOrigin.x == vectorPosX  && tempPtr->tapOrigin.y == vectorPosY) {
+            tempPtr->old = true;
+            synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
+        }else{
+            tempPtr->old = true;
+            synths[activeSynth].tapEvent(tempPtr->tapOrigin.x, tempPtr->tapOrigin.y);
+            synths[activeSynth].moveEvent(vectorPosX, vectorPosY, tempPtr->zH, tempPtr->cColor);
+            synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
+        }
+        mouseDragging = false;
+        
+    }
 }
 
 //--------------------------------------------------------------
@@ -246,8 +290,15 @@ void ofApp::updateFboMesh(){
     glReadPixels(ofGetMouseX(),ofGetMouseY(), 1,1, GL_RGB, GL_UNSIGNED_BYTE, RGB);
     
     fbo.end();
+    lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
+
     
 }
+
+void ofApp::updateTapMap() {
+    
+}
+
 bool ofApp::pointInsideGrid(ofVec3f p_) {
     bool rVal;
     if( (abs(p_.x) <= (TILES*TILESIZE/2) ) && (abs(p_.y) <= (TILES*TILESIZE/2)) ) {

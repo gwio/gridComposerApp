@@ -2,12 +2,15 @@
 
 #include "ofMain.h"
 #include "cube.h"
+#include "tapHelper.h"
 
 struct synthInfo {
     bool hasCube;
+    bool blocked;
     int cubeVecNum;
     synthInfo(){
         hasCube = false;
+        blocked = false;
     }
 };
 
@@ -28,8 +31,10 @@ public:
     void play();
     void addCube(int,int);
     void removeCube(int,int);
+    void replaceCube(int,int,float,ofColor);
     void drawDebug();
-    void clickEvent(int,int);
+    void tapEvent(int,int);
+    void moveEvent(int,int,float,ofColor);
     void updateCubeMesh();
     void updateFboMesh();
     

@@ -46,7 +46,7 @@ void Instrument::setup() {
     //add outer vertices to mesh
     for (int i = 0; i < verticesOuter.size(); i++) {
         cubes.addVertex(verticesOuter[i]);
-        cubes.addColor(ofColor(255,255,255));
+        cubes.addColor(ofColor(0,0,0));
     }
     
     
@@ -232,6 +232,17 @@ void Instrument::removeCube(int x_, int y_){
     
 }
 
+void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
+    layerInfo.at(x_).at(y_).hasCube = true;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr->z = zH_;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = zH_;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH_;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH_;
+    
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = c_;
+
+}
+
 void Instrument::play(){
     
 }
@@ -250,13 +261,18 @@ void Instrument::drawDebug() {
     ofPopMatrix();
 }
 
-void Instrument::clickEvent(int x_,int y_) {
+void Instrument::tapEvent(int x_,int y_) {
     
     if (layerInfo.at(x_).at(y_).hasCube) {
         removeCube(x_, y_);
     } else {
         addCube(x_, y_);
     }
+}
+
+void Instrument::moveEvent(int x_, int y_, float zH_, ofColor c_) {
+    
+        replaceCube(x_, y_,zH_,c_);
 }
 
 void Instrument::updateCubeMesh(){
