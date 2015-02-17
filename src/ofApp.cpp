@@ -1,6 +1,6 @@
 #include "ofApp.h"
-#define TILES 8
-#define TILESIZE 40
+#define TILES 18
+#define TILESIZE 20
 #define TILEBORDER 0.10
 
 
@@ -15,7 +15,7 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofEnableDepthTest();
-    //ofDisableAntiAliasing();
+    ofDisableAntiAliasing();
     ofSetVerticalSync(false);
     
     planeTemp.set(TILES*TILESIZE, TILES*TILESIZE);
@@ -34,7 +34,8 @@ void ofApp::setup(){
     fbo.end();
     
     ofEnableLighting();
-    light.setPosition(0, 0, 300);
+    light.setPosition(0, 0, 150);
+    light.setAmbientColor(ofColor::cyan);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -59,11 +60,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
     
-    ofDisableLighting();
-    
+
     glShadeModel(GL_SMOOTH);
-    
+    glEnable(GL_MULTISAMPLE);
+
     ofPushStyle();
     ofDrawBitmapString(ofToString(ofGetFrameRate()), 20, 20);
     ofDrawBitmapString(ofToString(intersectPos), 20,40);
@@ -75,8 +77,6 @@ void ofApp::draw(){
     ofEnableLighting();
     
     cam.begin();
-    //ofDrawAxis(120);
-    //ofRect(0, 0, 800, 800);
     light.enable();
     // planeTemp.draw();
     
@@ -233,7 +233,8 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-    
+    fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
+
 }
 
 //--------------------------------------------------------------
@@ -278,8 +279,8 @@ void ofApp::updateFboMesh(){
     
     synths[activeSynth].updateFboMesh();
     
-    fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     fbo.begin();
+    glDisable(GL_MULTISAMPLE);
     ofDisableLighting();
     ofClear(0,0,0);
     glShadeModel(GL_FLAT);
