@@ -22,7 +22,7 @@ Instrument::Instrument(int gTiles_, float gSize_, float border_) {
     gCounter = 1;
     bCounter = 1;
     
-    soundsCounter = 0;
+    soundsCounter = 1;
 }
 
 void Instrument::setup() {
@@ -212,7 +212,7 @@ void Instrument::addCube(int x_, int y_){
     
     float zH = ofRandom(75);
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
+   // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
     updateSoundsMap(x_, y_);
     
@@ -220,10 +220,25 @@ void Instrument::addCube(int x_, int y_){
 
 void Instrument::removeCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = false;
+    layerInfo.at(x_).at(y_).cubeGroupId = 0;
 
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = 10;
 
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
+    
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+          //  bool testN = false;
+            ofVec2f pos = ofVec2f(x_+x,y_+y);
+            if ( ((pos.x >= 0 && pos.x < gridTiles) && (pos.y >= 0 && pos.y < gridTiles)) && !(x==0 && y==0) ) {
+                if (layerInfo.at(pos.x).at(pos.y).hasCube) {
+                    //bool testN = true;
+                    resetCubeGroup( layerInfo.at(pos.x).at(pos.y).cubeGroupId,x_,y_);
+                    break;
+                }
+            }
+        }
+    }
     
 }
 
@@ -248,6 +263,10 @@ void Instrument::drawDebug() {
     ofPushStyle();
     for (int i = 0; i < layerInfo.size(); i++) {
         for (int j = 0; j < layerInfo.at(i).size(); j++) {
+            
+            ofSetColor(255);
+            ofDrawBitmapString(ofToString(layerInfo.at(i).at(j).cubeGroupId), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
+
             if (layerInfo.at(i).at(j).hasCube) {
                 //ofRect(i*gridSize, j*gridSize, 10, gridSize, gridSize);
                 if (layerInfo.at(i).at(j).blocked) {
@@ -256,9 +275,11 @@ void Instrument::drawDebug() {
                 ofSetColor(soundsMap[layerInfo.at(i).at(j).cubeGroupId].groupColor);
                 }
                 ofRect(cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y, 100, gridSize*0.7, gridSize*0.7);
-            }
+                
+                            }
         }
     }
+    
     ofPopStyle();
     ofPopMatrix();
 }
@@ -365,7 +386,6 @@ void Instrument::updateSoundsMap(int x_, int y_) {
         soundsMap[soundMapIndex].size++;
         layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = soundsMap[soundMapIndex].groupColor;
-        soundsCounter++;
         
         //with different neighbours -> change all neighbours
         if (neighbours.size() > 1) {
@@ -393,15 +413,29 @@ void Instrument::updateSoundsMap(int x_, int y_) {
     
 }
 
-void Instrument::updateSoundsMap() {
-    for (int a = 0; a < gridTiles; a++) {
-        for (int b = 0; b < gridTiles; b++) {
-            if (layerInfo.at(a).at(b).hasCube) {
-        
-            updateSoundsMap(a, b);
+void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) {
+    
+    int minusCouter = 0;
+    vector<ofVec2f> tempPosis;
+    for (int x = 0; x < gridTiles; x++) {
+        for (int y = 0; y <gridTiles; y++) {
+            
+            if (layerInfo.at(x).at(y).cubeGroupId == group_) {
+                layerInfo.at(x).at(y).hasCube = false;
+                layerInfo.at(x).at(y).cubeGroupId = 0;
+                tempPosis.push_back(ofVec2f(x,y));
+                minusCouter++;
             }
+            soundsMap[group_].size-=minusCouter;
+            
         }
     }
+    
+    cout << tempPosis.size() << "old group items" << endl;
+    for (int i = 0; i < tempPosis.size(); i++) {
+        addCube(tempPosis[i].x, tempPosis[i].y);
+    }
+    
     
     
 }

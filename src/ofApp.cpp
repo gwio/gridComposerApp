@@ -1,5 +1,5 @@
 #include "ofApp.h"
-#define TILES 18
+#define TILES 20
 #define TILESIZE 20
 #define TILEBORDER 0.10
 
@@ -15,7 +15,7 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofEnableDepthTest();
-    ofDisableAntiAliasing();
+    //ofDisableAntiAliasing();
     ofSetVerticalSync(false);
     
     planeTemp.set(TILES*TILESIZE, TILES*TILESIZE);
@@ -23,9 +23,9 @@ void ofApp::setup(){
     intersecPlane.setFrom(planeTemp);
     
     
-    cam.setPosition(0, 0, 570);
+    cam.setPosition(0, 0, 1070);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(42);
+    cam.setFov(22);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -64,8 +64,10 @@ void ofApp::draw(){
     
 
     glShadeModel(GL_SMOOTH);
-    glEnable(GL_MULTISAMPLE);
+    glDisable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
 
+    
     ofPushStyle();
     ofDrawBitmapString(ofToString(ofGetFrameRate()), 20, 20);
     ofDrawBitmapString(ofToString(intersectPos), 20,40);
@@ -124,7 +126,9 @@ void ofApp::keyPressed(int key){
         
         for (int i = 0; i < TILES; i++) {
             for (int j = 0; j < TILES; j++) {
+                if (ofRandom(100)>70) {
                 synths[0].addCube(i, j);
+                }
             }
         }
     }

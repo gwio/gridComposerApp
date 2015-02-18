@@ -12,6 +12,7 @@ struct synthInfo {
     synthInfo(){
         hasCube = false;
         blocked = false;
+        cubeGroupId = 0;
     }
 };
 
@@ -47,8 +48,7 @@ public:
     void updateCubeMesh();
     void updateFboMesh();
     void updateSoundsMap(int,int);
-    //test
-    void updateSoundsMap();
+    void resetCubeGroup(unsigned long, int, int);
     
     int gridTiles;
     float gridSize;
