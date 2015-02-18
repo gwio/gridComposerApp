@@ -8,10 +8,19 @@ struct synthInfo {
     bool hasCube;
     bool blocked;
     int cubeVecNum;
+    unsigned long cubeGroupId;
     synthInfo(){
         hasCube = false;
         blocked = false;
     }
+};
+
+struct cubeGroup {
+    
+    int size;
+    int ownId;
+    bool empty;
+    ofColor groupColor;
 };
 
 
@@ -37,6 +46,9 @@ public:
     void moveEvent(int,int,float,ofColor);
     void updateCubeMesh();
     void updateFboMesh();
+    void updateSoundsMap(int,int);
+    //test
+    void updateSoundsMap();
     
     int gridTiles;
     float gridSize;
@@ -46,6 +58,8 @@ public:
     //synthinfo
     int rCounter,gCounter,bCounter;
     vector<vector<synthInfo> > layerInfo;
+    map<unsigned long,cubeGroup> soundsMap;
+    unsigned long soundsCounter;
     
     //visual
     vector<ofVec3f> verticesOuter;

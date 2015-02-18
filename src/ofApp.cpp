@@ -35,7 +35,7 @@ void ofApp::setup(){
     
     ofEnableLighting();
     light.setPosition(0, 0, 150);
-    light.setAmbientColor(ofColor::cyan);
+  //  light.setAmbientColor(ofColor::cyan);
     drawFboImage = false;
     
     doubleClickTime = 300;

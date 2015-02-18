@@ -21,6 +21,8 @@ Instrument::Instrument(int gTiles_, float gSize_, float border_) {
     rCounter = 1;
     gCounter = 1;
     bCounter = 1;
+    
+    soundsCounter = 0;
 }
 
 void Instrument::setup() {
@@ -186,7 +188,6 @@ void Instrument::update() {
     
     
     updateCubeMesh();
-    
 }
 
 void Instrument::draw() {
@@ -210,29 +211,16 @@ void Instrument::addCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = true;
     
     float zH = ofRandom(75);
-    /*
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr->z = zH;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = zH;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH;
-     */
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH;
-
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
-    
-    
+    updateSoundsMap(x_, y_);
     
 }
 
 void Instrument::removeCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = false;
-    /*
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr->z = 10;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = 10;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = 10;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = 10;
-     */
+
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = 10;
 
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
@@ -241,16 +229,13 @@ void Instrument::removeCube(int x_, int y_){
 
 void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
     layerInfo.at(x_).at(y_).hasCube = true;
-    /*
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr->z = zH_;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr->z = zH_;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr->z = zH_;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr->z = zH_;
-     */
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH_;
-     
 
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = c_;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH_;
+    
+    //cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = c_;
+    
+    updateSoundsMap(x_, y_);
+
 
 }
 
@@ -260,15 +245,21 @@ void Instrument::play(){
 
 void Instrument::drawDebug() {
     ofPushMatrix();
+    ofPushStyle();
     for (int i = 0; i < layerInfo.size(); i++) {
         for (int j = 0; j < layerInfo.at(i).size(); j++) {
             if (layerInfo.at(i).at(j).hasCube) {
                 //ofRect(i*gridSize, j*gridSize, 10, gridSize, gridSize);
+                if (layerInfo.at(i).at(j).blocked) {
+                    ofSetColor(255, 0, 0);
+                } else {
+                ofSetColor(soundsMap[layerInfo.at(i).at(j).cubeGroupId].groupColor);
+                }
                 ofRect(cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y, 100, gridSize*0.7, gridSize*0.7);
             }
         }
     }
-    
+    ofPopStyle();
     ofPopMatrix();
 }
 
@@ -315,4 +306,102 @@ void Instrument::updateFboMesh(){
         fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].pickColor);
         fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].pickColor);
     }
+}
+
+void Instrument::updateSoundsMap(int x_, int y_) {
+    
+    //test neighbouring cubes 3x3
+    int tester[9];
+    int testerStart= 0;
+    int cCounter = 0;
+    vector<unsigned long> neighbours;
+    neighbours.clear();
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            
+            ofVec2f pos = ofVec2f(x_+x,y_+y);
+            if ( ((pos.x >= 0 && pos.x < gridTiles) && (pos.y >= 0 && pos.y < gridTiles)) && !(x==0 && y==0) ) {
+                if (layerInfo.at(pos.x).at(pos.y).hasCube) {
+                    bool testN = false;
+                    for (int i = 0; i < neighbours.size(); i++) {
+                        if (neighbours[i] == layerInfo.at(pos.x).at(pos.y).cubeGroupId) {
+                            testN = true;
+                            break;
+                        }
+                        
+                    }
+                    if (testN == false) {
+                        neighbours.push_back(layerInfo.at(pos.x).at(pos.y).cubeGroupId);
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    cout << neighbours.size()<< endl;
+    
+    //make newsound when alone
+    if (neighbours.size() == 0) {
+        cubeGroup temp = cubeGroup();
+        temp.ownId = soundsCounter;
+        temp.size = 1;
+        ofColor gColor = ofColor::fromHsb( soundsCounter*10%255, 255, 255);
+        temp.groupColor = gColor;
+        soundsMap[soundsCounter] = temp;
+        layerInfo.at(x_).at(y_).cubeGroupId = soundsCounter;
+        cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = gColor;
+        soundsCounter++;
+        //add to neightbours, here to the biggest neighbouring group, or random
+    } else {
+        int biggestN = 0;
+        unsigned long soundMapIndex = 0;
+        for (int i = 0; i < neighbours.size(); i++) {
+            if (soundsMap[neighbours[i]].size > biggestN) {
+                biggestN = soundsMap[neighbours[i]].size;
+                soundMapIndex = neighbours[i];
+            }
+        }
+        soundsMap[soundMapIndex].size++;
+        layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
+        cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = soundsMap[soundMapIndex].groupColor;
+        soundsCounter++;
+        
+        //with different neighbours -> change all neighbours
+        if (neighbours.size() > 1) {
+            for (int i = 0; i < neighbours.size(); i++) {
+                if (neighbours[i] != soundMapIndex) {
+                    for (int x = 0; x < gridTiles; x++) {
+                        for (int y = 0; y <gridTiles; y++) {
+                            if (   layerInfo.at(x).at(y).hasCube && layerInfo.at(x).at(y).cubeGroupId == neighbours[i]) {
+                                soundsMap[layerInfo.at(x).at(y).cubeGroupId].size--;
+                                layerInfo.at(x).at(y).cubeGroupId = soundMapIndex;
+                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].cubeColor = soundsMap[soundMapIndex].groupColor;
+                                soundsMap[soundMapIndex].size++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    
+    //   cout << soundsCounter << endl;
+    
+    
+}
+
+void Instrument::updateSoundsMap() {
+    for (int a = 0; a < gridTiles; a++) {
+        for (int b = 0; b < gridTiles; b++) {
+            if (layerInfo.at(a).at(b).hasCube) {
+        
+            updateSoundsMap(a, b);
+            }
+        }
+    }
+    
+    
 }
