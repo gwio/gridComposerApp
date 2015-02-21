@@ -4,6 +4,10 @@
 #include "ofxRay.h"
 #include "instrument.h"
 #include "tapHelper.h"
+#include "ofxTonic.h"
+
+using namespace Tonic;
+
 
 class ofApp : public ofBaseApp{
     
@@ -30,8 +34,13 @@ public:
     
     bool pointInsideGrid(ofVec3f);
     
+    //tonic
+    
+    void audioRequested (float * output, int bufferSize, int nChannels);
+    ofxTonicSynth tonicSynth;
+    
     //3d scene
-    ofCamera cam;
+    ofEasyCam cam;
     ofVec3f globalTranslate;
     
     //Synthebenen

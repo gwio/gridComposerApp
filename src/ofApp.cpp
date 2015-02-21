@@ -1,11 +1,13 @@
 #include "ofApp.h"
-#define TILES 20
-#define TILESIZE 20
-#define TILEBORDER 0.10
+#define TILES 10
+#define TILESIZE 30
+#define TILEBORDER 0.15
 
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
+
     
     synths.resize(1);
     synths[0] = Instrument(TILES,TILESIZE,TILEBORDER);
@@ -14,7 +16,7 @@ void ofApp::setup(){
     activeSynth = 0;
     
     ofSetFrameRate(60);
-    ofEnableDepthTest();
+  ofEnableDepthTest();
     //ofDisableAntiAliasing();
     ofSetVerticalSync(false);
     
@@ -23,9 +25,9 @@ void ofApp::setup(){
     intersecPlane.setFrom(planeTemp);
     
     
-    cam.setPosition(0, 0, 1070);
+    cam.setPosition(0, 0, 970);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(22);
+    cam.setFov(42);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -35,7 +37,7 @@ void ofApp::setup(){
     
     ofEnableLighting();
     light.setPosition(0, 0, 150);
-  //  light.setAmbientColor(ofColor::cyan);
+   light.setAmbientColor(ofColor::orangeRed);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -64,8 +66,8 @@ void ofApp::draw(){
     
 
     glShadeModel(GL_SMOOTH);
-    glDisable(GL_MULTISAMPLE);
-    //glEnable(GL_MULTISAMPLE);
+    //glDisable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
 
     
     ofPushStyle();
@@ -98,9 +100,8 @@ void ofApp::draw(){
     // mousePick.draw(ofGetMouseX(),ofGetMouseY());
     
     
-    //drawDebug();
-    
     ofDisableLighting();
+    //drawDebug();
     if(drawFboImage) {
         fbo.draw(0, 0);
     }
@@ -230,6 +231,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 
         tempPtr->old = true;
         synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
+        mouseDragging = false;
 
     }
     
@@ -319,4 +321,8 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
         rVal = false;
     }
     return rVal;
+}
+
+void ofApp::audioRequested (float * output, int bufferSize, int nChannels){
+    tonicSynth.fillBufferOfFloats(output, bufferSize, nChannels);
 }

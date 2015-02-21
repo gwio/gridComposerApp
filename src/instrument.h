@@ -20,8 +20,18 @@ struct cubeGroup {
     
     int size;
     int ownId;
-    bool empty;
     ofColor groupColor;
+    int lowX, highX;
+    int lowY, highY;
+    cubeGroup(){
+        
+    };
+    cubeGroup(int tiles_) {
+        lowX = tiles_-1;
+        lowY = tiles_-1;
+        highX = -1;
+        highY = -1;
+    }
 };
 
 
@@ -47,8 +57,10 @@ public:
     void moveEvent(int,int,float,ofColor);
     void updateCubeMesh();
     void updateFboMesh();
-    void updateSoundsMap(int,int);
+    void updateSoundsMap(int,int, bool);
     void resetCubeGroup(unsigned long, int, int);
+    
+    void updateGroupInfo(unsigned long,int,int);
     
     int gridTiles;
     float gridSize;

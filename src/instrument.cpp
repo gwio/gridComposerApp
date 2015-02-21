@@ -111,7 +111,7 @@ void Instrument::setup() {
     
     for (int i = 0; i < verticesInner.size(); i++) {
         cubes.addVertex(verticesInner[i]);
-        cubes.addColor(ofColor(255,255,255));
+        cubes.addColor(ofColor(0,0,0));
     }
     
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -186,6 +186,11 @@ void Instrument::update() {
         cubeVector[i].update();
     }
     
+    /*
+     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+     
+     }
+     */
     
     updateCubeMesh();
 }
@@ -212,46 +217,67 @@ void Instrument::addCube(int x_, int y_){
     
     float zH = ofRandom(75);
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH;
-   // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
+    // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
-    updateSoundsMap(x_, y_);
+    updateSoundsMap(x_, y_, false);
     
 }
 
 void Instrument::removeCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = false;
+    cubeGroup *tPtr = &  soundsMap[layerInfo.at(x_).at(y_).cubeGroupId];
+    
+    tPtr->size--;
+    if (tPtr->size < 1) {
+        soundsMap.erase(layerInfo.at(x_).at(y_).cubeGroupId);
+    }
+    
     layerInfo.at(x_).at(y_).cubeGroupId = 0;
-
+    
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = 10;
-
+    
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
     
+    
+    bool breakTest = false;
     for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
-          //  bool testN = false;
+            //  bool testN = false;
             ofVec2f pos = ofVec2f(x_+x,y_+y);
             if ( ((pos.x >= 0 && pos.x < gridTiles) && (pos.y >= 0 && pos.y < gridTiles)) && !(x==0 && y==0) ) {
                 if (layerInfo.at(pos.x).at(pos.y).hasCube) {
                     //bool testN = true;
                     resetCubeGroup( layerInfo.at(pos.x).at(pos.y).cubeGroupId,x_,y_);
+                    breakTest = true;
                     break;
                 }
             }
+        }
+        if (breakTest) {
+            break;
         }
     }
     
 }
 
 void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
+    
+    bool hasOld;
+    if (layerInfo.at(x_).at(y_).hasCube) {
+        hasOld = true;
+    } else {
+        hasOld = false;
+        
+    }
     layerInfo.at(x_).at(y_).hasCube = true;
-
+    
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH_;
     
     //cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = c_;
     
-    updateSoundsMap(x_, y_);
-
-
+    updateSoundsMap(x_, y_, hasOld);
+    
+    
 }
 
 void Instrument::play(){
@@ -265,18 +291,18 @@ void Instrument::drawDebug() {
         for (int j = 0; j < layerInfo.at(i).size(); j++) {
             
             ofSetColor(255);
-            ofDrawBitmapString(ofToString(layerInfo.at(i).at(j).cubeGroupId), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
-
+            ofDrawBitmapString(ofToString( soundsMap[ layerInfo.at(i).at(j).cubeGroupId ].size), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
+            
             if (layerInfo.at(i).at(j).hasCube) {
                 //ofRect(i*gridSize, j*gridSize, 10, gridSize, gridSize);
                 if (layerInfo.at(i).at(j).blocked) {
                     ofSetColor(255, 0, 0);
                 } else {
-                ofSetColor(soundsMap[layerInfo.at(i).at(j).cubeGroupId].groupColor);
+                    ofSetColor(soundsMap[layerInfo.at(i).at(j).cubeGroupId].groupColor);
                 }
                 ofRect(cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y, 100, gridSize*0.7, gridSize*0.7);
                 
-                            }
+            }
         }
     }
     
@@ -295,7 +321,7 @@ void Instrument::tapEvent(int x_,int y_) {
 
 void Instrument::moveEvent(int x_, int y_, float zH_, ofColor c_) {
     
-        replaceCube(x_, y_,zH_,c_);
+    replaceCube(x_, y_,zH_,c_);
 }
 
 void Instrument::updateCubeMesh(){
@@ -329,7 +355,7 @@ void Instrument::updateFboMesh(){
     }
 }
 
-void Instrument::updateSoundsMap(int x_, int y_) {
+void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
     
     //test neighbouring cubes 3x3
     int tester[9];
@@ -358,17 +384,22 @@ void Instrument::updateSoundsMap(int x_, int y_) {
                 
             }
         }
+        
     }
     
-    cout << neighbours.size()<< endl;
+    //cout << neighbours.size()<< endl;
     
     //make newsound when alone
     if (neighbours.size() == 0) {
-        cubeGroup temp = cubeGroup();
+        cubeGroup temp = cubeGroup(gridTiles);
         temp.ownId = soundsCounter;
         temp.size = 1;
-        ofColor gColor = ofColor::fromHsb( soundsCounter*10%255, 255, 255);
+        ofColor gColor = ofColor::fromHsb( soundsCounter*10%255, 100+ofRandom(100), 200);
         temp.groupColor = gColor;
+        temp.lowX = x_;
+        temp.highX = x_;
+        temp.lowY = y_;
+        temp.highY = y_;
         soundsMap[soundsCounter] = temp;
         layerInfo.at(x_).at(y_).cubeGroupId = soundsCounter;
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = gColor;
@@ -383,9 +414,16 @@ void Instrument::updateSoundsMap(int x_, int y_) {
                 soundMapIndex = neighbours[i];
             }
         }
-        soundsMap[soundMapIndex].size++;
+        cubeGroup *tempPtr = &soundsMap[soundMapIndex];
+        if (!replace_) {
+            tempPtr->size++;
+            updateGroupInfo(soundMapIndex, x_, y_);
+        }
         layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
-        cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = soundsMap[soundMapIndex].groupColor;
+        
+        
+        
+        cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = tempPtr->groupColor;
         
         //with different neighbours -> change all neighbours
         if (neighbours.size() > 1) {
@@ -394,10 +432,17 @@ void Instrument::updateSoundsMap(int x_, int y_) {
                     for (int x = 0; x < gridTiles; x++) {
                         for (int y = 0; y <gridTiles; y++) {
                             if (   layerInfo.at(x).at(y).hasCube && layerInfo.at(x).at(y).cubeGroupId == neighbours[i]) {
-                                soundsMap[layerInfo.at(x).at(y).cubeGroupId].size--;
+                                cubeGroup *aPtr = &soundsMap[layerInfo.at(x).at(y).cubeGroupId];
+                                aPtr->size--;
+                                
                                 layerInfo.at(x).at(y).cubeGroupId = soundMapIndex;
-                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].cubeColor = soundsMap[soundMapIndex].groupColor;
-                                soundsMap[soundMapIndex].size++;
+                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].cubeColor = tempPtr->groupColor;
+                                tempPtr->size++;
+                                updateGroupInfo(neighbours[i], x, y);
+                                if (aPtr->size < 1) {
+                                    soundsMap.erase(neighbours[i]);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -405,37 +450,83 @@ void Instrument::updateSoundsMap(int x_, int y_) {
             }
         }
         
+        //   cout << soundsCounter << endl;
+        
+        
     }
-    
-    
-    //   cout << soundsCounter << endl;
-    
     
 }
 
 void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) {
     
+    cout << " asdsad " << endl;
     int minusCouter = 0;
+    cubeGroup *cgPtr = &soundsMap[group_];
     vector<ofVec2f> tempPosis;
+    bool breakTest = false;
     for (int x = 0; x < gridTiles; x++) {
         for (int y = 0; y <gridTiles; y++) {
             
             if (layerInfo.at(x).at(y).cubeGroupId == group_) {
                 layerInfo.at(x).at(y).hasCube = false;
                 layerInfo.at(x).at(y).cubeGroupId = 0;
+                cgPtr->size--;
                 tempPosis.push_back(ofVec2f(x,y));
-                minusCouter++;
+                
+                
+                if (cgPtr->size < 1) {
+                    cout << cgPtr->size << "old group items" << endl;
+                    soundsMap.erase(group_);
+                    breakTest = true;
+                    break;
+                }
             }
-            soundsMap[group_].size-=minusCouter;
             
+        }
+        if (breakTest) {
+            break;
         }
     }
     
-    cout << tempPosis.size() << "old group items" << endl;
     for (int i = 0; i < tempPosis.size(); i++) {
         addCube(tempPosis[i].x, tempPosis[i].y);
     }
     
     
-    
 }
+
+void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
+    
+    //get noteOn noteOff infos for cubeGroup
+    
+    cubeGroup *groupPtr = &soundsMap[key_];
+
+    int lx = groupPtr->lowX;
+    int ly = gridTiles+1;
+    int hx = -1;
+    int hy = -1;
+    
+                if(x_ >  groupPtr->highX){
+                    groupPtr->highX = x_;
+                }
+                if(y_ > groupPtr->highY){
+                    groupPtr->highY = y_;
+                }
+                if(x_ < groupPtr->lowX){
+                    groupPtr->lowX= x_;
+                }
+                if(y_ < groupPtr->lowY){
+                    groupPtr->lowY = y_;
+                }
+   
+    
+       
+    cout <<"updateGroupInfo" << endl;
+}
+
+
+
+
+
+
+
