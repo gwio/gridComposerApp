@@ -1,7 +1,9 @@
 #include "ofApp.h"
-#define TILES 10
-#define TILESIZE 30
+#define TILES 12
+#define TILESIZE 22
 #define TILEBORDER 0.15
+//one beat = millis / 1000 = 1sec
+#define BPM 600
 
 
 //--------------------------------------------------------------
@@ -11,12 +13,17 @@ void ofApp::setup(){
     
     synths.resize(1);
     synths[0] = Instrument(TILES,TILESIZE,TILEBORDER);
-    synths[0].setup();
+    synths[0].setup(&timeCounter);
+    setupAudio();
     globalTranslate = ofVec3f(TILES*TILESIZE,TILES*TILESIZE,0)/-2;
     activeSynth = 0;
     
+    ControlGenerator pulse = ControlMetro().bpm(BPM);
+    ofEvent<float>* pulseEvent = tonicSynth.createOFEvent(pulse);
+    ofAddListener(*pulseEvent, this, &ofApp::pulseEvent );
+    
     ofSetFrameRate(60);
-  ofEnableDepthTest();
+    ofEnableDepthTest();
     //ofDisableAntiAliasing();
     ofSetVerticalSync(false);
     
@@ -37,7 +44,7 @@ void ofApp::setup(){
     
     ofEnableLighting();
     light.setPosition(0, 0, 150);
-   light.setAmbientColor(ofColor::orangeRed);
+    light.setAmbientColor(ofColor::orangeRed);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -45,12 +52,24 @@ void ofApp::setup(){
     lastTap = 0;
     mouseDragging = false;
     tapCounter = 0;
+    drawInfo = false;
+    
+    timeCounter = 0;
+}
+
+void ofApp::setupAudio(){
+    Generator temp;
+    for (int i = 0; i < synths.size(); i++) {
+        temp = temp + synths[i].instrumentOut;
+    }
+    mainOut = temp;
+    tonicSynth.setOutputGen(mainOut*0.3);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    
+   
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
@@ -70,13 +89,6 @@ void ofApp::draw(){
     glEnable(GL_MULTISAMPLE);
 
     
-    ofPushStyle();
-    ofDrawBitmapString(ofToString(ofGetFrameRate()), 20, 20);
-    ofDrawBitmapString(ofToString(intersectPos), 20,40);
-    ofDrawBitmapString(ofToString(vectorPosX), 20, 60);
-    ofDrawBitmapString(ofToString(vectorPosY), 20, 80);
-    ofDrawBitmapString(ofToString(int(RGB[0]))+" "+ofToString(int(RGB[1]))+" "+ofToString(int(RGB[2])), 20, 100);
-    ofPopStyle();
     
     ofEnableLighting();
     
@@ -101,7 +113,9 @@ void ofApp::draw(){
     
     
     ofDisableLighting();
-    //drawDebug();
+    if (drawInfo) {
+    drawDebug();
+    }
     if(drawFboImage) {
         fbo.draw(0, 0);
     }
@@ -111,6 +125,7 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
+    setupAudio();
     
     if (key == 's') {
         ofImage pix;
@@ -119,8 +134,12 @@ void ofApp::keyPressed(int key){
         pix.saveImage( ofGetTimestampString()+"debug.png");
     }
     
-    if (key == 'd') {
+    if (key == 'f') {
         drawFboImage = !drawFboImage;
+    }
+    
+    if (key == 'd') {
+        drawInfo = !drawInfo;
     }
     
     if (key == 'r') {
@@ -128,13 +147,13 @@ void ofApp::keyPressed(int key){
         for (int i = 0; i < TILES; i++) {
             for (int j = 0; j < TILES; j++) {
                 if (ofRandom(100)>70) {
-                synths[0].addCube(i, j);
+                synths[0].tapEvent(i, j);
                 }
             }
         }
     }
     
-    if (key == 'f') {
+    if (key == 'F') {
         ofToggleFullscreen();
     }
 }
@@ -263,6 +282,15 @@ void ofApp::drawDebug() {
     synths[activeSynth].drawDebug();
     ofPopMatrix();
     cam.end();
+    
+    ofPushStyle();
+    ofDrawBitmapString(ofToString(ofGetFrameRate()), 20, 20);
+    ofDrawBitmapString("Plane Intersect: "+ofToString(intersectPos), 20,40);
+    ofDrawBitmapString("Grid X: "+ofToString(vectorPosX), 20, 60);
+    ofDrawBitmapString("GridY: "+ofToString(vectorPosY), 20, 80);
+    ofDrawBitmapString("Pick RGB: "+ofToString(int(RGB[0]))+" "+ofToString(int(RGB[1]))+" "+ofToString(int(RGB[2])), 20, 100);
+    ofDrawBitmapString("BPM Counter: "+ofToString(timeCounter), 20, 120);
+    ofPopStyle();
 }
 
 void ofApp::intersectPlane(){
@@ -323,6 +351,17 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
     return rVal;
 }
 
+void ofApp::pulseEvent(float& val) {
+   // cout << "pulse" << val << endl;
+    for (int i = 0; i < synths.size(); i++) {
+        synths[i].noteTrigger();
+    }
+    timeCounter++;
+    if (timeCounter > TILES+2) {
+        timeCounter = 0;
+    }
+    
+}
 void ofApp::audioRequested (float * output, int bufferSize, int nChannels){
     tonicSynth.fillBufferOfFloats(output, bufferSize, nChannels);
 }

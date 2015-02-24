@@ -23,9 +23,13 @@ Instrument::Instrument(int gTiles_, float gSize_, float border_) {
     bCounter = 1;
     
     soundsCounter = 1;
+    
+    //instrumentOut = Tonic::SineWave().freq(120);
 }
 
-void Instrument::setup() {
+void Instrument::setup(int *stepperPos_) {
+    
+    stepperPos = stepperPos_;
     
     layerInfo.resize(gridTiles);
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -186,6 +190,7 @@ void Instrument::update() {
         cubeVector[i].update();
     }
     
+   // play();
     /*
      for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
      
@@ -230,6 +235,8 @@ void Instrument::removeCube(int x_, int y_){
     tPtr->size--;
     if (tPtr->size < 1) {
         soundsMap.erase(layerInfo.at(x_).at(y_).cubeGroupId);
+        //reallocate all synths to mainout
+        updateTonicOut();
     }
     
     layerInfo.at(x_).at(y_).cubeGroupId = 0;
@@ -280,8 +287,23 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
     
 }
 
-void Instrument::play(){
+void Instrument::noteTrigger(){
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if (it->second.lowX+1 == *stepperPos){
+            it->second.ramp.target(1.0);
+        }
+        
+        if (it->second.highX+2 == *stepperPos){
+            it->second.ramp.target(0.0);
+        }
+    }
     
+}
+
+
+
+void Instrument::generateSynths() {
+
 }
 
 void Instrument::drawDebug() {
@@ -291,9 +313,10 @@ void Instrument::drawDebug() {
         for (int j = 0; j < layerInfo.at(i).size(); j++) {
             
             ofSetColor(255);
-            ofDrawBitmapString(ofToString( soundsMap[ layerInfo.at(i).at(j).cubeGroupId ].size), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
             
             if (layerInfo.at(i).at(j).hasCube) {
+                ofDrawBitmapString(ofToString( soundsMap[ layerInfo.at(i).at(j).cubeGroupId ].size), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
+
                 //ofRect(i*gridSize, j*gridSize, 10, gridSize, gridSize);
                 if (layerInfo.at(i).at(j).blocked) {
                     ofSetColor(255, 0, 0);
@@ -400,7 +423,15 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         temp.highX = x_;
         temp.lowY = y_;
         temp.highY = y_;
+        
+        //set tonic synth
+        setupOneSynth(&temp);
+        
         soundsMap[soundsCounter] = temp;
+        
+        //reallocate all synths to mainout
+        updateTonicOut();
+        
         layerInfo.at(x_).at(y_).cubeGroupId = soundsCounter;
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = gColor;
         soundsCounter++;
@@ -417,6 +448,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeGroup *tempPtr = &soundsMap[soundMapIndex];
         if (!replace_) {
             tempPtr->size++;
+            //check for max,min, x,y
             updateGroupInfo(soundMapIndex, x_, y_);
         }
         layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
@@ -438,9 +470,11 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 layerInfo.at(x).at(y).cubeGroupId = soundMapIndex;
                                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].cubeColor = tempPtr->groupColor;
                                 tempPtr->size++;
+                                //check for max,min, x,y
                                 updateGroupInfo(neighbours[i], x, y);
                                 if (aPtr->size < 1) {
                                     soundsMap.erase(neighbours[i]);
+                                    updateTonicOut();
                                     break;
                                 }
                             }
@@ -477,6 +511,8 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
                 if (cgPtr->size < 1) {
                     cout << cgPtr->size << "old group items" << endl;
                     soundsMap.erase(group_);
+                    //reallocate all synths to mainout
+                    updateTonicOut();
                     breakTest = true;
                     break;
                 }
@@ -524,9 +560,25 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
     cout <<"updateGroupInfo" << endl;
 }
 
+void Instrument::setupOneSynth(cubeGroup *cgPtr) {
+    cgPtr->synth = Tonic::SineWave().freq(ofRandom(50,250));
+    cgPtr->ramp.length(0.1).value(0.0);
+    
+    cgPtr->synth = cgPtr->synth*cgPtr->ramp;
+}
 
 
+void Instrument::updateTonicOut(){
+    Tonic::Generator temp;
 
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+        temp = temp + it->second.synth;
+        }
+    }
+    
+    instrumentOut = temp*0.3;
+}
 
 
 

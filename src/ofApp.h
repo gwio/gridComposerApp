@@ -34,10 +34,14 @@ public:
     
     bool pointInsideGrid(ofVec3f);
     
-    //tonic
+    bool drawInfo;
     
+    //tonic
+    void setupAudio();
+    void pulseEvent(float &);
     void audioRequested (float * output, int bufferSize, int nChannels);
     ofxTonicSynth tonicSynth;
+    Generator mainOut;
     
     //3d scene
     ofEasyCam cam;
@@ -79,4 +83,8 @@ public:
     unsigned long tapCounter;
     
     unsigned long curMouseId;
+    
+    
+    //sound time
+     int timeCounter;
 };
