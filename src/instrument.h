@@ -96,5 +96,6 @@ public:
     
     //tonic
     Tonic::Generator instrumentOut;
+    bool readNotes;
     
 };

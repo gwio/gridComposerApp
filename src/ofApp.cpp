@@ -1,9 +1,8 @@
 #include "ofApp.h"
-#define TILES 12
-#define TILESIZE 22
+#define TILES 9
+#define TILESIZE 40
 #define TILEBORDER 0.15
-//one beat = millis / 1000 = 1sec
-#define BPM 600
+#define BPM 130*8
 
 
 //--------------------------------------------------------------
@@ -354,7 +353,7 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
 void ofApp::pulseEvent(float& val) {
    // cout << "pulse" << val << endl;
     for (int i = 0; i < synths.size(); i++) {
-        synths[i].noteTrigger();
+        synths[i].readNotes = true;;
     }
     timeCounter++;
     if (timeCounter > TILES+2) {

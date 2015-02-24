@@ -23,6 +23,7 @@ Instrument::Instrument(int gTiles_, float gSize_, float border_) {
     bCounter = 1;
     
     soundsCounter = 1;
+    readNotes = false;
     
     //instrumentOut = Tonic::SineWave().freq(120);
 }
@@ -190,6 +191,10 @@ void Instrument::update() {
         cubeVector[i].update();
     }
     
+    if (readNotes) {
+        noteTrigger();
+        readNotes = false;
+    }
    // play();
     /*
      for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
@@ -561,10 +566,19 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 }
 
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
-    cgPtr->synth = Tonic::SineWave().freq(ofRandom(50,250));
-    cgPtr->ramp.length(0.1).value(0.0);
+
+    static int twoOctavePentatonicScale[10] = {0, 2, 4, 7, 9, 11, 13, 16, 19, 21};
+    int note = int(ofRandom(9));
     
-    cgPtr->synth = cgPtr->synth*cgPtr->ramp;
+    cgPtr->synth = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note+46) );
+    
+    for (int i = 0; i < 5 ; i++) {
+        Tonic::Generator temp = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note*(i/5+1)))*(i*0.13)+0.01;
+        cgPtr->synth = cgPtr->synth + temp;
+    }
+    //cgPtr->synth = cgPtr->synth+    cgPtr->ramp.length(0.25).value(0.0);
+    
+    cgPtr->synth = cgPtr->synth*cgPtr->ramp.length(0.01);
 }
 
 
@@ -577,7 +591,7 @@ void Instrument::updateTonicOut(){
         }
     }
     
-    instrumentOut = temp*0.3;
+    instrumentOut = temp*0.25;
 }
 
 
