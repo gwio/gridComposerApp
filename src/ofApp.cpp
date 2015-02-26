@@ -8,7 +8,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
-
+    
     
     synths.resize(1);
     synths[0] = Instrument(TILES,TILESIZE,TILEBORDER);
@@ -62,19 +62,21 @@ void ofApp::setupAudio(){
         temp = temp + synths[i].instrumentOut;
     }
     mainOut = temp ;
-   
+    
     tonicSynth.setOutputGen(mainOut*0.5);
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-   
+    
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
         if (synths[i].synthHasChanged == true){
             setupAudio();
+            synths[i].synthHasChanged = false;
         }
     }
     
@@ -83,13 +85,13 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
     
-
+    
+    
     glShadeModel(GL_SMOOTH);
     glDisable(GL_MULTISAMPLE);
     //glEnable(GL_MULTISAMPLE);
-
+    
     
     
     ofEnableLighting();
@@ -103,7 +105,7 @@ void ofApp::draw(){
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].draw();
-       // synths[i].drawDebug();
+        // synths[i].drawDebug();
     }
     
     ofPopMatrix();
@@ -116,7 +118,7 @@ void ofApp::draw(){
     
     ofDisableLighting();
     if (drawInfo) {
-    drawDebug();
+        drawDebug();
     }
     if(drawFboImage) {
         fbo.draw(0, 0);
@@ -127,7 +129,7 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
-    
+    //setupAudio();
     if (key == 's') {
         ofImage pix;
         pix.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_COLOR);
@@ -148,7 +150,7 @@ void ofApp::keyPressed(int key){
         for (int i = 0; i < TILES; i++) {
             for (int j = 0; j < TILES; j++) {
                 if (ofRandom(100)>70) {
-                synths[0].tapEvent(i, j);
+                    synths[0].tapEvent(i, j);
                 }
             }
         }
@@ -219,7 +221,7 @@ void ofApp::mousePressed(int x, int y, int button){
         
     }
     lastTap = curTap;
-
+    
     /*
      if(pointInsideGrid(intersectPos)) {
      //cout << " ssad"  << endl;
@@ -235,7 +237,7 @@ void ofApp::mouseReleased(int x, int y, int button){
     
     if (mouseDragging && pointInsideGrid(intersectPos) ) {
         TapHelper* tempPtr = &tapMap[curMouseId];
-
+        
         if ( tempPtr->tapOrigin.x == vectorPosX  && tempPtr->tapOrigin.y == vectorPosY) {
             tempPtr->old = true;
             synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
@@ -248,11 +250,11 @@ void ofApp::mouseReleased(int x, int y, int button){
         mouseDragging = false;
     } else {
         TapHelper* tempPtr = &tapMap[curMouseId];
-
+        
         tempPtr->old = true;
         synths[activeSynth].layerInfo.at(tempPtr->tapOrigin.x).at(tempPtr->tapOrigin.y).blocked = false;
         mouseDragging = false;
-
+        
     }
     
 }
@@ -260,7 +262,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
-
+    
 }
 
 //--------------------------------------------------------------
@@ -334,7 +336,7 @@ void ofApp::updateFboMesh(){
     
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
-
+    
     
 }
 
@@ -353,14 +355,14 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
 }
 
 void ofApp::pulseEvent(float& val) {
-   // cout << "pulse" << val << endl;
+    // cout << "pulse" << val << endl;
     for (int i = 0; i < synths.size(); i++) {
         synths[i].readNotes = true;
     }
     timeCounter++;
     if (timeCounter > TILES+2) {
         timeCounter = 0;
-       
+        
         
     }
     
