@@ -26,12 +26,14 @@ struct cubeGroup {
     ofColor groupColor;
     int lowX, highX;
     int lowY, highY;
-    
-    Tonic::Generator synth;
-    Tonic::RampedValue ramp;
-    
+
+    vector< int> y_in_x_elements;
+    vector< int> x_in_y_elements;
+    Tonic::ofxTonicSynth groupSynth;
+    Tonic::Generator output;
+
     cubeGroup(){
-       // size = 0;
+
     };
     cubeGroup(int tiles_) {
         lowX = tiles_-1;
@@ -39,6 +41,10 @@ struct cubeGroup {
         highX = -1;
         highY = -1;
         size = 0;
+        
+        y_in_x_elements.resize(tiles_);
+        x_in_y_elements.resize(tiles_);
+        
     }
 };
 
@@ -91,11 +97,15 @@ public:
     ofVboMesh fboMesh;
     ofVboMesh cubes;
     
+    
     map<int,ofVec2f> cubeMap;
     vector<Cube> cubeVector;
     
     //tonic
     Tonic::Generator instrumentOut;
     bool readNotes;
+    bool synthHasChanged;
+    
+    
     
 };

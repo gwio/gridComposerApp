@@ -44,7 +44,7 @@ public:
     Generator mainOut;
     
     //3d scene
-    ofEasyCam cam;
+    ofCamera cam;
     ofVec3f globalTranslate;
     
     //Synthebenen
@@ -87,4 +87,6 @@ public:
     
     //sound time
      int timeCounter;
+    
+   
 };

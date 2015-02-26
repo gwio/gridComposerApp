@@ -24,13 +24,15 @@ Instrument::Instrument(int gTiles_, float gSize_, float border_) {
     
     soundsCounter = 1;
     readNotes = false;
+    synthHasChanged = false;
     
-    //instrumentOut = Tonic::SineWave().freq(120);
+    
 }
 
 void Instrument::setup(int *stepperPos_) {
     
     stepperPos = stepperPos_;
+
     
     layerInfo.resize(gridTiles);
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -192,15 +194,10 @@ void Instrument::update() {
     }
     
     if (readNotes) {
-        noteTrigger();
+       noteTrigger();
         readNotes = false;
     }
-   // play();
-    /*
-     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
-     
-     }
-     */
+ 
     
     updateCubeMesh();
 }
@@ -225,7 +222,7 @@ void Instrument::drawFbo() {
 void Instrument::addCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = true;
     
-    float zH = ofRandom(75);
+    float zH = ofRandom(100);
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH;
     // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     
@@ -285,23 +282,33 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
     
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].zHeight = zH_;
     
-    //cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = c_;
-    
     updateSoundsMap(x_, y_, hasOld);
     
     
 }
 
 void Instrument::noteTrigger(){
-    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
-        if (it->second.lowX+1 == *stepperPos){
-            it->second.ramp.target(1.0);
+    
+        for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+            if (*stepperPos >= it->second.lowX+1 && *stepperPos <= it->second.highX+2)  {
+                
+                float rampTarget = float( it->second.y_in_x_elements[*stepperPos-1]) / float(gridTiles) ;
+                
+                if (it->second.lowX+1 == *stepperPos){
+                    it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
+                    
+                }
+                else if (it->second.highX+2 == *stepperPos){
+                    it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+
+                    
+                } else {
+                    it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
+                    
+                }
+                
+            }
         }
-        
-        if (it->second.highX+2 == *stepperPos){
-            it->second.ramp.target(0.0);
-        }
-    }
     
 }
 
@@ -415,7 +422,6 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         
     }
     
-    //cout << neighbours.size()<< endl;
     
     //make newsound when alone
     if (neighbours.size() == 0) {
@@ -428,6 +434,9 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         temp.highX = x_;
         temp.lowY = y_;
         temp.highY = y_;
+        temp.y_in_x_elements.at(x_) = 1;
+        temp.x_in_y_elements.at(y_) = 1;
+
         
         //set tonic synth
         setupOneSynth(&temp);
@@ -454,13 +463,13 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         if (!replace_) {
             tempPtr->size++;
             //check for max,min, x,y
+            layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
+            cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = tempPtr->groupColor;
             updateGroupInfo(soundMapIndex, x_, y_);
-        }
+        } else {
         layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
-        
-        
-        
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = tempPtr->groupColor;
+        }
         
         //with different neighbours -> change all neighbours
         if (neighbours.size() > 1) {
@@ -488,17 +497,13 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                 }
             }
         }
-        
-        //   cout << soundsCounter << endl;
-        
-        
+       
     }
     
 }
 
 void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) {
     
-    cout << " asdsad " << endl;
     int minusCouter = 0;
     cubeGroup *cgPtr = &soundsMap[group_];
     vector<ofVec2f> tempPosis;
@@ -514,7 +519,6 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
                 
                 
                 if (cgPtr->size < 1) {
-                    cout << cgPtr->size << "old group items" << endl;
                     soundsMap.erase(group_);
                     //reallocate all synths to mainout
                     updateTonicOut();
@@ -560,25 +564,48 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
                     groupPtr->lowY = y_;
                 }
    
+    int yInxEleCounter = 0;
+    for (int i = 0; i < gridTiles; i++) {
+        if (  layerInfo.at(x_).at(i).hasCube && layerInfo.at(x_).at(i).cubeGroupId == key_ ){
+            yInxEleCounter++;
+        }
+    }
+    
+    groupPtr->y_in_x_elements.at(x_) = yInxEleCounter;
+
+    
+    int xInyEleCounter = 0;
+    for (int i = 0; i < gridTiles; i++) {
+        if (  layerInfo.at(i).at(y_).hasCube && layerInfo.at(i).at(y_).cubeGroupId == key_ ){
+            xInyEleCounter++;
+        }
+    }
+    
+    groupPtr->x_in_y_elements.at(y_) = xInyEleCounter;
     
        
-    cout <<"updateGroupInfo" << endl;
 }
 
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
 
-    static int twoOctavePentatonicScale[10] = {0, 2, 4, 7, 9, 11, 13, 16, 19, 21};
-    int note = int(ofRandom(9));
+
+    float rampLength = 0.6;
     
-    cgPtr->synth = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note+46) );
+    //1 preset additive synth with twlevetone
+    static int twoOctavePentatonicScale[19] = { 0,-1,-3,-5,-7,-8,-10,-12, 0,1,3,5,7,8,10,12,0,0,0};
+    int note = int(ofRandom(18))+34;
     
-    for (int i = 0; i < 5 ; i++) {
-        Tonic::Generator temp = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note*(i/5+1)))*(i*0.13)+0.01;
-        cgPtr->synth = cgPtr->synth + temp;
-    }
-    //cgPtr->synth = cgPtr->synth+    cgPtr->ramp.length(0.25).value(0.0);
+
+    Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
+    cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
     
-    cgPtr->synth = cgPtr->synth*cgPtr->ramp.length(0.01);
+    Tonic::RampedValue rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
+    
+    
+    cgPtr->output = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note) )*0.8;
+    
+    
+    cgPtr->output =  cgPtr->output *  rampVol;
 }
 
 
@@ -587,11 +614,12 @@ void Instrument::updateTonicOut(){
 
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-        temp = temp + it->second.synth;
+        temp = temp + it->second.output;
         }
     }
     
-    instrumentOut = temp*0.25;
+    instrumentOut = temp*0.5;
+    synthHasChanged = true;
 }
 
 

@@ -1,8 +1,8 @@
 #include "ofApp.h"
-#define TILES 9
-#define TILESIZE 40
+#define TILES 6
+#define TILESIZE 50
 #define TILEBORDER 0.15
-#define BPM 130*8
+#define BPM 130*1
 
 
 //--------------------------------------------------------------
@@ -33,7 +33,7 @@ void ofApp::setup(){
     
     cam.setPosition(0, 0, 970);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(42);
+    cam.setFov(52);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -43,7 +43,7 @@ void ofApp::setup(){
     
     ofEnableLighting();
     light.setPosition(0, 0, 150);
-    light.setAmbientColor(ofColor::orangeRed);
+    light.setAmbientColor(ofColor::gold);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -61,8 +61,9 @@ void ofApp::setupAudio(){
     for (int i = 0; i < synths.size(); i++) {
         temp = temp + synths[i].instrumentOut;
     }
-    mainOut = temp;
-    tonicSynth.setOutputGen(mainOut*0.3);
+    mainOut = temp ;
+   
+    tonicSynth.setOutputGen(mainOut*0.5);
 }
 
 //--------------------------------------------------------------
@@ -72,10 +73,12 @@ void ofApp::update(){
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
+        if (synths[i].synthHasChanged == true){
+            setupAudio();
+        }
     }
     
     intersectPlane();
-    
 }
 
 //--------------------------------------------------------------
@@ -84,8 +87,8 @@ void ofApp::draw(){
     
 
     glShadeModel(GL_SMOOTH);
-    //glDisable(GL_MULTISAMPLE);
-    glEnable(GL_MULTISAMPLE);
+    glDisable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
 
     
     
@@ -124,7 +127,6 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
-    setupAudio();
     
     if (key == 's') {
         ofImage pix;
@@ -191,7 +193,7 @@ void ofApp::mouseDragged(int x, int y, int button){
                 synths[activeSynth].layerInfo.at(cordTemp.x).at(cordTemp.y).blocked = true;
                 tapCounter++;
                 
-                cout << "added" << tapCounter << " pos:" << cordTemp << endl;
+                //cout << "added" << tapCounter << " pos:" << cordTemp << endl;
             }
         }
     }
@@ -353,11 +355,13 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
 void ofApp::pulseEvent(float& val) {
    // cout << "pulse" << val << endl;
     for (int i = 0; i < synths.size(); i++) {
-        synths[i].readNotes = true;;
+        synths[i].readNotes = true;
     }
     timeCounter++;
     if (timeCounter > TILES+2) {
         timeCounter = 0;
+       
+        
     }
     
 }
