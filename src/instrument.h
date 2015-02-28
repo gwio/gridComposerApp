@@ -56,14 +56,24 @@ public:
     
     
     Instrument();
-    Instrument(int,float,float);
+    Instrument(string,int,float,float);
     
-    void setup(int*);
+    void setup(int*, Tonic::ofxTonicSynth *);
     void updateTonicOut();
     void update();
     void draw();
     void drawFbo();
+    
+    
     void noteTrigger();
+    void noteTriggerWest();
+    void noteTriggerNorth();
+    void noteTriggerEast();
+    void noteTriggerSouth();
+
+
+    void nextDirection();
+    
     void generateSynths();
     void addCube(int,int);
     void removeCube(int,int);
@@ -78,11 +88,16 @@ public:
     void setupOneSynth(cubeGroup*);
     void updateGroupInfo(unsigned long,int,int);
     
+    string instrumentId;
+    
     int gridTiles;
     float gridSize;
     float borderSize;
     
     int *stepperPos;
+    int scanDirection;
+    bool loadedDirection[4] = {1,1,1,1};
+    bool activeDirection[4] = {1,1,1,1};
     
     //synthinfo
     int rCounter,gCounter,bCounter;
@@ -96,14 +111,20 @@ public:
     ofVboMesh raster;
     ofVboMesh fboMesh;
     ofVboMesh cubes;
+    float colorHue;
     
+    float layerZ;
+    float emptyInnerZ;
+    float scanZ;
     
     map<int,ofVec2f> cubeMap;
     vector<Cube> cubeVector;
     
     //tonic
+    Tonic::ofxTonicSynth *mainTonicPtr;
     Tonic::Generator instrumentOut;
-    bool readNotes;
+    Tonic::RampedValue outputRamp;
+       
     bool synthHasChanged;
     
     

@@ -15,17 +15,33 @@ public:
     ofVec3f *vec0Ptr,*vec1Ptr,*vec2Ptr,*vec3Ptr;
     int vIndex0,vIndex1,vIndex2,vIndex3;
     
-    float zHeight;
+    float defaultZ;
+    float actualZ;
     
     void setup();
     void update();
     
     
-    ofColor cubeColor;
-    ofColor altColor;
-    ofColor pickColor;
+    ofColor displayColor;
     
+    ofColor cubeColor;
+    
+    ofColor groupColor;
+    
+    ofColor scanColor;
+    
+    //for fbo picking
+    ofColor pickColor;
     
     bool active;
     bool tapActive;
+    
+    
+    void setColor(ofColor);
+    
+    void changeGroupColor(ofColor);
+    
+    
+    
+    void setDefaultHeight(float);
 };

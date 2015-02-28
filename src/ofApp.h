@@ -5,6 +5,7 @@
 #include "instrument.h"
 #include "tapHelper.h"
 #include "ofxTonic.h"
+#include "ofxGui.h"
 
 using namespace Tonic;
 
@@ -32,6 +33,9 @@ public:
     
     void updateTapMap();
     
+    void setupOfxGui();
+    
+    
     bool pointInsideGrid(ofVec3f);
     
     bool drawInfo;
@@ -40,11 +44,13 @@ public:
     void setupAudio();
     void pulseEvent(float &);
     void audioRequested (float * output, int bufferSize, int nChannels);
+    //mainout
     ofxTonicSynth tonicSynth;
+    RampedValue volumeRamp;
     Generator mainOut;
     
     //3d scene
-    ofCamera cam;
+    ofEasyCam cam;
     ofVec3f globalTranslate;
     
     //Synthebenen
@@ -88,5 +94,14 @@ public:
     //sound time
      int timeCounter;
     
-   
+   //ofx gui elements
+    bool showGui;
+    ofxPanel gui;
+    ofParameter<float> volumeRampValue;
+    void volumeRampValueChanged(float&volumeRampValue);
+    
+    
+    //hack for ofxgui panel
+    ofFbo guiFbo;
+    void updateGuiFbo();
 };

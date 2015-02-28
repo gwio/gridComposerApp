@@ -1,39 +1,47 @@
 #include "ofApp.h"
-#define TILES 6
-#define TILESIZE 50
-#define TILEBORDER 0.15
-#define BPM 130*1
+#define TILES 8
+#define TILESIZE 44
+#define TILEBORDER 0.1
+#define BPM 160*4
 
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
     
+    //setup synth layers first
     
     synths.resize(1);
-    synths[0] = Instrument(TILES,TILESIZE,TILEBORDER);
-    synths[0].setup(&timeCounter);
-    setupAudio();
+    synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
+    synths[0].setup(&timeCounter, &tonicSynth);
     globalTranslate = ofVec3f(TILES*TILESIZE,TILES*TILESIZE,0)/-2;
     activeSynth = 0;
+    
+    
+    ControlParameter rampTarget = tonicSynth.addParameter("mainVolumeRamp").max(1.0).min(0.0);
+    tonicSynth.setParameter("mainVolumeRamp", 1.0);
+    volumeRamp = RampedValue().value(0.7).length(0.1).target(rampTarget);
     
     ControlGenerator pulse = ControlMetro().bpm(BPM);
     ofEvent<float>* pulseEvent = tonicSynth.createOFEvent(pulse);
     ofAddListener(*pulseEvent, this, &ofApp::pulseEvent );
+    setupAudio();
+
+    setupOfxGui();
     
     ofSetFrameRate(60);
-    ofEnableDepthTest();
     //ofDisableAntiAliasing();
     ofSetVerticalSync(false);
+    ofEnableDepthTest();
     
     planeTemp.set(TILES*TILESIZE, TILES*TILESIZE);
     planeTemp.setPosition(0, 0, 0);
     intersecPlane.setFrom(planeTemp);
     
     
-    cam.setPosition(0, 0, 970);
+    cam.setPosition(0, 0, 950);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(52);
+    cam.setFov(32);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -42,8 +50,11 @@ void ofApp::setup(){
     fbo.end();
     
     ofEnableLighting();
-    light.setPosition(0, 0, 150);
-    light.setAmbientColor(ofColor::gold);
+    light.setPosition(0, 0, 30);
+    
+    
+    //temp sketch
+    light.setAmbientColor(ofColor::rosyBrown);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -52,8 +63,11 @@ void ofApp::setup(){
     mouseDragging = false;
     tapCounter = 0;
     drawInfo = false;
+    showGui = false;
     
-    timeCounter = 0;
+    timeCounter = -1;
+ 
+    guiFbo.allocate(400, 800, GL_RGBA);
 }
 
 void ofApp::setupAudio(){
@@ -63,14 +77,15 @@ void ofApp::setupAudio(){
     }
     mainOut = temp ;
     
-    tonicSynth.setOutputGen(mainOut*0.5);
-    
+    tonicSynth.setOutputGen(mainOut*volumeRamp);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    
+    if (showGui) {
+    updateGuiFbo();
+    }
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
@@ -81,19 +96,22 @@ void ofApp::update(){
     }
     
     intersectPlane();
+
+    
+   
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    
+   
     
     
     glShadeModel(GL_SMOOTH);
-    glDisable(GL_MULTISAMPLE);
-    //glEnable(GL_MULTISAMPLE);
-    
-    
-    
+    //glDisable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_MULTISAMPLE);
+
     ofEnableLighting();
     
     cam.begin();
@@ -112,9 +130,7 @@ void ofApp::draw(){
     
     cam.end();
     
-    
     // mousePick.draw(ofGetMouseX(),ofGetMouseY());
-    
     
     ofDisableLighting();
     if (drawInfo) {
@@ -123,6 +139,12 @@ void ofApp::draw(){
     if(drawFboImage) {
         fbo.draw(0, 0);
     }
+    
+
+    if (showGui) {
+    guiFbo.draw(0,0);
+    }
+
     
 }
 
@@ -159,6 +181,10 @@ void ofApp::keyPressed(int key){
     if (key == 'F') {
         ofToggleFullscreen();
     }
+    
+    if (key == 'o') {
+        showGui = !showGui;
+    }
 }
 
 //--------------------------------------------------------------
@@ -186,8 +212,8 @@ void ofApp::mouseDragged(int x, int y, int button){
                 TapHelper temp = TapHelper(
                                            tapCounter,
                                            cordTemp,
-                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].zHeight,
-                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].cubeColor
+                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].defaultZ,
+                                           synths[activeSynth].cubeVector[tempInfo.cubeVecNum].groupColor
                                            );
                 
                 curMouseId = tapCounter;
@@ -333,7 +359,6 @@ void ofApp::updateFboMesh(){
     cam.end();
     
     glReadPixels(ofGetMouseX(),ofGetMouseY(), 1,1, GL_RGB, GL_UNSIGNED_BYTE, RGB);
-    
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
     
@@ -356,17 +381,56 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
 
 void ofApp::pulseEvent(float& val) {
     // cout << "pulse" << val << endl;
-    for (int i = 0; i < synths.size(); i++) {
-        synths[i].readNotes = true;
-    }
+    
+    
+    
+    
+    
     timeCounter++;
-    if (timeCounter > TILES+2) {
+    
+    
+    if (timeCounter > TILES) {
         timeCounter = 0;
-        
-        
+        for (int i = 0; i < synths.size(); i++) {
+            synths[i].nextDirection();
+        }
     }
     
+    for (int i = 0; i < synths.size(); i++) {
+        synths[i].noteTrigger();
+    }
+    
+    
+    
+    
+
+    
 }
+
+void ofApp::setupOfxGui() {
+    volumeRampValue.addListener(this, &ofApp::volumeRampValueChanged);
+    gui.setup("gui");
+    gui.add(volumeRampValue.set("Main Volume", 1.0, 0.0, 1.0));
+ 
+    
+}
+
+void ofApp::volumeRampValueChanged(float & volumeRampValue) {
+    tonicSynth.setParameter("mainVolumeRamp", volumeRampValue);
+//    cout << volumeRampValue << endl;
+}
+
 void ofApp::audioRequested (float * output, int bufferSize, int nChannels){
     tonicSynth.fillBufferOfFloats(output, bufferSize, nChannels);
+}
+
+void ofApp::updateGuiFbo() {
+    
+     guiFbo.begin();
+     ofClear(0, 0, 0, 0);
+     glDisable(GL_DEPTH_TEST);
+     gui.draw();
+     glEnable(GL_DEPTH_TEST);
+     guiFbo.end();
+     
 }
