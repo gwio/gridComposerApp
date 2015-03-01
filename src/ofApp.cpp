@@ -1,8 +1,8 @@
 #include "ofApp.h"
-#define TILES 9
-#define TILESIZE 24
+#define TILES 7
+#define TILESIZE 40
 #define TILEBORDER 0.1
-#define BPM 160*1
+#define BPM 130*4
 
 
 //--------------------------------------------------------------
@@ -41,7 +41,7 @@ void ofApp::setup(){
     
     cam.setPosition(0, 0, 180);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(80);
+    cam.setFov(28);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -50,11 +50,11 @@ void ofApp::setup(){
     fbo.end();
     
     ofEnableLighting();
-    light.setPosition(0, 0, 30);
+    light.setPosition(0, 0, 80);
     
     
     //temp sketch
-    light.setAmbientColor(ofColor::steelBlue);
+    light.setAmbientColor(ofColor::greenYellow);
     drawFboImage = false;
     
     doubleClickTime = 300;

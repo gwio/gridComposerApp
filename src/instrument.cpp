@@ -1,8 +1,8 @@
 #include "instrument.h"
 
-#define CUBE_Z_HEIGHT 10
-#define EMPTY_Z 5
-#define SCAN_Z 10*1.3
+#define CUBE_Z_HEIGHT 30
+#define EMPTY_Z 10
+#define SCAN_Z 30*0.8
 
 #define COLOR_TARGET 55.0
 
@@ -845,11 +845,11 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.25;
+    float rampLength = 0.15;
     
     //1 preset additive synth with twlevetone
     static int twoOctavePentatonicScale[19] = { 0,-1,-3,-5,-7,-8,-10,-12, 0,1,3,5,7,8,10,12,0,0,0};
-    int note = int(ofRandom(18))+46;
+    int note = int(ofRandom(18))+36;
     
     
     Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
@@ -857,11 +857,26 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     Tonic::RampedValue rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
     
+    cgPtr->output = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note))*0.5;
     
-    cgPtr->output = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note) )*0.8;
+    
+    Tonic::Generator harmonic = Tonic::SineWave().freq(
+                                                       Tonic::ControlMidiToFreq().input(note) * 2 * (Tonic::SineWave().freq(10)*0.3)
+                                                       ) * 0.25;
+    
+    Tonic::Generator harmonic2 = Tonic::SineWave().freq(
+                                                        Tonic::ControlMidiToFreq().input(note)*3
+                                                        ) * 0.1 ;
+    
+    Tonic::Generator harmonic3 = Tonic::SquareWave().freq(
+                                                          Tonic::ControlMidiToFreq().input(note)*4
+                                                          )  *( 0.1 * rampVol);
+
+    cgPtr->output = Tonic::LPF6().input(cgPtr->output).cutoff(600);
     
     
-    cgPtr->output =  cgPtr->output *  rampVol;
+    
+    cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
 }
 
 
@@ -874,7 +889,15 @@ void Instrument::updateTonicOut(){
         }
     }
     
-    instrumentOut = temp*outputRamp;
+    
+    Tonic::StereoDelay delay = Tonic::StereoDelay(1.2f,1.2f)
+    .delayTimeLeft( 0.5 + Tonic::SineWave().freq(0.2) * 0.01)
+    .delayTimeRight(0.4 + Tonic::SineWave().freq(0.23) * 0.01)
+    .feedback(0.3)
+    .dryLevel(0.85)
+    .wetLevel(0.15);
+    
+    instrumentOut = (temp >> delay) * outputRamp;
     synthHasChanged = true;
 }
 

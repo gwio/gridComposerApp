@@ -50,7 +50,7 @@ public:
     Generator mainOut;
     
     //3d scene
-    ofCamera cam;
+    ofEasyCam cam;
     ofVec3f globalTranslate;
     
     //Synthebenen
