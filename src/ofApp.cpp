@@ -1,8 +1,8 @@
 #include "ofApp.h"
-#define TILES 8
-#define TILESIZE 44
+#define TILES 9
+#define TILESIZE 24
 #define TILEBORDER 0.1
-#define BPM 160*4
+#define BPM 160*1
 
 
 //--------------------------------------------------------------
@@ -39,9 +39,9 @@ void ofApp::setup(){
     intersecPlane.setFrom(planeTemp);
     
     
-    cam.setPosition(0, 0, 950);
+    cam.setPosition(0, 0, 180);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(32);
+    cam.setFov(80);
     ofBackground(11, 5, 5);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
@@ -54,7 +54,7 @@ void ofApp::setup(){
     
     
     //temp sketch
-    light.setAmbientColor(ofColor::rosyBrown);
+    light.setAmbientColor(ofColor::steelBlue);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -184,6 +184,19 @@ void ofApp::keyPressed(int key){
     
     if (key == 'o') {
         showGui = !showGui;
+    }
+    
+    if (key =='1') {
+        synths[activeSynth].loadedDirection[0] =  !synths[activeSynth].loadedDirection[0] ;
+    }
+    if (key =='2') {
+        synths[activeSynth].loadedDirection[1] =  !synths[activeSynth].loadedDirection[1] ;
+    }
+    if (key =='3') {
+        synths[activeSynth].loadedDirection[2] =  !synths[activeSynth].loadedDirection[2] ;
+    }
+    if (key =='4') {
+        synths[activeSynth].loadedDirection[3] =  !synths[activeSynth].loadedDirection[3] ;
     }
 }
 
@@ -330,8 +343,8 @@ void ofApp::intersectPlane(){
     mouseRay.t = worldMouse-cam.getPosition();
     
     intersecPlane.intersect(mouseRay, intersectPos);
-    vectorPosX = (intersectPos.x/TILESIZE)+TILES/2;
-    vectorPosY = (intersectPos.y/TILESIZE)+TILES/2;
+    vectorPosX = (intersectPos.x/TILESIZE)+ float(TILES)/2;
+    vectorPosY = (intersectPos.y/TILESIZE)+ float(TILES)/2;
     
 }
 
