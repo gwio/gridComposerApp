@@ -107,7 +107,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
             cubeVector[i*(gridTiles)+j].setDefaultHeight(emptyInnerZ);
             //add pickColor
             ofColor tempColor = ofColor(rCounter,gCounter,bCounter);
-            cubeVector[i*(gridTiles)+j].pickColor = tempColor;
+            cubeVector[i*(gridTiles)+j].fboColor = tempColor;
             cubeMap[tempColor.getHex()] = ofVec2f(i,j);
             if (rCounter%255==0) {
                 rCounter=1;
@@ -192,7 +192,27 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     bCounter = 1;
     
     fboMesh = cubes;
+    //set fboMeshColors
+    for (int j = 0; j < cubeVector.size(); j++) {
+         fboMesh.setColor(cubeVector[j].vIndex0, cubeVector[j].fboColor);
+         fboMesh.setColor(cubeVector[j].vIndex1, cubeVector[j].fboColor);
+         fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].fboColor);
+         fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].fboColor);
+    }
+
+    //setup interface planes
+    planes.clear();
+    planes.reserve(4);
+    planes.resize(4);
     
+    
+ 
+    planes[0].setup(ofVec3f(0, (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 1, gridSize);
+    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,2, gridSize);
+    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 3, gridSize);
+    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,4, gridSize);
+   
+
     
     //setup main tonic out
     
@@ -214,7 +234,9 @@ void Instrument::update() {
         cubeVector[i].update();
     }
     
-   
+    for (int i = 0; i < planes.size(); i++) {
+        planes[i].update();
+    }
     
     updateCubeMesh();
 }
@@ -224,6 +246,10 @@ void Instrument::draw() {
     
     cubes.draw();
     
+    for (int i = 0; i < planes.size(); i++) {
+        planes[i].draw();
+    }
+    
     ofPopMatrix();
 }
 
@@ -232,6 +258,9 @@ void Instrument::drawFbo() {
     
     fboMesh.draw();
     
+    for (int i = 0; i < planes.size(); i++) {
+        planes[i].drawFbo();
+    }
     ofPopMatrix();
 }
 
@@ -269,7 +298,7 @@ void Instrument::removeCube(int x_, int y_){
 
     
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::white;
+ //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
 
     
     
@@ -323,28 +352,28 @@ void Instrument::noteTrigger() {
             break;
             
         case 0:
-            if(activeDirection[0]){
+            if(connectedDirection[0]){
                 noteTriggerWest();
                 break;
             } else {
                 break;
             }
         case 1:
-           if(activeDirection[1]){
+           if(connectedDirection[1]){
                 noteTriggerNorth();
                 break;
             } else {
                 break;
             }
         case 2:
-            if(activeDirection[2]){
+            if(connectedDirection[2]){
                 noteTriggerEast();
                 break;
             } else {
                 break;
             }
         case 3:
-           if(activeDirection[3]){
+           if(connectedDirection[3]){
                 noteTriggerSouth();
                 break;
             } else {
@@ -361,7 +390,7 @@ void Instrument::nextDirection() {
     
     while (   test == false   &&  counter !=4 ) {
         
-        if (loadedDirection[(scanDirection+1)%4]) {
+        if (activeDirection[(scanDirection+1)%4]) {
             test = true;
             scanDirection = (scanDirection+1)%4;
         } else {
@@ -372,8 +401,9 @@ void Instrument::nextDirection() {
             }
         }
         
-        
     }
+    planes[scanDirection%4].pulse();
+
     
   //  cout << scanDirection << endl;
 }
@@ -628,11 +658,6 @@ void Instrument::updateFboMesh(){
         fboMesh.setVertex(cubeVector[j].vIndex1, *cubeVector[j].vec1Ptr);
         fboMesh.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
         fboMesh.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
-        
-        fboMesh.setColor(cubeVector[j].vIndex0, cubeVector[j].pickColor);
-        fboMesh.setColor(cubeVector[j].vIndex1, cubeVector[j].pickColor);
-        fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].pickColor);
-        fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].pickColor);
     }
 }
 
@@ -845,39 +870,34 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.15;
+    float rampLength = 1.65;
     
     //1 preset additive synth with twlevetone
-    static int twoOctavePentatonicScale[19] = { 0,-1,-3,-5,-7,-8,-10,-12, 0,1,3,5,7,8,10,12,0,0,0};
-    int note = int(ofRandom(18))+36;
+    static int twoOctavePentatonicScale[19] = { 0,-1-12,-3,-5,-7-12,-8,-10,-12, 0,1,3+12,5,7,8+24,10,12,0+24,0,0};
+    int note = twoOctavePentatonicScale [ int(ofRandom(18))]+44;
     
     
     Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
     cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
     
     Tonic::RampedValue rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
-    
     cgPtr->output = Tonic::SineWave().freq(Tonic::ControlMidiToFreq().input(note))*0.5;
     
     
     Tonic::Generator harmonic = Tonic::SineWave().freq(
-                                                       Tonic::ControlMidiToFreq().input(note) * 2 * (Tonic::SineWave().freq(10)*0.3)
-                                                       ) * 0.25;
+                                                       Tonic::ControlMidiToFreq().input(note) * 2.01
+                                                       ) * (0.25);
     
     Tonic::Generator harmonic2 = Tonic::SineWave().freq(
-                                                        Tonic::ControlMidiToFreq().input(note)*3
+                                                        Tonic::ControlMidiToFreq().input(note)*2.95
                                                         ) * 0.1 ;
     
     Tonic::Generator harmonic3 = Tonic::SquareWave().freq(
-                                                          Tonic::ControlMidiToFreq().input(note)*4
+                                                          Tonic::ControlMidiToFreq().input(note)*3.5
                                                           )  *( 0.1 * rampVol);
-
-    cgPtr->output = Tonic::LPF6().input(cgPtr->output).cutoff(600);
     
     
-    
-    cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
-}
+cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;}
 
 
 void Instrument::updateTonicOut(){

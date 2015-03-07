@@ -66,7 +66,6 @@ void Cube::update(){
   
     if (displayColor != cubeColor) {
         displayColor = displayColor.lerp(cubeColor, 0.15);
-        
     }
    
 }

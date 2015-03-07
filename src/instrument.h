@@ -4,7 +4,7 @@
 #include "cube.h"
 #include "tapHelper.h"
 #include "ofxTonic.h"
-
+#include "interfacePlane.h"
 
 
 struct synthInfo {
@@ -96,8 +96,12 @@ public:
     
     int *stepperPos;
     int scanDirection;
-    bool loadedDirection[4] = {1,1,1,1};
+    
+    //active = direction will be triggered by pulse
+    // connected = if direction is active, then if connected -> sound, else-> pause
     bool activeDirection[4] = {1,1,1,1};
+    bool connectedDirection[4] = {1,1,1,1};
+
     
     //synthinfo
     int rCounter,gCounter,bCounter;
@@ -119,6 +123,11 @@ public:
     
     map<int,ofVec2f> cubeMap;
     vector<Cube> cubeVector;
+    
+    
+    //interface planes
+    
+    vector<InterfacePlane> planes;
     
     //tonic
     Tonic::ofxTonicSynth *mainTonicPtr;

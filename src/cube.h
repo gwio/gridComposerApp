@@ -18,6 +18,8 @@ public:
     float defaultZ;
     float actualZ;
     
+    float Zpct;
+    
     void setup();
     void update();
     
@@ -31,7 +33,7 @@ public:
     ofColor scanColor;
     
     //for fbo picking
-    ofColor pickColor;
+    ofColor fboColor;
     
     bool active;
     bool tapActive;

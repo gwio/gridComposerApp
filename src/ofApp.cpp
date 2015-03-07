@@ -1,8 +1,8 @@
 #include "ofApp.h"
 #define TILES 7
-#define TILESIZE 40
+#define TILESIZE 55
 #define TILEBORDER 0.1
-#define BPM 130*4
+#define BPM 130*16
 
 
 //--------------------------------------------------------------
@@ -187,16 +187,16 @@ void ofApp::keyPressed(int key){
     }
     
     if (key =='1') {
-        synths[activeSynth].loadedDirection[0] =  !synths[activeSynth].loadedDirection[0] ;
+        synths[activeSynth].activeDirection[0] =  !synths[activeSynth].activeDirection[0] ;
     }
     if (key =='2') {
-        synths[activeSynth].loadedDirection[1] =  !synths[activeSynth].loadedDirection[1] ;
+        synths[activeSynth].activeDirection[1] =  !synths[activeSynth].activeDirection[1] ;
     }
     if (key =='3') {
-        synths[activeSynth].loadedDirection[2] =  !synths[activeSynth].loadedDirection[2] ;
+        synths[activeSynth].activeDirection[2] =  !synths[activeSynth].activeDirection[2] ;
     }
     if (key =='4') {
-        synths[activeSynth].loadedDirection[3] =  !synths[activeSynth].loadedDirection[3] ;
+        synths[activeSynth].activeDirection[3] =  !synths[activeSynth].activeDirection[3] ;
     }
 }
 
@@ -243,13 +243,15 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
+    updateFboMesh();
+
+    
     curTap = ofGetElapsedTimeMillis();
     if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
         
         
-        updateFboMesh();
         
-        if (lastPickColor != ofColor(0,0,0)) {
+        if (lastPickColor != ofColor(255,255,255)) {
             if (synths[activeSynth].cubeMap.find(lastPickColor.getHex()) != synths[activeSynth].cubeMap.end() ) {
                 
                 ofVec2f cordTemp = synths[activeSynth].cubeMap[lastPickColor.getHex()];
@@ -258,7 +260,27 @@ void ofApp::mousePressed(int x, int y, int button){
             
         }
         
+       
+        
     }
+    
+    if (!pointInsideGrid(intersectPos)) {
+        if (lastPickColor == ofColor(1,0,0) ) {
+            synths[activeSynth].activeDirection[0] =  !synths[activeSynth].activeDirection[0] ;
+            synths[activeSynth].planes[0].active =  !synths[activeSynth].planes[0].active ;
+        } else if (lastPickColor == ofColor(2,0,0)){
+            synths[activeSynth].activeDirection[1] =  !synths[activeSynth].activeDirection[1] ;
+            synths[activeSynth].planes[1].active =  !synths[activeSynth].planes[1].active ;
+        } else if (lastPickColor == ofColor(3,0,0)) {
+            synths[activeSynth].activeDirection[2] =  !synths[activeSynth].activeDirection[2] ;
+            synths[activeSynth].planes[2].active =  !synths[activeSynth].planes[2].active ;
+        }else if (lastPickColor == ofColor(4,0,0)) {
+            synths[activeSynth].activeDirection[3] =  !synths[activeSynth].activeDirection[3] ;
+            synths[activeSynth].planes[3].active =  !synths[activeSynth].planes[3].active ;
+        }
+        
+    }
+    
     lastTap = curTap;
     
     /*
@@ -358,7 +380,7 @@ void ofApp::updateFboMesh(){
     fbo.begin();
     glDisable(GL_MULTISAMPLE);
     ofDisableLighting();
-    ofClear(0,0,0);
+    ofClear(255,255,255);
     glShadeModel(GL_FLAT);
     
     cam.begin();
@@ -375,7 +397,7 @@ void ofApp::updateFboMesh(){
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
     
-    
+    //cout << lastPickColor << endl;
 }
 
 void ofApp::updateTapMap() {
