@@ -8,22 +8,28 @@ public:
     InterfacePlane();
     
     
-    void setup(ofVec3f, float, int, float );
+    void setup(ofVec3f, float, int, float, ofVboMesh&, ofVboMesh&, ofVboMesh& );
     void update();
     void draw();
     void drawFbo();
     void pulse();
     
     
-    ofVboMesh activeMesh;
-    ofVboMesh fbo_activeMesh;
+    ofVboMesh* activeMesh;
+    ofVboMesh* fbo_activeMesh;
+    ofVboMesh* connectedMesh;
+    int direction;
+    
     ofVec3f activeMeshON;
     ofVec3f default1, default4;
-    float onPositionPct;
-    float pctSpeed;
-    float pctTemp;
     
-    ofVboMesh connectedMesh;
+    ofVec3f connectedOn1, connectedOn2, connectedOff1, connectedOff2;
+    ofVec3f connectedAni;
+    float onPositionPct;
+    float connectedAniPct;
+    float pctSpeed, connectedPctSpeed;
+    float pctTemp, connectedPctTemp;
+    
     ofVboMesh fbo_connectedMesh;
     
     ofColor activeFboColor;
@@ -33,7 +39,9 @@ public:
     ofColor activeOnColor;
     ofColor activeOffColor;
     
-    ofColor connectedColor;
+    ofColor connectedDrawColor;
+    ofColor connectedOnColor;
+    ofColor connectedOffColor;
     
     
     bool active, connected;

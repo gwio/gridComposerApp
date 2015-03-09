@@ -1,6 +1,6 @@
 #include "ofApp.h"
-#define TILES 7
-#define TILESIZE 55
+#define TILES 9
+#define TILESIZE 45
 #define TILEBORDER 0.1
 #define BPM 130*16
 
@@ -31,7 +31,7 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     //ofDisableAntiAliasing();
-    ofSetVerticalSync(false);
+    ofSetVerticalSync(true);
     ofEnableDepthTest();
     
     planeTemp.set(TILES*TILESIZE, TILES*TILESIZE);
@@ -41,8 +41,8 @@ void ofApp::setup(){
     
     cam.setPosition(0, 0, 180);
     cam.lookAt(ofVec3f(0,0,0));
-    cam.setFov(28);
-    ofBackground(11, 5, 5);
+    cam.setFov(48);
+    ofBackground(11, 65, 65);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
     
     fbo.begin();
@@ -50,11 +50,11 @@ void ofApp::setup(){
     fbo.end();
     
     ofEnableLighting();
-    light.setPosition(0, 0, 80);
+    light.setPosition(0, 0, 140);
     
     
     //temp sketch
-    light.setAmbientColor(ofColor::greenYellow);
+    light.setAmbientColor(ofColor::fireBrick);
     drawFboImage = false;
     
     doubleClickTime = 300;
@@ -279,6 +279,19 @@ void ofApp::mousePressed(int x, int y, int button){
             synths[activeSynth].planes[3].active =  !synths[activeSynth].planes[3].active ;
         }
         
+       else if (lastPickColor == ofColor(5,0,0) ) {
+            synths[activeSynth].connectedDirection[0] =  !synths[activeSynth].connectedDirection[0] ;
+            synths[activeSynth].planes[0].connected =  !synths[activeSynth].planes[0].connected ;
+        } else if (lastPickColor == ofColor(6,0,0)){
+            synths[activeSynth].connectedDirection[1] =  !synths[activeSynth].connectedDirection[1] ;
+            synths[activeSynth].planes[1].connected =  !synths[activeSynth].planes[1].connected ;
+        } else if (lastPickColor == ofColor(7,0,0)) {
+            synths[activeSynth].connectedDirection[2] =  !synths[activeSynth].connectedDirection[2] ;
+            synths[activeSynth].planes[2].connected =  !synths[activeSynth].planes[2].connected ;
+        }else if (lastPickColor == ofColor(8,0,0)) {
+            synths[activeSynth].connectedDirection[3] =  !synths[activeSynth].connectedDirection[3] ;
+            synths[activeSynth].planes[3].connected =  !synths[activeSynth].planes[3].connected ;
+        }
     }
     
     lastTap = curTap;

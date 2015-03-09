@@ -1,8 +1,8 @@
 #include "instrument.h"
 
-#define CUBE_Z_HEIGHT 30
+#define CUBE_Z_HEIGHT 40
 #define EMPTY_Z 10
-#define SCAN_Z 30*0.8
+#define SCAN_Z 40*0.8
 
 #define COLOR_TARGET 55.0
 
@@ -42,6 +42,11 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     
+    for (int i = 0; i < 4 ; i++) {
+        connectedDirection[i] = true;
+        activeDirection[i]= true;
+    }
+    
     stepperPos = stepperPos_;
     mainTonicPtr = mainTonicPtr_;
     
@@ -66,7 +71,8 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     //add outer vertices to mesh
     for (int i = 0; i < verticesOuter.size(); i++) {
         cubes.addVertex(verticesOuter[i]);
-        cubes.addColor(ofColor(0,0,0));
+       // cubes.addColor(ofColor(0,0,0));
+        cubes.addColor(ofColor(11, 65, 65));
     }
     
     
@@ -201,16 +207,22 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     }
 
     //setup interface planes
+    interfacePlaneMesh.clear();
+    interfacePlaneMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+    interfacePlaneFboMesh.clear();
+    interfacePlaneFboMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+    interfaceConnectedMesh.clear();
+    interfaceConnectedMesh.setMode(OF_PRIMITIVE_LINES);
     planes.clear();
     planes.reserve(4);
     planes.resize(4);
     
     
  
-    planes[0].setup(ofVec3f(0, (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 1, gridSize);
-    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,2, gridSize);
-    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 3, gridSize);
-    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,4, gridSize);
+    planes[0].setup(ofVec3f(0, (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh);
+    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,1, gridSize,interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh);
+    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 2, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh);
+    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,3, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh);
    
 
     
@@ -246,9 +258,8 @@ void Instrument::draw() {
     
     cubes.draw();
     
-    for (int i = 0; i < planes.size(); i++) {
-        planes[i].draw();
-    }
+    interfacePlaneMesh.drawWireframe();
+    interfaceConnectedMesh.draw();
     
     ofPopMatrix();
 }
@@ -258,9 +269,8 @@ void Instrument::drawFbo() {
     
     fboMesh.draw();
     
-    for (int i = 0; i < planes.size(); i++) {
-        planes[i].drawFbo();
-    }
+    interfacePlaneFboMesh.draw();
+    
     ofPopMatrix();
 }
 
@@ -402,8 +412,8 @@ void Instrument::nextDirection() {
         }
         
     }
+    
     planes[scanDirection%4].pulse();
-
     
   //  cout << scanDirection << endl;
 }
@@ -870,11 +880,11 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 1.65;
+    float rampLength = 0.35;
     
     //1 preset additive synth with twlevetone
     static int twoOctavePentatonicScale[19] = { 0,-1-12,-3,-5,-7-12,-8,-10,-12, 0,1,3+12,5,7,8+24,10,12,0+24,0,0};
-    int note = twoOctavePentatonicScale [ int(ofRandom(18))]+44;
+    int note = twoOctavePentatonicScale [ int(ofRandom(18))]+40;
     
     
     Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
@@ -894,10 +904,11 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     Tonic::Generator harmonic3 = Tonic::SquareWave().freq(
                                                           Tonic::ControlMidiToFreq().input(note)*3.5
-                                                          )  *( 0.1 * rampVol);
+                                                          )  *(0.1 * rampVol);
     
     
-cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;}
+cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
+}
 
 
 void Instrument::updateTonicOut(){
@@ -910,7 +921,7 @@ void Instrument::updateTonicOut(){
     }
     
     
-    Tonic::StereoDelay delay = Tonic::StereoDelay(1.2f,1.2f)
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.6f,0.6f)
     .delayTimeLeft( 0.5 + Tonic::SineWave().freq(0.2) * 0.01)
     .delayTimeRight(0.4 + Tonic::SineWave().freq(0.23) * 0.01)
     .feedback(0.3)

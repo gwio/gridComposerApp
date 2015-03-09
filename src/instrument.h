@@ -99,8 +99,8 @@ public:
     
     //active = direction will be triggered by pulse
     // connected = if direction is active, then if connected -> sound, else-> pause
-    bool activeDirection[4] = {1,1,1,1};
-    bool connectedDirection[4] = {1,1,1,1};
+    bool activeDirection[4] ;
+    bool connectedDirection[4] ;
 
     
     //synthinfo
@@ -126,7 +126,9 @@ public:
     
     
     //interface planes
-    
+    ofVboMesh interfacePlaneMesh;
+    ofVboMesh interfacePlaneFboMesh;
+    ofVboMesh interfaceConnectedMesh;
     vector<InterfacePlane> planes;
     
     //tonic
