@@ -10,6 +10,8 @@
 using namespace Tonic;
 
 
+
+
 class ofApp : public ofBaseApp{
     
 public:
@@ -33,8 +35,11 @@ public:
     
     void updateTapMap();
     
+    void setupPathAndAnmation();
+    
     void setupOfxGui();
     
+    void updateCamera();
     
     bool pointInsideGrid(ofVec3f);
     
@@ -49,21 +54,43 @@ public:
     RampedValue volumeRamp;
     Generator mainOut;
     
+    
     //3d scene
     ofEasyCam cam;
-    ofVec3f globalTranslate;
+    ofCamera testCam;
+    
+   // ofCamera testCam;
+    ofNode globalTranslate;
+    ofNode camActiveSynth;
+    ofNode camNotActiveSynth;
+    ofNode synthActivePos;
+    float camFov;
+    float camActiveFov;
+    float camTargetFov;
+    float camDefaultFov;
+    
+    ofQuaternion camQuatDefault, camQuatTarget;
+    
+    //animation paths
+    ofPolyline oneToActive, twoToActive, threeToActive;
+    ofPolyline oneToBack, twoToBack, threeToBack;
+    ofPolyline camPath;
+    ofPolyline camPathBack;
+    ofPolyline camUsePath;
+    float aniPct;
+    float aniCam;
+    bool animCam;
     
     //Synthebenen
     int activeSynth;
     vector<Instrument> synths;
-    
+    vector<ofNode> synthPos;
     
     //ofx ray testing
     ofRay mouseRay;
-    ofPlane intersecPlane;
+    vector<ofPlane> intersecPlane;
     ofVec3f worldMouse, intersectPos;
     int vectorPosX, vectorPosY;
-    ofPlanePrimitive planeTemp;
     
     //colorpicking grid
     ofVboMesh pickingRaster;
@@ -92,9 +119,9 @@ public:
     
     
     //sound time
-     int timeCounter;
+    int timeCounter;
     
-   //ofx gui elements
+    //ofx gui elements
     bool showGui;
     ofxPanel gui;
     ofParameter<float> volumeRampValue;
@@ -104,4 +131,12 @@ public:
     //hack for ofxgui panel
     ofFbo guiFbo;
     void updateGuiFbo();
+    
+    //interface stuff
+    bool focusCam;
+    int synthButton[3];
+    
+    
+    bool debugCam;
+    
 };

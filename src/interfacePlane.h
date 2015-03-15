@@ -8,7 +8,7 @@ public:
     InterfacePlane();
     
     
-    void setup(ofVec3f, float, int, float, ofVboMesh&, ofVboMesh&, ofVboMesh& );
+    void setup(ofVec3f, float, int, float, ofVboMesh&, ofVboMesh&, ofVboMesh&, ofVec3f );
     void update();
     void draw();
     void drawFbo();
@@ -30,7 +30,7 @@ public:
     float pctSpeed, connectedPctSpeed;
     float pctTemp, connectedPctTemp;
     
-    ofVboMesh fbo_connectedMesh;
+   // ofVboMesh fbo_connectedMesh;
     
     ofColor activeFboColor;
     ofColor connectedFboColor;

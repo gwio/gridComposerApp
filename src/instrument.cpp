@@ -37,10 +37,14 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     scanZ = SCAN_Z;
     
     colorHue = ofRandom(255);
+    animate = false;
+    inFocus = false;
     
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_) {
+    
+    myNode = node_;
     
     for (int i = 0; i < 4 ; i++) {
         connectedDirection[i] = true;
@@ -71,7 +75,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     //add outer vertices to mesh
     for (int i = 0; i < verticesOuter.size(); i++) {
         cubes.addVertex(verticesOuter[i]);
-       // cubes.addColor(ofColor(0,0,0));
+        // cubes.addColor(ofColor(0,0,0));
         cubes.addColor(ofColor(11, 65, 65));
     }
     
@@ -200,12 +204,12 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     fboMesh = cubes;
     //set fboMeshColors
     for (int j = 0; j < cubeVector.size(); j++) {
-         fboMesh.setColor(cubeVector[j].vIndex0, cubeVector[j].fboColor);
-         fboMesh.setColor(cubeVector[j].vIndex1, cubeVector[j].fboColor);
-         fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].fboColor);
-         fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].fboColor);
+        fboMesh.setColor(cubeVector[j].vIndex0, cubeVector[j].fboColor);
+        fboMesh.setColor(cubeVector[j].vIndex1, cubeVector[j].fboColor);
+        fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].fboColor);
+        fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].fboColor);
     }
-
+    
     //setup interface planes
     interfacePlaneMesh.clear();
     interfacePlaneMesh.setMode(OF_PRIMITIVE_TRIANGLES);
@@ -218,13 +222,45 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     planes.resize(4);
     
     
- 
-    planes[0].setup(ofVec3f(0, (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh);
-    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,1, gridSize,interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh);
-    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 2, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh);
-    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,3, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh);
-   
+    ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
 
+    
+    
+    planes[0].setup(ofVec3f(0,(gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
+    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,1, gridSize,interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
+    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 2, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
+    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,3, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
+    
+    
+    
+    //test
+    
+    
+    for (int i = 0; i < cubes.getNumVertices(); i++) {
+        cubes.setVertex(i, cubes.getVertex(i)+tranVec);
+    }
+    
+    for (int i = 0; i < fboMesh.getNumVertices(); i++) {
+        fboMesh.setVertex(i, fboMesh.getVertex(i)+tranVec);
+    }
+    
+    for (int i = 0; i < interfacePlaneMesh.getNumVertices(); i++) {
+        interfacePlaneMesh.setVertex(i, interfacePlaneMesh.getVertex(i)+tranVec);
+    }
+    
+    for (int i = 0; i < interfaceConnectedMesh.getNumVertices(); i++) {
+        interfaceConnectedMesh.setVertex(i, interfaceConnectedMesh.getVertex(i)+tranVec);
+    }
+    
+    for (int i = 0; i < interfacePlaneFboMesh.getNumVertices(); i++) {
+        interfacePlaneFboMesh.setVertex(i, interfacePlaneFboMesh.getVertex(i)+tranVec);
+    }
+    
+    for (int i = 0; i < verticesInner.size(); i++) {
+        verticesInner[i] = verticesInner[i]+tranVec;
+    }
+    
+    
     
     //setup main tonic out
     
@@ -233,7 +269,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_) {
     outputRamp = Tonic::RampedValue().value(0.5).length(0.1).target(rampTarget);
     instrumentOut = instrumentOut * outputRamp;
     
-
+    
     cout << cubes.getNumVertices() << endl;
     
     
@@ -254,14 +290,14 @@ void Instrument::update() {
 }
 
 void Instrument::draw() {
-    ofPushMatrix();
+   // ofPushMatrix();
     
     cubes.draw();
     
     interfacePlaneMesh.drawWireframe();
     interfaceConnectedMesh.draw();
     
-    ofPopMatrix();
+   // ofPopMatrix();
 }
 
 void Instrument::drawFbo() {
@@ -284,8 +320,8 @@ void Instrument::addCube(int x_, int y_){
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setDefaultHeight(zH);
     // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
     //ofColor tempC = ofColor::fromHsb(  colorHue+ofRandom(-10,10) , 230+ofRandom(-20,20), 200);
-   // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = tempC;
-
+    // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = tempC;
+    
     
     updateSoundsMap(x_, y_, false);
     
@@ -305,11 +341,11 @@ void Instrument::removeCube(int x_, int y_){
     layerInfo.at(x_).at(y_).cubeGroupId = 0;
     
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setDefaultHeight(emptyInnerZ);
-
+    
     
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
- //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
-
+    //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
+    
     
     
     bool breakTest = false;
@@ -352,9 +388,9 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
 }
 
 void Instrument::noteTrigger() {
-  
     
-   // cout << scanDirection << endl;
+    
+    // cout << scanDirection << endl;
     switch (scanDirection)
     {
             
@@ -369,7 +405,7 @@ void Instrument::noteTrigger() {
                 break;
             }
         case 1:
-           if(connectedDirection[1]){
+            if(connectedDirection[1]){
                 noteTriggerNorth();
                 break;
             } else {
@@ -383,13 +419,13 @@ void Instrument::noteTrigger() {
                 break;
             }
         case 3:
-           if(connectedDirection[3]){
+            if(connectedDirection[3]){
                 noteTriggerSouth();
                 break;
             } else {
                 break;
             }
-        
+            
     }
     
 }
@@ -415,11 +451,11 @@ void Instrument::nextDirection() {
     
     planes[scanDirection%4].pulse();
     
-  //  cout << scanDirection << endl;
+    //  cout << scanDirection << endl;
 }
 
 void Instrument::noteTriggerWest(){
-
+    
     //scanline
     if (*stepperPos == 0) {
         for (int  i = 0; i < gridTiles; i++) {
@@ -444,7 +480,7 @@ void Instrument::noteTriggerWest(){
             if (layerInfo.at(*stepperPos-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].groupColor);
-
+                
             }
         }
         
@@ -453,7 +489,7 @@ void Instrument::noteTriggerWest(){
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if (*stepperPos >= it->second.lowX && *stepperPos <= it->second.highX+1)  {
             
-             if (it->second.highX+1 == *stepperPos){
+            if (it->second.highX+1 == *stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
             } else {
                 float rampTarget = float( it->second.y_in_x_elements[*stepperPos]) / float(gridTiles) ;
@@ -507,11 +543,11 @@ void Instrument::noteTriggerNorth() {
             }
         }
     }
- 
+    
 }
 
 void Instrument::noteTriggerEast() {
- 
+    
     
     //scanline
     if (*stepperPos == 0) {
@@ -605,7 +641,6 @@ void Instrument::generateSynths() {
 }
 
 void Instrument::drawDebug() {
-    ofPushMatrix();
     ofPushStyle();
     for (int i = 0; i < layerInfo.size(); i++) {
         for (int j = 0; j < layerInfo.at(i).size(); j++) {
@@ -628,7 +663,6 @@ void Instrument::drawDebug() {
     }
     
     ofPopStyle();
-    ofPopMatrix();
 }
 
 void Instrument::tapEvent(int x_,int y_) {
@@ -730,7 +764,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         layerInfo.at(x_).at(y_).cubeGroupId = soundsCounter;
         
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(gColor);
-
+        
         soundsCounter++;
         //add to neightbours, here to the biggest neighbouring group, or random
     } else {
@@ -749,14 +783,14 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
             layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
             
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-
+            
             
             updateGroupInfo(soundMapIndex, x_, y_);
         } else {
             layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
             
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-
+            
         }
         
         //with different neighbours -> change all neighbours
@@ -772,8 +806,8 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 layerInfo.at(x).at(y).cubeGroupId = soundMapIndex;
                                 
                                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-
-
+                                
+                                
                                 tempPtr->size++;
                                 //check for max,min, x,y
                                 updateGroupInfo(soundMapIndex, x, y);
@@ -880,7 +914,7 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.35;
+    float rampLength = 0.62;
     
     //1 preset additive synth with twlevetone
     static int twoOctavePentatonicScale[19] = { 0,-1-12,-3,-5,-7-12,-8,-10,-12, 0,1,3+12,5,7,8+24,10,12,0+24,0,0};
@@ -907,7 +941,7 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
                                                           )  *(0.1 * rampVol);
     
     
-cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
+    cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
 }
 
 
@@ -933,7 +967,37 @@ void Instrument::updateTonicOut(){
 }
 
 
+void Instrument::setTranslate(ofVec3f trans_) {
+    myNode.setPosition(trans_);
+}
+
+void Instrument::setRotate(ofQuaternion rot_){
+    myNode.setOrientation(rot_);
+}
 
 
+void Instrument::planeMovement(float &pct_){
+    
+    if (animate && pct_ < 1.0) {
+        
+        float index = aniPath.getIndexAtPercent(pct_);
+     //   cout << index << endl;
+        ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
+        setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+        
+        ofQuaternion tempRot;
+        tempRot.slerp(pct_, myDefault,myTarget);
+        
+        setRotate( tempRot );
+
+    }
+    
+    if (animate && pct_ >= 1.0) {
+        
+        setTranslate( aniPath.getVertices().at(aniPath.size()-1));
+        
+        animate=false;
+    }
+}
 
 

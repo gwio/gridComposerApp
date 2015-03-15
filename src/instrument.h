@@ -26,14 +26,14 @@ struct cubeGroup {
     ofColor groupColor;
     int lowX, highX;
     int lowY, highY;
-
+    
     vector< int> y_in_x_elements;
     vector< int> x_in_y_elements;
     Tonic::ofxTonicSynth groupSynth;
     Tonic::Generator output;
-
+    
     cubeGroup(){
-
+        
     };
     cubeGroup(int tiles_) {
         lowX = tiles_-1;
@@ -58,7 +58,7 @@ public:
     Instrument();
     Instrument(string,int,float,float);
     
-    void setup(int*, Tonic::ofxTonicSynth *);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode);
     void updateTonicOut();
     void update();
     void draw();
@@ -70,8 +70,8 @@ public:
     void noteTriggerNorth();
     void noteTriggerEast();
     void noteTriggerSouth();
-
-
+    
+    
     void nextDirection();
     
     void generateSynths();
@@ -87,6 +87,9 @@ public:
     void resetCubeGroup(unsigned long, int, int);
     void setupOneSynth(cubeGroup*);
     void updateGroupInfo(unsigned long,int,int);
+    void setTranslate(ofVec3f);
+    void setRotate(ofQuaternion);
+    void planeMovement(float&);
     
     string instrumentId;
     
@@ -101,13 +104,22 @@ public:
     // connected = if direction is active, then if connected -> sound, else-> pause
     bool activeDirection[4] ;
     bool connectedDirection[4] ;
-
+    bool animate;
+    bool inFocus;
+    
     
     //synthinfo
     int rCounter,gCounter,bCounter;
     vector<vector<synthInfo> > layerInfo;
     map<unsigned long,cubeGroup> soundsMap;
     unsigned long soundsCounter;
+    
+    
+    //transformation
+    ofNode myNode;
+    ofQuaternion myDefault;
+    ofQuaternion myTarget;
+    ofPolyline aniPath;
     
     //visual
     vector<ofVec3f> verticesOuter;
@@ -135,7 +147,7 @@ public:
     Tonic::ofxTonicSynth *mainTonicPtr;
     Tonic::Generator instrumentOut;
     Tonic::RampedValue outputRamp;
-       
+    
     bool synthHasChanged;
     
     
