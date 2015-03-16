@@ -125,6 +125,8 @@ public:
     float myScaleTarget;
     float myScaleDefault;
     
+    float easeInOut(float, float);
+    
     //visual
     vector<ofVec3f> verticesOuter;
     vector<ofVec3f> verticesInner;

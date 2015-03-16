@@ -747,7 +747,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeGroup temp = cubeGroup(gridTiles);
         temp.ownId = soundsCounter;
         temp.size = 1;
-        ofColor gColor = ofColor::fromHsb(  fmod( (510+(colorHue+ofRandom(-12,12))),255) , 150+ofRandom(-50,50), 120+ofRandom(-40,40));;
+        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-12,12),0,255), 150+ofRandom(-50,50), 120+ofRandom(-40,40));;
         temp.groupColor = gColor;
         temp.lowX = x_;
         temp.highX = x_;
@@ -918,11 +918,11 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.62;
+    float rampLength = 0.32;
     
     //1 preset additive synth with twlevetone
     static int twoOctavePentatonicScale[19] = { 0,-1-12,-3,-5,-7-12,-8,-10,-12, 0,1,3+12,5,7,8+24,10,12,0+24,0,0};
-    int note = twoOctavePentatonicScale [ int(ofRandom(18))]+40;
+    int note = twoOctavePentatonicScale [ int(ofRandom(18))]+44;
     
     
     Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
@@ -984,38 +984,70 @@ void Instrument::setScale(float scale_){
 }
 
 
+float Instrument::easeInOut(float input_, float a_) {
+   
+    
+    float epsilon = 0.00001;
+    float min_param_a = 0.0 + epsilon;
+    float max_param_a = 1.0 - epsilon;
+    a_ = min(max_param_a, max(min_param_a, a_));
+    a_ = 1.0-a_; // for sensible results
+     
+    
+    float y = 0;
+    if (input_<=0.5){
+        y = (pow(2.0*input_, 1.0/a_))/2.0;
+    } else {
+        y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
+    }
+    return y;
+    
+}
+
 void Instrument::planeMovement(float &pct_){
     
-    if (animate && pct_ < 1.0) {
-        
-        float index = aniPath.getIndexAtPercent(pct_);
-     //   cout << index << endl;
-        ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
-        setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
-        
-        ofQuaternion tempRot;
-        tempRot.slerp(pct_, myDefault,myTarget);
-        
-        setRotate( tempRot );
+    
+    
+        if (animate && pct_ < 0.99) {
+            
+            float inOut = easeInOut(pct_, 0.8);
 
-    }
+            
+            float index = aniPath.getIndexAtPercent(inOut);
+           
+            ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
+            setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+            
+            ofQuaternion tempRot;
+            tempRot.slerp(inOut, myDefault,myTarget);
+            
+            setRotate( tempRot );
+            
+        }
+        
+    
     
     if (animate && pct_ >= 1.0) {
-        
+    
         setTranslate( aniPath.getVertices().at(aniPath.size()-1));
         
         animate=false;
     }
     
-    if(scaling && pct_ < 1.0) {
-        setScale( ofLerp(myScaleDefault, myScaleTarget, pct_));
+    if(scaling && pct_ < 0.99) {
+        float inOut = easeInOut(pct_, 0.8);
 
+        setScale( ofLerp(myScaleDefault, myScaleTarget, inOut));
+        
     }
     
     if (scaling && pct_ >= 1.0) {
-        setScale(myScaleTarget);
+       setScale(myScaleTarget);
         scaling = false;
     }
+        
+    
+    
 }
 
 

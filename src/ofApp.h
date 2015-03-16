@@ -69,6 +69,8 @@ public:
     float camTargetFov;
     float camDefaultFov;
     
+    float easeInOut(float,float);
+    
     ofQuaternion camQuatDefault, camQuatTarget;
     
     //animation paths

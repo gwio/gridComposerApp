@@ -2,8 +2,8 @@
 #define TILES 7
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
-#define BPM 130*2
-#define ANI_SPEED 0.01;
+#define BPM 130*4
+#define ANI_SPEED 0.022;
 
 
 //--------------------------------------------------------------
@@ -157,7 +157,7 @@ void ofApp::draw(){
     
     
     glShadeModel(GL_SMOOTH);
-    //glDisable(GL_MULTISAMPLE);
+   // glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
@@ -813,26 +813,47 @@ void ofApp::updateGuiFbo() {
 
 void ofApp::updateCamera(){
     
-    if (animCam && aniCam < 1.0 ) {
+    if (animCam && aniCam < 0.99 ) {
         
-        float index = camUsePath.getIndexAtPercent(aniCam);
-        cout << index << endl;
+        float inOut = easeInOut(aniCam, 0.62);
+        
+        float index = camUsePath.getIndexAtPercent(inOut);
         ofVec3f tempPos =  (camUsePath.getVertices().at((int)index+1)-camUsePath.getVertices().at((int)index))* (index-floor(index));
         testCam.setPosition( camUsePath.getVertices().at((int)index)+ tempPos);
         
-        testCam.setFov(ofLerp(camDefaultFov, camTargetFov, aniCam));
+        testCam.setFov(ofLerp(camDefaultFov, camTargetFov, inOut));
         
         ofQuaternion tempRot;
-        tempRot.slerp(aniCam, camQuatDefault,camQuatTarget);
+        tempRot.slerp(inOut, camQuatDefault,camQuatTarget);
         testCam.setOrientation(tempRot);
-        //testCam.lookAt(synths[activeSynth].myNode.getPosition());
     }
     
     if (animCam && aniCam >=1.0) {
         animCam = false;
-        // testCam.lookAt(synths[activeSynth].myNode.getPosition());
-        // testCam.setPosition(camUsePath.getVertices().at(camUsePath.size()-1));
+     //    testCam.lookAt(synths[activeSynth].myNode.getPosition());
+    //     testCam.setPosition(camUsePath.getVertices().at(camUsePath.size()-1));
     }
+}
+
+
+float ofApp::easeInOut(float input_, float a_) {
+    
+    
+    float epsilon = 0.00001;
+    float min_param_a = 0.0 + epsilon;
+    float max_param_a = 1.0 - epsilon;
+    a_ = min(max_param_a, max(min_param_a, a_));
+    a_ = 1.0-a_; // for sensible results
+    
+    
+    float y = 0;
+    if (input_<=0.5){
+        y = (pow(2.0*input_, 1.0/a_))/2.0;
+    } else {
+        y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
+    }
+    return y;
+    
 }
 
 void ofApp::setupPathAndAnimation() {
@@ -859,46 +880,46 @@ void ofApp::setupPathAndAnimation() {
     
     centerToOne.addVertex(synthPos[1].getPosition());
     centerToOne.lineTo(synthPos[0].getPosition());
-    centerToOne = centerToOne.getResampledByCount(40);
+    centerToOne = centerToOne.getResampledByCount(80);
     
     centerToThree.addVertex(synthPos[1].getPosition());
     centerToThree.lineTo(synthPos[2].getPosition());
-    centerToThree = centerToThree.getResampledByCount(40);
+    centerToThree = centerToThree.getResampledByCount(80);
     
     //-----------__________----------________
     twoToActive.addVertex(synthPos[1].getPosition());
     twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*1.2), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
-    twoToActive = twoToActive.getResampledByCount(40);
+    twoToActive = twoToActive.getResampledByCount(80);
     
     oneToActive.addVertex(synthPos[0].getPosition());
     oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*1.2),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
-    oneToActive = oneToActive.getResampledByCount(40);
+    oneToActive = oneToActive.getResampledByCount(80);
     
     threeToActive.addVertex(synthPos[2].getPosition());
     threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*1.2),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
-    threeToActive = threeToActive.getResampledByCount(40);
+    threeToActive = threeToActive.getResampledByCount(80);
     
     //------------__________-------------__________
     twoToBack.addVertex(synthActivePos.getPosition());
     twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.6), synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[1].getPosition());
-    twoToBack = twoToBack.getResampledByCount(40);
+    twoToBack = twoToBack.getResampledByCount(80);
     
     oneToBack.addVertex(synthActivePos.getPosition());
     oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.6), synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[0].getPosition());
-    oneToBack = oneToBack.getResampledByCount(40);
+    oneToBack = oneToBack.getResampledByCount(80);
     
     threeToBack.addVertex(synthActivePos.getPosition());
     threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.6), synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*0.8), synthPos[2].getPosition());
-    threeToBack = threeToBack.getResampledByCount(40);
+    threeToBack = threeToBack.getResampledByCount(80);
     
     //_____----------_________________-------------
     camPath.addVertex(camNotActiveSynth.getPosition());
     camPath.bezierTo(camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camActiveSynth.getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac) , camActiveSynth.getPosition());
-    camPath = camPath.getResampledByCount(40);
+    camPath = camPath.getResampledByCount(80);
     
     camPathBack.addVertex(camActiveSynth.getPosition());
     camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,TILESIZE*TILES*bezierHandleFac,0), camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camNotActiveSynth.getPosition());
-    camPathBack = camPathBack.getResampledByCount(40);
+    camPathBack = camPathBack.getResampledByCount(80);
     
     
     
