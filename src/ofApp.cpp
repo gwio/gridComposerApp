@@ -3,7 +3,7 @@
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*2
-#define ANI_SPEED 0.02;
+#define ANI_SPEED 0.01;
 
 
 //--------------------------------------------------------------
@@ -848,7 +848,7 @@ void ofApp::setupPathAndAnimation() {
     float bezierHandleFac = 2.5;
     
     synthActivePos.setPosition(0, -TILES*TILESIZE*4, TILESIZE*TILES*3.5);
-    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5,TILES*TILESIZE*2.2));
+    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.5,TILES*TILESIZE*2.2));
     camNotActiveSynth.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
@@ -867,28 +867,28 @@ void ofApp::setupPathAndAnimation() {
     
     //-----------__________----------________
     twoToActive.addVertex(synthPos[1].getPosition());
-    twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
+    twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*1.2), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     twoToActive = twoToActive.getResampledByCount(40);
     
     oneToActive.addVertex(synthPos[0].getPosition());
-    oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
+    oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*1.2),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     oneToActive = oneToActive.getResampledByCount(40);
     
     threeToActive.addVertex(synthPos[2].getPosition());
-    threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
+    threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*1.2),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     threeToActive = threeToActive.getResampledByCount(40);
     
     //------------__________-------------__________
     twoToBack.addVertex(synthActivePos.getPosition());
-    twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac), synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[1].getPosition());
+    twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.2), synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[1].getPosition());
     twoToBack = twoToBack.getResampledByCount(40);
     
     oneToBack.addVertex(synthActivePos.getPosition());
-    oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac), synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[0].getPosition());
+    oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.2), synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[0].getPosition());
     oneToBack = oneToBack.getResampledByCount(40);
     
     threeToBack.addVertex(synthActivePos.getPosition());
-    threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac), synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*0.8), synthPos[2].getPosition());
+    threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.2), synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*0.8), synthPos[2].getPosition());
     threeToBack = threeToBack.getResampledByCount(40);
     
     //_____----------_________________-------------
@@ -897,7 +897,7 @@ void ofApp::setupPathAndAnimation() {
     camPath = camPath.getResampledByCount(40);
     
     camPathBack.addVertex(camActiveSynth.getPosition());
-    camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,0,-TILESIZE*TILES*bezierHandleFac), camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camNotActiveSynth.getPosition());
+    camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,TILESIZE*TILES*bezierHandleFac,0), camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camNotActiveSynth.getPosition());
     camPathBack = camPathBack.getResampledByCount(40);
     
     
