@@ -224,7 +224,7 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             
             default1 += translateVec_;
             default4 += translateVec_;
-
+            
             connectedOn1 += translateVec_;
             connectedOn2 += translateVec_;
             
@@ -320,7 +320,7 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             
             connectedOn1 += translateVec_;
             connectedOn2 += translateVec_;
-
+            
             
             break;
             
@@ -410,7 +410,7 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             
             default1 += translateVec_;
             default4 += translateVec_;
-
+            
             connectedOn1 += translateVec_;
             connectedOn2 += translateVec_;
             

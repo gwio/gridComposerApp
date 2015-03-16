@@ -227,7 +227,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
-
+    
     
     
     planes[0].setup(ofVec3f(0,(gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
@@ -294,14 +294,14 @@ void Instrument::update() {
 }
 
 void Instrument::draw() {
-   // ofPushMatrix();
+    // ofPushMatrix();
     
     cubes.draw();
     
     interfacePlaneMesh.drawWireframe();
     interfaceConnectedMesh.draw();
     
-   // ofPopMatrix();
+    // ofPopMatrix();
 }
 
 void Instrument::drawFbo() {
@@ -984,68 +984,36 @@ void Instrument::setScale(float scale_){
 }
 
 
-float Instrument::easeInOut(float input_, float a_) {
-   
-    
-    float epsilon = 0.00001;
-    float min_param_a = 0.0 + epsilon;
-    float max_param_a = 1.0 - epsilon;
-    a_ = min(max_param_a, max(min_param_a, a_));
-    a_ = 1.0-a_; // for sensible results
-     
-    
-    float y = 0;
-    if (input_<=0.5){
-        y = (pow(2.0*input_, 1.0/a_))/2.0;
-    } else {
-        y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
-    }
-    return y;
-    
-}
-
-void Instrument::planeMovement(float &pct_){
+void Instrument::planeMovement(float pct_){
     
     
-    
-        if (animate && pct_ < 0.99) {
-            
-            float inOut = easeInOut(pct_, 0.8);
-
-            
-            float index = aniPath.getIndexAtPercent(inOut);
-           
-            ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
-            setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
-            
-            ofQuaternion tempRot;
-            tempRot.slerp(inOut, myDefault,myTarget);
-            
-            setRotate( tempRot );
-            
-        }
-        
-    
-    
-    if (animate && pct_ >= 1.0) {
-    
+    if (animate && pct_==1.0) {
+        animate = false;
         setTranslate( aniPath.getVertices().at(aniPath.size()-1));
         
-        animate=false;
+        ofQuaternion tempRot;
+        tempRot.slerp(pct_, myDefault,myTarget);
+        setRotate( tempRot );
+    } else if (animate) {
+        float index = aniPath.getIndexAtPercent(pct_);
+        ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
+        setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+        ofQuaternion tempRot;
+        tempRot.slerp(pct_, myDefault,myTarget);
+        setRotate( tempRot );
     }
     
-    if(scaling && pct_ < 0.99) {
-        float inOut = easeInOut(pct_, 0.8);
-
-        setScale( ofLerp(myScaleDefault, myScaleTarget, inOut));
+    
+    if(scaling ) {
         
+        setScale( ofLerp(myScaleDefault, myScaleTarget, pct_));
+        
+        if (scaling && pct_== 1.0) {
+            scaling = false;
+        }
     }
     
-    if (scaling && pct_ >= 1.0) {
-       setScale(myScaleTarget);
-        scaling = false;
-    }
-        
+    
     
     
 }

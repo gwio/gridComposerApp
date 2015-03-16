@@ -39,7 +39,7 @@ public:
     
     void setupOfxGui();
     
-    void updateCamera();
+    void updateCamera(float);
     
     bool pointInsideGrid(ofVec3f);
     
@@ -83,6 +83,9 @@ public:
     float aniPct;
     float aniCam;
     bool animCam;
+    float tweenFloat;
+    
+    bool interfaceMoving;
     
     //Synthebenen
     int activeSynth;

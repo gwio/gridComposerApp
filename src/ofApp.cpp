@@ -103,7 +103,7 @@ void ofApp::setup(){
     aniCam = 1.0;
     
     animCam = false;
-    
+    interfaceMoving = false;
     debugCam = false;
     
 }
@@ -127,7 +127,7 @@ void ofApp::update(){
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
-        synths[i].planeMovement(aniPct);
+        
         
         if (synths[i].synthHasChanged == true){
             setupAudio();
@@ -136,15 +136,29 @@ void ofApp::update(){
     }
     
     //for animation
-    if (aniPct <= 1.0) {
+    if (aniPct < 1.0) {
+        tweenFloat = easeInOut( ofClamp(aniPct, 0.0, 1.0), 0.785);
+        // cout << tweenFloat << endl;
+        for (int i = 0; i < synths.size(); i++) {
+            synths[i].planeMovement(tweenFloat);
+        }
+        if (animCam) {
+            updateCamera(tweenFloat);
+        }
         aniPct += ANI_SPEED;
     }
     
-    if (aniCam <= 1.0) {
-        aniCam += ANI_SPEED;
+    if (aniPct >= 1.0) {
+        for (int i = 0; i < synths.size(); i++) {
+            synths[i].planeMovement(1.0);
+        }
+        if (animCam) {
+            updateCamera(1.0);
+        }
+        aniPct = 1.0;
     }
     
-    updateCamera();
+    
     intersectPlane();
     
     
@@ -157,7 +171,7 @@ void ofApp::draw(){
     
     
     glShadeModel(GL_SMOOTH);
-   // glDisable(GL_MULTISAMPLE);
+    // glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
@@ -305,13 +319,12 @@ void ofApp::keyPressed(int key){
             synths[synthButton[2]].myScaleDefault = 1.0;
             synths[synthButton[1]].myScaleTarget = 0.5;
             synths[synthButton[2]].myScaleTarget = 0.5;
-
-
+            
+            
             
             synthButton[0] = synthButton[1];
             synthButton[1] = temp;
             
-            aniPct = 0.0;
             
             
             //camani
@@ -321,7 +334,9 @@ void ofApp::keyPressed(int key){
             camTargetFov = camActiveFov;
             camDefaultFov = camFov;
             animCam = true;
-            aniCam = 0.0;
+            
+            aniPct = 0.0;
+            
             
         }
         
@@ -348,8 +363,6 @@ void ofApp::keyPressed(int key){
             synths[synthButton[0]].myScaleTarget = 1.0;
             synths[synthButton[2]].myScaleTarget = 1.0;
             
-            aniPct = 0.0;
-            
             
             
             //camani
@@ -359,8 +372,8 @@ void ofApp::keyPressed(int key){
             camTargetFov = camFov;
             camDefaultFov = camActiveFov;
             animCam = true;
-            aniCam = 0.0;
             
+            aniPct = 0.0;
             
             
         } else{
@@ -378,8 +391,6 @@ void ofApp::keyPressed(int key){
             synths[synthButton[2]].myScaleTarget = 0.5;
             
             
-            aniPct = 0.0;
-            
             
             //cam
             camQuatDefault = camNotActiveSynth.getOrientationQuat();
@@ -388,7 +399,8 @@ void ofApp::keyPressed(int key){
             camDefaultFov = camFov;
             camTargetFov = camActiveFov;
             animCam = true;
-            aniCam = 0.0;
+            
+            aniPct = 0.0;
             
             
             
@@ -440,8 +452,8 @@ void ofApp::keyPressed(int key){
             synths[synthButton[1]].animate = true;
             synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
             synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
-
-
+            
+            
             synths[synthButton[0]].scaling = true;
             synths[synthButton[1]].scaling = true;
             synths[synthButton[0]].myScaleDefault = 1.0;
@@ -453,9 +465,6 @@ void ofApp::keyPressed(int key){
             synthButton[2] = synthButton[1];
             synthButton[1] = temp;
             
-            aniPct = 0.0;
-            
-            
             //camera
             camQuatDefault = camNotActiveSynth.getOrientationQuat();
             camQuatTarget = camActiveSynth.getOrientationQuat();
@@ -463,8 +472,8 @@ void ofApp::keyPressed(int key){
             camDefaultFov = camFov;
             camTargetFov = camActiveFov;
             animCam = true;
-            aniCam = 0.0;
             
+            aniPct = 0.0;
             
         }
         
@@ -811,28 +820,32 @@ void ofApp::updateGuiFbo() {
 }
 
 
-void ofApp::updateCamera(){
+void ofApp::updateCamera(float pct_){
     
-    if (animCam && aniCam < 0.99 ) {
+    if (animCam && pct_ == 1.0) {
+        animCam = false;
+        testCam.setPosition( camUsePath.getVertices().at(camUsePath.size()-1));
+        ofQuaternion tempRot;
+        tempRot.slerp(pct_, camQuatDefault,camQuatTarget);
+        testCam.setOrientation(tempRot);
         
-        float inOut = easeInOut(aniCam, 0.62);
         
-        float index = camUsePath.getIndexAtPercent(inOut);
+    } else if (animCam) {
+        
+        float index = camUsePath.getIndexAtPercent(pct_);
         ofVec3f tempPos =  (camUsePath.getVertices().at((int)index+1)-camUsePath.getVertices().at((int)index))* (index-floor(index));
         testCam.setPosition( camUsePath.getVertices().at((int)index)+ tempPos);
         
-        testCam.setFov(ofLerp(camDefaultFov, camTargetFov, inOut));
+        testCam.setFov(ofLerp(camDefaultFov, camTargetFov, pct_));
         
         ofQuaternion tempRot;
-        tempRot.slerp(inOut, camQuatDefault,camQuatTarget);
+        tempRot.slerp(pct_, camQuatDefault,camQuatTarget);
         testCam.setOrientation(tempRot);
+        
+        
     }
     
-    if (animCam && aniCam >=1.0) {
-        animCam = false;
-     //    testCam.lookAt(synths[activeSynth].myNode.getPosition());
-    //     testCam.setPosition(camUsePath.getVertices().at(camUsePath.size()-1));
-    }
+    
 }
 
 

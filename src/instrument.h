@@ -90,7 +90,7 @@ public:
     void setTranslate(ofVec3f);
     void setRotate(ofQuaternion);
     void setScale(float);
-    void planeMovement(float&);
+    void planeMovement(float);
     
     string instrumentId;
     
@@ -125,7 +125,6 @@ public:
     float myScaleTarget;
     float myScaleDefault;
     
-    float easeInOut(float, float);
     
     //visual
     vector<ofVec3f> verticesOuter;
