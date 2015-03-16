@@ -848,7 +848,7 @@ void ofApp::setupPathAndAnimation() {
     float bezierHandleFac = 2.5;
     
     synthActivePos.setPosition(0, -TILES*TILESIZE*4, TILESIZE*TILES*3.5);
-    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.5,TILES*TILESIZE*2.2));
+    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.0,TILES*TILESIZE*2.2));
     camNotActiveSynth.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
@@ -880,15 +880,15 @@ void ofApp::setupPathAndAnimation() {
     
     //------------__________-------------__________
     twoToBack.addVertex(synthActivePos.getPosition());
-    twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.2), synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[1].getPosition());
+    twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.6), synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[1].getPosition());
     twoToBack = twoToBack.getResampledByCount(40);
     
     oneToBack.addVertex(synthActivePos.getPosition());
-    oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.2), synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[0].getPosition());
+    oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.6), synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[0].getPosition());
     oneToBack = oneToBack.getResampledByCount(40);
     
     threeToBack.addVertex(synthActivePos.getPosition());
-    threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.2), synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*0.8), synthPos[2].getPosition());
+    threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac*0.6), synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*0.8), synthPos[2].getPosition());
     threeToBack = threeToBack.getResampledByCount(40);
     
     //_____----------_________________-------------
