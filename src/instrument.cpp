@@ -1,8 +1,9 @@
 #include "instrument.h"
 
-#define CUBE_Z_HEIGHT 40
-#define EMPTY_Z 10
-#define SCAN_Z 40*0.8
+//layer is 100x100
+#define CUBE_Z_HEIGHT 10
+#define EMPTY_Z 2.55
+#define SCAN_Z 16*0.8
 
 #define COLOR_TARGET 55.0
 
@@ -39,6 +40,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     colorHue = ofRandom(255);
     animate = false;
     inFocus = false;
+    scaling = false;
+    
+    myScaleTarget = 1.0;
     
 }
 
@@ -975,6 +979,10 @@ void Instrument::setRotate(ofQuaternion rot_){
     myNode.setOrientation(rot_);
 }
 
+void Instrument::setScale(float scale_){
+    myNode.setScale(scale_);
+}
+
 
 void Instrument::planeMovement(float &pct_){
     
@@ -997,6 +1005,16 @@ void Instrument::planeMovement(float &pct_){
         setTranslate( aniPath.getVertices().at(aniPath.size()-1));
         
         animate=false;
+    }
+    
+    if(scaling && pct_ < 1.0) {
+        setScale( ofLerp(myScaleDefault, myScaleTarget, pct_));
+
+    }
+    
+    if (scaling && pct_ >= 1.0) {
+        setScale(myScaleTarget);
+        scaling = false;
     }
 }
 

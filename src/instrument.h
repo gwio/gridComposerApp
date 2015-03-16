@@ -89,6 +89,7 @@ public:
     void updateGroupInfo(unsigned long,int,int);
     void setTranslate(ofVec3f);
     void setRotate(ofQuaternion);
+    void setScale(float);
     void planeMovement(float&);
     
     string instrumentId;
@@ -105,6 +106,7 @@ public:
     bool activeDirection[4] ;
     bool connectedDirection[4] ;
     bool animate;
+    bool scaling;
     bool inFocus;
     
     
@@ -120,6 +122,8 @@ public:
     ofQuaternion myDefault;
     ofQuaternion myTarget;
     ofPolyline aniPath;
+    float myScaleTarget;
+    float myScaleDefault;
     
     //visual
     vector<ofVec3f> verticesOuter;

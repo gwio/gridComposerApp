@@ -25,9 +25,9 @@ InterfacePlane::InterfacePlane() {
 
 void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gridSize_, ofVboMesh &i_planeMesh, ofVboMesh &i_planeFboMesh, ofVboMesh &i_connected, ofVec3f translateVec_ ){
     //ids 1 left, 2 up, 3 right, 4 down
-    float breite = gridSize_*0.7;
-    float planeSize_ = planeSize_A*0.86;
-    float abstand = 1.5;
+    float breite = planeSize_A*0.08;
+    float planeSize_ = planeSize_A*0.66;
+    float abstand = 2.2;
     //depends on tilesize
     float arrow = 0.5;
     ofVec3f center;
@@ -49,8 +49,8 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             //left
         case 0:
             
-            activeMeshON = ofVec3f(+gridSize_*arrow,0,0);
-            center = center_+ ofVec3f(-gridSize_*abstand,0,0) ;
+            activeMeshON = ofVec3f(+breite*arrow,0,0);
+            center = center_+ ofVec3f(-breite*abstand,0,0) ;
             
             //0
             i_planeMesh.addVertex(center+ ofVec3f(-breite/2,-planeSize_/2,0) );
@@ -140,8 +140,8 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             
         case 1:
             
-            activeMeshON = ofVec3f(0,0-gridSize_*arrow,0) ;
-            center = center_+ ofVec3f(0,gridSize_*abstand,0) ;
+            activeMeshON = ofVec3f(0,0-breite*arrow,0) ;
+            center = center_+ ofVec3f(0,breite*abstand,0) ;
             
             
             //0
@@ -232,8 +232,8 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             
         case 2:
             
-            activeMeshON = ofVec3f(-gridSize_*arrow,0,0) ;
-            center = center_+ ofVec3f(+gridSize_*abstand,0,0) ;
+            activeMeshON = ofVec3f(-breite*arrow,0,0) ;
+            center = center_+ ofVec3f(+breite*abstand,0,0) ;
             
             
             
@@ -326,8 +326,8 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
             
         case 3:
             
-            activeMeshON = ofVec3f(0,+gridSize_*arrow,0) ;
-            center = center_+ ofVec3f(0,-gridSize_*abstand,0) ;
+            activeMeshON = ofVec3f(0,+breite*arrow,0) ;
+            center = center_+ ofVec3f(0,-breite*abstand,0) ;
             
             
             

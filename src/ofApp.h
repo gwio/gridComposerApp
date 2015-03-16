@@ -35,7 +35,7 @@ public:
     
     void updateTapMap();
     
-    void setupPathAndAnmation();
+    void setupPathAndAnimation();
     
     void setupOfxGui();
     
@@ -74,6 +74,7 @@ public:
     //animation paths
     ofPolyline oneToActive, twoToActive, threeToActive;
     ofPolyline oneToBack, twoToBack, threeToBack;
+    ofPolyline centerToOne, centerToThree;
     ofPolyline camPath;
     ofPolyline camPathBack;
     ofPolyline camUsePath;

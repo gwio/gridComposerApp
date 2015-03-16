@@ -1,9 +1,9 @@
 #include "ofApp.h"
 #define TILES 7
-#define TILESIZE 65
+#define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*2
-#define ANI_SPEED 0.01;
+#define ANI_SPEED 0.02;
 
 
 //--------------------------------------------------------------
@@ -11,10 +11,10 @@ void ofApp::setup(){
     ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
     
     synthPos.resize(3);
-
+    
     for (int i = -1; i < 2; i++) {
         ofNode temp;
-        temp.setPosition( i*(TILES*TILESIZE*1.7), 0, 0);
+        temp.setPosition( i*(TILES*TILESIZE*2), 0, 0);
         //temp.setOrientation(ofVec3f(0,0,1));
         synthPos[i+1]=temp;
     }
@@ -62,7 +62,7 @@ void ofApp::setup(){
     }
     
     
-    setupPathAndAnmation();
+    setupPathAndAnimation();
     
     ofBackground(11, 65, 65);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
@@ -71,7 +71,7 @@ void ofApp::setup(){
     ofClear(0, 0, 0);
     fbo.end();
     
-    ofEnableLighting();
+    //   ofEnableLighting();
     light.setPosition(0, 0, 140);
     
     
@@ -92,13 +92,13 @@ void ofApp::setup(){
     guiFbo.allocate(400, 800, GL_RGBA);
     
     focusCam = false;
-  
+    
     
     synthButton[0] = 0;
     synthButton[1] = 1;
     synthButton[2] = 2;
     
-   
+    
     aniPct = 1.0;
     aniCam = 1.0;
     
@@ -127,7 +127,7 @@ void ofApp::update(){
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
-       synths[i].planeMovement(aniPct);
+        synths[i].planeMovement(aniPct);
         
         if (synths[i].synthHasChanged == true){
             setupAudio();
@@ -162,24 +162,24 @@ void ofApp::draw(){
     
     glEnable(GL_MULTISAMPLE);
     
-    ofEnableLighting();
+    //  ofEnableLighting();
     
     
     if (!debugCam) {
         testCam.begin();
     } else {
-    cam.begin();
+        cam.begin();
     }
     
-    light.enable();
+    //  light.enable();
     // planeTemp.draw();
     
-  // globalTranslate.transformGL();
+    // globalTranslate.transformGL();
     
     
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
-
+        
         synths[i].draw();
         
         synths[i].myNode.restoreTransformGL();
@@ -187,7 +187,7 @@ void ofApp::draw(){
     }
     
     
-  // globalTranslate.restoreTransformGL();
+    // globalTranslate.restoreTransformGL();
     
     if (!debugCam) {
         testCam.end();
@@ -197,7 +197,7 @@ void ofApp::draw(){
     
     // mousePick.draw(ofGetMouseX(),ofGetMouseY());
     
-    ofDisableLighting();
+    //  ofDisableLighting();
     if (drawInfo) {
         drawDebug();
     }
@@ -255,50 +255,65 @@ void ofApp::keyPressed(int key){
         int temp = synthButton[0];
         activeSynth = synthButton[0];
         
-        bool testHere = false;
-            if (synths[synthButton[1]].inFocus) {
-                testHere = true;
-                
-                synths[synthButton[1]].aniPath = oneToBack;
-                synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
-                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat().inverse();
-
-
-
-                synths[synthButton[1]].inFocus = false ;
-                synths[synthButton[1]].animate = true ;
-
-                
-                synths[temp].inFocus = true;
-                synths[temp].animate = true;
-                synths[ temp ].aniPath = oneToActive;
-                synths[temp].myTarget = synthActivePos.getOrientationQuat().inverse();
-                synths[temp].myDefault = synthPos[0].getOrientationQuat();
-
-                
-                synthButton[0] = synthButton[1];
-                synthButton[1] = temp;
-                aniPct = 0.0;
-                
-            }
-        
-        if (!testHere) {
-            synths[temp].inFocus = true;
-            synths[temp].aniPath = oneToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat().inverse();
-            synths[temp].myDefault = synthPos[0].getOrientationQuat();
-
-
-            synths[temp].animate = true;
+        if (synths[synthButton[1]].inFocus) {
             
-            synths[synthButton[1]].setTranslate(synthPos[0].getPosition());
-
+            synths[synthButton[1]].aniPath = oneToBack;
+            synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
+            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+            
+            
+            
+            synths[synthButton[1]].inFocus = false ;
+            synths[synthButton[1]].animate = true ;
+            
+            
+            synths[temp].inFocus = true;
+            synths[temp].animate = true;
+            synths[ temp ].aniPath = oneToActive;
+            synths[temp].myTarget = synthActivePos.getOrientationQuat();
+            synths[temp].myDefault = synthPos[0].getOrientationQuat();
+            
+            synths[synthButton[0]].scaling = true;
+            synths[synthButton[1]].scaling = true;
+            synths[synthButton[0]].myScaleDefault = 0.5;
+            synths[synthButton[1]].myScaleDefault = 1.0;
+            synths[synthButton[0]].myScaleTarget = 1.0;
+            synths[synthButton[1]].myScaleTarget = 0.5;
+            
+            
             synthButton[0] = synthButton[1];
             synthButton[1] = temp;
-           
             aniPct = 0.0;
             
-           
+        } else {
+            synths[temp].inFocus = true;
+            synths[temp].aniPath = oneToActive;
+            synths[temp].myTarget = synthActivePos.getOrientationQuat();
+            synths[temp].myDefault = synthPos[0].getOrientationQuat();
+            
+            
+            synths[temp].animate = true;
+            
+            synths[synthButton[1]].aniPath = centerToOne;
+            synths[synthButton[1]].animate = true;
+            synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
+            synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
+            
+            synths[synthButton[1]].scaling = true;
+            synths[synthButton[2]].scaling = true;
+            synths[synthButton[1]].myScaleDefault = 1.0;
+            synths[synthButton[2]].myScaleDefault = 1.0;
+            synths[synthButton[1]].myScaleTarget = 0.5;
+            synths[synthButton[2]].myScaleTarget = 0.5;
+
+
+            
+            synthButton[0] = synthButton[1];
+            synthButton[1] = temp;
+            
+            aniPct = 0.0;
+            
+            
             //camani
             camQuatDefault = camNotActiveSynth.getOrientationQuat();
             camQuatTarget = camActiveSynth.getOrientationQuat();
@@ -312,20 +327,26 @@ void ofApp::keyPressed(int key){
         
     }
     if (key =='2') {
-      
+        
         int temp = synthButton[1];
         activeSynth = synthButton[1];
         
-        bool testHere = false;
         if (synths[synthButton[1]].inFocus) {
-            testHere = true;
             
             synths[synthButton[1]].aniPath = twoToBack;
             synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
-            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat().inverse();
-        
+            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+            
             synths[synthButton[1]].inFocus = false ;
             synths[synthButton[1]].animate = true ;
+            
+            
+            synths[synthButton[0]].scaling = true;
+            synths[synthButton[2]].scaling = true;
+            synths[synthButton[0]].myScaleDefault = 0.5;
+            synths[synthButton[2]].myScaleDefault = 0.5;
+            synths[synthButton[0]].myScaleTarget = 1.0;
+            synths[synthButton[2]].myScaleTarget = 1.0;
             
             aniPct = 0.0;
             
@@ -340,16 +361,21 @@ void ofApp::keyPressed(int key){
             animCam = true;
             aniCam = 0.0;
             
-           
             
-        }
-        
-        if (!testHere) {
+            
+        } else{
             synths[temp].inFocus = true;
             synths[temp].aniPath = twoToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat().inverse();
+            synths[temp].myTarget = synthActivePos.getOrientationQuat();
             synths[temp].myDefault = synthPos[1].getOrientationQuat();
             synths[temp].animate = true;
+            
+            synths[synthButton[0]].scaling = true;
+            synths[synthButton[2]].scaling = true;
+            synths[synthButton[0]].myScaleDefault = 1.0;
+            synths[synthButton[2]].myScaleDefault = 1.0;
+            synths[synthButton[0]].myScaleTarget = 0.5;
+            synths[synthButton[2]].myScaleTarget = 0.5;
             
             
             aniPct = 0.0;
@@ -363,11 +389,11 @@ void ofApp::keyPressed(int key){
             camTargetFov = camActiveFov;
             animCam = true;
             aniCam = 0.0;
-           
             
-
+            
+            
         }
-
+        
         
     }
     if (key =='3') {
@@ -375,14 +401,12 @@ void ofApp::keyPressed(int key){
         int temp = synthButton[2];
         activeSynth = synthButton[2];
         
-        bool testHere = false;
         if (synths[synthButton[1]].inFocus) {
-            testHere = true;
             
             synths[synthButton[1]].aniPath = threeToBack;
             synths[synthButton[1]].myTarget = synthPos[2].getOrientationQuat();
-            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat().inverse();
-
+            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+            
             synths[synthButton[1]].inFocus = false ;
             synths[synthButton[1]].animate = true ;
             
@@ -390,31 +414,48 @@ void ofApp::keyPressed(int key){
             synths[temp].inFocus = true;
             synths[temp].animate = true;
             synths[ temp ].aniPath = threeToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat().inverse();
+            synths[temp].myTarget = synthActivePos.getOrientationQuat();
             synths[temp].myDefault = synthPos[2].getOrientationQuat();
-
+            
+            synths[synthButton[2]].scaling = true;
+            synths[synthButton[1]].scaling = true;
+            synths[synthButton[2]].myScaleDefault = 0.5;
+            synths[synthButton[1]].myScaleDefault = 1.0;
+            synths[synthButton[2]].myScaleTarget = 1.0;
+            synths[synthButton[1]].myScaleTarget = 0.5;
+            
             
             synthButton[2] = synthButton[1];
             synthButton[1] = temp;
             aniPct = 0.0;
             
-        }
-        
-        if (!testHere) {
+        }else {
             synths[temp].inFocus = true;
             synths[temp].aniPath = threeToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat().inverse();
+            synths[temp].myTarget = synthActivePos.getOrientationQuat();
             synths[temp].myDefault = synthPos[2].getOrientationQuat();
             synths[temp].animate = true;
             
-            synths[synthButton[1]].setTranslate(synthPos[2].getPosition());
+            synths[synthButton[1]].aniPath = centerToThree;
+            synths[synthButton[1]].animate = true;
+            synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
+            synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
+
+
+            synths[synthButton[0]].scaling = true;
+            synths[synthButton[1]].scaling = true;
+            synths[synthButton[0]].myScaleDefault = 1.0;
+            synths[synthButton[1]].myScaleDefault = 1.0;
+            synths[synthButton[0]].myScaleTarget = 0.5;
+            synths[synthButton[1]].myScaleTarget = 0.5;
+            
             
             synthButton[2] = synthButton[1];
             synthButton[1] = temp;
             
             aniPct = 0.0;
             
-          
+            
             //camera
             camQuatDefault = camNotActiveSynth.getOrientationQuat();
             camQuatTarget = camActiveSynth.getOrientationQuat();
@@ -426,14 +467,14 @@ void ofApp::keyPressed(int key){
             
             
         }
-    
+        
     }
     
     
     if (key == 'c') {
         debugCam = !debugCam;
     }
- 
+    
 }
 
 //--------------------------------------------------------------
@@ -595,7 +636,7 @@ void ofApp::drawDebug() {
     } else {
         cam.begin();
     }
-   // globalTranslate.transformGL();
+    // globalTranslate.transformGL();
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].myNode.transformGL();
@@ -605,14 +646,14 @@ void ofApp::drawDebug() {
         synthPos[i].draw();
     }
     
- //   globalTranslate.restoreTransformGL();
+    //   globalTranslate.restoreTransformGL();
     
     
     synthActivePos.draw();
-   // camActiveSynth.draw();
+    // camActiveSynth.draw();
     camNotActiveSynth.draw();
     
-   
+    
     
     testCam.draw();
     
@@ -625,6 +666,10 @@ void ofApp::drawDebug() {
     threeToBack.draw();
     
     camPath.draw();
+    camPathBack.draw();
+    
+    centerToThree.draw();
+    centerToOne.draw();
     
     //ofDrawGrid(2500);
     
@@ -647,10 +692,10 @@ void ofApp::drawDebug() {
 
 void ofApp::intersectPlane(){
     //raytesting
-    worldMouse = cam.screenToWorld(ofVec3f(ofGetMouseX(),ofGetMouseY(),0.0));
+    worldMouse = testCam.screenToWorld(ofVec3f(ofGetMouseX(),ofGetMouseY(),0.0));
     
     mouseRay.s = worldMouse;
-    mouseRay.t = worldMouse-cam.getPosition();
+    mouseRay.t = worldMouse-testCam.getPosition();
     
     intersecPlane[activeSynth].intersect(mouseRay, intersectPos);
     vectorPosX = (intersectPos.x/TILESIZE)+ float(TILES)/2;
@@ -677,14 +722,14 @@ void ofApp::updateFboMesh(){
     ofDisableLighting();
     light.disable();
     
-  //  globalTranslate.transformGL();
+    //  globalTranslate.transformGL();
     
     synths[activeSynth].myNode.transformGL();
     synths[activeSynth].drawFbo();
     synths[activeSynth].myNode.restoreTransformGL();
-
     
-  //  globalTranslate.restoreTransformGL();
+    
+    //  globalTranslate.restoreTransformGL();
     
     testCam.end();
     
@@ -692,7 +737,7 @@ void ofApp::updateFboMesh(){
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
     
-
+    cout << lastPickColor  << endl;
 }
 
 void ofApp::updateTapMap() {
@@ -785,69 +830,82 @@ void ofApp::updateCamera(){
     
     if (animCam && aniCam >=1.0) {
         animCam = false;
-       // testCam.lookAt(synths[activeSynth].myNode.getPosition());
-       // testCam.setPosition(camUsePath.getVertices().at(camUsePath.size()-1));
+        // testCam.lookAt(synths[activeSynth].myNode.getPosition());
+        // testCam.setPosition(camUsePath.getVertices().at(camUsePath.size()-1));
     }
 }
 
-void ofApp::setupPathAndAnmation() {
+void ofApp::setupPathAndAnimation() {
     cam.setNearClip(10);
     cam.setFarClip(51000);
-    cam.setFov(50);
+    cam.setFov(20);
     
     testCam.setNearClip(10);
     testCam.setFarClip(51000);
-    camActiveFov = 100;
-    camFov = 50;
-    testCam.setFov(camDefaultFov);
+    camActiveFov = 20;
+    camFov = 30;
     
+    float bezierHandleFac = 2.5;
     
-    synthActivePos.setPosition(0, -TILES*TILESIZE*3, TILESIZE*TILES*3);
-    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-1000,0));
-    camNotActiveSynth.setPosition(0, 0, 600);
+    synthActivePos.setPosition(0, -TILES*TILESIZE*4, TILESIZE*TILES*3.5);
+    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5,TILES*TILESIZE*2.2));
+    camNotActiveSynth.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
     camNotActiveSynth.lookAt(synthPos[1].getPosition() - camNotActiveSynth.getZAxis());
-    synthActivePos.lookAt(  camActiveSynth.getPosition()-testCam.getZAxis() );
+    //  synthActivePos.lookAt(  camActiveSynth.getPosition() - synthActivePos.getZAxis() );
+    synthActivePos.setOrientation(camActiveSynth.getOrientationQuat());
     
+    
+    centerToOne.addVertex(synthPos[1].getPosition());
+    centerToOne.lineTo(synthPos[0].getPosition());
+    centerToOne = centerToOne.getResampledByCount(40);
+    
+    centerToThree.addVertex(synthPos[1].getPosition());
+    centerToThree.lineTo(synthPos[2].getPosition());
+    centerToThree = centerToThree.getResampledByCount(40);
+    
+    //-----------__________----------________
     twoToActive.addVertex(synthPos[1].getPosition());
-    twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*3), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*3,0), synthActivePos.getPosition());
+    twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     twoToActive = twoToActive.getResampledByCount(40);
     
     oneToActive.addVertex(synthPos[0].getPosition());
-    oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*3),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*3,0), synthActivePos.getPosition());
+    oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     oneToActive = oneToActive.getResampledByCount(40);
     
     threeToActive.addVertex(synthPos[2].getPosition());
-    threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*3),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*3,0), synthActivePos.getPosition());
+    threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     threeToActive = threeToActive.getResampledByCount(40);
     
+    //------------__________-------------__________
     twoToBack.addVertex(synthActivePos.getPosition());
-    twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*3), synthPos[1].getPosition()+ofVec3f(0,0-TILES*TILESIZE*3,0), synthPos[1].getPosition());
+    twoToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac), synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[1].getPosition());
     twoToBack = twoToBack.getResampledByCount(40);
     
     oneToBack.addVertex(synthActivePos.getPosition());
-    oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*3), synthPos[0].getPosition()+ofVec3f(0,-TILES*TILESIZE*3,0), synthPos[0].getPosition());
+    oneToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac), synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*0.8), synthPos[0].getPosition());
     oneToBack = oneToBack.getResampledByCount(40);
     
     threeToBack.addVertex(synthActivePos.getPosition());
-    threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*3), synthPos[2].getPosition()+ofVec3f(0,-TILESIZE*TILES*3,0), synthPos[2].getPosition());
+    threeToBack.bezierTo(synthActivePos.getPosition()+ofVec3f(0,0,-TILES*TILESIZE*bezierHandleFac), synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*0.8), synthPos[2].getPosition());
     threeToBack = threeToBack.getResampledByCount(40);
     
+    //_____----------_________________-------------
     camPath.addVertex(camNotActiveSynth.getPosition());
-    camPath.bezierTo(camNotActiveSynth.getPosition()+ofVec3f(0,0,TILES*TILESIZE), camActiveSynth.getPosition()+ofVec3f(0,TILESIZE*TILES,0) , camActiveSynth.getPosition());
+    camPath.bezierTo(camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camActiveSynth.getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac) , camActiveSynth.getPosition());
     camPath = camPath.getResampledByCount(40);
     
     camPathBack.addVertex(camActiveSynth.getPosition());
-    camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,TILESIZE*TILES,0), camNotActiveSynth.getPosition()+ofVec3f(0,0,TILES*TILESIZE), camNotActiveSynth.getPosition());
+    camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,0,-TILESIZE*TILES*bezierHandleFac), camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camNotActiveSynth.getPosition());
     camPathBack = camPathBack.getResampledByCount(40);
-
+    
     
     
     
     testCam.setPosition(camNotActiveSynth.getPosition());
     testCam.setOrientation(camNotActiveSynth.getOrientationQuat());
-    testCam.setFov(55);
-
+    testCam.setFov(camFov);
+    
 }
 
