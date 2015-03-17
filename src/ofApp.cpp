@@ -1,9 +1,9 @@
 #include "ofApp.h"
-#define TILES 7
+#define TILES 17
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*4
-#define ANI_SPEED 0.022;
+#define ANI_SPEED 0.028;
 
 
 //--------------------------------------------------------------
@@ -137,7 +137,7 @@ void ofApp::update(){
     
     //for animation
     if (aniPct < 1.0) {
-        tweenFloat = easeInOut( ofClamp(aniPct, 0.0, 1.0), 0.785);
+        tweenFloat = easeInOut( ofClamp(aniPct, 0.0, 1.0), 0.705);
         // cout << tweenFloat << endl;
         for (int i = 0; i < synths.size(); i++) {
             synths[i].planeMovement(tweenFloat);
@@ -171,10 +171,10 @@ void ofApp::draw(){
     
     
     glShadeModel(GL_SMOOTH);
-    // glDisable(GL_MULTISAMPLE);
+     glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     
-    glEnable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
     
     //  ofEnableLighting();
     
@@ -746,7 +746,7 @@ void ofApp::updateFboMesh(){
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
     
-    cout << lastPickColor  << endl;
+  //  cout << lastPickColor  << endl;
 }
 
 void ofApp::updateTapMap() {

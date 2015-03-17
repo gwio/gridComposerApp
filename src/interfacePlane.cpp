@@ -17,9 +17,9 @@ InterfacePlane::InterfacePlane() {
     connectedOffColor = ofColor::orangeRed;
     
     onPositionPct = 1.0;
-    connectedAniPct = 1.0;
-    pctSpeed = 0.05;
-    connectedPctSpeed = 0.05;
+    connectedAniPct = 0.0;
+    pctSpeed = 0.085;
+    connectedPctSpeed = 0.085;
 }
 
 
@@ -433,9 +433,9 @@ void InterfacePlane::update() {
             }
         }
         
-        if(onPositionPct < 1){
+        if(onPositionPct <= 1){
             onPositionPct+=pctSpeed;
-            pctTemp = (sin(ofMap(onPositionPct, 0.0, 1.0, HALF_PI+PI, HALF_PI))*0.5)+0.5;
+            pctTemp = easeInOut( ofClamp(onPositionPct, 0.0, 1.0), 0.57);
             activeMesh->setVertex(1+(direction*6),default1+(activeMeshON * pctTemp ));
             activeMesh->setVertex(4+(direction*6), default4+(activeMeshON * pctTemp ));
             
@@ -452,9 +452,9 @@ void InterfacePlane::update() {
         }
         
         
-        if(onPositionPct > 0){
+        if(onPositionPct >= 0){
             onPositionPct-=pctSpeed;
-            pctTemp = (sin(ofMap(onPositionPct, 0.0, 1.0, HALF_PI+PI, HALF_PI))*0.5)+0.5;
+            pctTemp = easeInOut( ofClamp(onPositionPct, 0.0, 1.0), 0.57);
             activeMesh->setVertex(1+(direction*6),default1+(activeMeshON * pctTemp ));
             activeMesh->setVertex(4+(direction*6), default4+(activeMeshON * pctTemp ));
             
@@ -483,11 +483,10 @@ void InterfacePlane::update() {
         
         
         
-        //hack with 1- float error 0.0000111???
-        if(1-connectedAniPct > 0){
+        if(connectedAniPct >= 0){
             
-            connectedAniPct+=connectedPctSpeed;
-            connectedPctTemp = (sin(ofMap(1-connectedAniPct, 0.0, 1.0,HALF_PI+PI, HALF_PI))*0.5)+0.5;
+            connectedAniPct-=connectedPctSpeed;
+            connectedPctTemp = easeInOut( ofClamp(connectedAniPct,0.0,1.0), 0.57);
             connectedMesh->setVertex(0+(direction*2), connectedOn1-(connectedAni*connectedPctTemp));
             connectedMesh->setVertex(1+(direction*2), connectedOn2+(connectedAni*connectedPctTemp));
             
@@ -504,19 +503,16 @@ void InterfacePlane::update() {
             
         }
         
-        if(1-connectedAniPct < 1){
-            connectedAniPct-=connectedPctSpeed;
-            connectedPctTemp = (sin(ofMap(1-connectedAniPct, 0.0, 1.0,HALF_PI+PI, HALF_PI))*0.5)+0.5;
+        if(connectedAniPct <= 1){
+            connectedAniPct+=connectedPctSpeed;
+            connectedPctTemp = easeInOut( ofClamp(connectedAniPct,0.0,1.0), 0.57);
             connectedMesh->setVertex(0+(direction*2), connectedOn1-(connectedAni*connectedPctTemp));
             connectedMesh->setVertex(1+(direction*2), connectedOn2+(connectedAni*connectedPctTemp));
         }
     }
 }
 
-void InterfacePlane::draw() {
-    
-    
-}
+
 
 void InterfacePlane::pulse() {
     activeDrawColor = ofColor::white;
@@ -525,5 +521,23 @@ void InterfacePlane::pulse() {
     }
 }
 
-void InterfacePlane::drawFbo(){
+
+float InterfacePlane::easeInOut(float input_, float a_) {
+    
+        
+        float epsilon = 0.00001;
+        float min_param_a = 0.0 + epsilon;
+        float max_param_a = 1.0 - epsilon;
+        a_ = min(max_param_a, max(min_param_a, a_));
+        a_ = 1.0-a_; // for sensible results
+        
+        
+        float y = 0;
+        if (input_<=0.5){
+            y = (pow(2.0*input_, 1.0/a_))/2.0;
+        } else {
+            y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
+        }
+        return y;
+    
 }

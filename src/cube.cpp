@@ -8,7 +8,7 @@
 
 #include "cube.h"
 
-#define SPEED 2
+#define SPEED 0.045
 
 
 Cube::Cube(){
@@ -17,7 +17,9 @@ Cube::Cube(){
     groupColor = ofColor::white;
     scanColor=ofColor::white;
     
-
+    aniPct = 0.0;
+    diff = 0.0;
+    aniFac = 0.0;
 
 }
 
@@ -48,20 +50,26 @@ void Cube::setup(){
 }
 
 void Cube::update(){
-    if (vec0Ptr->z < defaultZ) {
-        vec0Ptr->z += SPEED;
-        vec1Ptr->z += SPEED;
-        vec2Ptr->z += SPEED;
-        vec3Ptr->z += SPEED;
-
+    if (defaultZ != vec0Ptr->z) {
+ 
+        if (diff > 0) {
+        aniFac = ofClamp(1-pow(1-aniPct,4),0.0,1.0);
+        }
+        
+        if (diff < 0) {
+            aniFac = ofClamp(pow(aniPct,3),0.0,1.0);
+        }
+        
+       // cout << aniFac << endl;
+        vec0Ptr->z = actualZ + (diff*aniFac);
+        vec1Ptr->z = actualZ + (diff*aniFac);
+        vec2Ptr->z = actualZ + (diff*aniFac);
+        vec3Ptr->z = actualZ + (diff*aniFac);
+        
+        aniPct+=SPEED;
     }
     
-    if (vec0Ptr->z > defaultZ) {
-        vec0Ptr->z -= SPEED;
-        vec1Ptr->z -= SPEED;
-        vec2Ptr->z -= SPEED;
-        vec3Ptr->z -= SPEED;
-    }
+ 
     
   
     if (displayColor != cubeColor) {
@@ -83,5 +91,8 @@ void Cube::setColor(ofColor c_){
    // displayColor = c_;
 }
 void Cube::setDefaultHeight(float height_) {
+    diff = height_-vec0Ptr->z;
+    actualZ = vec0Ptr->z;
     defaultZ = height_;
+    aniPct = 0.0;
 }

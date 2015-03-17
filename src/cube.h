@@ -18,7 +18,9 @@ public:
     float defaultZ;
     float actualZ;
     
-    float Zpct;
+    float aniPct;
+    float diff;
+    float aniFac;
     
     void setup();
     void update();

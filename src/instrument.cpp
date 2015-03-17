@@ -3,7 +3,7 @@
 //layer is 100x100
 #define CUBE_Z_HEIGHT 10
 #define EMPTY_Z 2.55
-#define SCAN_Z 16*0.8
+#define SCAN_Z 10*2.0
 
 #define COLOR_TARGET 55.0
 

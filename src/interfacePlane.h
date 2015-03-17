@@ -10,9 +10,9 @@ public:
     
     void setup(ofVec3f, float, int, float, ofVboMesh&, ofVboMesh&, ofVboMesh&, ofVec3f );
     void update();
-    void draw();
-    void drawFbo();
     void pulse();
+    
+    float easeInOut(float,float);
     
     
     ofVboMesh* activeMesh;
