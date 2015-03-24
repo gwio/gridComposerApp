@@ -1,10 +1,3 @@
-//
-//  interfacePlane.cpp
-//  sound_table_app
-//
-//  Created by Christian Gwiozda on 06.03.15.
-//
-//
 
 #include "interfacePlane.h"
 
@@ -43,6 +36,7 @@ void InterfacePlane::setup(ofVec3f center_, float planeSize_A, int id_, float gr
     activeDrawColor = activeOnColor;
     connectedDrawColor = connectedOnColor;
     
+    //colors for this are x,0,0
     
     switch (id_)
     {

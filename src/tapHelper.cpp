@@ -1,11 +1,3 @@
-//
-//  tapHelper.cpp
-//  sound_table_app
-//
-//  Created by Christian Gwiozda on 17.02.15.
-//
-//
-
 #include "tapHelper.h"
 
 TapHelper::TapHelper() {

@@ -25,6 +25,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     gridSize = gSize_;
     borderSize = border_;
     
+    //pickColors start wit 1,1,1
     rCounter = 1;
     gCounter = 1;
     bCounter = 1;
@@ -995,12 +996,15 @@ void Instrument::planeMovement(float pct_){
         tempRot.slerp(pct_, myDefault,myTarget);
         setRotate( tempRot );
     } else if (animate) {
+        if (aniPath.size() > 1) {
         float index = aniPath.getIndexAtPercent(pct_);
         ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
         setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+        }
         ofQuaternion tempRot;
         tempRot.slerp(pct_, myDefault,myTarget);
         setRotate( tempRot );
+        
     }
     
     
@@ -1016,6 +1020,13 @@ void Instrument::planeMovement(float pct_){
     
     
     
+}
+
+ofPolyline Instrument::getEmptyPath(ofVec3f pos_) {
+    
+    ofPolyline temp;
+    temp.addVertex(pos_);
+    return temp;
 }
 
 

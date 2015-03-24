@@ -1,14 +1,23 @@
 #include "ofApp.h"
-#define TILES 17
+#define TILES 7
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*4
 #define ANI_SPEED 0.028;
 
+enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
+
+
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
+    
+    ofSetFrameRate(60);
+    //ofDisableAntiAliasing();
+    ofSetVerticalSync(true);
+    ofEnableDepthTest();
     
     synthPos.resize(3);
     
@@ -47,10 +56,7 @@ void ofApp::setup(){
     
     setupOfxGui();
     
-    ofSetFrameRate(60);
-    //ofDisableAntiAliasing();
-    ofSetVerticalSync(true);
-    ofEnableDepthTest();
+ 
     
     
     intersecPlane.resize(3);
@@ -62,7 +68,8 @@ void ofApp::setup(){
     }
     
     
-    setupPathAndAnimation();
+    setupStatesAndAnimation();
+    setupGlobalInterface();
     
     ofBackground(11, 65, 65);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
@@ -72,7 +79,7 @@ void ofApp::setup(){
     fbo.end();
     
     //   ofEnableLighting();
-    light.setPosition(0, 0, 140);
+    light.setPosition(0, 800, 840);
     
     
     //temp sketch
@@ -105,6 +112,7 @@ void ofApp::setup(){
     animCam = false;
     interfaceMoving = false;
     debugCam = false;
+    currentState = STATE_DEFAULT;
     
 }
 
@@ -137,6 +145,7 @@ void ofApp::update(){
     
     //for animation
     if (aniPct < 1.0) {
+        interfaceMoving = true;
         tweenFloat = easeInOut( ofClamp(aniPct, 0.0, 1.0), 0.705);
         // cout << tweenFloat << endl;
         for (int i = 0; i < synths.size(); i++) {
@@ -156,6 +165,7 @@ void ofApp::update(){
             updateCamera(1.0);
         }
         aniPct = 1.0;
+        interfaceMoving = false;
     }
     
     
@@ -171,12 +181,12 @@ void ofApp::draw(){
     
     
     glShadeModel(GL_SMOOTH);
-     glDisable(GL_MULTISAMPLE);
+    // glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     
-    //glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     
-    //  ofEnableLighting();
+      ofEnableLighting();
     
     
     if (!debugCam) {
@@ -185,7 +195,7 @@ void ofApp::draw(){
         cam.begin();
     }
     
-    //  light.enable();
+      light.enable();
     // planeTemp.draw();
     
     // globalTranslate.transformGL();
@@ -211,7 +221,7 @@ void ofApp::draw(){
     
     // mousePick.draw(ofGetMouseX(),ofGetMouseY());
     
-    //  ofDisableLighting();
+      ofDisableLighting();
     if (drawInfo) {
         drawDebug();
     }
@@ -265,6 +275,48 @@ void ofApp::keyPressed(int key){
         showGui = !showGui;
     }
     
+    
+    if (!interfaceMoving) {
+        if(key == '4'  && currentState != STATE_VOLUME && currentState != STATE_EDIT ) {
+            
+            synths[synthButton[0]].aniPath = OneVolumeLayerPathOn;
+            synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
+            synths[synthButton[0]].myTarget = volumeMatrix.getOrientationQuat();
+            synths[synthButton[0]].animate = true ;
+            synths[synthButton[1]].aniPath = TwoVolumeLayerPathOn;
+            synths[synthButton[1]].myDefault = synthPos[1].getOrientationQuat();
+            synths[synthButton[1]].myTarget = volumeMatrix.getOrientationQuat();
+            synths[synthButton[1]].animate = true ;
+            synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOn;
+            synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
+            synths[synthButton[2]].myTarget = volumeMatrix.getOrientationQuat();
+            synths[synthButton[2]].animate = true ;
+
+            
+                aniPct = 0.0;
+                
+                currentState = STATE_VOLUME;
+            
+        } else if(key == '4'  && currentState == STATE_VOLUME) {
+            
+            synths[synthButton[0]].aniPath = OneVolumeLayerPathOff;
+            synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
+            synths[synthButton[0]].myDefault = volumeMatrix.getOrientationQuat();
+            synths[synthButton[0]].animate = true ;
+            synths[synthButton[1]].aniPath = TwoVolumeLayerPathOff;
+            synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
+            synths[synthButton[1]].myDefault = volumeMatrix.getOrientationQuat();
+            synths[synthButton[1]].animate = true ;
+            synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOff;
+            synths[synthButton[2]].myTarget = synthPos[0].getOrientationQuat();
+            synths[synthButton[2]].myDefault = volumeMatrix.getOrientationQuat();
+            synths[synthButton[2]].animate = true ;
+                aniPct = 0.0;
+                currentState = STATE_DEFAULT;
+            
+        }
+        
+        
     if (key =='1') {
         int temp = synthButton[0];
         activeSynth = synthButton[0];
@@ -337,7 +389,7 @@ void ofApp::keyPressed(int key){
             
             aniPct = 0.0;
             
-            
+            currentState = STATE_EDIT;
         }
         
     }
@@ -375,6 +427,7 @@ void ofApp::keyPressed(int key){
             
             aniPct = 0.0;
             
+            currentState = STATE_DEFAULT;
             
         } else{
             synths[temp].inFocus = true;
@@ -402,7 +455,7 @@ void ofApp::keyPressed(int key){
             
             aniPct = 0.0;
             
-            
+            currentState = STATE_EDIT;
             
         }
         
@@ -475,7 +528,11 @@ void ofApp::keyPressed(int key){
             
             aniPct = 0.0;
             
+            currentState = STATE_EDIT;
+
         }
+        
+    }
         
     }
     
@@ -680,6 +737,8 @@ void ofApp::drawDebug() {
     centerToThree.draw();
     centerToOne.draw();
     
+    //volumeLayerPathOff.draw();
+    
     //ofDrawGrid(2500);
     
     if (!debugCam) {
@@ -869,11 +928,14 @@ float ofApp::easeInOut(float input_, float a_) {
     
 }
 
-void ofApp::setupPathAndAnimation() {
+void ofApp::setupStatesAndAnimation() {
+
     cam.setNearClip(10);
     cam.setFarClip(51000);
     cam.setFov(20);
     
+    
+    //startcam settings
     testCam.setNearClip(10);
     testCam.setFarClip(51000);
     camActiveFov = 20;
@@ -881,16 +943,19 @@ void ofApp::setupPathAndAnimation() {
     
     float bezierHandleFac = 2.5;
     
+    //___---___
+    //---___---
+    
+    //synthlayer and camera for active edit position
     synthActivePos.setPosition(0, -TILES*TILESIZE*4, TILESIZE*TILES*3.5);
     camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.0,TILES*TILESIZE*2.2));
     camNotActiveSynth.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
     camNotActiveSynth.lookAt(synthPos[1].getPosition() - camNotActiveSynth.getZAxis());
-    //  synthActivePos.lookAt(  camActiveSynth.getPosition() - synthActivePos.getZAxis() );
     synthActivePos.setOrientation(camActiveSynth.getOrientationQuat());
     
-    
+    //movements camera and synths from default to active
     centerToOne.addVertex(synthPos[1].getPosition());
     centerToOne.lineTo(synthPos[0].getPosition());
     centerToOne = centerToOne.getResampledByCount(80);
@@ -936,10 +1001,85 @@ void ofApp::setupPathAndAnimation() {
     
     
     
-    
+    //startcam position an rotate
     testCam.setPosition(camNotActiveSynth.getPosition());
     testCam.setOrientation(camNotActiveSynth.getOrientationQuat());
     testCam.setFov(camFov);
+    //___---___
+    //---___---
+
+    //from default to volume
+    volumeMatrix.rotate(45, -1, 0, 0);
+    
+    TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
+    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-TILESIZE*TILES/4), ofVec3f(0,TILES*TILESIZE/4,-TILES*TILESIZE/2), ofVec3f(0,TILESIZE*TILES/2,-TILESIZE*TILES/2));
+    TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
+    
+    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,TILESIZE*TILES/2,-TILESIZE*TILES/2));
+    TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,TILES*TILESIZE/4,-TILES*TILESIZE/2), ofVec3f(0,0,-TILESIZE*TILES/4), ofVec3f(0,0,0));
+    TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
+    
+    OneVolumeLayerPathOn = TwoVolumeLayerPathOn;
+    OneVolumeLayerPathOff = TwoVolumeLayerPathOff;
+    ThreeVolumeLayerPathOn = TwoVolumeLayerPathOn;
+    ThreeVolumeLayerPathOff = TwoVolumeLayerPathOff;
+    
+    for (int i = 0; i < TwoVolumeLayerPathOn.size(); i++) {
+        OneVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[0].getPosition();
+        OneVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[0].getPosition();
+        ThreeVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[2].getPosition();
+        ThreeVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[2].getPosition();
+    }
     
 }
+
+
+void ofApp::setupGlobalInterface() {
+    GlobalGUI temp = GlobalGUI(0,string("mainVolume"),ofColor(50,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(1,string("OneVolume"),ofColor(51,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(2,string("TwoVolume"),ofColor(52,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(3,string("ThreeVolume"),ofColor(53,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(4,string("activeOctave"),ofColor(54,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(5,string("activeScale"),ofColor(55,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(6,string("activeKey"),ofColor(56,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(7,string("activePreset"),ofColor(57,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(8,string("mainVtolume"),ofColor(58,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(9,string("OnePlayPause"),ofColor(59,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(10,string("TwoPlayPause"),ofColor(60,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(11,string("ThreePlayPause"),ofColor(61,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(12,string("SwitchVolume"),ofColor(62,0,0));
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(13,string("SwitchActiveOptions"),ofColor(63,0,0));
+    mainInterfaceData.push_back(temp);
+
+    mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
+    
+    for (int i = 0; i < mainInterfaceData.size(); i++) {
+        
+        for (int j = 0; j < 4; j++) {
+            mainInterface.addVertex(ofVec3f(0,0,0));
+            mainInterfaceFbo.addVertex(ofVec3f(0,0,0));
+            mainInterface.addColor(ofColor(255,255,255));
+            mainInterfaceFbo.addColor(ofColor(50+i,0,0));
+        }
+        
+        for (int j = 0; j < 6; j++) {
+            mainInterface.addIndex(mainInterfaceData.at(i).index[j]);
+        }
+    }
+
+}
+
 

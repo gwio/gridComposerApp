@@ -122,6 +122,7 @@ public:
     ofQuaternion myDefault;
     ofQuaternion myTarget;
     ofPolyline aniPath;
+    ofPolyline getEmptyPath(ofVec3f);
     float myScaleTarget;
     float myScaleDefault;
     

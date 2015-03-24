@@ -1,10 +1,3 @@
-//
-//  cube.cpp
-//  sound_table_app
-//
-//  Created by Christian Gwiozda on 10.02.15.
-//
-//
 
 #include "cube.h"
 

@@ -6,6 +6,7 @@
 #include "tapHelper.h"
 #include "ofxTonic.h"
 #include "ofxGui.h"
+#include "GlobalGUI.h"
 
 using namespace Tonic;
 
@@ -35,7 +36,9 @@ public:
     
     void updateTapMap();
     
-    void setupPathAndAnimation();
+    void setupStatesAndAnimation();
+    
+    void setupGlobalInterface();
     
     void setupOfxGui();
     
@@ -64,6 +67,7 @@ public:
     ofNode camActiveSynth;
     ofNode camNotActiveSynth;
     ofNode synthActivePos;
+    ofNode volumeMatrix;
     float camFov;
     float camActiveFov;
     float camTargetFov;
@@ -80,6 +84,8 @@ public:
     ofPolyline camPath;
     ofPolyline camPathBack;
     ofPolyline camUsePath;
+    ofPolyline OneVolumeLayerPathOn,TwoVolumeLayerPathOn,ThreeVolumeLayerPathOn;
+    ofPolyline OneVolumeLayerPathOff,TwoVolumeLayerPathOff,ThreeVolumeLayerPathOff;
     float aniPct;
     float aniCam;
     bool animCam;
@@ -133,6 +139,10 @@ public:
     ofParameter<float> volumeRampValue;
     void volumeRampValueChanged(float&volumeRampValue);
     
+    //GlobalGui
+    vector<GlobalGUI> mainInterfaceData;
+    ofVboMesh mainInterface;
+    ofVboMesh mainInterfaceFbo;
     
     //hack for ofxgui panel
     ofFbo guiFbo;
@@ -141,7 +151,7 @@ public:
     //interface stuff
     bool focusCam;
     int synthButton[3];
-    
+    int currentState;
     
     bool debugCam;
     
