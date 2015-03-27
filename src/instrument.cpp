@@ -42,6 +42,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     animate = false;
     inFocus = false;
     scaling = false;
+    keyNote = 44;
+    preset = 0;
     
     pause = false;
     myScaleTarget = 1.0;
@@ -925,43 +927,41 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.22;
     
-    //1 preset additive synth with twlevetone
-    static int twoOctavePentatonicScale[19] = { 0,-1-12,-3,-5,-7-12,-8,-10,-12, 0,1,3+12,5,7,8+24,10,12,0+24,0,0};
-   // int note = twoOctavePentatonicScale [ int(ofRandom(18))]+44;
-   
+            float rampLength = 0.22;
+            
+            
+            Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
+            cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
+            
+            Tonic::RampedValue rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
+            
+            Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
+            
+            Tonic::RampedValue freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(0.66).target(rampFreqTarget);
+            
+            cgPtr->groupNote = getRandomNote();
+            cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
+            
+            cgPtr->output = Tonic::SineWave().freq(freqRamp)*0.5;
+            
+            
+            Tonic::Generator harmonic = Tonic::SineWave().freq(
+                                                               freqRamp * 2 + (rampVol*45)
+                                                               ) * (0.25);
+            
+            Tonic::Generator harmonic2 = Tonic::SineWave().freq(
+                                                                freqRamp*3
+                                                                ) * 0.1 ;
+            
+            Tonic::Generator harmonic3 = Tonic::SquareWave().freq(
+                                                                  freqRamp*5
+                                                                  )  *(0.1 * rampVol);
+            
+            
+            cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
     
     
-    
-    Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
-    cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
-    
-    Tonic::RampedValue rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
-    
-    Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
-
-    Tonic::RampedValue freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(0.66).target(rampFreqTarget);
-
-    cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(getRandomNote() ));
-    
-    cgPtr->output = Tonic::SineWave().freq(freqRamp)*0.5;
-    
-    
-    Tonic::Generator harmonic = Tonic::SineWave().freq(
-                                                       freqRamp * 2 + (rampVol*45)
-                                                       ) * (0.25);
-    
-    Tonic::Generator harmonic2 = Tonic::SineWave().freq(
-                                                        freqRamp*3
-                                                        ) * 0.1 ;
-    
-    Tonic::Generator harmonic3 = Tonic::SquareWave().freq(
-                                                          freqRamp*5
-                                                          )  *(0.1 * rampVol);
-    
-    
-    cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
 }
 
 
@@ -1026,7 +1026,8 @@ void Instrument::applyNewScale(){
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             
-            it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(getRandomNote() ));
+            it->second.groupNote = getRandomNote();
+            it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
         }
     }
 }
@@ -1039,7 +1040,16 @@ void Instrument::setMusicScale(GlobalScales& scale_){
 }
 
 void Instrument::setKeyNote(int keyNote_) {
-    keyNote = keyNote_;
+    int change = keyNote_;
+    keyNote += change;
+    
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+            it->second.groupNote+=keyNote_;
+            it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
+        }
+    }
+
 }
 
 void Instrument::planeMovement(float pct_){

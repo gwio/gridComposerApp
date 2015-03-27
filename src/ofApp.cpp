@@ -1,5 +1,5 @@
 #include "ofApp.h"
-#define TILES 4
+#define TILES 7
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*4
@@ -35,18 +35,18 @@ void ofApp::setup(){
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
     synths[0].setup(&timeCounter, &tonicSynth, synthPos[0]);
     synths[0].setMusicScale(scaleCollection);
-    synths[0].setKeyNote(40-12);
+   // synths[0].setKeyNote(40-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
     synths[1].setup(&timeCounter, &tonicSynth, synthPos[1]);
     synths[1].setMusicScale(scaleCollection);
-    synths[1].setKeyNote(40);
+   // synths[1].setKeyNote(40);
 
 
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
     synths[2].setup(&timeCounter, &tonicSynth, synthPos[2]);
     synths[2].setMusicScale(scaleCollection);
-    synths[2].setKeyNote(40+12);
+   // synths[2].setKeyNote(40+12);
 
     
     globalTranslate.setPosition(ofVec3f(TILES*TILESIZE,TILES*TILESIZE,0)/-2);
@@ -198,10 +198,15 @@ void ofApp::update(){
     
     if (currentState == STATE_EDIT_DETAIL) {
         mainInterfaceData[5].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+        mainInterfaceData[4].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+        mainInterfaceData[6].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
         }
-        
+        for (int i = 0; i < 12; i++) {
+            mainInterfaceData[25+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+        }
     }
 }
 
@@ -762,6 +767,14 @@ void ofApp::mousePressed(int x, int y, int button){
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
             cout << synths[activeSynth].activeScale.name  << endl;
             }
+            if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].setKeyNote(-12);
+                cout << "-12"  << endl;
+            }
+            if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].setKeyNote(12);
+                cout << "+12"  << endl;
+            }
             for (int i = 1; i < 12; i++) {
                 
                 if (   mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
@@ -769,6 +782,15 @@ void ofApp::mousePressed(int x, int y, int button){
                 cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
+            
+            for (int i = 1; i < 12; i++) {
+                
+                if (   mainInterfaceData[25+i].isInside(ofVec2f(x,y))) {
+                    synths[activeSynth].setKeyNote(i);
+                    cout <<  "+ " << i << endl;
+                }
+            }
+            
         }
     }
 }
@@ -1167,7 +1189,7 @@ void ofApp::setupGlobalInterface() {
     GlobalGUI temp = GlobalGUI(0,string("mainVolume"), horizontalSlider, ofColor(50,0,0),place);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(0,+300,0);
+    place = ofVec3f(0,+150,0);
     temp = GlobalGUI(1,string("OneVolume"),horizontalSlider,ofColor(51,0,0),place);
     mainInterfaceData.push_back(temp);
     temp = GlobalGUI(2,string("TwoVolume"),horizontalSlider,ofColor(52,0,0),place);
@@ -1175,14 +1197,16 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place);
     mainInterfaceData.push_back(temp);
     
-    
-    temp = GlobalGUI(4,string("activeOctave"),smallButton,ofColor(54,0,0),place);
+    place = ofVec3f(+300, 40,0);
+    temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(+250,-250,0);
     temp = GlobalGUI(5,string("activeScale"),horizontalSlider*1.25,ofColor(55,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(6,string("activeKey"),smallButton,ofColor(56,0,0),place);
+    
+    place = ofVec3f(+300, -40,0);
+    temp = GlobalGUI(6,string("OctaveUp"),smallButton,ofColor(56,0,0),place);
     mainInterfaceData.push_back(temp);
     temp = GlobalGUI(7,string("activePreset"),smallButton,ofColor(57,0,0),place);
     mainInterfaceData.push_back(temp);
@@ -1210,6 +1234,12 @@ void ofApp::setupGlobalInterface() {
         
     }
     
+    for (int i = 0; i < 12; i++) {
+        place = ofVec3f(+350,150-(i*20),0);
+        temp = GlobalGUI(25+i,notes[i],smallButton,ofColor(0,0,0),place);
+        mainInterfaceData.push_back(temp);
+    }
+    
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
@@ -1235,8 +1265,14 @@ void ofApp::detailEditInterfaceOn() {
 
 void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    }
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[25+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     }
 }
 

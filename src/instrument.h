@@ -27,6 +27,7 @@ struct cubeGroup {
     ofColor groupColor;
     int lowX, highX;
     int lowY, highY;
+    int groupNote;
     
     vector< int> y_in_x_elements;
     vector< int> x_in_y_elements;
@@ -112,6 +113,7 @@ public:
     
     int *stepperPos;
     int scanDirection;
+    int preset;
     
     //active = direction will be triggered by pulse
     // connected = if direction is active, then if connected -> sound, else-> pause
