@@ -5,6 +5,7 @@
 #include "tapHelper.h"
 #include "ofxTonic.h"
 #include "interfacePlane.h"
+#include "GlobalScales.h"
 
 
 struct synthInfo {
@@ -92,7 +93,18 @@ public:
     void setScale(float);
     void planeMovement(float);
     
+    int getRandomNote();
+    
+    int keyNote;
+    void setKeyNote(int);
+    Scale activeScale;
+    vector<int> scaleNoteSteps;
+    void setMusicScale(GlobalScales&);
+    void changeMusicScale(int);
+    void applyNewScale();
+    
     string instrumentId;
+    void changeSynthVolume(float &);
     
     int gridTiles;
     float gridSize;
@@ -109,7 +121,7 @@ public:
     bool scaling;
     bool inFocus;
     
-    
+    bool pause;
     //synthinfo
     int rCounter,gCounter,bCounter;
     vector<vector<synthInfo> > layerInfo;

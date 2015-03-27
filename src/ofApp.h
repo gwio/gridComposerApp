@@ -7,6 +7,7 @@
 #include "ofxTonic.h"
 #include "ofxGui.h"
 #include "GlobalGUI.h"
+#include "GlobalScales.h"
 
 using namespace Tonic;
 
@@ -48,6 +49,15 @@ public:
     
     bool drawInfo;
     
+    void pauseInterfaceOn();
+    void pauseInterfaceOff();
+    
+    void volumeInterfacOn();
+    void volumeInterfaceOff();
+    
+    void detailEditInterfaceOn();
+    void detailEditInterfaceOff();
+    
     //tonic
     void setupAudio();
     void pulseEvent(float &);
@@ -57,6 +67,8 @@ public:
     RampedValue volumeRamp;
     Generator mainOut;
     
+    //scales
+    GlobalScales scaleCollection;
     
     //3d scene
     ofEasyCam cam;

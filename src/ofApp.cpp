@@ -1,5 +1,5 @@
 #include "ofApp.h"
-#define TILES 7
+#define TILES 4
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*4
@@ -19,6 +19,8 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofEnableDepthTest();
     
+    scaleCollection.loadScales();
+    
     synthPos.resize(3);
     
     for (int i = -1; i < 2; i++) {
@@ -32,12 +34,20 @@ void ofApp::setup(){
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
     synths[0].setup(&timeCounter, &tonicSynth, synthPos[0]);
+    synths[0].setMusicScale(scaleCollection);
+    synths[0].setKeyNote(40-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
     synths[1].setup(&timeCounter, &tonicSynth, synthPos[1]);
-    
+    synths[1].setMusicScale(scaleCollection);
+    synths[1].setKeyNote(40);
+
+
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
     synths[2].setup(&timeCounter, &tonicSynth, synthPos[2]);
+    synths[2].setMusicScale(scaleCollection);
+    synths[2].setKeyNote(40+12);
+
     
     globalTranslate.setPosition(ofVec3f(TILES*TILESIZE,TILES*TILESIZE,0)/-2);
     activeSynth = 1;
@@ -56,7 +66,7 @@ void ofApp::setup(){
     
     setupOfxGui();
     
- 
+    
     
     
     intersecPlane.resize(3);
@@ -171,8 +181,28 @@ void ofApp::update(){
     
     intersectPlane();
     
+    //global interfac
+    if (currentState == STATE_DEFAULT) {
+        mainInterfaceData[0].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
+        
+        mainInterfaceData[8].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()));
+        mainInterfaceData[9].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
+        mainInterfaceData[10].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()));
+    }
     
+    if (currentState == STATE_VOLUME) {
+        mainInterfaceData[1].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()));
+        mainInterfaceData[2].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
+        mainInterfaceData[3].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()));
+    }
     
+    if (currentState == STATE_EDIT_DETAIL) {
+        mainInterfaceData[5].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+        for (int i = 0; i < 12; i++) {
+            mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+        }
+        
+    }
 }
 
 //--------------------------------------------------------------
@@ -186,7 +216,7 @@ void ofApp::draw(){
     
     glEnable(GL_MULTISAMPLE);
     
-      ofEnableLighting();
+    ofEnableLighting();
     
     
     if (!debugCam) {
@@ -195,7 +225,7 @@ void ofApp::draw(){
         cam.begin();
     }
     
-      light.enable();
+    light.enable();
     // planeTemp.draw();
     
     // globalTranslate.transformGL();
@@ -221,7 +251,7 @@ void ofApp::draw(){
     
     // mousePick.draw(ofGetMouseX(),ofGetMouseY());
     
-      ofDisableLighting();
+    ofDisableLighting();
     if (drawInfo) {
         drawDebug();
     }
@@ -234,7 +264,7 @@ void ofApp::draw(){
         guiFbo.draw(0,0);
     }
     
-    
+    mainInterface.draw();
 }
 
 //--------------------------------------------------------------
@@ -277,6 +307,18 @@ void ofApp::keyPressed(int key){
     
     
     if (!interfaceMoving) {
+        
+        if (key == '5' && currentState == STATE_EDIT) {
+            
+            detailEditInterfaceOn();
+            currentState = STATE_EDIT_DETAIL;
+        } else if (key == '5' && currentState  == STATE_EDIT_DETAIL) {
+            
+            detailEditInterfaceOff();
+            currentState = STATE_EDIT;
+        }
+        
+        
         if(key == '4'  && currentState != STATE_VOLUME && currentState != STATE_EDIT ) {
             
             synths[synthButton[0]].aniPath = OneVolumeLayerPathOn;
@@ -291,11 +333,13 @@ void ofApp::keyPressed(int key){
             synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
             synths[synthButton[2]].myTarget = volumeMatrix.getOrientationQuat();
             synths[synthButton[2]].animate = true ;
-
             
-                aniPct = 0.0;
-                
-                currentState = STATE_VOLUME;
+            
+            aniPct = 0.0;
+            
+            pauseInterfaceOff();
+            volumeInterfacOn();
+            currentState = STATE_VOLUME;
             
         } else if(key == '4'  && currentState == STATE_VOLUME) {
             
@@ -311,228 +355,236 @@ void ofApp::keyPressed(int key){
             synths[synthButton[2]].myTarget = synthPos[0].getOrientationQuat();
             synths[synthButton[2]].myDefault = volumeMatrix.getOrientationQuat();
             synths[synthButton[2]].animate = true ;
-                aniPct = 0.0;
-                currentState = STATE_DEFAULT;
-            
-        }
-        
-        
-    if (key =='1') {
-        int temp = synthButton[0];
-        activeSynth = synthButton[0];
-        
-        if (synths[synthButton[1]].inFocus) {
-            
-            synths[synthButton[1]].aniPath = oneToBack;
-            synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
-            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
-            
-            
-            
-            synths[synthButton[1]].inFocus = false ;
-            synths[synthButton[1]].animate = true ;
-            
-            
-            synths[temp].inFocus = true;
-            synths[temp].animate = true;
-            synths[ temp ].aniPath = oneToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat();
-            synths[temp].myDefault = synthPos[0].getOrientationQuat();
-            
-            synths[synthButton[0]].scaling = true;
-            synths[synthButton[1]].scaling = true;
-            synths[synthButton[0]].myScaleDefault = 0.5;
-            synths[synthButton[1]].myScaleDefault = 1.0;
-            synths[synthButton[0]].myScaleTarget = 1.0;
-            synths[synthButton[1]].myScaleTarget = 0.5;
-            
-            
-            synthButton[0] = synthButton[1];
-            synthButton[1] = temp;
-            aniPct = 0.0;
-            
-        } else {
-            synths[temp].inFocus = true;
-            synths[temp].aniPath = oneToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat();
-            synths[temp].myDefault = synthPos[0].getOrientationQuat();
-            
-            
-            synths[temp].animate = true;
-            
-            synths[synthButton[1]].aniPath = centerToOne;
-            synths[synthButton[1]].animate = true;
-            synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
-            synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
-            
-            synths[synthButton[1]].scaling = true;
-            synths[synthButton[2]].scaling = true;
-            synths[synthButton[1]].myScaleDefault = 1.0;
-            synths[synthButton[2]].myScaleDefault = 1.0;
-            synths[synthButton[1]].myScaleTarget = 0.5;
-            synths[synthButton[2]].myScaleTarget = 0.5;
-            
-            
-            
-            synthButton[0] = synthButton[1];
-            synthButton[1] = temp;
-            
-            
-            
-            //camani
-            camQuatDefault = camNotActiveSynth.getOrientationQuat();
-            camQuatTarget = camActiveSynth.getOrientationQuat();
-            camUsePath = camPath;
-            camTargetFov = camActiveFov;
-            camDefaultFov = camFov;
-            animCam = true;
             
             aniPct = 0.0;
             
-            currentState = STATE_EDIT;
-        }
-        
-    }
-    if (key =='2') {
-        
-        int temp = synthButton[1];
-        activeSynth = synthButton[1];
-        
-        if (synths[synthButton[1]].inFocus) {
-            
-            synths[synthButton[1]].aniPath = twoToBack;
-            synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
-            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
-            
-            synths[synthButton[1]].inFocus = false ;
-            synths[synthButton[1]].animate = true ;
-            
-            
-            synths[synthButton[0]].scaling = true;
-            synths[synthButton[2]].scaling = true;
-            synths[synthButton[0]].myScaleDefault = 0.5;
-            synths[synthButton[2]].myScaleDefault = 0.5;
-            synths[synthButton[0]].myScaleTarget = 1.0;
-            synths[synthButton[2]].myScaleTarget = 1.0;
-            
-            
-            
-            //camani
-            camQuatDefault = camActiveSynth.getOrientationQuat();
-            camQuatTarget = camNotActiveSynth.getOrientationQuat();
-            camUsePath = camPathBack;
-            camTargetFov = camFov;
-            camDefaultFov = camActiveFov;
-            animCam = true;
-            
-            aniPct = 0.0;
-            
+            pauseInterfaceOn();
+            volumeInterfaceOff();
             currentState = STATE_DEFAULT;
             
-        } else{
-            synths[temp].inFocus = true;
-            synths[temp].aniPath = twoToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat();
-            synths[temp].myDefault = synthPos[1].getOrientationQuat();
-            synths[temp].animate = true;
-            
-            synths[synthButton[0]].scaling = true;
-            synths[synthButton[2]].scaling = true;
-            synths[synthButton[0]].myScaleDefault = 1.0;
-            synths[synthButton[2]].myScaleDefault = 1.0;
-            synths[synthButton[0]].myScaleTarget = 0.5;
-            synths[synthButton[2]].myScaleTarget = 0.5;
-            
-            
-            
-            //cam
-            camQuatDefault = camNotActiveSynth.getOrientationQuat();
-            camQuatTarget = camActiveSynth.getOrientationQuat();
-            camUsePath = camPath;
-            camDefaultFov = camFov;
-            camTargetFov = camActiveFov;
-            animCam = true;
-            
-            aniPct = 0.0;
-            
-            currentState = STATE_EDIT;
-            
         }
         
         
-    }
-    if (key =='3') {
-        
-        int temp = synthButton[2];
-        activeSynth = synthButton[2];
-        
-        if (synths[synthButton[1]].inFocus) {
+        if (key =='1') {
+            int temp = synthButton[0];
+            activeSynth = synthButton[0];
             
-            synths[synthButton[1]].aniPath = threeToBack;
-            synths[synthButton[1]].myTarget = synthPos[2].getOrientationQuat();
-            synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+            if (synths[synthButton[1]].inFocus) {
+                
+                synths[synthButton[1]].aniPath = oneToBack;
+                synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
+                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+                
+                
+                
+                synths[synthButton[1]].inFocus = false ;
+                synths[synthButton[1]].animate = true ;
+                
+                
+                synths[temp].inFocus = true;
+                synths[temp].animate = true;
+                synths[ temp ].aniPath = oneToActive;
+                synths[temp].myTarget = synthActivePos.getOrientationQuat();
+                synths[temp].myDefault = synthPos[0].getOrientationQuat();
+                
+                synths[synthButton[0]].scaling = true;
+                synths[synthButton[1]].scaling = true;
+                synths[synthButton[0]].myScaleDefault = 0.5;
+                synths[synthButton[1]].myScaleDefault = 1.0;
+                synths[synthButton[0]].myScaleTarget = 1.0;
+                synths[synthButton[1]].myScaleTarget = 0.5;
+                
+                
+                synthButton[0] = synthButton[1];
+                synthButton[1] = temp;
+                aniPct = 0.0;
+                
+            } else {
+                synths[temp].inFocus = true;
+                synths[temp].aniPath = oneToActive;
+                synths[temp].myTarget = synthActivePos.getOrientationQuat();
+                synths[temp].myDefault = synthPos[0].getOrientationQuat();
+                
+                
+                synths[temp].animate = true;
+                
+                synths[synthButton[1]].aniPath = centerToOne;
+                synths[synthButton[1]].animate = true;
+                synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
+                synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
+                
+                synths[synthButton[1]].scaling = true;
+                synths[synthButton[2]].scaling = true;
+                synths[synthButton[1]].myScaleDefault = 1.0;
+                synths[synthButton[2]].myScaleDefault = 1.0;
+                synths[synthButton[1]].myScaleTarget = 0.5;
+                synths[synthButton[2]].myScaleTarget = 0.5;
+                
+                
+                
+                synthButton[0] = synthButton[1];
+                synthButton[1] = temp;
+                
+                
+                
+                //camani
+                camQuatDefault = camNotActiveSynth.getOrientationQuat();
+                camQuatTarget = camActiveSynth.getOrientationQuat();
+                camUsePath = camPath;
+                camTargetFov = camActiveFov;
+                camDefaultFov = camFov;
+                animCam = true;
+                
+                aniPct = 0.0;
+                
+                pauseInterfaceOff();
+                currentState = STATE_EDIT;
+            }
             
-            synths[synthButton[1]].inFocus = false ;
-            synths[synthButton[1]].animate = true ;
-            
-            
-            synths[temp].inFocus = true;
-            synths[temp].animate = true;
-            synths[ temp ].aniPath = threeToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat();
-            synths[temp].myDefault = synthPos[2].getOrientationQuat();
-            
-            synths[synthButton[2]].scaling = true;
-            synths[synthButton[1]].scaling = true;
-            synths[synthButton[2]].myScaleDefault = 0.5;
-            synths[synthButton[1]].myScaleDefault = 1.0;
-            synths[synthButton[2]].myScaleTarget = 1.0;
-            synths[synthButton[1]].myScaleTarget = 0.5;
-            
-            
-            synthButton[2] = synthButton[1];
-            synthButton[1] = temp;
-            aniPct = 0.0;
-            
-        }else {
-            synths[temp].inFocus = true;
-            synths[temp].aniPath = threeToActive;
-            synths[temp].myTarget = synthActivePos.getOrientationQuat();
-            synths[temp].myDefault = synthPos[2].getOrientationQuat();
-            synths[temp].animate = true;
-            
-            synths[synthButton[1]].aniPath = centerToThree;
-            synths[synthButton[1]].animate = true;
-            synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
-            synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
-            
-            
-            synths[synthButton[0]].scaling = true;
-            synths[synthButton[1]].scaling = true;
-            synths[synthButton[0]].myScaleDefault = 1.0;
-            synths[synthButton[1]].myScaleDefault = 1.0;
-            synths[synthButton[0]].myScaleTarget = 0.5;
-            synths[synthButton[1]].myScaleTarget = 0.5;
-            
-            
-            synthButton[2] = synthButton[1];
-            synthButton[1] = temp;
-            
-            //camera
-            camQuatDefault = camNotActiveSynth.getOrientationQuat();
-            camQuatTarget = camActiveSynth.getOrientationQuat();
-            camUsePath = camPath;
-            camDefaultFov = camFov;
-            camTargetFov = camActiveFov;
-            animCam = true;
-            
-            aniPct = 0.0;
-            
-            currentState = STATE_EDIT;
-
         }
-        
-    }
+        if (key =='2') {
+            
+            int temp = synthButton[1];
+            activeSynth = synthButton[1];
+            
+            if (synths[synthButton[1]].inFocus) {
+                
+                synths[synthButton[1]].aniPath = twoToBack;
+                synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
+                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+                
+                synths[synthButton[1]].inFocus = false ;
+                synths[synthButton[1]].animate = true ;
+                
+                
+                synths[synthButton[0]].scaling = true;
+                synths[synthButton[2]].scaling = true;
+                synths[synthButton[0]].myScaleDefault = 0.5;
+                synths[synthButton[2]].myScaleDefault = 0.5;
+                synths[synthButton[0]].myScaleTarget = 1.0;
+                synths[synthButton[2]].myScaleTarget = 1.0;
+                
+                
+                
+                //camani
+                camQuatDefault = camActiveSynth.getOrientationQuat();
+                camQuatTarget = camNotActiveSynth.getOrientationQuat();
+                camUsePath = camPathBack;
+                camTargetFov = camFov;
+                camDefaultFov = camActiveFov;
+                animCam = true;
+                
+                aniPct = 0.0;
+                
+                pauseInterfaceOn();
+                currentState = STATE_DEFAULT;
+                
+            } else{
+                synths[temp].inFocus = true;
+                synths[temp].aniPath = twoToActive;
+                synths[temp].myTarget = synthActivePos.getOrientationQuat();
+                synths[temp].myDefault = synthPos[1].getOrientationQuat();
+                synths[temp].animate = true;
+                
+                synths[synthButton[0]].scaling = true;
+                synths[synthButton[2]].scaling = true;
+                synths[synthButton[0]].myScaleDefault = 1.0;
+                synths[synthButton[2]].myScaleDefault = 1.0;
+                synths[synthButton[0]].myScaleTarget = 0.5;
+                synths[synthButton[2]].myScaleTarget = 0.5;
+                
+                
+                
+                //cam
+                camQuatDefault = camNotActiveSynth.getOrientationQuat();
+                camQuatTarget = camActiveSynth.getOrientationQuat();
+                camUsePath = camPath;
+                camDefaultFov = camFov;
+                camTargetFov = camActiveFov;
+                animCam = true;
+                
+                aniPct = 0.0;
+                
+                pauseInterfaceOff();
+                currentState = STATE_EDIT;
+                
+            }
+            
+            
+        }
+        if (key =='3') {
+            
+            int temp = synthButton[2];
+            activeSynth = synthButton[2];
+            
+            if (synths[synthButton[1]].inFocus) {
+                
+                synths[synthButton[1]].aniPath = threeToBack;
+                synths[synthButton[1]].myTarget = synthPos[2].getOrientationQuat();
+                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+                
+                synths[synthButton[1]].inFocus = false ;
+                synths[synthButton[1]].animate = true ;
+                
+                
+                synths[temp].inFocus = true;
+                synths[temp].animate = true;
+                synths[ temp ].aniPath = threeToActive;
+                synths[temp].myTarget = synthActivePos.getOrientationQuat();
+                synths[temp].myDefault = synthPos[2].getOrientationQuat();
+                
+                synths[synthButton[2]].scaling = true;
+                synths[synthButton[1]].scaling = true;
+                synths[synthButton[2]].myScaleDefault = 0.5;
+                synths[synthButton[1]].myScaleDefault = 1.0;
+                synths[synthButton[2]].myScaleTarget = 1.0;
+                synths[synthButton[1]].myScaleTarget = 0.5;
+                
+                
+                synthButton[2] = synthButton[1];
+                synthButton[1] = temp;
+                aniPct = 0.0;
+                
+            }else {
+                synths[temp].inFocus = true;
+                synths[temp].aniPath = threeToActive;
+                synths[temp].myTarget = synthActivePos.getOrientationQuat();
+                synths[temp].myDefault = synthPos[2].getOrientationQuat();
+                synths[temp].animate = true;
+                
+                synths[synthButton[1]].aniPath = centerToThree;
+                synths[synthButton[1]].animate = true;
+                synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
+                synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
+                
+                
+                synths[synthButton[0]].scaling = true;
+                synths[synthButton[1]].scaling = true;
+                synths[synthButton[0]].myScaleDefault = 1.0;
+                synths[synthButton[1]].myScaleDefault = 1.0;
+                synths[synthButton[0]].myScaleTarget = 0.5;
+                synths[synthButton[1]].myScaleTarget = 0.5;
+                
+                
+                synthButton[2] = synthButton[1];
+                synthButton[1] = temp;
+                
+                //camera
+                camQuatDefault = camNotActiveSynth.getOrientationQuat();
+                camQuatTarget = camActiveSynth.getOrientationQuat();
+                camUsePath = camPath;
+                camDefaultFov = camFov;
+                camTargetFov = camActiveFov;
+                animCam = true;
+                
+                aniPct = 0.0;
+                
+                pauseInterfaceOff();
+                currentState = STATE_EDIT;
+                
+            }
+            
+        }
         
     }
     
@@ -580,6 +632,20 @@ void ofApp::mouseDragged(int x, int y, int button){
                 //cout << "added" << tapCounter << " pos:" << cordTemp << endl;
             }
         }
+    }
+    
+    if (!interfaceMoving) {
+        
+        
+        if (currentState == STATE_DEFAULT) {
+            if (mainInterfaceData[0].isInside(ofVec3f(x, mainInterfaceData[0].minY+ mainInterfaceData[0].elementSize.y/2,0))) {
+                synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
+                float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
+                volumeRampValueChanged(value);
+                cout << value  << endl;
+            }
+        }
+        
     }
 }
 
@@ -645,8 +711,66 @@ void ofApp::mousePressed(int x, int y, int button){
      synths[activeSynth].clickEvent(vectorPosX, vectorPosY);
      }
      */
-    
-    
+    if (!interfaceMoving) {
+        
+        
+        if (currentState == STATE_DEFAULT) {
+            
+            if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
+                cout << "0 pause"  << endl;
+                synths[synthButton[0]].pause = !synths[synthButton[0]].pause;
+            }
+            if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
+                cout << "1 pause"  << endl;
+                synths[synthButton[1]].pause = !synths[synthButton[1]].pause;
+                
+            }
+            if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
+                cout << "2 pause"  << endl;
+                synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
+            }
+            if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
+                synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
+                float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
+                volumeRampValueChanged(value);
+                cout << value  << endl;
+            }
+        }
+        
+        if (currentState == STATE_VOLUME) {
+            
+            if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
+                synths[synthButton[0]].changeSynthVolume(value);
+                cout << value  << endl;
+            }
+            if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
+                synths[synthButton[1]].changeSynthVolume(value);
+                cout << value  << endl;
+            }
+            if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
+                synths[synthButton[2]].changeSynthVolume(value);
+                cout << value  << endl;
+            }
+            
+        }
+        
+        if (currentState == STATE_EDIT_DETAIL) {
+            
+            if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
+            cout << synths[activeSynth].activeScale.name  << endl;
+            }
+            for (int i = 1; i < 12; i++) {
+                
+                if (   mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
+                    synths[activeSynth].changeMusicScale(i);
+                cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
+                }
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -805,7 +929,7 @@ void ofApp::updateFboMesh(){
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
     
-  //  cout << lastPickColor  << endl;
+    //  cout << lastPickColor  << endl;
 }
 
 void ofApp::updateTapMap() {
@@ -929,7 +1053,7 @@ float ofApp::easeInOut(float input_, float a_) {
 }
 
 void ofApp::setupStatesAndAnimation() {
-
+    
     cam.setNearClip(10);
     cam.setFarClip(51000);
     cam.setFov(20);
@@ -1007,24 +1131,24 @@ void ofApp::setupStatesAndAnimation() {
     testCam.setFov(camFov);
     //___---___
     //---___---
-
+    
     //from default to volume
     volumeMatrix.rotate(45, -1, 0, 0);
     
     TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
-    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-TILESIZE*TILES/4), ofVec3f(0,TILES*TILESIZE/4,-TILES*TILESIZE/2), ofVec3f(0,TILESIZE*TILES/2,-TILESIZE*TILES/2));
-    TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
+    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,(TILESIZE*TILES)/2,-(TILESIZE*TILES)/2));
+   // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
-    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,TILESIZE*TILES/2,-TILESIZE*TILES/2));
-    TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,TILES*TILESIZE/4,-TILES*TILESIZE/2), ofVec3f(0,0,-TILESIZE*TILES/4), ofVec3f(0,0,0));
-    TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
+    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,(TILESIZE*TILES)/2,-(TILESIZE*TILES)/2));
+    TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
+   // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
     OneVolumeLayerPathOn = TwoVolumeLayerPathOn;
     OneVolumeLayerPathOff = TwoVolumeLayerPathOff;
     ThreeVolumeLayerPathOn = TwoVolumeLayerPathOn;
     ThreeVolumeLayerPathOff = TwoVolumeLayerPathOff;
     
-    for (int i = 0; i < TwoVolumeLayerPathOn.size(); i++) {
+    for (int i = 0; i < TwoVolumeLayerPathOn.size() ; i++) {
         OneVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[0].getPosition();
         OneVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[0].getPosition();
         ThreeVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[2].getPosition();
@@ -1035,35 +1159,57 @@ void ofApp::setupStatesAndAnimation() {
 
 
 void ofApp::setupGlobalInterface() {
-    GlobalGUI temp = GlobalGUI(0,string("mainVolume"),ofColor(50,0,0));
+    ofVec3f smallButton = ofVec3f(20,20,0);
+    ofVec3f horizontalSlider = ofVec3f(100,20,0);
+    ofVec3f verticalSlider = ofVec3f(20,100,0);
+    
+    ofVec3f place = ofVec3f(0,-200,0);
+    GlobalGUI temp = GlobalGUI(0,string("mainVolume"), horizontalSlider, ofColor(50,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(1,string("OneVolume"),ofColor(51,0,0));
+    
+    place = ofVec3f(0,+300,0);
+    temp = GlobalGUI(1,string("OneVolume"),horizontalSlider,ofColor(51,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(2,string("TwoVolume"),ofColor(52,0,0));
+    temp = GlobalGUI(2,string("TwoVolume"),horizontalSlider,ofColor(52,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(3,string("ThreeVolume"),ofColor(53,0,0));
+    temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(4,string("activeOctave"),ofColor(54,0,0));
+    
+    
+    temp = GlobalGUI(4,string("activeOctave"),smallButton,ofColor(54,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(5,string("activeScale"),ofColor(55,0,0));
+    
+    place = ofVec3f(+250,-250,0);
+    temp = GlobalGUI(5,string("activeScale"),horizontalSlider*1.25,ofColor(55,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(6,string("activeKey"),ofColor(56,0,0));
+    temp = GlobalGUI(6,string("activeKey"),smallButton,ofColor(56,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(7,string("activePreset"),ofColor(57,0,0));
+    temp = GlobalGUI(7,string("activePreset"),smallButton,ofColor(57,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(8,string("mainVtolume"),ofColor(58,0,0));
+    
+    
+    place = ofVec3f(0,+200,0);
+    temp = GlobalGUI(8,string("OnePlayPause"),smallButton,ofColor(59,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(9,string("OnePlayPause"),ofColor(59,0,0));
+    temp = GlobalGUI(9,string("TwoPlayPause"),smallButton,ofColor(60,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(10,string("TwoPlayPause"),ofColor(60,0,0));
+    temp = GlobalGUI(10,string("ThreePlayPause"),smallButton,ofColor(61,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(11,string("ThreePlayPause"),ofColor(61,0,0));
+    
+    temp = GlobalGUI(11,string("SwitchVolume"),smallButton,ofColor(62,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(12,string("SwitchVolume"),ofColor(62,0,0));
+    temp = GlobalGUI(12,string("SwitchActiveOptions"),smallButton,ofColor(63,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(13,string("SwitchActiveOptions"),ofColor(63,0,0));
-    mainInterfaceData.push_back(temp);
-
+    
+    
+    string notes[] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+    for (int i = 0; i < 12; i++) {
+        place = ofVec3f(+250,150-(i*20),0);
+        temp = GlobalGUI(13+i,notes[i],smallButton,ofColor(0,0,0),place);
+        mainInterfaceData.push_back(temp);
+        
+    }
+    
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
@@ -1071,15 +1217,48 @@ void ofApp::setupGlobalInterface() {
         for (int j = 0; j < 4; j++) {
             mainInterface.addVertex(ofVec3f(0,0,0));
             mainInterfaceFbo.addVertex(ofVec3f(0,0,0));
-            mainInterface.addColor(ofColor(255,255,255));
+            mainInterface.addColor(mainInterfaceData[i].elementColor);
             mainInterfaceFbo.addColor(ofColor(50+i,0,0));
         }
         
         for (int j = 0; j < 6; j++) {
-            mainInterface.addIndex(mainInterfaceData.at(i).index[j]);
+            mainInterface.addIndex(mainInterfaceData.at(i).index[j]+(4*i));
         }
     }
+    
+}
 
+void ofApp::detailEditInterfaceOn() {
+    
 }
 
 
+void ofApp::detailEditInterfaceOff() {
+    mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    }
+}
+
+void ofApp::volumeInterfacOn() {
+    
+}
+
+void ofApp::volumeInterfaceOff() {
+    mainInterfaceData[1].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[2].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[3].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+}
+
+void ofApp::pauseInterfaceOn() {
+    
+}
+
+void ofApp::pauseInterfaceOff() {
+    mainInterfaceData[0].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    
+    mainInterfaceData[8].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[9].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[10].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    
+}

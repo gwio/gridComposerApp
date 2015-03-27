@@ -9,12 +9,12 @@ public:
         
     
     
-    GlobalGUI(int,string,ofColor);
+    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f);
     
     int counter;
     
-    ofVec3f elementPos, elementSize;
-    
+    ofVec3f elementSize;
+    ofVec3f placement;
     string elementName;
     
     string drawString;
@@ -22,6 +22,7 @@ public:
     ofVec3f drawStringPos;
     
     float minVal, maxVal, curVal;
+    float minX,minY,maxX,maxY;
     
     ofColor elementColor, pickColor;
     
@@ -29,6 +30,7 @@ public:
     int index[6];
     void update();
     
-    ofVec3f getWorldToScreen(ofVec3f&, ofCamera&);
-    void updateMainMesh(ofVboMesh& mesh_);
+    void updateMainMesh(ofVboMesh&, ofVec3f);
+    
+    bool isInside(ofVec2f);
 };

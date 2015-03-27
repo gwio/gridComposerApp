@@ -1,7 +1,7 @@
 
 #include "cube.h"
 
-#define SPEED 0.045
+#define SPEED 0.065
 
 
 Cube::Cube(){
@@ -46,11 +46,14 @@ void Cube::update(){
     if (defaultZ != vec0Ptr->z) {
  
         if (diff > 0) {
-        aniFac = ofClamp(1-pow(1-aniPct,4),0.0,1.0);
+            aniFac = ofClamp(1-pow(1-aniPct,2),0.0,1.0);
+
+
         }
         
         if (diff < 0) {
-            aniFac = ofClamp(pow(aniPct,3),0.0,1.0);
+            aniFac = ofClamp(pow(aniPct,4),0.0,1.0);
+
         }
         
        // cout << aniFac << endl;
