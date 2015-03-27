@@ -6,6 +6,7 @@
 #include "ofxTonic.h"
 #include "interfacePlane.h"
 #include "GlobalScales.h"
+#include "SynthPresetManager.h"
 
 
 struct synthInfo {
@@ -33,6 +34,7 @@ struct cubeGroup {
     vector< int> x_in_y_elements;
     Tonic::ofxTonicSynth groupSynth;
     Tonic::Generator output;
+    Tonic::RampedValue rampVol, freqRamp;
     
     cubeGroup(){
         
@@ -88,11 +90,14 @@ public:
     void updateSoundsMap(int,int, bool);
     void resetCubeGroup(unsigned long, int, int);
     void setupOneSynth(cubeGroup*);
+    void changePreset();
     void updateGroupInfo(unsigned long,int,int);
     void setTranslate(ofVec3f);
     void setRotate(ofQuaternion);
     void setScale(float);
     void planeMovement(float);
+    
+    SynthPresetManager presetManager;
     
     int getRandomNote();
     

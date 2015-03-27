@@ -58,6 +58,10 @@ public:
     void detailEditInterfaceOn();
     void detailEditInterfaceOff();
     
+    
+    
+    void makePresetString();
+    
     //tonic
     void setupAudio();
     void pulseEvent(float &);
@@ -70,6 +74,8 @@ public:
     //scales
     GlobalScales scaleCollection;
     
+    
+    vector<string> presetNames;
     //3d scene
     ofEasyCam cam;
     ofCamera testCam;

@@ -72,6 +72,7 @@ void GlobalGUI::setOn(ofVboMesh& mesh_) {
     mesh_.setColor(1+counter,elementColor);
     mesh_.setColor(2+counter, elementColor);
     mesh_.setColor(3+counter, elementColor);
+    onOff = true;
 }
 
 
@@ -80,4 +81,5 @@ void GlobalGUI::setOff(ofVboMesh& mesh_) {
     mesh_.setColor(1+counter,elementColorOff);
     mesh_.setColor(2+counter, elementColorOff);
     mesh_.setColor(3+counter, elementColorOff);
+    onOff = false;
 }

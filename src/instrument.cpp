@@ -929,40 +929,36 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
     
-            float rampLength = 0.22;
+            float rampLength = 0.42;
             
-            
+    
+            //create volume ramp
             Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
             cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
-            
-            Tonic::RampedValue rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
-            
+            cgPtr->rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
+    
+            //create freq ramp
             Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
-            
-            Tonic::RampedValue freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(0.66).target(rampFreqTarget);
-            
+            cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(0.66).target(rampFreqTarget);
             cgPtr->groupNote = getRandomNote();
             cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
-            
-            cgPtr->output = Tonic::SineWave().freq(freqRamp)*0.5;
-            
-            
-            Tonic::Generator harmonic = Tonic::SineWave().freq(
-                                                               freqRamp * 2 + (rampVol*45)
-                                                               ) * (0.25);
-            
-            Tonic::Generator harmonic2 = Tonic::SineWave().freq(
-                                                                freqRamp*3
-                                                                ) * 0.1 ;
-            
-            Tonic::Generator harmonic3 = Tonic::SquareWave().freq(
-                                                                  freqRamp*5
-                                                                  )  *(0.1 * rampVol);
-            
-            
-            cgPtr->output =  (cgPtr->output + harmonic + harmonic2 + harmonic3) * rampVol;
     
     
+            presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol);
+
+}
+
+void Instrument::changePreset() {
+ 
+    preset++;
+    
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol);
+        }
+    }
+
+    updateTonicOut();
 }
 
 
@@ -980,8 +976,8 @@ void Instrument::updateTonicOut(){
     .delayTimeLeft( 0.5 + Tonic::SineWave().freq(0.2) * 0.01)
     .delayTimeRight(0.4 + Tonic::SineWave().freq(0.23) * 0.01)
     .feedback(0.3)
-    .dryLevel(0.85)
-    .wetLevel(0.15);
+    .dryLevel(0.90)
+    .wetLevel(0.10);
     
     instrumentOut = (temp >> delay) * outputRamp;
     synthHasChanged = true;

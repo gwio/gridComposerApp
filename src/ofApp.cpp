@@ -1,5 +1,5 @@
 #include "ofApp.h"
-#define TILES 7
+#define TILES 6
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.12
 #define BPM 130*4
@@ -200,6 +200,8 @@ void ofApp::update(){
         mainInterfaceData[5].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
         mainInterfaceData[4].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
         mainInterfaceData[6].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+        mainInterfaceData[7].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+
         
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
@@ -723,15 +725,18 @@ void ofApp::mousePressed(int x, int y, int button){
             
             if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
                 cout << "0 pause"  << endl;
+               mainInterfaceData[8].switchColor(mainInterface);
                 synths[synthButton[0]].pause = !synths[synthButton[0]].pause;
             }
             if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
                 cout << "1 pause"  << endl;
+                mainInterfaceData[9].switchColor(mainInterface);
                 synths[synthButton[1]].pause = !synths[synthButton[1]].pause;
                 
             }
             if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
                 cout << "2 pause"  << endl;
+                mainInterfaceData[10].switchColor(mainInterface);
                 synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
             }
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
@@ -777,6 +782,10 @@ void ofApp::mousePressed(int x, int y, int button){
             if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(12);
                 cout << "+12"  << endl;
+            }
+            if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].changePreset();
+               // cout << presetNames.at(synths[activeSynth].preset)  << endl;
             }
             for (int i = 1; i < 12; i++) {
                 
@@ -1201,18 +1210,20 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(+300, 40,0);
+    place = ofVec3f(+320, 40,0);
     temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(+250,-250,0);
-    temp = GlobalGUI(5,string("activeScale"),horizontalSlider*1.25,ofColor(55,0,0),place);
+    temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(+300, -40,0);
+    place = ofVec3f(+320, -40,0);
     temp = GlobalGUI(6,string("OctaveUp"),smallButton,ofColor(56,0,0),place);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(7,string("activePreset"),smallButton,ofColor(57,0,0),place);
+    
+    place = ofVec3f(+250, -210,0);
+    temp = GlobalGUI(7,string("activePreset"),horizontalSlider,ofColor(57,0,0),place);
     mainInterfaceData.push_back(temp);
     
     
@@ -1239,7 +1250,7 @@ void ofApp::setupGlobalInterface() {
     }
     
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(+350,150-(i*20),0);
+        place = ofVec3f(+290,150-(i*20),0);
         temp = GlobalGUI(25+i,notes[i],smallButton,ofColor(0,0,0),place);
         mainInterfaceData.push_back(temp);
     }
@@ -1278,6 +1289,8 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[7].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
@@ -1307,5 +1320,13 @@ void ofApp::pauseInterfaceOff() {
     mainInterfaceData[8].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[9].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[10].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    
+}
+
+void ofApp::makePresetString() {
+    presetNames.push_back("Sinu");
+    presetNames.push_back("simple");
+    presetNames.push_back("simple2");
+
     
 }
