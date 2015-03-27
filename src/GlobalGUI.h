@@ -24,7 +24,7 @@ public:
     float minVal, maxVal, curVal;
     float minX,minY,maxX,maxY;
     
-    ofColor elementColor, pickColor;
+    ofColor elementColor, elementColorOff;
     
     ofVec3f vertices[4];
     int index[6];
@@ -33,4 +33,9 @@ public:
     void updateMainMesh(ofVboMesh&, ofVec3f);
     
     bool isInside(ofVec2f);
+    bool onOff;
+    
+    void switchColor(ofVboMesh&);
+    void setOn(ofVboMesh&);
+    void setOff(ofVboMesh&);
 };

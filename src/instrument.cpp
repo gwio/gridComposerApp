@@ -47,6 +47,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     
     pause = false;
     myScaleTarget = 1.0;
+    currentScaleVecPos = 0;
     
 }
 
@@ -1033,10 +1034,12 @@ void Instrument::applyNewScale(){
 }
 
 
-void Instrument::setMusicScale(GlobalScales& scale_){
+void Instrument::setMusicScale(GlobalScales& scale_,int num_){
     scaleNoteSteps.clear();
-    scaleNoteSteps = scale_.scaleNotes.at(2);
-    activeScale = scale_.scaleVec.at(2);
+    scaleNoteSteps = scale_.scaleNotes.at(num_);
+    activeScale = scale_.scaleVec.at(num_);
+    
+    applyNewScale();
 }
 
 void Instrument::setKeyNote(int keyNote_) {

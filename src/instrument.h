@@ -100,9 +100,10 @@ public:
     void setKeyNote(int);
     Scale activeScale;
     vector<int> scaleNoteSteps;
-    void setMusicScale(GlobalScales&);
+    void setMusicScale(GlobalScales&, int);
     void changeMusicScale(int);
     void applyNewScale();
+    int currentScaleVecPos;
     
     string instrumentId;
     void changeSynthVolume(float &);

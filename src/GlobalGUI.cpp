@@ -9,7 +9,7 @@ GlobalGUI::GlobalGUI(){
 GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_) {
     elementName = name_;
     drawString = name_;
-    elementColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
+    elementColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(200,255), 255);
     
     counter=counter_*4;
     index[0]=0;
@@ -19,10 +19,11 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     index[4]=3;
     index[5]=0;
     
-   pickColor = pickc_;
+    elementColorOff = ofColor::fromHsb(elementColor.getHue(), elementColor.getBrightness(), elementColor.getSaturation(), 25 );
    placement =  placement_;
     
     elementSize = elementSize_;
+    onOff = true;
 }
 
 
@@ -48,4 +49,35 @@ bool GlobalGUI::isInside(ofVec2f click_) {
         result = false;
         return result;
     }
+}
+
+void GlobalGUI::switchColor(ofVboMesh& mesh_) {
+    onOff = !onOff;
+    if (onOff) {
+        mesh_.setColor(0+counter, elementColor);
+        mesh_.setColor(1+counter,elementColor);
+        mesh_.setColor(2+counter, elementColor);
+        mesh_.setColor(3+counter, elementColor);
+    } else {
+            mesh_.setColor(0+counter, elementColorOff);
+            mesh_.setColor(1+counter,elementColorOff);
+            mesh_.setColor(2+counter, elementColorOff);
+            mesh_.setColor(3+counter, elementColorOff);
+    }
+    
+}
+
+void GlobalGUI::setOn(ofVboMesh& mesh_) {
+    mesh_.setColor(0+counter, elementColor);
+    mesh_.setColor(1+counter,elementColor);
+    mesh_.setColor(2+counter, elementColor);
+    mesh_.setColor(3+counter, elementColor);
+}
+
+
+void GlobalGUI::setOff(ofVboMesh& mesh_) {
+    mesh_.setColor(0+counter, elementColorOff);
+    mesh_.setColor(1+counter,elementColorOff);
+    mesh_.setColor(2+counter, elementColorOff);
+    mesh_.setColor(3+counter, elementColorOff);
 }

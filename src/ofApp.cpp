@@ -34,20 +34,20 @@ void ofApp::setup(){
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
     synths[0].setup(&timeCounter, &tonicSynth, synthPos[0]);
-    synths[0].setMusicScale(scaleCollection);
-   // synths[0].setKeyNote(40-12);
+    synths[0].setMusicScale(scaleCollection, 0);
+    // synths[0].setKeyNote(40-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
     synths[1].setup(&timeCounter, &tonicSynth, synthPos[1]);
-    synths[1].setMusicScale(scaleCollection);
-   // synths[1].setKeyNote(40);
-
-
+    synths[1].setMusicScale(scaleCollection, 0);
+    // synths[1].setKeyNote(40);
+    
+    
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
     synths[2].setup(&timeCounter, &tonicSynth, synthPos[2]);
-    synths[2].setMusicScale(scaleCollection);
-   // synths[2].setKeyNote(40+12);
-
+    synths[2].setMusicScale(scaleCollection, 0);
+    // synths[2].setKeyNote(40+12);
+    
     
     globalTranslate.setPosition(ofVec3f(TILES*TILESIZE,TILES*TILESIZE,0)/-2);
     activeSynth = 1;
@@ -200,7 +200,7 @@ void ofApp::update(){
         mainInterfaceData[5].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
         mainInterfaceData[4].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
         mainInterfaceData[6].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
-
+        
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
         }
@@ -765,7 +765,10 @@ void ofApp::mousePressed(int x, int y, int button){
         if (currentState == STATE_EDIT_DETAIL) {
             
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
-            cout << synths[activeSynth].activeScale.name  << endl;
+                synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                synths[activeSynth].currentScaleVecPos++;
+                detailEditInterfaceOn();
+                cout << synths[activeSynth].activeScale.name  << endl;
             }
             if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(-12);
@@ -779,7 +782,8 @@ void ofApp::mousePressed(int x, int y, int button){
                 
                 if (   mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
                     synths[activeSynth].changeMusicScale(i);
-                cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
+                    mainInterfaceData[13+i].switchColor(mainInterface);
+                    cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
             
@@ -1159,11 +1163,11 @@ void ofApp::setupStatesAndAnimation() {
     
     TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
     TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,(TILESIZE*TILES)/2,-(TILESIZE*TILES)/2));
-   // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
+    // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
     TwoVolumeLayerPathOff.addVertex(ofVec3f(0,(TILESIZE*TILES)/2,-(TILESIZE*TILES)/2));
     TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
-   // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
+    // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
     OneVolumeLayerPathOn = TwoVolumeLayerPathOn;
     OneVolumeLayerPathOff = TwoVolumeLayerPathOff;
@@ -1259,7 +1263,14 @@ void ofApp::setupGlobalInterface() {
 }
 
 void ofApp::detailEditInterfaceOn() {
-    
+    for (int i = 0; i < 12; i++) {
+        
+        if (   synths[activeSynth].activeScale.steps[i] ) {
+            mainInterfaceData[13+i].setOn(mainInterface);
+        } else {
+            mainInterfaceData[13+i].setOff(mainInterface);
+        }
+    }
 }
 
 
@@ -1267,7 +1278,7 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-
+    
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     }
