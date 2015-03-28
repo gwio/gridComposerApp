@@ -13,11 +13,15 @@ public:
     
     int counter;
     
+    bool showString;
+    
     ofVec3f elementSize;
     ofVec3f placement;
     string elementName;
     
     string drawString;
+    
+    float sliderWidth;
     
     ofVec3f drawStringPos;
     
@@ -30,7 +34,10 @@ public:
     int index[6];
     void update();
     
+    void setColor(ofColor);
+    
     void updateMainMesh(ofVboMesh&, ofVec3f);
+    void updateMainMeshSlider(ofVboMesh&, ofVec3f, float);
     
     bool isInside(ofVec2f);
     bool onOff;
@@ -38,4 +45,5 @@ public:
     void switchColor(ofVboMesh&);
     void setOn(ofVboMesh&);
     void setOff(ofVboMesh&);
+    
 };

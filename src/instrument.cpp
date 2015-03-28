@@ -48,6 +48,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     pause = false;
     myScaleTarget = 1.0;
     currentScaleVecPos = 0;
+    sVolume = 1.0;
     
 }
 
@@ -998,6 +999,7 @@ void Instrument::setScale(float scale_){
 
 
 void Instrument::changeSynthVolume(float & vol_) {
+    sVolume = vol_;
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, vol_);
   //  scanZ =  (30*vol_);
 }

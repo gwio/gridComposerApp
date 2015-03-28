@@ -103,6 +103,7 @@ public:
     
     int keyNote;
     void setKeyNote(int);
+    float sVolume;
     Scale activeScale;
     vector<int> scaleNoteSteps;
     void setMusicScale(GlobalScales&, int);

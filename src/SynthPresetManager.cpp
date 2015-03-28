@@ -45,7 +45,8 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
                  freq_/2 *
                  ( (1.0f + SineWave().freq((LFNoise().setFreq(0.5f) + 1.f) * 2.f + 0.2f)  )
                  )
-              )  * ((SineWave().freq(0.15f) + 1.f) * 0.75f + 0.25));
+              )
+              * ((SineWave().freq(0.15f) + 1.f) * 0.75f + 0.25));
         
               output_ = outputGen *vol_;
     }

@@ -8,6 +8,7 @@
 #include "ofxGui.h"
 #include "GlobalGUI.h"
 #include "GlobalScales.h"
+#include "ofxFontStash.h"
 
 using namespace Tonic;
 
@@ -33,6 +34,9 @@ public:
     
     void drawDebug();
     void intersectPlane();
+    
+    ofVec3f intersectPlane(ofVec2f);
+
     void updateFboMesh();
     
     void updateTapMap();
@@ -58,7 +62,7 @@ public:
     void detailEditInterfaceOn();
     void detailEditInterfaceOff();
     
-    
+    void makeDesignGrid();
     
     void makePresetString();
     
@@ -74,6 +78,8 @@ public:
     //scales
     GlobalScales scaleCollection;
     
+    //font
+    ofxFontStash font;
     
     vector<string> presetNames;
     //3d scene
@@ -92,6 +98,8 @@ public:
     float camDefaultFov;
     
     float easeInOut(float,float);
+    
+    float nearClip, farClip;
     
     ofQuaternion camQuatDefault, camQuatTarget;
     
@@ -172,5 +180,8 @@ public:
     int currentState;
     
     bool debugCam;
+    
+    //designgrid
+    ofVec2f designGrid[3][3];
     
 };

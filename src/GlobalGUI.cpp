@@ -24,6 +24,9 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     
     elementSize = elementSize_;
     onOff = true;
+    
+    sliderWidth = 0.0;
+    showString = false;
 }
 
 
@@ -37,7 +40,30 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
     maxX = elementSize.x/2+placement.x+vec_.x;
     minY = -elementSize.y/2+placement.y+vec_.y;
     maxY = elementSize.y/2+placement.y+vec_.y;
+    
+    drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0);
    }
+
+
+void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width_){
+    
+    mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement);
+    mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement);
+    mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2-width_, elementSize.y/2,0)+placement);
+    mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2-width_, -elementSize.y/2,0)+placement);
+    
+    minX = -elementSize.x/2+placement.x+vec_.x;
+    maxX = elementSize.x/2+placement.x+vec_.x;
+    minY = -elementSize.y/2+placement.y+vec_.y;
+    maxY = elementSize.y/2+placement.y+vec_.y;
+    
+    drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0);
+
+}
+
+void GlobalGUI::setColor(ofColor c_) {
+    
+}
 
 
 bool GlobalGUI::isInside(ofVec2f click_) {
@@ -83,3 +109,5 @@ void GlobalGUI::setOff(ofVboMesh& mesh_) {
     mesh_.setColor(3+counter, elementColorOff);
     onOff = false;
 }
+
+

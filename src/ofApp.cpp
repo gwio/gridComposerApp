@@ -19,13 +19,27 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofEnableDepthTest();
     
+   font.setup( "sspb.ttf" //font file, ttf only
+    );					//lower res mipmaps wil bleed into each other
+    
+    font.setKerning(font.getKerning());
+    font.setLodBias(-1);
+    
     scaleCollection.loadScales();
+    makeDesignGrid();
     
     synthPos.resize(3);
     
+    camActiveFov = 20;
+    camFov = 30;
+    
+    nearClip = 10;
+    farClip = 10000;
+    
     for (int i = -1; i < 2; i++) {
         ofNode temp;
-        temp.setPosition( i*(TILES*TILESIZE*2), 0, 0);
+       // temp.setPosition( i*(TILES*TILESIZE*2), 0, 0);
+        temp.setPosition( intersectPlane( designGrid[i+1][1] ) );
         //temp.setOrientation(ofVec3f(0,0,1));
         synthPos[i+1]=temp;
     }
@@ -77,9 +91,11 @@ void ofApp::setup(){
         intersecPlane.at(i).setFrom(temp);
     }
     
-    
     setupStatesAndAnimation();
     setupGlobalInterface();
+    
+
+   
     
     ofBackground(11, 65, 65);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
@@ -183,7 +199,7 @@ void ofApp::update(){
     
     //global interfac
     if (currentState == STATE_DEFAULT) {
-        mainInterfaceData[0].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
+        mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),mainInterfaceData[0].sliderWidth);
         
         mainInterfaceData[8].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()));
         mainInterfaceData[9].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
@@ -191,9 +207,9 @@ void ofApp::update(){
     }
     
     if (currentState == STATE_VOLUME) {
-        mainInterfaceData[1].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()));
-        mainInterfaceData[2].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
-        mainInterfaceData[3].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()));
+        mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth);
+        mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth);
+        mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth);
     }
     
     if (currentState == STATE_EDIT_DETAIL) {
@@ -223,7 +239,7 @@ void ofApp::draw(){
     
     glEnable(GL_MULTISAMPLE);
     
-    ofEnableLighting();
+   // ofEnableLighting();
     
     
     if (!debugCam) {
@@ -232,7 +248,7 @@ void ofApp::draw(){
         cam.begin();
     }
     
-    light.enable();
+  //  light.enable();
     // planeTemp.draw();
     
     // globalTranslate.transformGL();
@@ -271,7 +287,20 @@ void ofApp::draw(){
         guiFbo.draw(0,0);
     }
     
+    
+    glDisable(GL_DEPTH_TEST);
+
     mainInterface.draw();
+    
+    ofPushStyle();
+    ofSetColor(255, 255, 255);
+    for (int i = 0; i < mainInterfaceData.size();i ++){
+        if (mainInterfaceData[i].showString){
+            font.draw(mainInterfaceData[i].elementName, 42, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
+        }
+    }
+    ofPopStyle();
+    
 }
 
 //--------------------------------------------------------------
@@ -645,12 +674,36 @@ void ofApp::mouseDragged(int x, int y, int button){
         
         
         if (currentState == STATE_DEFAULT) {
-            if (mainInterfaceData[0].isInside(ofVec3f(x, mainInterfaceData[0].minY+ mainInterfaceData[0].elementSize.y/2,0))) {
-                synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
+            if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[0].sliderWidth = mainInterfaceData[0].maxX - x;
                 volumeRampValueChanged(value);
                 cout << value  << endl;
             }
+        }
+        
+        if (currentState == STATE_VOLUME) {
+            
+            if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX - x;
+                synths[synthButton[0]].changeSynthVolume(value);
+                cout << value  << endl;
+            }
+            if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX - x;
+                synths[synthButton[1]].changeSynthVolume(value);
+                cout << value  << endl;
+            }
+            if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX - x;
+                synths[synthButton[2]].changeSynthVolume(value);
+                cout << value  << endl;
+            }
+
+            
         }
         
     }
@@ -741,6 +794,7 @@ void ofApp::mousePressed(int x, int y, int button){
             }
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
+                mainInterfaceData[0].sliderWidth = mainInterfaceData[0].maxX - x;
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 volumeRampValueChanged(value);
                 cout << value  << endl;
@@ -751,16 +805,19 @@ void ofApp::mousePressed(int x, int y, int button){
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX - x;
                 synths[synthButton[0]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX - x;
                 synths[synthButton[1]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX - x;
                 synths[synthButton[2]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -771,6 +828,7 @@ void ofApp::mousePressed(int x, int y, int button){
             
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
                 synths[activeSynth].currentScaleVecPos++;
                 detailEditInterfaceOn();
                 cout << synths[activeSynth].activeScale.name  << endl;
@@ -838,7 +896,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
-    
+    makeDesignGrid();
 }
 
 //--------------------------------------------------------------
@@ -915,6 +973,18 @@ void ofApp::drawDebug() {
     ofDrawBitmapString("BPM Counter: "+ofToString(timeCounter), 20, 120);
     ofPopStyle();
     
+    
+    for (int i = 1; i < 3; i++) {
+        
+        ofLine(0, (ofGetHeight()/3)*i, ofGetWidth(), (ofGetHeight()/3)*i );
+        ofLine(ofGetWidth()/3*i, 0, ofGetWidth()/3*i, ofGetHeight());
+    }
+    
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            ofEllipse(designGrid[i][j], 10, 10);
+        }
+    }
 }
 
 void ofApp::intersectPlane(){
@@ -930,7 +1000,27 @@ void ofApp::intersectPlane(){
     
 }
 
-
+ofVec3f ofApp::intersectPlane(ofVec2f target_) {
+    
+    ofCamera tempNode;
+    tempNode.setNearClip(nearClip);
+    tempNode.setFarClip(farClip);
+    tempNode.setFov(camFov);
+    tempNode.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
+    tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
+    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0));
+    ofRay ray;
+    ray.s = wMouse;
+    ray.t = wMouse-tempNode.getPosition();
+    
+    ofPlanePrimitive planeTemp;
+    planeTemp.set(2000, 2000);
+    ofPlane iP;
+    iP.setFrom(planeTemp);
+    ofVec3f cord;
+    iP.intersect(ray, cord);
+    return cord;
+}
 
 
 void ofApp::updateFboMesh(){
@@ -940,6 +1030,7 @@ void ofApp::updateFboMesh(){
     synths[activeSynth].updateFboMesh();
     
     fbo.begin();
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_MULTISAMPLE);
     ofDisableLighting();
     ofClear(255,255,255);
@@ -961,6 +1052,8 @@ void ofApp::updateFboMesh(){
     testCam.end();
     
     glReadPixels(ofGetMouseX(),ofGetMouseY(), 1,1, GL_RGB, GL_UNSIGNED_BYTE, RGB);
+    glDisable(GL_DEPTH_TEST);
+
     fbo.end();
     lastPickColor = ofColor(RGB[0],RGB[1],RGB[2]);
     
@@ -1095,11 +1188,9 @@ void ofApp::setupStatesAndAnimation() {
     
     
     //startcam settings
-    testCam.setNearClip(10);
-    testCam.setFarClip(51000);
-    camActiveFov = 20;
-    camFov = 30;
-    
+    testCam.setNearClip(nearClip);
+    testCam.setFarClip(farClip);
+  
     float bezierHandleFac = 2.5;
     
     //___---___
@@ -1274,6 +1365,8 @@ void ofApp::setupGlobalInterface() {
 }
 
 void ofApp::detailEditInterfaceOn() {
+    mainInterfaceData[5].showString = true;
+
     for (int i = 0; i < 12; i++) {
         
         if (   synths[activeSynth].activeScale.steps[i] ) {
@@ -1281,12 +1374,15 @@ void ofApp::detailEditInterfaceOn() {
         } else {
             mainInterfaceData[13+i].setOff(mainInterface);
         }
+        
+        mainInterfaceData[25+i].showString = true;
     }
 }
 
 
 void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[5].showString = false;
     mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[7].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
@@ -1297,25 +1393,39 @@ void ofApp::detailEditInterfaceOff() {
     }
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[25+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+        mainInterfaceData[25+i].showString = false;
+
     }
 }
 
 void ofApp::volumeInterfacOn() {
-    
+    mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX- ofMap(synths[synthButton[0]].sVolume, 0.0, 1.0, mainInterfaceData[1].minX, mainInterfaceData[1].maxX);
+    mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX- ofMap(synths[synthButton[1]].sVolume, 0.0, 1.0, mainInterfaceData[2].minX, mainInterfaceData[2].maxX);
+    mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX- ofMap(synths[synthButton[2]].sVolume, 0.0, 1.0, mainInterfaceData[3].minX, mainInterfaceData[3].maxX);
+    mainInterfaceData[1].showString = true;
+    mainInterfaceData[2].showString = true;
+    mainInterfaceData[3].showString = true;
+
 }
 
 void ofApp::volumeInterfaceOff() {
     mainInterfaceData[1].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[2].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[3].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[1].showString = false;
+    mainInterfaceData[2].showString = false;
+    mainInterfaceData[3].showString = false;
+
 }
 
 void ofApp::pauseInterfaceOn() {
-    
+    mainInterfaceData[0].showString = true;
 }
 
 void ofApp::pauseInterfaceOff() {
     mainInterfaceData[0].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[0].showString = false;
+
     
     mainInterfaceData[8].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[9].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
@@ -1327,6 +1437,16 @@ void ofApp::makePresetString() {
     presetNames.push_back("Sinu");
     presetNames.push_back("simple");
     presetNames.push_back("simple2");
+}
 
+void ofApp::makeDesignGrid() {
     
+    ofVec2f third = ofVec2f(ofGetWidth()/3,ofGetHeight()/3);
+    ofVec2f center = third/2;
+    
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            designGrid[i][j] = ofVec2f(third.x*i+center.x,third.y*j+center.y);
+        }
+    }
 }
