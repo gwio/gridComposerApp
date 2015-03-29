@@ -32,6 +32,8 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
+    void updateInterfaceMesh();
+    
     void drawDebug();
     void intersectPlane();
     
@@ -61,6 +63,9 @@ public:
     
     void detailEditInterfaceOn();
     void detailEditInterfaceOff();
+    
+    void editInterfaceOn();
+    void editInterfaceOff();
     
     void makeDesignGrid();
     
@@ -169,6 +174,7 @@ public:
     vector<GlobalGUI> mainInterfaceData;
     ofVboMesh mainInterface;
     ofVboMesh mainInterfaceFbo;
+    void updateSynthScaleInfo();
     
     //hack for ofxgui panel
     ofFbo guiFbo;

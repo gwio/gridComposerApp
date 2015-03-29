@@ -30,8 +30,8 @@ void ofApp::setup(){
     
     synthPos.resize(3);
     
-    camActiveFov = 20;
-    camFov = 30;
+    camActiveFov = 25;
+    camFov = 35;
     
     nearClip = 10;
     farClip = 10000;
@@ -132,7 +132,7 @@ void ofApp::setup(){
     synthButton[2] = 2;
     
     
-    aniPct = 1.0;
+  //  aniPct = 1.0;
     aniCam = 1.0;
     
     animCam = false;
@@ -183,6 +183,8 @@ void ofApp::update(){
         aniPct += ANI_SPEED;
     }
     
+   
+    
     if (aniPct >= 1.0) {
         for (int i = 0; i < synths.size(); i++) {
             synths[i].planeMovement(1.0);
@@ -191,41 +193,58 @@ void ofApp::update(){
             updateCamera(1.0);
         }
         aniPct = 1.0;
+        tweenFloat = easeInOut( ofClamp(aniPct, 0.0, 1.0), 0.705);
         interfaceMoving = false;
+        updateInterfaceMesh();
     }
     
     
-    intersectPlane();
-    
-    //global interfac
-    if (currentState == STATE_DEFAULT) {
-        mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),mainInterfaceData[0].sliderWidth);
-        
-        mainInterfaceData[8].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()));
-        mainInterfaceData[9].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()));
-        mainInterfaceData[10].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()));
-    }
-    
-    if (currentState == STATE_VOLUME) {
-        mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth);
-        mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth);
-        mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth);
-    }
-    
-    if (currentState == STATE_EDIT_DETAIL) {
-        mainInterfaceData[5].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
-        mainInterfaceData[4].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
-        mainInterfaceData[6].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
-        mainInterfaceData[7].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
+    if (interfaceMoving) {
 
-        
-        for (int i = 0; i < 12; i++) {
-            mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
-        }
-        for (int i = 0; i < 12; i++) {
-            mainInterfaceData[25+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()));
-        }
+        updateInterfaceMesh();
+    
     }
+    
+   
+    intersectPlane();
+
+}
+
+void ofApp::updateInterfaceMesh() {
+    //global interfac
+    // if (currentState == STATE_DEFAULT) {
+    mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),mainInterfaceData[0].sliderWidth,tweenFloat);
+    
+    mainInterfaceData[8].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()),tweenFloat);
+    mainInterfaceData[9].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
+    mainInterfaceData[10].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()),tweenFloat);
+    //  }
+    
+    //   if (currentState == STATE_VOLUME) {
+    mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
+    mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
+    mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
+    //   }
+    
+    //   if (currentState == STATE_EDIT_DETAIL) {
+    mainInterfaceData[4].updateMainMesh(mainInterface, ofVec3f(ofGetWidth()/2,ofGetHeight()/2,0),tweenFloat);
+    mainInterfaceData[6].updateMainMesh(mainInterface, ofVec3f(ofGetWidth()/2,ofGetHeight()/2,0),tweenFloat);
+    
+    
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()),tweenFloat);
+    }
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[25+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()),tweenFloat);
+    }
+    //  }
+    
+    //   if (currentState == STATE_EDIT) {
+    mainInterfaceData[5].updateMainMesh(mainInterface, ofVec3f(ofGetWidth()/2,ofGetHeight()/2,0),tweenFloat);
+    mainInterfaceData[7].updateMainMesh(mainInterface, ofVec3f(ofGetWidth()/2,ofGetHeight()/2,0),tweenFloat);
+    
+    
+    //   }
 }
 
 //--------------------------------------------------------------
@@ -296,7 +315,11 @@ void ofApp::draw(){
     ofSetColor(255, 255, 255);
     for (int i = 0; i < mainInterfaceData.size();i ++){
         if (mainInterfaceData[i].showString){
+            if (i < 13) {
             font.draw(mainInterfaceData[i].elementName, 42, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
+            } else {
+                font.draw(mainInterfaceData[i].elementName, 21, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
+            }
         }
     }
     ofPopStyle();
@@ -347,10 +370,12 @@ void ofApp::keyPressed(int key){
         if (key == '5' && currentState == STATE_EDIT) {
             
             detailEditInterfaceOn();
+            aniPct = 0.0;
             currentState = STATE_EDIT_DETAIL;
         } else if (key == '5' && currentState  == STATE_EDIT_DETAIL) {
             
             detailEditInterfaceOff();
+            aniPct = 0.0;
             currentState = STATE_EDIT;
         }
         
@@ -434,6 +459,7 @@ void ofApp::keyPressed(int key){
                 synthButton[0] = synthButton[1];
                 synthButton[1] = temp;
                 aniPct = 0.0;
+                updateSynthScaleInfo();
                 
             } else {
                 synths[temp].inFocus = true;
@@ -473,7 +499,11 @@ void ofApp::keyPressed(int key){
                 
                 aniPct = 0.0;
                 
+                if (currentState == STATE_DEFAULT){
+                editInterfaceOn();
                 pauseInterfaceOff();
+                }
+                
                 currentState = STATE_EDIT;
             }
             
@@ -513,6 +543,15 @@ void ofApp::keyPressed(int key){
                 aniPct = 0.0;
                 
                 pauseInterfaceOn();
+                if (currentState == STATE_EDIT) {
+                editInterfaceOff();
+                }
+                
+                if (currentState == STATE_EDIT_DETAIL) {
+                    editInterfaceOff();
+                detailEditInterfaceOff();
+                }
+                
                 currentState = STATE_DEFAULT;
                 
             } else{
@@ -541,7 +580,10 @@ void ofApp::keyPressed(int key){
                 
                 aniPct = 0.0;
                 
-                pauseInterfaceOff();
+                if (currentState == STATE_DEFAULT){
+                    editInterfaceOn();
+                    pauseInterfaceOff();
+                }
                 currentState = STATE_EDIT;
                 
             }
@@ -580,6 +622,7 @@ void ofApp::keyPressed(int key){
                 synthButton[2] = synthButton[1];
                 synthButton[1] = temp;
                 aniPct = 0.0;
+                updateSynthScaleInfo();
                 
             }else {
                 synths[temp].inFocus = true;
@@ -615,7 +658,11 @@ void ofApp::keyPressed(int key){
                 
                 aniPct = 0.0;
                 
-                pauseInterfaceOff();
+                if (currentState == STATE_DEFAULT){
+                    editInterfaceOn();
+                    pauseInterfaceOff();
+                }
+                
                 currentState = STATE_EDIT;
                 
             }
@@ -826,6 +873,7 @@ void ofApp::mousePressed(int x, int y, int button){
         
         if (currentState == STATE_EDIT_DETAIL) {
             
+            
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                 mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
@@ -833,6 +881,12 @@ void ofApp::mousePressed(int x, int y, int button){
                 detailEditInterfaceOn();
                 cout << synths[activeSynth].activeScale.name  << endl;
             }
+            
+            if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].changePreset();
+                // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+            }
+            
             if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(-12);
                 cout << "-12"  << endl;
@@ -841,10 +895,7 @@ void ofApp::mousePressed(int x, int y, int button){
                 synths[activeSynth].setKeyNote(12);
                 cout << "+12"  << endl;
             }
-            if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
-                synths[activeSynth].changePreset();
-               // cout << presetNames.at(synths[activeSynth].preset)  << endl;
-            }
+            
             for (int i = 1; i < 12; i++) {
                 
                 if (   mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
@@ -860,6 +911,23 @@ void ofApp::mousePressed(int x, int y, int button){
                     synths[activeSynth].setKeyNote(i);
                     cout <<  "+ " << i << endl;
                 }
+            }
+            
+        }
+        
+        if (currentState == STATE_EDIT) {
+            
+            if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+                synths[activeSynth].currentScaleVecPos++;
+               // editInterfaceOn();
+                cout << synths[activeSynth].activeScale.name  << endl;
+            }
+            
+            if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].changePreset();
+                // cout << presetNames.at(synths[activeSynth].preset)  << endl;
             }
             
         }
@@ -1198,7 +1266,7 @@ void ofApp::setupStatesAndAnimation() {
     
     //synthlayer and camera for active edit position
     synthActivePos.setPosition(0, -TILES*TILESIZE*4, TILESIZE*TILES*3.5);
-    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.0,TILES*TILESIZE*2.2));
+    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.5,TILES*TILESIZE*2.2));
     camNotActiveSynth.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
@@ -1285,64 +1353,73 @@ void ofApp::setupStatesAndAnimation() {
 
 
 void ofApp::setupGlobalInterface() {
-    ofVec3f smallButton = ofVec3f(20,20,0);
-    ofVec3f horizontalSlider = ofVec3f(100,20,0);
-    ofVec3f verticalSlider = ofVec3f(20,100,0);
+    ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2/12,0);
+    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,20,0);
+    ofVec3f verticalSlider = ofVec3f(20,designGrid[0][0].y*2,0);
     
-    ofVec3f place = ofVec3f(0,-200,0);
-    GlobalGUI temp = GlobalGUI(0,string("mainVolume"), horizontalSlider, ofColor(50,0,0),place);
-    mainInterfaceData.push_back(temp);
-    
-    place = ofVec3f(0,+150,0);
-    temp = GlobalGUI(1,string("OneVolume"),horizontalSlider,ofColor(51,0,0),place);
-    mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(2,string("TwoVolume"),horizontalSlider,ofColor(52,0,0),place);
-    mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place);
+    ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
+    ofVec3f offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    GlobalGUI temp = GlobalGUI(0,string("mainVolume"), horizontalSlider, ofColor(50,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(+320, 40,0);
-    temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place);
+    place = ofVec3f(0,designGrid[0][0].y/2,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6);
+    temp = GlobalGUI(1,string("OneVolume"),horizontalSlider,ofColor(51,0,0),place,offPlace);
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(2,string("TwoVolume"),horizontalSlider,ofColor(52,0,0),place,offPlace);
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(+250,-250,0);
-    temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place);
+    place = ofVec3f(designGrid[0][0].x*2, designGrid[0][0].y,0);
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(+320, -40,0);
-    temp = GlobalGUI(6,string("OctaveUp"),smallButton,ofColor(56,0,0),place);
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    place = ofVec3f(designGrid[0][0].x*2,-designGrid[0][0].y*2.5,0);
+    temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(+250, -210,0);
-    temp = GlobalGUI(7,string("activePreset"),horizontalSlider,ofColor(57,0,0),place);
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    place = ofVec3f(designGrid[0][0].x*2, -designGrid[0][0].y,0);
+    temp = GlobalGUI(6,string("OctaveUp"),smallButton,ofColor(56,0,0),place,offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    place = ofVec3f(designGrid[0][0].x*2,-designGrid[0][0].y*2,0);
+    temp = GlobalGUI(7,string("activePreset"),horizontalSlider,ofColor(57,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
     
-    place = ofVec3f(0,+200,0);
-    temp = GlobalGUI(8,string("OnePlayPause"),smallButton,ofColor(59,0,0),place);
+    place = ofVec3f(0,designGrid[0][0].y*2,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(8,string("OnePlayPause"),smallButton,ofColor(59,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(9,string("TwoPlayPause"),smallButton,ofColor(60,0,0),place);
+    temp = GlobalGUI(9,string("TwoPlayPause"),smallButton,ofColor(60,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(10,string("ThreePlayPause"),smallButton,ofColor(61,0,0),place);
+    temp = GlobalGUI(10,string("ThreePlayPause"),smallButton,ofColor(61,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    temp = GlobalGUI(11,string("SwitchVolume"),smallButton,ofColor(62,0,0),place);
+    temp = GlobalGUI(11,string("SwitchVolume"),smallButton,ofColor(62,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(12,string("SwitchActiveOptions"),smallButton,ofColor(63,0,0),place);
+    temp = GlobalGUI(12,string("SwitchActiveOptions"),smallButton,ofColor(63,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
     
     string notes[] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(+250,150-(i*20),0);
-        temp = GlobalGUI(13+i,notes[i],smallButton,ofColor(0,0,0),place);
+        place = ofVec3f(designGrid[0][0].x,designGrid[0][0].y-(i*smallButton.y),0);
+        temp = GlobalGUI(13+i,notes[i],smallButton,ofColor(0,0,0),place,offPlace);
         mainInterfaceData.push_back(temp);
         
     }
     
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(+290,150-(i*20),0);
-        temp = GlobalGUI(25+i,notes[i],smallButton,ofColor(0,0,0),place);
+        place = ofVec3f(designGrid[0][0].x*1.5,designGrid[0][0].y-(i*smallButton.y),0);
+        temp = GlobalGUI(25+i,notes[i],smallButton,ofColor(0,0,0),place, offPlace);
         mainInterfaceData.push_back(temp);
     }
     
@@ -1362,39 +1439,87 @@ void ofApp::setupGlobalInterface() {
         }
     }
     
+    pauseInterfaceOn();
+    aniPct = 0.0;
+}
+
+void ofApp::editInterfaceOn(){
+    mainInterfaceData[5].showString = true;
+    mainInterfaceData[5].moveDir = 1;
+    mainInterfaceData[5].animation = true;
+    
+    mainInterfaceData[7].showString = true;
+    mainInterfaceData[7].moveDir = 1;
+    mainInterfaceData[7].animation = true;
+
+}
+
+
+void ofApp::editInterfaceOff(){
+    
+    
+   // mainInterfaceData[7].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[7].showString = false;
+    mainInterfaceData[7].moveDir = 0;
+    mainInterfaceData[7].animation = true;
+
+    
+  //  mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[5].showString = false;
+    mainInterfaceData[5].moveDir = 0;
+    mainInterfaceData[5].animation = true;
+
+
 }
 
 void ofApp::detailEditInterfaceOn() {
-    mainInterfaceData[5].showString = true;
+    mainInterfaceData[6].showString = true;
+    mainInterfaceData[6].moveDir = 1;
+    mainInterfaceData[6].animation = true;
 
+    mainInterfaceData[4].showString = true;
+    mainInterfaceData[4].moveDir = 1;
+    mainInterfaceData[4].animation = true;
+
+    
+    updateSynthScaleInfo();
     for (int i = 0; i < 12; i++) {
-        
-        if (   synths[activeSynth].activeScale.steps[i] ) {
-            mainInterfaceData[13+i].setOn(mainInterface);
-        } else {
-            mainInterfaceData[13+i].setOff(mainInterface);
-        }
+        mainInterfaceData[13+i].moveDir = 1;
+        mainInterfaceData[13+i].animation = true;
+
         
         mainInterfaceData[25+i].showString = true;
+        mainInterfaceData[25+i].moveDir = 1;
+        mainInterfaceData[25+i].animation = true;
+
     }
 }
 
 
 void ofApp::detailEditInterfaceOff() {
-    mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[5].showString = false;
-    mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[7].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    //  mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[4].showString = false;
+    mainInterfaceData[4].moveDir = 0;
+    mainInterfaceData[4].animation = true;
+
+ //   mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[6].showString = false;
+    mainInterfaceData[6].moveDir = 0;
+    mainInterfaceData[6].animation = true;
+
 
     
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+     //   mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+        mainInterfaceData[13+i].moveDir = 0;
+        mainInterfaceData[13+i].animation = true;
+
     }
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[25+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+      //  mainInterfaceData[25+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
         mainInterfaceData[25+i].showString = false;
-
+        mainInterfaceData[25+i].animation = true;
+        mainInterfaceData[25+i].moveDir = 0;
     }
 }
 
@@ -1403,36 +1528,87 @@ void ofApp::volumeInterfacOn() {
     mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX- ofMap(synths[synthButton[1]].sVolume, 0.0, 1.0, mainInterfaceData[2].minX, mainInterfaceData[2].maxX);
     mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX- ofMap(synths[synthButton[2]].sVolume, 0.0, 1.0, mainInterfaceData[3].minX, mainInterfaceData[3].maxX);
     mainInterfaceData[1].showString = true;
+    mainInterfaceData[1].animation = true;
+    mainInterfaceData[1].moveDir = 1;
     mainInterfaceData[2].showString = true;
+    mainInterfaceData[2].animation = true;
+    mainInterfaceData[2].moveDir = 1;
     mainInterfaceData[3].showString = true;
+    mainInterfaceData[3].animation = true;
+    mainInterfaceData[3].moveDir = 1;
+   
+
 
 }
 
 void ofApp::volumeInterfaceOff() {
-    mainInterfaceData[1].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[2].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[3].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+   // mainInterfaceData[1].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+ //   mainInterfaceData[2].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+ //   mainInterfaceData[3].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[1].showString = false;
+    mainInterfaceData[1].animation = true;
+    mainInterfaceData[1].moveDir = 0;
     mainInterfaceData[2].showString = false;
+    mainInterfaceData[2].animation = true;
+    mainInterfaceData[2].moveDir = 0;
     mainInterfaceData[3].showString = false;
+    mainInterfaceData[3].animation = true;
+    mainInterfaceData[3].moveDir = 0;
 
 }
 
 void ofApp::pauseInterfaceOn() {
     mainInterfaceData[0].showString = true;
+    mainInterfaceData[0].moveDir = 1;
+    mainInterfaceData[0].animation = true;
+
+
+    mainInterfaceData[8].moveDir = 1;
+    mainInterfaceData[8].animation = true;
+
+    mainInterfaceData[9].moveDir = 1;
+    mainInterfaceData[9].animation = true;
+
+    mainInterfaceData[10].moveDir = 1;
+    mainInterfaceData[10].animation = true;
+
+
 }
 
 void ofApp::pauseInterfaceOff() {
-    mainInterfaceData[0].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+   // mainInterfaceData[0].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
     mainInterfaceData[0].showString = false;
+    mainInterfaceData[0].moveDir = 0;
+    mainInterfaceData[0].animation = true;
 
     
-    mainInterfaceData[8].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[9].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[10].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    
+  //  mainInterfaceData[8].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+  //  mainInterfaceData[9].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+  //  mainInterfaceData[10].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
+    mainInterfaceData[8].moveDir = 0;
+    mainInterfaceData[8].animation = true;
+
+    mainInterfaceData[9].moveDir = 0;
+    mainInterfaceData[9].animation = true;
+
+    mainInterfaceData[10].moveDir = 0;
+    mainInterfaceData[10].animation = true;
+
+
 }
 
+void ofApp::updateSynthScaleInfo() {
+    
+    for (int i = 0; i < 12; i++) {
+        
+        if (   synths[activeSynth].activeScale.steps[i] ) {
+            mainInterfaceData[13+i].setOn(mainInterface);
+        } else {
+            mainInterfaceData[13+i].setOff(mainInterface);
+        }
+    }
+    
+}
 void ofApp::makePresetString() {
     presetNames.push_back("Sinu");
     presetNames.push_back("simple");

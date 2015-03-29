@@ -9,14 +9,16 @@ public:
         
     
     
-    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f);
+    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f);
     
     int counter;
     
     bool showString;
+    bool animation;
     
     ofVec3f elementSize;
     ofVec3f placement;
+    ofVec3f offPlacement;
     string elementName;
     
     string drawString;
@@ -24,6 +26,8 @@ public:
     float sliderWidth;
     
     ofVec3f drawStringPos;
+    
+    int moveDir;
     
     float minVal, maxVal, curVal;
     float minX,minY,maxX,maxY;
@@ -37,7 +41,8 @@ public:
     void setColor(ofColor);
     
     void updateMainMesh(ofVboMesh&, ofVec3f);
-    void updateMainMeshSlider(ofVboMesh&, ofVec3f, float);
+    void updateMainMesh(ofVboMesh&, ofVec3f, float&);
+    void updateMainMeshSlider(ofVboMesh&, ofVec3f, float, float&);
     
     bool isInside(ofVec2f);
     bool onOff;
