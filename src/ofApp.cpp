@@ -253,7 +253,7 @@ void ofApp::draw(){
     
     
     glShadeModel(GL_SMOOTH);
-    // glDisable(GL_MULTISAMPLE);
+     //glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
@@ -309,7 +309,9 @@ void ofApp::draw(){
     
     glDisable(GL_DEPTH_TEST);
 
-    mainInterface.draw();
+      mainInterface.draw();
+    
+    
     
     ofPushStyle();
     ofSetColor(255, 255, 255);
@@ -723,7 +725,8 @@ void ofApp::mouseDragged(int x, int y, int button){
         if (currentState == STATE_DEFAULT) {
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[0].sliderWidth = mainInterfaceData[0].maxX - x;
+               // mainInterfaceData[0].sliderWidth = mainInterfaceData[0].maxX - x;
+                mainInterfaceData[0].setSlider(mainInterface, mainInterfaceData[0].maxX - x);
                 volumeRampValueChanged(value);
                 cout << value  << endl;
             }
@@ -733,19 +736,22 @@ void ofApp::mouseDragged(int x, int y, int button){
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX - x;
+                //mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX - x;
+                mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x);
                 synths[synthButton[0]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX - x;
+                //mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX - x;
+                mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x);
                 synths[synthButton[1]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX - x;
+               // mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX - x;
+                mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x);
                 synths[synthButton[2]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -841,7 +847,8 @@ void ofApp::mousePressed(int x, int y, int button){
             }
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
-                mainInterfaceData[0].sliderWidth = mainInterfaceData[0].maxX - x;
+              //  mainInterfaceData[0].sliderWidth = mainInterfaceData[0].maxX - x;
+                mainInterfaceData[0].setSlider(mainInterface, mainInterfaceData[0].maxX - x );
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 volumeRampValueChanged(value);
                 cout << value  << endl;
@@ -852,19 +859,25 @@ void ofApp::mousePressed(int x, int y, int button){
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX - x;
+              //  mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX - x;
+                mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x );
+
                 synths[synthButton[0]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX - x;
+               // mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX - x;
+                mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x );
+
                 synths[synthButton[1]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX - x;
+              //  mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX - x;
+                mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x );
+
                 synths[synthButton[2]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -1354,7 +1367,7 @@ void ofApp::setupStatesAndAnimation() {
 
 void ofApp::setupGlobalInterface() {
     ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2/12,0);
-    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,20,0);
+    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2/12,0);
     ofVec3f verticalSlider = ofVec3f(20,designGrid[0][0].y*2,0);
     
     ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
@@ -1371,8 +1384,8 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(designGrid[0][0].x*2, designGrid[0][0].y,0);
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    place = ofVec3f(designGrid[0][0].x*2.1, designGrid[0][0].y,0);
+    offPlace = ofVec3f(designGrid[0][0].x*12,0,0);
     temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
@@ -1381,8 +1394,8 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
-    place = ofVec3f(designGrid[0][0].x*2, -designGrid[0][0].y,0);
+    offPlace = ofVec3f(designGrid[0][0].x*12,0,0);
+    place = ofVec3f(designGrid[0][0].x*2.1, -designGrid[0][0].y,0);
     temp = GlobalGUI(6,string("OctaveUp"),smallButton,ofColor(56,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
@@ -1408,9 +1421,9 @@ void ofApp::setupGlobalInterface() {
     
     
     string notes[] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    offPlace = ofVec3f(designGrid[0][0].x*2.2,0,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(designGrid[0][0].x,designGrid[0][0].y-(i*smallButton.y),0);
+        place = ofVec3f(designGrid[0][0].x*1.1,designGrid[0][0].y-(i*smallButton.y),0);
         temp = GlobalGUI(13+i,notes[i],smallButton,ofColor(0,0,0),place,offPlace);
         mainInterfaceData.push_back(temp);
         
@@ -1418,7 +1431,7 @@ void ofApp::setupGlobalInterface() {
     
     offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(designGrid[0][0].x*1.5,designGrid[0][0].y-(i*smallButton.y),0);
+        place = ofVec3f(designGrid[0][0].x*1.6,designGrid[0][0].y-(i*smallButton.y),0);
         temp = GlobalGUI(25+i,notes[i],smallButton,ofColor(0,0,0),place, offPlace);
         mainInterfaceData.push_back(temp);
     }
@@ -1459,13 +1472,13 @@ void ofApp::editInterfaceOff(){
     
     
    // mainInterfaceData[7].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[7].showString = false;
+   // mainInterfaceData[7].showString = false;
     mainInterfaceData[7].moveDir = 0;
     mainInterfaceData[7].animation = true;
 
     
   //  mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[5].showString = false;
+    //mainInterfaceData[5].showString = false;
     mainInterfaceData[5].moveDir = 0;
     mainInterfaceData[5].animation = true;
 
@@ -1498,12 +1511,12 @@ void ofApp::detailEditInterfaceOn() {
 
 void ofApp::detailEditInterfaceOff() {
     //  mainInterfaceData[4].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[4].showString = false;
+ //   mainInterfaceData[4].showString = false;
     mainInterfaceData[4].moveDir = 0;
     mainInterfaceData[4].animation = true;
 
  //   mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[6].showString = false;
+  //  mainInterfaceData[6].showString = false;
     mainInterfaceData[6].moveDir = 0;
     mainInterfaceData[6].animation = true;
 
@@ -1517,7 +1530,7 @@ void ofApp::detailEditInterfaceOff() {
     }
     for (int i = 0; i < 12; i++) {
       //  mainInterfaceData[25+i].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-        mainInterfaceData[25+i].showString = false;
+     //   mainInterfaceData[25+i].showString = false;
         mainInterfaceData[25+i].animation = true;
         mainInterfaceData[25+i].moveDir = 0;
     }
@@ -1545,13 +1558,13 @@ void ofApp::volumeInterfaceOff() {
    // mainInterfaceData[1].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
  //   mainInterfaceData[2].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
  //   mainInterfaceData[3].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[1].showString = false;
+   // mainInterfaceData[1].showString = false;
     mainInterfaceData[1].animation = true;
     mainInterfaceData[1].moveDir = 0;
-    mainInterfaceData[2].showString = false;
+ //   mainInterfaceData[2].showString = false;
     mainInterfaceData[2].animation = true;
     mainInterfaceData[2].moveDir = 0;
-    mainInterfaceData[3].showString = false;
+ //   mainInterfaceData[3].showString = false;
     mainInterfaceData[3].animation = true;
     mainInterfaceData[3].moveDir = 0;
 
@@ -1577,7 +1590,7 @@ void ofApp::pauseInterfaceOn() {
 
 void ofApp::pauseInterfaceOff() {
    // mainInterfaceData[0].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    mainInterfaceData[0].showString = false;
+  //  mainInterfaceData[0].showString = false;
     mainInterfaceData[0].moveDir = 0;
     mainInterfaceData[0].animation = true;
 

@@ -16,6 +16,7 @@ public:
     bool showString;
     bool animation;
     
+    ofVec3f curPos;
     ofVec3f elementSize;
     ofVec3f placement;
     ofVec3f offPlacement;
@@ -43,6 +44,8 @@ public:
     void updateMainMesh(ofVboMesh&, ofVec3f);
     void updateMainMesh(ofVboMesh&, ofVec3f, float&);
     void updateMainMeshSlider(ofVboMesh&, ofVec3f, float, float&);
+    
+    void setSlider(ofVboMesh&, float);
     
     bool isInside(ofVec2f);
     bool onOff;
