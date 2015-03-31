@@ -42,13 +42,14 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     animate = false;
     inFocus = false;
     scaling = false;
-    keyNote = 44;
+    keyNote = 0;
     preset = 0;
     
     pause = false;
     myScaleTarget = 1.0;
     currentScaleVecPos = 0;
     sVolume = 1.0;
+    pitchMod = 0;
     
 }
 
@@ -930,8 +931,8 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
     
-            float rampLength = 0.42;
-            
+            float rampLength = 0.22;
+    float freqRamp = 0.16;
     
             //create volume ramp
             Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
@@ -940,7 +941,7 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
             //create freq ramp
             Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
-            cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(0.66).target(rampFreqTarget);
+            cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
             cgPtr->groupNote = getRandomNote();
             cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
     
@@ -1041,6 +1042,8 @@ void Instrument::setMusicScale(GlobalScales& scale_,int num_){
 }
 
 void Instrument::setKeyNote(int keyNote_) {
+    
+   
     int change = keyNote_;
     keyNote += change;
     
@@ -1050,7 +1053,18 @@ void Instrument::setKeyNote(int keyNote_) {
             it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
         }
     }
+    
+}
 
+void Instrument::applyPitchMod(float mod_) {
+    
+    pitchMod = mod_;
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+            
+            it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote )+pitchMod);
+        }
+    }
 }
 
 void Instrument::planeMovement(float pct_){

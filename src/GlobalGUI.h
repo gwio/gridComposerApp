@@ -39,7 +39,7 @@ public:
     int index[6];
     void update();
     
-    void setColor(ofColor);
+    void setColor(ofVboMesh&, ofColor);
     
     void updateMainMesh(ofVboMesh&, ofVec3f);
     void updateMainMesh(ofVboMesh&, ofVec3f, float&);

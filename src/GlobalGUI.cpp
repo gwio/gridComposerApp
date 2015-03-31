@@ -72,8 +72,8 @@ void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
     
     mesh_.setVertex(0+counter, curPos+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
     mesh_.setVertex(1+counter, curPos+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
-    mesh_.setVertex(2+counter, curPos+ofVec3f(elementSize.x/2-width_, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
-    mesh_.setVertex(3+counter, curPos+ofVec3f(elementSize.x/2-width_, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
+    mesh_.setVertex(2+counter, curPos+ofVec3f(elementSize.x/2-sliderWidth, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
+    mesh_.setVertex(3+counter, curPos+ofVec3f(elementSize.x/2-sliderWidth, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
     
     minX = -elementSize.x/2+placement.x+curPos.x;
     maxX = elementSize.x/2+placement.x+curPos.x;
@@ -89,8 +89,8 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
     if (animation) {
     mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
     mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-    mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2-width_, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-    mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2-width_, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+    mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+    mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
     
     minX = -elementSize.x/2+placement.x+vec_.x;
     maxX = elementSize.x/2+placement.x+vec_.x;
@@ -105,7 +105,13 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
     }
 }
 
-void GlobalGUI::setColor(ofColor c_) {
+void GlobalGUI::setColor(ofVboMesh& mesh_, ofColor c_) {
+    
+    mesh_.setColor(0+counter, ofColor(c_));
+    mesh_.setColor(1+counter, ofColor(c_));
+    mesh_.setColor(2+counter, ofColor(c_));
+    mesh_.setColor(3+counter, ofColor(c_));
+
     
 }
 

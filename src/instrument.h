@@ -102,6 +102,7 @@ public:
     int getRandomNote();
     
     int keyNote;
+    int pitchMod;
     void setKeyNote(int);
     float sVolume;
     Scale activeScale;
@@ -109,6 +110,7 @@ public:
     void setMusicScale(GlobalScales&, int);
     void changeMusicScale(int);
     void applyNewScale();
+    void applyPitchMod(float);
     int currentScaleVecPos;
     
     string instrumentId;

@@ -161,8 +161,13 @@ public:
     unsigned long curMouseId;
     
     
+    //music
+    
+    vector<string> notes;
+    
     //sound time
     int timeCounter;
+    int bpm;
     
     //ofx gui elements
     bool showGui;
@@ -175,6 +180,7 @@ public:
     ofVboMesh mainInterface;
     ofVboMesh mainInterfaceFbo;
     void updateSynthScaleInfo();
+    void updateKeyNoteInfo(int);
     
     //hack for ofxgui panel
     ofFbo guiFbo;
@@ -184,7 +190,8 @@ public:
     bool focusCam;
     int synthButton[3];
     int currentState;
-    
+    bool interfacePadActive;
+    ofVec3f interfacePadStart;
     bool debugCam;
     
     //designgrid
