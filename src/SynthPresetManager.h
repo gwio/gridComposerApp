@@ -11,5 +11,5 @@ public:
     SynthPresetManager();
     int count;
     
-  void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&);
+    void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&);
 };

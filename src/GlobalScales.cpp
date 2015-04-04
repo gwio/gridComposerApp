@@ -30,7 +30,7 @@ void GlobalScales::loadScales() {
     scaleNotes.push_back(tempNotes);
     
     //___________________
-
+    
     tempNotes.clear();
     temp.name = "Dorian";
     {
@@ -46,7 +46,7 @@ void GlobalScales::loadScales() {
     scaleNotes.push_back(tempNotes);
     
     //___________________
-
+    
     tempNotes.clear();
     temp.name = "Phrygian";
     {
@@ -76,7 +76,7 @@ void GlobalScales::loadScales() {
     }
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
-
+    
     //___________________
     
     tempNotes.clear();
@@ -92,7 +92,7 @@ void GlobalScales::loadScales() {
     }
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
-
+    
     
     //___________________
     
@@ -109,10 +109,10 @@ void GlobalScales::loadScales() {
     }
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
-
+    
     //___________________
     
-
+    
     tempNotes.clear();
     temp.name = "Locrian";
     {
@@ -126,7 +126,7 @@ void GlobalScales::loadScales() {
     }
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
-
-
-   
+    
+    
+    
 }

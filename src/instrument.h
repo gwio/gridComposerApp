@@ -103,6 +103,7 @@ public:
     
     int keyNote;
     int pitchMod;
+    int octaveRange;
     void setKeyNote(int);
     float sVolume;
     Scale activeScale;

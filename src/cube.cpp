@@ -13,7 +13,7 @@ Cube::Cube(){
     aniPct = 0.0;
     diff = 0.0;
     aniFac = 0.0;
-
+    
 }
 
 Cube::Cube(ofVec3f* ptr0_,ofVec3f* ptr1_,ofVec3f* ptr2_, ofVec3f* ptr3_, int v0_, int v1_, int v2_, int v3_) {
@@ -27,9 +27,9 @@ Cube::Cube(ofVec3f* ptr0_,ofVec3f* ptr1_,ofVec3f* ptr2_, ofVec3f* ptr3_, int v0_
     vIndex1 = v1_;
     vIndex2 = v2_;
     vIndex3 = v3_;
-
     
-   }
+    
+}
 
 
 void Cube::setup(){
@@ -39,24 +39,24 @@ void Cube::setup(){
     scanColor=ofColor::white;
     groupColor = ofColor::white;
     
-
+    
 }
 
 void Cube::update(){
     if (defaultZ != vec0Ptr->z) {
- 
+        
         if (diff > 0) {
             aniFac = ofClamp(1-pow(1-aniPct,2),0.0,1.0);
-
-
+            
+            
         }
         
         if (diff < 0) {
             aniFac = ofClamp(pow(aniPct,4),0.0,1.0);
-
+            
         }
         
-       // cout << aniFac << endl;
+        // cout << aniFac << endl;
         vec0Ptr->z = actualZ + (diff*aniFac);
         vec1Ptr->z = actualZ + (diff*aniFac);
         vec2Ptr->z = actualZ + (diff*aniFac);
@@ -65,26 +65,26 @@ void Cube::update(){
         aniPct+=SPEED;
     }
     
- 
     
-  
+    
+    
     if (displayColor != cubeColor) {
         displayColor = displayColor.lerp(cubeColor, 0.15);
     }
-   
+    
 }
 
-  
+
 void Cube::changeGroupColor(ofColor c_) {
     cubeColor = c_;
-   // displayColor = c_;
+    // displayColor = c_;
     groupColor = c_;
     scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, c_.getBrightness()+80);
 }
 
 void Cube::setColor(ofColor c_){
     cubeColor = c_;
-   // displayColor = c_;
+    // displayColor = c_;
 }
 void Cube::setDefaultHeight(float height_) {
     diff = height_-vec0Ptr->z;

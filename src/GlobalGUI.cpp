@@ -20,7 +20,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     index[5]=0;
     
     elementColorOff = ofColor::fromHsb(elementColor.getHue(), elementColor.getBrightness(), elementColor.getSaturation(), 25 );
-   placement =  placement_;
+    placement =  placement_;
     offPlacement = offPlacement_;
     
     elementSize = elementSize_;
@@ -48,19 +48,19 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
     if (animation){
-    mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
-    mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
-    mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
-    mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
-   
-    minX = -elementSize.x/2+placement.x+vec_.x;
-    maxX = elementSize.x/2+placement.x+vec_.x;
-    minY = -elementSize.y/2+placement.y+vec_.y;
-    maxY = elementSize.y/2+placement.y+vec_.y;
-    
-    drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-tween_)));
+        mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
+        mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
+        mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
+        mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*( abs(moveDir-tween_))));
+        
+        minX = -elementSize.x/2+placement.x+vec_.x;
+        maxX = elementSize.x/2+placement.x+vec_.x;
+        minY = -elementSize.y/2+placement.y+vec_.y;
+        maxY = elementSize.y/2+placement.y+vec_.y;
+        
+        drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-tween_)));
         curPos = vec_;
-   }
+    }
     
     if(animation && tween_ >= 1.0){
         animation = false;
@@ -81,23 +81,23 @@ void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
     maxY = elementSize.y/2+placement.y+curPos.y;
     
     drawStringPos = curPos+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-1)));
-
-   }
+    
+}
 
 void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width_, float& tween_){
     
     if (animation) {
-    mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-    mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-    mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-    mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-    
-    minX = -elementSize.x/2+placement.x+vec_.x;
-    maxX = elementSize.x/2+placement.x+vec_.x;
-    minY = -elementSize.y/2+placement.y+vec_.y;
-    maxY = elementSize.y/2+placement.y+vec_.y;
-    
-    drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-tween_)));
+        mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+        mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+        mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+        mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+        
+        minX = -elementSize.x/2+placement.x+vec_.x;
+        maxX = elementSize.x/2+placement.x+vec_.x;
+        minY = -elementSize.y/2+placement.y+vec_.y;
+        maxY = elementSize.y/2+placement.y+vec_.y;
+        
+        drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-tween_)));
         curPos = vec_;
     }
     if(animation && tween_ >= 1.0){
@@ -111,7 +111,7 @@ void GlobalGUI::setColor(ofVboMesh& mesh_, ofColor c_) {
     mesh_.setColor(1+counter, ofColor(c_));
     mesh_.setColor(2+counter, ofColor(c_));
     mesh_.setColor(3+counter, ofColor(c_));
-
+    
     
 }
 
@@ -135,10 +135,10 @@ void GlobalGUI::switchColor(ofVboMesh& mesh_) {
         mesh_.setColor(2+counter, elementColor);
         mesh_.setColor(3+counter, elementColor);
     } else {
-            mesh_.setColor(0+counter, elementColorOff);
-            mesh_.setColor(1+counter,elementColorOff);
-            mesh_.setColor(2+counter, elementColorOff);
-            mesh_.setColor(3+counter, elementColorOff);
+        mesh_.setColor(0+counter, elementColorOff);
+        mesh_.setColor(1+counter,elementColorOff);
+        mesh_.setColor(2+counter, elementColorOff);
+        mesh_.setColor(3+counter, elementColorOff);
     }
     
 }

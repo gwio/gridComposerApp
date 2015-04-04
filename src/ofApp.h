@@ -38,7 +38,7 @@ public:
     void intersectPlane();
     
     ofVec3f intersectPlane(ofVec2f);
-
+    
     void updateFboMesh();
     
     void updateTapMap();
@@ -91,7 +91,7 @@ public:
     ofEasyCam cam;
     ofCamera testCam;
     
-   // ofCamera testCam;
+    // ofCamera testCam;
     ofNode globalTranslate;
     ofNode camActiveSynth;
     ofNode camNotActiveSynth;

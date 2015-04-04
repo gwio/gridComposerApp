@@ -50,6 +50,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     currentScaleVecPos = 0;
     sVolume = 1.0;
     pitchMod = 0;
+    octaveRange = 0;
     
 }
 
@@ -281,7 +282,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     instrumentOut = instrumentOut * outputRamp;
     
     
- //   cout << cubes.getNumVertices() << endl;
+    //   cout << cubes.getNumVertices() << endl;
     
     
 }
@@ -446,22 +447,22 @@ void Instrument::nextDirection() {
     int counter = 0;
     
     if (!pause) {
-    
-    while (   test == false   &&  counter !=4 ) {
         
-        if (activeDirection[(scanDirection+1)%4]) {
-            test = true;
-            scanDirection = (scanDirection+1)%4;
-        } else {
-            scanDirection++;
-            counter++;
-            if(counter==4){
-                scanDirection = -1;
+        while (   test == false   &&  counter !=4 ) {
+            
+            if (activeDirection[(scanDirection+1)%4]) {
+                test = true;
+                scanDirection = (scanDirection+1)%4;
+            } else {
+                scanDirection++;
+                counter++;
+                if(counter==4){
+                    scanDirection = -1;
+                }
             }
+            
         }
         
-    }
-    
     } else {
         scanDirection = -1;
     }
@@ -931,27 +932,27 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
     
-            float rampLength = 0.22;
+    float rampLength = 0.22;
     float freqRamp = 0.16;
     
-            //create volume ramp
-            Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
-            cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
-            cgPtr->rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
+    //create volume ramp
+    Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
+    cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
+    cgPtr->rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
     
-            //create freq ramp
-            Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
-            cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
-            cgPtr->groupNote = getRandomNote();
-            cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
+    //create freq ramp
+    Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
+    cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
+    cgPtr->groupNote = getRandomNote();
+    cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
     
     
-            presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol);
-
+    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol);
+    
 }
 
 void Instrument::changePreset() {
- 
+    
     preset++;
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
@@ -959,7 +960,7 @@ void Instrument::changePreset() {
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol);
         }
     }
-
+    
     updateTonicOut();
 }
 
@@ -1002,7 +1003,7 @@ void Instrument::setScale(float scale_){
 void Instrument::changeSynthVolume(float & vol_) {
     sVolume = vol_;
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, vol_);
-  //  scanZ =  (30*vol_);
+    //  scanZ =  (30*vol_);
 }
 
 
@@ -1043,7 +1044,7 @@ void Instrument::setMusicScale(GlobalScales& scale_,int num_){
 
 void Instrument::setKeyNote(int keyNote_) {
     
-   
+    
     int change = keyNote_;
     keyNote += change;
     
@@ -1079,9 +1080,9 @@ void Instrument::planeMovement(float pct_){
         setRotate( tempRot );
     } else if (animate) {
         if (aniPath.size() > 1) {
-        float index = aniPath.getIndexAtPercent(pct_);
-        ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
-        setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+            float index = aniPath.getIndexAtPercent(pct_);
+            ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
+            setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
         }
         ofQuaternion tempRot;
         tempRot.slerp(pct_, myDefault,myTarget);

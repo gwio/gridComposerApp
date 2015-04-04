@@ -18,7 +18,7 @@ struct Scale{
 class GlobalScales {
     
 public:
-   
+    
     vector<Scale> scaleVec;
     vector< vector<int> > scaleNotes;
     

@@ -518,20 +518,20 @@ void InterfacePlane::pulse() {
 
 float InterfacePlane::easeInOut(float input_, float a_) {
     
-        
-        float epsilon = 0.00001;
-        float min_param_a = 0.0 + epsilon;
-        float max_param_a = 1.0 - epsilon;
-        a_ = min(max_param_a, max(min_param_a, a_));
-        a_ = 1.0-a_; // for sensible results
-        
-        
-        float y = 0;
-        if (input_<=0.5){
-            y = (pow(2.0*input_, 1.0/a_))/2.0;
-        } else {
-            y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
-        }
-        return y;
+    
+    float epsilon = 0.00001;
+    float min_param_a = 0.0 + epsilon;
+    float max_param_a = 1.0 - epsilon;
+    a_ = min(max_param_a, max(min_param_a, a_));
+    a_ = 1.0-a_; // for sensible results
+    
+    
+    float y = 0;
+    if (input_<=0.5){
+        y = (pow(2.0*input_, 1.0/a_))/2.0;
+    } else {
+        y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
+    }
+    return y;
     
 }
