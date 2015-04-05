@@ -104,22 +104,22 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             
             ofVec3f temp;
             ofVec3f dir;
-            dir = (ofVec3f(1,1,0) - ofVec3f(0,0,0))*borderRatio;
+            dir = (ofVec3f(1,1,0) - ofVec3f(0,0,0)).normalize()*borderRatio;
             temp = verticesOuter[index] + dir;
             verticesInner[indexCounter*4] = temp;
             cubeVector[i*(gridTiles)+j].vec0Ptr = &verticesInner[indexCounter*4];
             
-            dir = (ofVec3f(1,-1,0) - ofVec3f(0,0,0))*borderRatio;
+            dir = (ofVec3f(1,-1,0) - ofVec3f(0,0,0)).normalize()*borderRatio;
             temp = verticesOuter[index+1] + dir;
             verticesInner[indexCounter*4+1] = temp;
             cubeVector[i*(gridTiles)+j].vec1Ptr = &verticesInner[indexCounter*4+1];
             
-            dir = (ofVec3f(-1,-1,0) - ofVec3f(0,0,0))*borderRatio;
+            dir = (ofVec3f(-1,-1,0) - ofVec3f(0,0,0)).normalize()*borderRatio;
             temp = verticesOuter[index+1+(gridTiles+1)] + dir;
             verticesInner[indexCounter*4+2] = temp;
             cubeVector[i*(gridTiles)+j].vec2Ptr = &verticesInner[indexCounter*4+2];
             
-            dir = (ofVec3f(-1,1,0) - ofVec3f(0,0,0))*borderRatio;
+            dir = (ofVec3f(-1,1,0) - ofVec3f(0,0,0)).normalize()*borderRatio;
             temp = verticesOuter[index+1+gridTiles] + dir;
             verticesInner[indexCounter*4+3] = temp;
             cubeVector[i*(gridTiles)+j].vec3Ptr = &verticesInner[indexCounter*4+3];
@@ -234,14 +234,14 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     planes.resize(4);
     
     
-    ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
+     gridCenter = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
     
     
     
-    planes[0].setup(ofVec3f(0,(gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,1, gridSize,interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 2, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,3, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
+    planes[0].setup(ofVec3f(0,(gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh,gridCenter);
+    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,1, gridSize,interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,gridCenter);
+    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 2, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,gridCenter);
+    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,3, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,gridCenter);
     
     
     
@@ -249,32 +249,34 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     for (int i = 0; i < cubes.getNumVertices(); i++) {
-        cubes.setVertex(i, cubes.getVertex(i)+tranVec);
+        cubes.setVertex(i, cubes.getVertex(i)+gridCenter);
     }
     
     for (int i = 0; i < fboMesh.getNumVertices(); i++) {
-        fboMesh.setVertex(i, fboMesh.getVertex(i)+tranVec);
+        fboMesh.setVertex(i, fboMesh.getVertex(i)+gridCenter);
     }
     
     for (int i = 0; i < interfacePlaneMesh.getNumVertices(); i++) {
-        interfacePlaneMesh.setVertex(i, interfacePlaneMesh.getVertex(i)+tranVec);
+        interfacePlaneMesh.setVertex(i, interfacePlaneMesh.getVertex(i)+gridCenter);
     }
     
     for (int i = 0; i < interfaceConnectedMesh.getNumVertices(); i++) {
-        interfaceConnectedMesh.setVertex(i, interfaceConnectedMesh.getVertex(i)+tranVec);
+        interfaceConnectedMesh.setVertex(i, interfaceConnectedMesh.getVertex(i)+gridCenter);
     }
     
     for (int i = 0; i < interfacePlaneFboMesh.getNumVertices(); i++) {
-        interfacePlaneFboMesh.setVertex(i, interfacePlaneFboMesh.getVertex(i)+tranVec);
+        interfacePlaneFboMesh.setVertex(i, interfacePlaneFboMesh.getVertex(i)+gridCenter);
     }
     
     for (int i = 0; i < verticesInner.size(); i++) {
-        verticesInner[i] = verticesInner[i]+tranVec;
+        verticesInner[i] = verticesInner[i]+gridCenter;
     }
     
+
+    verticesInnerOriginal = vector<ofVec3f>(verticesInner);
     
+    //setup main tonic out;
     
-    //setup main tonic out
     
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
@@ -354,7 +356,11 @@ void Instrument::removeCube(int x_, int y_){
     
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setDefaultHeight(emptyInnerZ);
     
-    
+    *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr = verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex0-verticesOuter.size()];
+    *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr = verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex1-verticesOuter.size()];
+    *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr = verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex2-verticesOuter.size()];
+    *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr = verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex3-verticesOuter.size()];
+
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
     //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
     
@@ -725,17 +731,18 @@ void Instrument::updateFboMesh(){
 void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
     
     //test neighbouring cubes 3x3
-    int tester[9];
+    bool tester[9];
     int testerStart= 0;
     int cCounter = 0;
     vector<unsigned long> neighbours;
     neighbours.clear();
     for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
-            
+            tester[ (4+x)+((y*3)*-1) ] = false;
             ofVec2f pos = ofVec2f(x_+x,y_+y);
             if ( ((pos.x >= 0 && pos.x < gridTiles) && (pos.y >= 0 && pos.y < gridTiles)) && !(x==0 && y==0) ) {
                 if (layerInfo.at(pos.x).at(pos.y).hasCube) {
+                    tester[ (4+x)+((y*3)*-1) ] = true;
                     bool testN = false;
                     for (int i = 0; i < neighbours.size(); i++) {
                         if (neighbours[i] == layerInfo.at(pos.x).at(pos.y).cubeGroupId) {
@@ -753,8 +760,9 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         }
         
     }
-    
-    
+
+    //-----------------------------------------------------------------------
+    //update cubegroups
     //make newsound when alone
     if (neighbours.size() == 0) {
         cubeGroup temp = cubeGroup(gridTiles);
@@ -844,6 +852,121 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
     
 }
 
+void Instrument::adjustMesh(bool* tester,int x_,int y_) {
+    //---------------------------------------------------------------------------------------
+    //adjust mesh when needed
+    //vec0
+    int testChar =  ofBinaryToInt( ofToString(int(tester[7]))+ofToString(int(tester[6]))+ofToString(int(tester[3])) );
+    switch (testChar) {
+        case 0:
+            
+            break;
+            
+        case 1:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr = ofVec3f((x_)*gridSize+gridCenter.x,verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex0-verticesOuter.size()].y,0);
+            
+            break;
+            
+        case 2: case 3: case 5: case 6: case 7: {
+            ofVec3f dir = ((ofVec3f(-1,-1,0) - ofVec3f(0,0,0))).normalize()*(gridSize*borderSize);
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr = verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex0-verticesOuter.size()]+dir ;
+        
+
+            break;
+        }
+        case 4:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec0Ptr = ofVec3f(verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex0-verticesOuter.size()].x,(y_)*gridSize+gridCenter.y,0);
+            
+            break;
+        default:
+            break;
+    }
+    
+    
+    //vec1
+    testChar =  ofBinaryToInt( ofToString(int(tester[3]))+ofToString(int(tester[0]))+ofToString(int(tester[1])) );
+    
+    switch (testChar) {
+        case 0:
+            
+            break;
+            
+        case 1:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr = ofVec3f(verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex1-verticesOuter.size()].x,(y_+1)*gridSize+gridCenter.y,0);
+            
+            break;
+            
+        case 2: case 3: case 5: case 6: case 7: {
+            ofVec3f dir = ((ofVec3f(-1,1,0) - ofVec3f(0,0,0))).normalize()*(gridSize*borderSize);
+           *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr = verticesInnerOriginal[ cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex1-verticesOuter.size()]+ dir;
+            break;
+        }
+        case 4:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec1Ptr = ofVec3f((x_)*gridSize+gridCenter.x,verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex1-verticesOuter.size()].y,0);
+            
+            break;
+        default:
+            break;
+    }
+    
+    //vec2
+    testChar =  ofBinaryToInt( ofToString(int(tester[1]))+ofToString(int(tester[2]))+ofToString(int(tester[5])) );
+    
+    switch (testChar) {
+        case 0:
+            
+            break;
+            
+        case 1:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr = ofVec3f((x_+1)*gridSize+gridCenter.x,verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex2-verticesOuter.size()].y,0);
+            
+            break;
+            
+        case 2: case 3: case 5: case 6: case 7: {
+            ofVec3f dir = ((ofVec3f(1,1,0) - ofVec3f(0,0,0))).normalize()*(gridSize*borderSize);
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr = verticesInnerOriginal[ cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex2-verticesOuter.size()] + dir;
+            break;
+        }
+        case 4:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec2Ptr = ofVec3f(verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex2-verticesOuter.size()].x,(y_+1)*gridSize+gridCenter.y,0);
+            
+            break;
+        default:
+            break;
+            
+    }
+    
+    //vec3
+    testChar =  ofBinaryToInt( ofToString(int(tester[5]))+ofToString(int(tester[8]))+ofToString(int(tester[7])) );
+    
+    switch (testChar) {
+        case 0:
+            
+            break;
+            
+        case 1:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr = ofVec3f(verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex3-verticesOuter.size()].x,(y_)*gridSize+gridCenter.y,0);
+            
+            break;
+            
+        case 2: case 3: case 5: case 6: case 7: {
+            ofVec3f dir = ((ofVec3f(1,-1,0) - ofVec3f(0,0,0))).normalize()*(gridSize*borderSize);
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr = verticesInnerOriginal[ cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex3-verticesOuter.size()]+dir;
+            break;
+        }
+        case 4:
+            *cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vec3Ptr = ofVec3f((x_+1)*gridSize+gridCenter.x,verticesInnerOriginal[cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].vIndex3-verticesOuter.size()].y,0);
+            
+            break;
+        default:
+            break;
+            
+    }
+    
+    
+
+}
+
 void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) {
     
     int minusCouter = 0;
@@ -924,7 +1047,33 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
     }
     
     groupPtr->x_in_y_elements.at(y_) = xInyEleCounter;
+   
     
+    bool tester[9];
+    for (int i = 0; i < gridTiles; i++) {
+        for (int j = 0; j < gridTiles; j++) {
+            
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    tester[ (4+x)+((y*3)*-1) ] = false;
+
+                    if (  layerInfo.at(i).at(j).hasCube && layerInfo.at(i).at(j).cubeGroupId == key_ ){
+                        
+                        ofVec2f pos = ofVec2f(i+x,j+y);
+                        if ( ((pos.x >= 0 && pos.x < gridTiles) && (pos.y >= 0 && pos.y < gridTiles)) && !(x==0 && y==0) ) {
+                            if (layerInfo.at(pos.x).at(pos.y).hasCube) {
+                                tester[ (4+x)+((y*3)*-1) ] = true;
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            adjustMesh(&tester[0], i, j);
+
+            
+        }
+    }
     
 }
 

@@ -86,6 +86,7 @@ public:
     void tapEvent(int,int);
     void moveEvent(int,int,float,ofColor);
     void updateCubeMesh();
+    void adjustMesh(bool*,int,int);
     void updateFboMesh();
     void updateSoundsMap(int,int, bool);
     void resetCubeGroup(unsigned long, int, int);
@@ -154,6 +155,8 @@ public:
     //visual
     vector<ofVec3f> verticesOuter;
     vector<ofVec3f> verticesInner;
+    vector<ofVec3f> verticesInnerOriginal;
+
     ofVboMesh raster;
     ofVboMesh fboMesh;
     ofVboMesh cubes;
@@ -179,7 +182,7 @@ public:
     Tonic::RampedValue outputRamp;
     
     bool synthHasChanged;
-    
+    ofVec3f gridCenter;
     
     
 };

@@ -1,7 +1,7 @@
 #include "ofApp.h"
 #define TILES 6
 #define TILESIZE 100/TILES
-#define TILEBORDER 0.12
+#define TILEBORDER 0.35
 #define BPM 130*4
 #define ANI_SPEED 0.02;
 
