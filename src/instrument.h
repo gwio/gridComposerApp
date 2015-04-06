@@ -35,6 +35,7 @@ struct cubeGroup {
     Tonic::ofxTonicSynth groupSynth;
     Tonic::Generator output;
     Tonic::RampedValue rampVol, freqRamp;
+    Tonic::ControlGenerator trigger;
     
     cubeGroup(){
         

@@ -479,6 +479,7 @@ void Instrument::noteTriggerWest(){
             if (layerInfo.at(0).at(i).hasCube) {
                 cubeVector[layerInfo.at(0).at(i).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(0).at(i).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(0).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -493,6 +494,9 @@ void Instrument::noteTriggerWest(){
             if (layerInfo.at(*stepperPos).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(*stepperPos).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
+              
+
             }
             if (layerInfo.at(*stepperPos-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -526,6 +530,8 @@ void Instrument::noteTriggerNorth() {
             if (layerInfo.at(i).at(gridTiles-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(i).at(gridTiles-1).cubeGroupId].groupSynth.setParameter("trigger",1);
+
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -540,6 +546,8 @@ void Instrument::noteTriggerNorth() {
             if (layerInfo.at(i).at(gridTiles-*stepperPos-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeGroupId].groupSynth.setParameter("trigger",1);
+
             }
             if (layerInfo.at(i).at(gridTiles-*stepperPos).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -572,6 +580,7 @@ void Instrument::noteTriggerEast() {
             if (layerInfo.at(gridTiles-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(gridTiles-1).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -586,6 +595,8 @@ void Instrument::noteTriggerEast() {
             if (layerInfo.at(gridTiles-*stepperPos-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
+
             }
             if (layerInfo.at(gridTiles-*stepperPos).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -615,6 +626,7 @@ void Instrument::noteTriggerSouth() {
             if (layerInfo.at(i).at(0).hasCube) {
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(0).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(i).at(0).cubeGroupId].groupSynth.setParameter("trigger",1);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -629,6 +641,7 @@ void Instrument::noteTriggerSouth() {
             if (layerInfo.at(i).at(*stepperPos).hasCube) {
                 cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].scanColor);
+                soundsMap[layerInfo.at(i).at(*stepperPos).cubeGroupId].groupSynth.setParameter("trigger",1);
             }
             if (layerInfo.at(i).at(*stepperPos-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -931,7 +944,6 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    
     float rampLength = 0.22;
     float freqRamp = 0.16;
     
@@ -946,8 +958,10 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     cgPtr->groupNote = getRandomNote();
     cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
     
+    cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
     
-    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol);
+    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger);
+    
     
 }
 
@@ -957,7 +971,7 @@ void Instrument::changePreset() {
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol);
+            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger);
         }
     }
     
