@@ -5,10 +5,10 @@
 
 
 Cube::Cube(){
-    displayColor = ofColor::white;
-    cubeColor = ofColor::white;
-    groupColor = ofColor::white;
-    scanColor=ofColor::white;
+    displayColor =ofColor( 1, 55, 65,0);
+    cubeColor = ofColor( 1, 55, 65,0);
+    groupColor = ofColor( 1, 55, 65,0);
+    scanColor=ofColor( 11, 55, 65,0);
     
     aniPct = 0.0;
     diff = 0.0;
@@ -34,10 +34,10 @@ Cube::Cube(ofVec3f* ptr0_,ofVec3f* ptr1_,ofVec3f* ptr2_, ofVec3f* ptr3_, int v0_
 
 void Cube::setup(){
     
-    displayColor = ofColor::white;
-    cubeColor = ofColor::white;
-    scanColor=ofColor::white;
-    groupColor = ofColor::white;
+    displayColor =ofColor( 11, 55, 65,0);
+    cubeColor = ofColor( 11, 55, 65,0);
+    scanColor=ofColor( 1, 55, 65,0);
+    groupColor = ofColor( 11, 55, 65,0);
     
     
 }
@@ -69,7 +69,7 @@ void Cube::update(){
     
     
     if (displayColor != cubeColor) {
-        displayColor = displayColor.lerp(cubeColor, 0.15);
+        displayColor = displayColor.lerp(cubeColor, 0.11);
     }
     
 }

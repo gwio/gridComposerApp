@@ -52,6 +52,11 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     pitchMod = 0;
     octaveRange = 0;
     
+    if ( ofIsStringInString(instrumentId,"b") ) {
+        trackSwitchOn = true;
+    } else {
+        trackSwitchOn = false;
+    }
 }
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_) {
@@ -77,8 +82,9 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     for (int i = 0; i < gridTiles+1; i++) {
         for (int j = 0; j < gridTiles+1; j++) {
             ofVec3f tPoint = ofVec3f(i*gridSize,j*gridSize,0);
-            raster.addVertex(tPoint+ofVec3f(0,0,100));
-            raster.addColor(ofColor(255,255,255));
+            raster.addVertex(tPoint+ofVec3f(0,0,0));
+                raster.addColor(ofColor(255,255,255,190));
+           
             verticesOuter[indexCounter] = tPoint;
             indexCounter++;
         }
@@ -89,6 +95,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         cubes.addVertex(verticesOuter[i]);
         // cubes.addColor(ofColor(0,0,0));
         cubes.addColor(ofColor(11, 65, 65));
+       
     }
     
     
@@ -127,6 +134,11 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             indexCounter++;
             //add starting zHeight
             cubeVector[i*(gridTiles)+j].setDefaultHeight(emptyInnerZ);
+            
+           // if (trackSwitchOn){
+                cubeVector[i*(gridTiles)+j].setColor(ofColor::white);
+        //    }
+            
             //add pickColor
             ofColor tempColor = ofColor(rCounter,gCounter,bCounter);
             cubeVector[i*(gridTiles)+j].fboColor = tempColor;
@@ -151,7 +163,11 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     for (int i = 0; i < verticesInner.size(); i++) {
         cubes.addVertex(verticesInner[i]);
+        if (trackSwitchOn){
         cubes.addColor(ofColor(0,0,0));
+        } else {
+            cubes.addColor(ofColor(11, 65, 65));
+        }
     }
     
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -245,8 +261,11 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     
-    //test
+    //add displacement
     
+    for (int i = 0; i < raster.getNumVertices(); i++) {
+        raster.setVertex(i, raster.getVertex(i)+tranVec);
+    }
     
     for (int i = 0; i < cubes.getNumVertices(); i++) {
         cubes.setVertex(i, cubes.getVertex(i)+tranVec);
@@ -274,6 +293,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     
+    
     //setup main tonic out
     
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
@@ -290,8 +310,10 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
 
 void Instrument::update() {
     
+    if (trackSwitchOn) {
     for (int i = 0; i < cubeVector.size(); i++) {
         cubeVector[i].update();
+    }
     }
     
     for (int i = 0; i < planes.size(); i++) {
@@ -303,12 +325,17 @@ void Instrument::update() {
 
 void Instrument::draw() {
     // ofPushMatrix();
+    if (trackSwitchOn) {
     
     cubes.draw();
     
     interfacePlaneMesh.drawWireframe();
     interfaceConnectedMesh.draw();
     
+    } else {
+        
+        raster.draw();
+    }
     // ofPopMatrix();
 }
 

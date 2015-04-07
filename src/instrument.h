@@ -135,6 +135,7 @@ public:
     bool inFocus;
     
     bool pause;
+    bool trackSwitchOn;
     //synthinfo
     int rCounter,gCounter,bCounter;
     vector<vector<synthInfo> > layerInfo;

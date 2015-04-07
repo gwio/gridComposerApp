@@ -232,6 +232,11 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[37].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), tweenFloat);
     mainInterfaceData[38].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), tweenFloat);
     
+    mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[0][2], tweenFloat);
+    mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[1][2], tweenFloat);
+    mainInterfaceData[42].updateMainMesh(mainInterface, designGrid[2][2], tweenFloat);
+
+    
     //  }
     
     //   if (currentState == STATE_VOLUME) {
@@ -254,9 +259,12 @@ void ofApp::updateInterfaceMesh() {
     //  }
     
     //   if (currentState == STATE_EDIT) {
-    mainInterfaceData[5].updateMainMesh(mainInterface, ofVec3f(ofGetWidth()/2,ofGetHeight()/2,0),tweenFloat);
-    mainInterfaceData[7].updateMainMesh(mainInterface, ofVec3f(ofGetWidth()/2,ofGetHeight()/2,0),tweenFloat);
+    mainInterfaceData[5].updateMainMesh(mainInterface,  designGrid[2][1],tweenFloat);
+    mainInterfaceData[7].updateMainMesh(mainInterface,  designGrid[0][1],tweenFloat);
     
+    mainInterfaceData[43].updateMainMesh(mainInterface,  designGrid[1][2],tweenFloat);
+    mainInterfaceData[44].updateMainMesh(mainInterface,  designGrid[0][0],tweenFloat);
+
     
     if (interfacePadActive) {
         mainInterfaceData[39].setColor(mainInterface, ofColor::fromHsb(mainInterfaceData[39].elementColor.getHue(), (sin(ofGetElapsedTimeMillis())+1)*50+100, (sin(ofGetElapsedTimeMillis())+1)*50+100));
@@ -390,17 +398,7 @@ void ofApp::keyPressed(int key){
     
     if (!interfaceMoving) {
         
-        if (key == '5' && currentState == STATE_EDIT) {
-            
-            detailEditInterfaceOn();
-            aniPct = 0.0;
-            currentState = STATE_EDIT_DETAIL;
-        } else if (key == '5' && currentState  == STATE_EDIT_DETAIL) {
-            
-            detailEditInterfaceOff();
-            aniPct = 0.0;
-            currentState = STATE_EDIT;
-        }
+        
         
         
         if(key == '4'  && currentState != STATE_VOLUME && currentState != STATE_EDIT ) {
@@ -450,255 +448,18 @@ void ofApp::keyPressed(int key){
         
         
         if (key =='1') {
-            int temp = synthButton[0];
-            activeSynth = synthButton[0];
-            
-            if (synths[synthButton[1]].inFocus) {
-                
-                synths[synthButton[1]].aniPath = oneToBack;
-                synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
-                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
-                
-                
-                
-                synths[synthButton[1]].inFocus = false ;
-                synths[synthButton[1]].animate = true ;
-                
-                
-                synths[temp].inFocus = true;
-                synths[temp].animate = true;
-                synths[ temp ].aniPath = oneToActive;
-                synths[temp].myTarget = synthActivePos.getOrientationQuat();
-                synths[temp].myDefault = synthPos[0].getOrientationQuat();
-                
-                synths[synthButton[0]].scaling = true;
-                synths[synthButton[1]].scaling = true;
-                synths[synthButton[0]].myScaleDefault = 0.5;
-                synths[synthButton[1]].myScaleDefault = 1.0;
-                synths[synthButton[0]].myScaleTarget = 1.0;
-                synths[synthButton[1]].myScaleTarget = 0.5;
-                
-                
-                synthButton[0] = synthButton[1];
-                synthButton[1] = temp;
-                aniPct = 0.0;
-                
-                mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                updateSynthScaleInfo();
-                updateKeyNoteInfo(0);
-                
-            } else {
-                synths[temp].inFocus = true;
-                synths[temp].aniPath = oneToActive;
-                synths[temp].myTarget = synthActivePos.getOrientationQuat();
-                synths[temp].myDefault = synthPos[0].getOrientationQuat();
-                
-                
-                synths[temp].animate = true;
-                
-                synths[synthButton[1]].aniPath = centerToOne;
-                synths[synthButton[1]].animate = true;
-                synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
-                synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
-                
-                synths[synthButton[1]].scaling = true;
-                synths[synthButton[2]].scaling = true;
-                synths[synthButton[1]].myScaleDefault = 1.0;
-                synths[synthButton[2]].myScaleDefault = 1.0;
-                synths[synthButton[1]].myScaleTarget = 0.5;
-                synths[synthButton[2]].myScaleTarget = 0.5;
-                
-                
-                
-                synthButton[0] = synthButton[1];
-                synthButton[1] = temp;
-                
-                
-                
-                //camani
-                camQuatDefault = camNotActiveSynth.getOrientationQuat();
-                camQuatTarget = camActiveSynth.getOrientationQuat();
-                camUsePath = camPath;
-                camTargetFov = camActiveFov;
-                camDefaultFov = camFov;
-                animCam = true;
-                
-                aniPct = 0.0;
-                
-                if (currentState == STATE_DEFAULT){
-                    editInterfaceOn();
-                    pauseInterfaceOff();
-                    mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                }
-                
-                currentState = STATE_EDIT;
-            }
+          
             
         }
         if (key =='2') {
             
-            int temp = synthButton[1];
-            activeSynth = synthButton[1];
-            
-            if (synths[synthButton[1]].inFocus) {
-                
-                synths[synthButton[1]].aniPath = twoToBack;
-                synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
-                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
-                
-                synths[synthButton[1]].inFocus = false ;
-                synths[synthButton[1]].animate = true ;
-                
-                
-                synths[synthButton[0]].scaling = true;
-                synths[synthButton[2]].scaling = true;
-                synths[synthButton[0]].myScaleDefault = 0.5;
-                synths[synthButton[2]].myScaleDefault = 0.5;
-                synths[synthButton[0]].myScaleTarget = 1.0;
-                synths[synthButton[2]].myScaleTarget = 1.0;
-                
-                
-                
-                //camani
-                camQuatDefault = camActiveSynth.getOrientationQuat();
-                camQuatTarget = camNotActiveSynth.getOrientationQuat();
-                camUsePath = camPathBack;
-                camTargetFov = camFov;
-                camDefaultFov = camActiveFov;
-                animCam = true;
-                
-                aniPct = 0.0;
-                
-                pauseInterfaceOn();
-                if (currentState == STATE_EDIT) {
-                    editInterfaceOff();
-                }
-                
-                if (currentState == STATE_EDIT_DETAIL) {
-                    editInterfaceOff();
-                    detailEditInterfaceOff();
-                }
-                
-                currentState = STATE_DEFAULT;
-                
-            } else{
-                synths[temp].inFocus = true;
-                synths[temp].aniPath = twoToActive;
-                synths[temp].myTarget = synthActivePos.getOrientationQuat();
-                synths[temp].myDefault = synthPos[1].getOrientationQuat();
-                synths[temp].animate = true;
-                
-                synths[synthButton[0]].scaling = true;
-                synths[synthButton[2]].scaling = true;
-                synths[synthButton[0]].myScaleDefault = 1.0;
-                synths[synthButton[2]].myScaleDefault = 1.0;
-                synths[synthButton[0]].myScaleTarget = 0.5;
-                synths[synthButton[2]].myScaleTarget = 0.5;
-                
-                
-                
-                //cam
-                camQuatDefault = camNotActiveSynth.getOrientationQuat();
-                camQuatTarget = camActiveSynth.getOrientationQuat();
-                camUsePath = camPath;
-                camDefaultFov = camFov;
-                camTargetFov = camActiveFov;
-                animCam = true;
-                
-                aniPct = 0.0;
-                
-                if (currentState == STATE_DEFAULT){
-                    editInterfaceOn();
-                    pauseInterfaceOff();
-                    mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                }
-                currentState = STATE_EDIT;
-                
-            }
+           
             
             
         }
         if (key =='3') {
             
-            int temp = synthButton[2];
-            activeSynth = synthButton[2];
             
-            if (synths[synthButton[1]].inFocus) {
-                
-                synths[synthButton[1]].aniPath = threeToBack;
-                synths[synthButton[1]].myTarget = synthPos[2].getOrientationQuat();
-                synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
-                
-                synths[synthButton[1]].inFocus = false ;
-                synths[synthButton[1]].animate = true ;
-                
-                
-                synths[temp].inFocus = true;
-                synths[temp].animate = true;
-                synths[ temp ].aniPath = threeToActive;
-                synths[temp].myTarget = synthActivePos.getOrientationQuat();
-                synths[temp].myDefault = synthPos[2].getOrientationQuat();
-                
-                synths[synthButton[2]].scaling = true;
-                synths[synthButton[1]].scaling = true;
-                synths[synthButton[2]].myScaleDefault = 0.5;
-                synths[synthButton[1]].myScaleDefault = 1.0;
-                synths[synthButton[2]].myScaleTarget = 1.0;
-                synths[synthButton[1]].myScaleTarget = 0.5;
-                
-                
-                synthButton[2] = synthButton[1];
-                synthButton[1] = temp;
-                aniPct = 0.0;
-                
-                mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                updateSynthScaleInfo();
-                updateKeyNoteInfo(0);
-                
-                
-            }else {
-                synths[temp].inFocus = true;
-                synths[temp].aniPath = threeToActive;
-                synths[temp].myTarget = synthActivePos.getOrientationQuat();
-                synths[temp].myDefault = synthPos[2].getOrientationQuat();
-                synths[temp].animate = true;
-                
-                synths[synthButton[1]].aniPath = centerToThree;
-                synths[synthButton[1]].animate = true;
-                synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
-                synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
-                
-                
-                synths[synthButton[0]].scaling = true;
-                synths[synthButton[1]].scaling = true;
-                synths[synthButton[0]].myScaleDefault = 1.0;
-                synths[synthButton[1]].myScaleDefault = 1.0;
-                synths[synthButton[0]].myScaleTarget = 0.5;
-                synths[synthButton[1]].myScaleTarget = 0.5;
-                
-                
-                synthButton[2] = synthButton[1];
-                synthButton[1] = temp;
-                
-                //camera
-                camQuatDefault = camNotActiveSynth.getOrientationQuat();
-                camQuatTarget = camActiveSynth.getOrientationQuat();
-                camUsePath = camPath;
-                camDefaultFov = camFov;
-                camTargetFov = camActiveFov;
-                animCam = true;
-                
-                aniPct = 0.0;
-                
-                if (currentState == STATE_DEFAULT){
-                    editInterfaceOn();
-                    pauseInterfaceOff();
-                    mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                }
-                
-                currentState = STATE_EDIT;
-                
-            }
             
         }
         
@@ -821,8 +582,63 @@ void ofApp::mousePressed(int x, int y, int button){
     curTap = ofGetElapsedTimeMillis();
     if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
         
+        if (!interfaceMoving) {
+            
+            
+            if (currentState == STATE_DEFAULT) {
+
+                if( (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x) &&
+                    (y > designGrid[0][1].y-designGrid[0][0].y && y < designGrid[0][1].y+designGrid[0][0].y) ){
+                    if(!synths[synthButton[0]].trackSwitchOn) {
+                    synths[synthButton[0]].trackSwitchOn = true;
+                    } else {
+                        buttonOnePress();
+                    }
+                }
+                
+                if( (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) &&
+                   (y > designGrid[1][1].y-designGrid[0][0].y && y < designGrid[1][1].y+designGrid[0][0].y) ){
+                    buttonTwoPress();
+                }
+                
+                if( (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) &&
+                   (y > designGrid[2][1].y-designGrid[0][0].y && y < designGrid[2][1].y+designGrid[0][0].y) ){
+                    if(!synths[synthButton[2]].trackSwitchOn) {
+                    synths[synthButton[2]].trackSwitchOn = true;
+                    } else {
+                        buttonThreePress();
+                    }
+                }
+            }
+            
+            
+            
+            if( (currentState == STATE_EDIT_DETAIL) || (currentState == STATE_EDIT) ){
+             
+                if( (x > designGrid[0][2].x-designGrid[0][0].x && x < designGrid[0][2].x+designGrid[0][0].x) &&
+                   (y > designGrid[0][2].y-designGrid[0][0].y && y < designGrid[0][2].y+designGrid[0][0].y) ){
+                    if(synths[synthButton[0]].trackSwitchOn) {
+                    buttonOnePress();
+                    } else {
+                        synths[synthButton[0]].trackSwitchOn = true;
+                    }
+                }
+                
+                if( (x > designGrid[2][2].x-designGrid[0][0].x && x < designGrid[2][2].x+designGrid[0][0].x) &&
+                   (y > designGrid[2][2].y-designGrid[0][0].y && y < designGrid[2][2].y+designGrid[0][0].y) ){
+                    if(synths[synthButton[2]].trackSwitchOn) {
+                    buttonThreePress();
+                    } else {
+                        synths[synthButton[2]].trackSwitchOn = true;
+                    }
+                }
+                
+            }
+
+            
+        }
         
-        
+        /*
         if (lastPickColor != ofColor(255,255,255)) {
             if (synths[activeSynth].cubeMap.find(lastPickColor.getHex()) != synths[activeSynth].cubeMap.end() ) {
                 
@@ -832,7 +648,7 @@ void ofApp::mousePressed(int x, int y, int button){
             
         }
         
-        
+        */
         
     }
     
@@ -913,9 +729,29 @@ void ofApp::mousePressed(int x, int y, int button){
                 tonicSynth.setParameter("BPM", bpm);
                 cout << "bpm+"  << bpm << endl;
             }
+            if (mainInterfaceData[40].isInside(ofVec2f(x,y))) {
+                if (synths[synthButton[0]].trackSwitchOn){
+                    buttonOnePress();
+                } else {
+                    synths[synthButton[0]].trackSwitchOn = true;
+                }
+                cout << "toggle1"  << endl;
+            }
+            if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
+                buttonTwoPress();
+                cout << "toggle2"   << endl;
+            }
+            if (mainInterfaceData[42].isInside(ofVec2f(x,y))) {
+                if (synths[synthButton[2]].trackSwitchOn){
+                    buttonThreePress();
+                } else {
+                    synths[synthButton[2]].trackSwitchOn = true;
+                }
+                cout << "toggle1"  << endl;
+            }
         }
         
-        if (currentState == STATE_VOLUME) {
+      else  if (currentState == STATE_VOLUME) {
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
@@ -944,8 +780,18 @@ void ofApp::mousePressed(int x, int y, int button){
             
         }
         
-        if (currentState == STATE_EDIT_DETAIL) {
+ 
+        
+        
+    else    if (currentState == STATE_EDIT_DETAIL) {
             
+        
+        
+            if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                buttonTwoPress();
+                cout << "vvv" << endl;
+                // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+            }
             
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
@@ -988,10 +834,25 @@ void ofApp::mousePressed(int x, int y, int button){
                     cout <<  "midinote " << synths[activeSynth].keyNote << endl;
                 }
             }
-            
+        
+        if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+            buttonEditDetail();
+            mainInterfaceData[44].elementName = "o>";
+            cout << "<o>" << endl;
+            // cout << presetNames.at(synths[activeSynth].preset)  << endl;
         }
         
-        if (currentState == STATE_EDIT) {
+        }
+        
+     else   if (currentState == STATE_EDIT) {
+         
+         
+            if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                buttonTwoPress();
+                cout << "vvv" << endl;
+
+                // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+            }
             
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
@@ -1005,7 +866,13 @@ void ofApp::mousePressed(int x, int y, int button){
                 synths[activeSynth].changePreset();
                 // cout << presetNames.at(synths[activeSynth].preset)  << endl;
             }
-            
+         
+         if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+             buttonEditDetail();
+             mainInterfaceData[44].elementName = "<o";
+             cout << "<o>" << endl;
+             // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+         }
         }
     }
 }
@@ -1437,7 +1304,7 @@ void ofApp::setupStatesAndAnimation() {
 
 
 void ofApp::setupGlobalInterface() {
-    ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2/12,0);
+    ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/6,designGrid[0][0].y*2/6,0);
     ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2/12,0);
     ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
@@ -1460,8 +1327,8 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
-    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    place = ofVec3f(designGrid[0][0].x*2,-designGrid[0][0].y*2.5,0);
+    offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
+    place = ofVec3f(0,0,0);
     temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
@@ -1471,7 +1338,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    place = ofVec3f(designGrid[0][0].x*2,-designGrid[0][0].y*2,0);
+    place = ofVec3f(0,0,0);
     temp = GlobalGUI(7,string("activePreset"),horizontalSlider,ofColor(57,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
@@ -1525,6 +1392,40 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     
+    //toggle 1,2,3
+    
+    place = ofVec3f(0,designGrid[0][0].y,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(40, string("toggle1"), smallButton, ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    place = ofVec3f(0,designGrid[0][0].y,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(41, string("toggle2"), smallButton, ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    place = ofVec3f(0,designGrid[0][0].y,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(42, string("toggle2"), smallButton, ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    
+    //toogle from state_edit to state_default
+    
+    place = ofVec3f(0,designGrid[0][0].y,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(43, string("vvv"), smallButton, ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    //toggle edit detail
+    
+    place = ofVec3f(-designGrid[0][0].x*0.8,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(44, string("o>"), smallButton, ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+
+    
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
@@ -1554,24 +1455,34 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[7].moveDir = 1;
     mainInterfaceData[7].animation = true;
     
+    
+    mainInterfaceData[43].showString = true;
+    mainInterfaceData[43].moveDir = 1;
+    mainInterfaceData[43].animation = true;
+    
+    mainInterfaceData[44].showString = true;
+    mainInterfaceData[44].moveDir = 1;
+    mainInterfaceData[44].animation = true;
+    
 }
 
 
 void ofApp::editInterfaceOff(){
     
     
-    // mainInterfaceData[7].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    // mainInterfaceData[7].showString = false;
-    mainInterfaceData[7].moveDir = 0;
+       mainInterfaceData[7].moveDir = 0;
     mainInterfaceData[7].animation = true;
     
     
-    //  mainInterfaceData[5].updateMainMesh(mainInterface,ofVec3f( -1000-1000,0));
-    //mainInterfaceData[5].showString = false;
-    mainInterfaceData[5].moveDir = 0;
+       mainInterfaceData[5].moveDir = 0;
     mainInterfaceData[5].animation = true;
     
+    mainInterfaceData[43].moveDir = 0;
+    mainInterfaceData[43].animation = true;
     
+    mainInterfaceData[44].moveDir = 0;
+    mainInterfaceData[44].animation = true;
+
     
 }
 
@@ -1690,6 +1601,18 @@ void ofApp::pauseInterfaceOn() {
     mainInterfaceData[38].moveDir = 1;
     mainInterfaceData[38].animation = true;
     
+    mainInterfaceData[40].showString = true;
+    mainInterfaceData[40].moveDir = 1;
+    mainInterfaceData[40].animation = true;
+    
+    mainInterfaceData[41].showString = true;
+    mainInterfaceData[41].moveDir = 1;
+    mainInterfaceData[41].animation = true;
+    
+    mainInterfaceData[42].showString = true;
+    mainInterfaceData[42].moveDir = 1;
+    mainInterfaceData[42].animation = true;
+    
     
     
     
@@ -1719,6 +1642,15 @@ void ofApp::pauseInterfaceOff() {
     
     mainInterfaceData[38].moveDir = 0;
     mainInterfaceData[38].animation = true;
+    
+    mainInterfaceData[40].moveDir = 0;
+    mainInterfaceData[40].animation = true;
+    
+    mainInterfaceData[41].moveDir = 0;
+    mainInterfaceData[41].animation = true;
+    
+    mainInterfaceData[42].moveDir = 0;
+    mainInterfaceData[42].animation = true;
 }
 
 void ofApp::updateSynthScaleInfo() {
@@ -1765,5 +1697,284 @@ void ofApp::makeDesignGrid() {
         for (int j = 0; j < 3; j++) {
             designGrid[i][j] = ofVec2f(third.x*i+center.x,third.y*j+center.y);
         }
+    }
+}
+
+
+void ofApp::buttonOnePress(){
+    int temp = synthButton[0];
+    activeSynth = synthButton[0];
+    
+    if (synths[synthButton[1]].inFocus) {
+        
+        synths[synthButton[1]].aniPath = oneToBack;
+        synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
+        synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+        
+        
+        
+        synths[synthButton[1]].inFocus = false ;
+        synths[synthButton[1]].animate = true ;
+        
+        
+        synths[temp].inFocus = true;
+        synths[temp].animate = true;
+        synths[ temp ].aniPath = oneToActive;
+        synths[temp].myTarget = synthActivePos.getOrientationQuat();
+        synths[temp].myDefault = synthPos[0].getOrientationQuat();
+        
+        synths[synthButton[0]].scaling = true;
+        synths[synthButton[1]].scaling = true;
+        synths[synthButton[0]].myScaleDefault = 0.5;
+        synths[synthButton[1]].myScaleDefault = 1.0;
+        synths[synthButton[0]].myScaleTarget = 1.0;
+        synths[synthButton[1]].myScaleTarget = 0.5;
+        
+        
+        synthButton[0] = synthButton[1];
+        synthButton[1] = temp;
+        aniPct = 0.0;
+        
+        editInterfaceOn();
+        if (currentState == STATE_EDIT_DETAIL){
+            detailEditInterfaceOn();
+        }
+        
+        mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+        updateSynthScaleInfo();
+        updateKeyNoteInfo(0);
+        
+    } else {
+        synths[temp].inFocus = true;
+        synths[temp].aniPath = oneToActive;
+        synths[temp].myTarget = synthActivePos.getOrientationQuat();
+        synths[temp].myDefault = synthPos[0].getOrientationQuat();
+        
+        
+        synths[temp].animate = true;
+        
+        synths[synthButton[1]].aniPath = centerToOne;
+        synths[synthButton[1]].animate = true;
+        synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
+        
+        synths[synthButton[1]].scaling = true;
+        synths[synthButton[2]].scaling = true;
+        synths[synthButton[1]].myScaleDefault = 1.0;
+        synths[synthButton[2]].myScaleDefault = 1.0;
+        synths[synthButton[1]].myScaleTarget = 0.5;
+        synths[synthButton[2]].myScaleTarget = 0.5;
+        
+        
+        
+        synthButton[0] = synthButton[1];
+        synthButton[1] = temp;
+        
+        
+        
+        //camani
+        camQuatDefault = camNotActiveSynth.getOrientationQuat();
+        camQuatTarget = camActiveSynth.getOrientationQuat();
+        camUsePath = camPath;
+        camTargetFov = camActiveFov;
+        camDefaultFov = camFov;
+        animCam = true;
+        
+        aniPct = 0.0;
+        
+        if (currentState == STATE_DEFAULT){
+            editInterfaceOn();
+            pauseInterfaceOff();
+            mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+        }
+        
+        currentState = STATE_EDIT;
+    }
+}
+
+void ofApp::buttonTwoPress(){
+    int temp = synthButton[1];
+    activeSynth = synthButton[1];
+    
+    if (synths[synthButton[1]].inFocus) {
+        
+        synths[synthButton[1]].aniPath = twoToBack;
+        synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+        
+        synths[synthButton[1]].inFocus = false ;
+        synths[synthButton[1]].animate = true ;
+        
+        
+        synths[synthButton[0]].scaling = true;
+        synths[synthButton[2]].scaling = true;
+        synths[synthButton[0]].myScaleDefault = 0.5;
+        synths[synthButton[2]].myScaleDefault = 0.5;
+        synths[synthButton[0]].myScaleTarget = 1.0;
+        synths[synthButton[2]].myScaleTarget = 1.0;
+        
+        
+        
+        //camani
+        camQuatDefault = camActiveSynth.getOrientationQuat();
+        camQuatTarget = camNotActiveSynth.getOrientationQuat();
+        camUsePath = camPathBack;
+        camTargetFov = camFov;
+        camDefaultFov = camActiveFov;
+        animCam = true;
+        
+        aniPct = 0.0;
+        
+        pauseInterfaceOn();
+        if (currentState == STATE_EDIT) {
+            editInterfaceOff();
+        }
+        
+        if (currentState == STATE_EDIT_DETAIL) {
+            editInterfaceOff();
+            detailEditInterfaceOff();
+        }
+        
+        currentState = STATE_DEFAULT;
+        
+    } else{
+        synths[temp].inFocus = true;
+        synths[temp].aniPath = twoToActive;
+        synths[temp].myTarget = synthActivePos.getOrientationQuat();
+        synths[temp].myDefault = synthPos[1].getOrientationQuat();
+        synths[temp].animate = true;
+        
+        synths[synthButton[0]].scaling = true;
+        synths[synthButton[2]].scaling = true;
+        synths[synthButton[0]].myScaleDefault = 1.0;
+        synths[synthButton[2]].myScaleDefault = 1.0;
+        synths[synthButton[0]].myScaleTarget = 0.5;
+        synths[synthButton[2]].myScaleTarget = 0.5;
+        
+        
+        
+        //cam
+        camQuatDefault = camNotActiveSynth.getOrientationQuat();
+        camQuatTarget = camActiveSynth.getOrientationQuat();
+        camUsePath = camPath;
+        camDefaultFov = camFov;
+        camTargetFov = camActiveFov;
+        animCam = true;
+        
+        aniPct = 0.0;
+        
+        if (currentState == STATE_DEFAULT){
+            editInterfaceOn();
+            pauseInterfaceOff();
+            mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+        }
+        currentState = STATE_EDIT;
+        
+    }
+    
+}
+
+
+void ofApp::buttonThreePress(){
+    
+    int temp = synthButton[2];
+    activeSynth = synthButton[2];
+    
+    if (synths[synthButton[1]].inFocus) {
+        
+        synths[synthButton[1]].aniPath = threeToBack;
+        synths[synthButton[1]].myTarget = synthPos[2].getOrientationQuat();
+        synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
+        
+        synths[synthButton[1]].inFocus = false ;
+        synths[synthButton[1]].animate = true ;
+        
+        
+        synths[temp].inFocus = true;
+        synths[temp].animate = true;
+        synths[ temp ].aniPath = threeToActive;
+        synths[temp].myTarget = synthActivePos.getOrientationQuat();
+        synths[temp].myDefault = synthPos[2].getOrientationQuat();
+        
+        synths[synthButton[2]].scaling = true;
+        synths[synthButton[1]].scaling = true;
+        synths[synthButton[2]].myScaleDefault = 0.5;
+        synths[synthButton[1]].myScaleDefault = 1.0;
+        synths[synthButton[2]].myScaleTarget = 1.0;
+        synths[synthButton[1]].myScaleTarget = 0.5;
+        
+        
+        synthButton[2] = synthButton[1];
+        synthButton[1] = temp;
+        aniPct = 0.0;
+        
+        editInterfaceOn();
+        if (currentState == STATE_EDIT_DETAIL){
+            detailEditInterfaceOn();
+        }
+        
+        mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+        updateSynthScaleInfo();
+        updateKeyNoteInfo(0);
+        
+        
+    }else {
+        synths[temp].inFocus = true;
+        synths[temp].aniPath = threeToActive;
+        synths[temp].myTarget = synthActivePos.getOrientationQuat();
+        synths[temp].myDefault = synthPos[2].getOrientationQuat();
+        synths[temp].animate = true;
+        
+        synths[synthButton[1]].aniPath = centerToThree;
+        synths[synthButton[1]].animate = true;
+        synths[synthButton[1]].myTarget =   synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].myDefault =   synthPos[1].getOrientationQuat();
+        
+        
+        synths[synthButton[0]].scaling = true;
+        synths[synthButton[1]].scaling = true;
+        synths[synthButton[0]].myScaleDefault = 1.0;
+        synths[synthButton[1]].myScaleDefault = 1.0;
+        synths[synthButton[0]].myScaleTarget = 0.5;
+        synths[synthButton[1]].myScaleTarget = 0.5;
+        
+        
+        synthButton[2] = synthButton[1];
+        synthButton[1] = temp;
+        
+        //camera
+        camQuatDefault = camNotActiveSynth.getOrientationQuat();
+        camQuatTarget = camActiveSynth.getOrientationQuat();
+        camUsePath = camPath;
+        camDefaultFov = camFov;
+        camTargetFov = camActiveFov;
+        animCam = true;
+        
+        aniPct = 0.0;
+        
+        if (currentState == STATE_DEFAULT){
+            editInterfaceOn();
+            pauseInterfaceOff();
+            mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+        }
+        
+        currentState = STATE_EDIT;
+        
+    }
+}
+
+void ofApp::buttonEditDetail() {
+    
+    
+    if ( currentState == STATE_EDIT) {
+        
+        detailEditInterfaceOn();
+        aniPct = 0.0;
+        currentState = STATE_EDIT_DETAIL;
+    } else if ( currentState  == STATE_EDIT_DETAIL) {
+        
+        detailEditInterfaceOff();
+        aniPct = 0.0;
+        currentState = STATE_EDIT;
     }
 }

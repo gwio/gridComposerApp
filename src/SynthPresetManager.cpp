@@ -34,11 +34,13 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     } else if(preset_ ==1 ){
         
         //simple squarewave
+        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+
         
         output_ = SquareWave().freq(freq_)*0.25;
         Generator har1 =   SquareWave().freq(freq_* 4)*0.15;
         
-        output_  = (output_ +har1) * 0.5 *vol_;
+        output_  = (output_ +har1) * 0.5 *vol_*adsr;
         
     } else if (preset_ == 2) {
         ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
@@ -57,10 +59,11 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         output_ = outputGen *vol_*adsr;
     } else if (preset_ == 3) {
         
-        
+        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+
         Generator outputGen = SineWave().freq( freq_+ ((LFNoise().setFreq(10.5)+10*vol_)*60) );
         Generator harmonic1 = SineWave().freq(freq_*vol_*2)*0.2;
-        output_ =( outputGen )* 0.7 * vol_;
+        output_ =( outputGen )* 0.7 * vol_*adsr;
         
     } else if (preset_ == 4) {
         Generator hpNoise = (Noise() * dBToLin(-18.0)) >> HPF24().cutoff(3000.0) >> LPF12().cutoff(10000);
@@ -72,13 +75,15 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         output_ = (hpNoise+tones +(tones*0.5)  )  *vol_ *adsr;
     } else if (preset_ == 5) {
         
+        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+
         Compressor duckingComp = Compressor()
         .attack(0.001)
         .threshold( dBToLin(-52) )
         .ratio(16)
         .lookahead(0.001);
         Generator randomBass = (RectWave().freq( freq_ ) * 0.8) >> LPF24().cutoff( 300 * (1 + ((SineWave().freq(0.1) + 1) * 0.5))).Q(1.5);
-        output_ = (randomBass >> duckingComp) *vol_;
+        output_ = (randomBass >> duckingComp)*adsr *vol_;
     }
     
 }

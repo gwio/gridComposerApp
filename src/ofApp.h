@@ -71,6 +71,11 @@ public:
     
     void makePresetString();
     
+    void buttonOnePress();
+    void buttonTwoPress();
+    void buttonThreePress();
+    void buttonEditDetail();
+    
     //tonic
     void setupAudio();
     void pulseEvent(float &);
