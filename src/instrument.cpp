@@ -25,6 +25,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     gridSize = gSize_;
     borderSize = border_;
     
+    
     //pickColors start wit 1,1,1
     rCounter = 1;
     gCounter = 1;
@@ -57,6 +58,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     } else {
         trackSwitchOn = false;
     }
+    
+    
 }
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_) {
@@ -1119,6 +1122,8 @@ void Instrument::planeMovement(float pct_){
         ofQuaternion tempRot;
         tempRot.slerp(pct_, myDefault,myTarget);
         setRotate( tempRot );
+        
+                
     } else if (animate) {
         if (aniPath.size() > 1) {
             float index = aniPath.getIndexAtPercent(pct_);

@@ -35,7 +35,7 @@ public:
     void updateInterfaceMesh();
     
     void drawDebug();
-    void intersectPlane();
+    void intersectPlane(float,float);
     
     ofVec3f intersectPlane(ofVec2f);
     
@@ -136,9 +136,10 @@ public:
     
     //ofx ray testing
     ofRay mouseRay;
-    vector<ofPlane> intersecPlane;
     ofVec3f worldMouse, intersectPos;
     int vectorPosX, vectorPosY;
+    ofPlane thisIntersect;
+    ofPlanePrimitive planeForIntersect;
     
     //colorpicking grid
     ofVboMesh pickingRaster;

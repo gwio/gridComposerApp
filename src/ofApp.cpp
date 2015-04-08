@@ -1,6 +1,6 @@
 #include "ofApp.h"
-#define TILES 6
-#define TILESIZE 100/TILES
+#define TILES 7.0
+#define TILESIZE 100.0/TILES
 #define TILEBORDER 0.12
 #define BPM 130*4
 #define ANI_SPEED 0.02;
@@ -12,7 +12,7 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
+    ofSoundStreamSetup(2, 2, this, 44100, 256, 4);
     
     ofSetFrameRate(60);
     //ofDisableAntiAliasing();
@@ -93,19 +93,12 @@ void ofApp::setup(){
     
     
     
-    intersecPlane.resize(3);
-    for (int i = 0; i < 3 ; i++) {
-        ofPlanePrimitive temp;
-        temp.set(TILES*TILESIZE, TILES*TILESIZE);
-        temp.setPosition(synthPos[i].getPosition());
-        intersecPlane.at(i).setFrom(temp);
-    }
-    
     setupStatesAndAnimation();
     setupGlobalInterface();
     
-    
-    
+    //intersectplane
+    planeForIntersect.set(TILES*TILESIZE,TILES*TILESIZE);
+    thisIntersect.setFrom(planeForIntersect);
     
     ofBackground(11, 65, 65);
     fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGB);
@@ -204,6 +197,9 @@ void ofApp::update(){
         }
         aniPct = 1.0;
         tweenFloat = easeInOut( ofClamp(aniPct, 0.0, 1.0), 0.705);
+        planeForIntersect.setPosition(synths[activeSynth].myNode.getPosition());
+        planeForIntersect.setOrientation(synths[activeSynth].myNode.getOrientationQuat());
+        thisIntersect.setFrom(planeForIntersect);
         interfaceMoving = false;
         updateInterfaceMesh();
     }
@@ -216,7 +212,7 @@ void ofApp::update(){
     }
     
     
-    intersectPlane();
+    intersectPlane(ofGetMouseX(),ofGetMouseY());
     
 }
 
@@ -235,7 +231,7 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[0][2], tweenFloat);
     mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[1][2], tweenFloat);
     mainInterfaceData[42].updateMainMesh(mainInterface, designGrid[2][2], tweenFloat);
-
+    
     
     //  }
     
@@ -251,10 +247,10 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[39].updateMainMesh(mainInterface, designGrid[2][1], tweenFloat);
     
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[13+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()),tweenFloat);
+        mainInterfaceData[13+i].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
     }
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[25+i].updateMainMesh(mainInterface, testCam.worldToScreen(synthActivePos.getPosition()),tweenFloat);
+        mainInterfaceData[25+i].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
     }
     //  }
     
@@ -264,7 +260,7 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[43].updateMainMesh(mainInterface,  designGrid[1][2],tweenFloat);
     mainInterfaceData[44].updateMainMesh(mainInterface,  designGrid[0][0],tweenFloat);
-
+    
     
     if (interfacePadActive) {
         mainInterfaceData[39].setColor(mainInterface, ofColor::fromHsb(mainInterfaceData[39].elementColor.getHue(), (sin(ofGetElapsedTimeMillis())+1)*50+100, (sin(ofGetElapsedTimeMillis())+1)*50+100));
@@ -299,6 +295,7 @@ void ofApp::draw(){
     
     // globalTranslate.transformGL();
     
+    thisIntersect.draw();
     
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
@@ -448,12 +445,12 @@ void ofApp::keyPressed(int key){
         
         
         if (key =='1') {
-          
+            
             
         }
         if (key =='2') {
             
-           
+            
             
             
         }
@@ -578,6 +575,15 @@ void ofApp::mousePressed(int x, int y, int button){
     
     updateFboMesh();
     
+    if (!interfaceMoving) {
+    if (currentState == STATE_EDIT || currentState == STATE_EDIT_DETAIL) {
+        intersectPlane(x, y);
+        if ( (intersectPos.x < 100 && intersectPos.x > 0) && (intersectPos.y < 100 && intersectPos.y > 0) ) {
+            synths[activeSynth].tapEvent(vectorPosX,vectorPosY);
+            cout <<"inside" << endl;
+        }
+    }
+    }
     
     curTap = ofGetElapsedTimeMillis();
     if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
@@ -586,11 +592,11 @@ void ofApp::mousePressed(int x, int y, int button){
             
             
             if (currentState == STATE_DEFAULT) {
-
+                
                 if( (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x) &&
-                    (y > designGrid[0][1].y-designGrid[0][0].y && y < designGrid[0][1].y+designGrid[0][0].y) ){
+                   (y > designGrid[0][1].y-designGrid[0][0].y && y < designGrid[0][1].y+designGrid[0][0].y) ){
                     if(!synths[synthButton[0]].trackSwitchOn) {
-                    synths[synthButton[0]].trackSwitchOn = true;
+                        synths[synthButton[0]].trackSwitchOn = true;
                     } else {
                         buttonOnePress();
                     }
@@ -604,7 +610,7 @@ void ofApp::mousePressed(int x, int y, int button){
                 if( (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) &&
                    (y > designGrid[2][1].y-designGrid[0][0].y && y < designGrid[2][1].y+designGrid[0][0].y) ){
                     if(!synths[synthButton[2]].trackSwitchOn) {
-                    synths[synthButton[2]].trackSwitchOn = true;
+                        synths[synthButton[2]].trackSwitchOn = true;
                     } else {
                         buttonThreePress();
                     }
@@ -614,11 +620,11 @@ void ofApp::mousePressed(int x, int y, int button){
             
             
             if( (currentState == STATE_EDIT_DETAIL) || (currentState == STATE_EDIT) ){
-             
+                
                 if( (x > designGrid[0][2].x-designGrid[0][0].x && x < designGrid[0][2].x+designGrid[0][0].x) &&
                    (y > designGrid[0][2].y-designGrid[0][0].y && y < designGrid[0][2].y+designGrid[0][0].y) ){
                     if(synths[synthButton[0]].trackSwitchOn) {
-                    buttonOnePress();
+                        buttonOnePress();
                     } else {
                         synths[synthButton[0]].trackSwitchOn = true;
                     }
@@ -627,16 +633,17 @@ void ofApp::mousePressed(int x, int y, int button){
                 if( (x > designGrid[2][2].x-designGrid[0][0].x && x < designGrid[2][2].x+designGrid[0][0].x) &&
                    (y > designGrid[2][2].y-designGrid[0][0].y && y < designGrid[2][2].y+designGrid[0][0].y) ){
                     if(synths[synthButton[2]].trackSwitchOn) {
-                    buttonThreePress();
+                        buttonThreePress();
                     } else {
                         synths[synthButton[2]].trackSwitchOn = true;
                     }
                 }
                 
             }
-
+            
             
         }
+        
         
         /*
         if (lastPickColor != ofColor(255,255,255)) {
@@ -647,8 +654,8 @@ void ofApp::mousePressed(int x, int y, int button){
             }
             
         }
-        
         */
+        
         
     }
     
@@ -751,7 +758,7 @@ void ofApp::mousePressed(int x, int y, int button){
             }
         }
         
-      else  if (currentState == STATE_VOLUME) {
+        else  if (currentState == STATE_VOLUME) {
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
@@ -780,13 +787,13 @@ void ofApp::mousePressed(int x, int y, int button){
             
         }
         
- 
         
         
-    else    if (currentState == STATE_EDIT_DETAIL) {
+        
+        else    if (currentState == STATE_EDIT_DETAIL) {
             
-        
-        
+            
+            
             if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonTwoPress();
                 cout << "vvv" << endl;
@@ -794,9 +801,9 @@ void ofApp::mousePressed(int x, int y, int button){
             }
             
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].currentScaleVecPos++;
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                 mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                synths[activeSynth].currentScaleVecPos++;
                 detailEditInterfaceOn();
                 cout << synths[activeSynth].activeScale.name  << endl;
             }
@@ -834,30 +841,30 @@ void ofApp::mousePressed(int x, int y, int button){
                     cout <<  "midinote " << synths[activeSynth].keyNote << endl;
                 }
             }
-        
-        if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
-            buttonEditDetail();
-            mainInterfaceData[44].elementName = "o>";
-            cout << "<o>" << endl;
-            // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+            
+            if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+                buttonEditDetail();
+                mainInterfaceData[44].elementName = "o>";
+                cout << "<o>" << endl;
+                // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+            }
+            
         }
         
-        }
-        
-     else   if (currentState == STATE_EDIT) {
-         
-         
+        else   if (currentState == STATE_EDIT) {
+            
+            
             if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonTwoPress();
                 cout << "vvv" << endl;
-
+                
                 // cout << presetNames.at(synths[activeSynth].preset)  << endl;
             }
             
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
+                synths[activeSynth].currentScaleVecPos++;
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                 mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                synths[activeSynth].currentScaleVecPos++;
                 // editInterfaceOn();
                 cout << synths[activeSynth].activeScale.name  << endl;
             }
@@ -866,13 +873,13 @@ void ofApp::mousePressed(int x, int y, int button){
                 synths[activeSynth].changePreset();
                 // cout << presetNames.at(synths[activeSynth].preset)  << endl;
             }
-         
-         if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
-             buttonEditDetail();
-             mainInterfaceData[44].elementName = "<o";
-             cout << "<o>" << endl;
-             // cout << presetNames.at(synths[activeSynth].preset)  << endl;
-         }
+            
+            if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+                buttonEditDetail();
+                mainInterfaceData[44].elementName = "<o";
+                cout << "<o>" << endl;
+                // cout << presetNames.at(synths[activeSynth].preset)  << endl;
+            }
         }
     }
 }
@@ -1006,17 +1013,24 @@ void ofApp::drawDebug() {
     }
 }
 
-void ofApp::intersectPlane(){
+void ofApp::intersectPlane(float x_,float y_){
     //raytesting
-    worldMouse = testCam.screenToWorld(ofVec3f(ofGetMouseX(),ofGetMouseY(),0.0));
+    worldMouse = testCam.screenToWorld(ofVec3f(x_,y_,0.0));
     
     mouseRay.s = worldMouse;
     mouseRay.t = worldMouse-testCam.getPosition();
     
-    intersecPlane[activeSynth].intersect(mouseRay, intersectPos);
-    vectorPosX = (intersectPos.x/TILESIZE)+ float(TILES)/2;
-    vectorPosY = (intersectPos.y/TILESIZE)+ float(TILES)/2;
+    thisIntersect.intersect(mouseRay, intersectPos);
     
+    ofNode temp;
+    temp.setPosition(intersectPos-synths[activeSynth].myNode.getPosition());
+    ofQuaternion tempRot = synths[activeSynth].myNode.getOrientationQuat();
+    temp.rotateAround(tempRot.inverse(), ofVec3f(0,0,0));
+    
+    intersectPos = temp.getPosition()+ofVec3f( (TILES*TILESIZE)/2,(TILES*TILESIZE)/2,0);
+
+    vectorPosX =  int((intersectPos.x/ float (TILESIZE)));
+    vectorPosY = int((intersectPos.y/ float(TILESIZE)));
 }
 
 ofVec3f ofApp::intersectPlane(ofVec2f target_) {
@@ -1360,18 +1374,18 @@ void ofApp::setupGlobalInterface() {
     
     notes = ofSplitString("C C# D D# E F F# G G# A A# B"," ");
     //scale
-    offPlace = ofVec3f(designGrid[0][0].x*2.2,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(designGrid[0][0].x*1.1,designGrid[0][0].y-(i*smallButton.y),0);
-        temp = GlobalGUI(13+i,notes[i],smallButton,ofColor(0,0,0),place,offPlace);
+        place = ofVec3f(-designGrid[0][0].x*2+(i*smallButton.x),-designGrid[0][0].y*0.2,0);
+        temp = GlobalGUI(13+i,notes[i],smallButton*0.66,ofColor(0,0,0),place,offPlace);
         mainInterfaceData.push_back(temp);
         
     }
     //keynote
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f(designGrid[0][0].x*1.6,designGrid[0][0].y-(i*smallButton.y),0);
-        temp = GlobalGUI(25+i,notes[i],smallButton,ofColor(0,0,0),place, offPlace);
+        place = ofVec3f(-designGrid[0][0].x*2+(i*smallButton.x),0,0);
+        temp = GlobalGUI(25+i,notes[i],smallButton*0.66,ofColor(0,0,0),place, offPlace);
         mainInterfaceData.push_back(temp);
     }
     
@@ -1424,7 +1438,7 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(44, string("o>"), smallButton, ofColor(23,23,23), place, offPlace);
     mainInterfaceData.push_back(temp);
     
-
+    
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -1470,11 +1484,11 @@ void ofApp::editInterfaceOn(){
 void ofApp::editInterfaceOff(){
     
     
-       mainInterfaceData[7].moveDir = 0;
+    mainInterfaceData[7].moveDir = 0;
     mainInterfaceData[7].animation = true;
     
     
-       mainInterfaceData[5].moveDir = 0;
+    mainInterfaceData[5].moveDir = 0;
     mainInterfaceData[5].animation = true;
     
     mainInterfaceData[43].moveDir = 0;
@@ -1482,7 +1496,7 @@ void ofApp::editInterfaceOff(){
     
     mainInterfaceData[44].moveDir = 0;
     mainInterfaceData[44].animation = true;
-
+    
     
 }
 
@@ -1679,13 +1693,13 @@ void ofApp::makePresetString() {
     presetNames.push_back("Sinu");
     presetNames.push_back("simple");
     presetNames.push_back("simple2");
-presetNames.push_back("simple3");
+    presetNames.push_back("simple3");
     presetNames.push_back("simple2");
     presetNames.push_back("simple2");
-
-
-
-
+    
+    
+    
+    
 }
 
 void ofApp::makeDesignGrid() {
@@ -1796,6 +1810,7 @@ void ofApp::buttonTwoPress(){
     int temp = synthButton[1];
     activeSynth = synthButton[1];
     
+    
     if (synths[synthButton[1]].inFocus) {
         
         synths[synthButton[1]].aniPath = twoToBack;
@@ -1879,6 +1894,7 @@ void ofApp::buttonThreePress(){
     
     int temp = synthButton[2];
     activeSynth = synthButton[2];
+    
     
     if (synths[synthButton[1]].inFocus) {
         

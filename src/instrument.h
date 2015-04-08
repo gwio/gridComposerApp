@@ -168,7 +168,6 @@ public:
     map<int,ofVec2f> cubeMap;
     vector<Cube> cubeVector;
     
-    
     //interface planes
     ofVboMesh interfacePlaneMesh;
     ofVboMesh interfacePlaneFboMesh;
