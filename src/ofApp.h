@@ -180,6 +180,7 @@ public:
     bool interfacePadActive;
     ofVec3f interfacePadStart;
     bool debugCam;
+    bool insideSynth;
     
     //designgrid
     ofVec2f designGrid[3][3];

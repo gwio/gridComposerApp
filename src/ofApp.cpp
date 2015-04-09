@@ -194,7 +194,7 @@ void ofApp::update(){
     }
     
     
-   // intersectPlane(ofGetMouseX(),ofGetMouseY());
+  //  intersectPlane(ofGetMouseX(),ofGetMouseY());
     
 }
 
@@ -237,7 +237,7 @@ void ofApp::updateInterfaceMesh() {
     //  }
     
     //   if (currentState == STATE_EDIT) {
-    mainInterfaceData[5].updateMainMesh(mainInterface,  designGrid[2][1],tweenFloat);
+    mainInterfaceData[5].updateMainMesh(mainInterface,  designGrid[1][1],tweenFloat);
     mainInterfaceData[7].updateMainMesh(mainInterface,  designGrid[0][1],tweenFloat);
     
     mainInterfaceData[43].updateMainMesh(mainInterface,  designGrid[1][2],tweenFloat);
@@ -255,6 +255,23 @@ void ofApp::updateInterfaceMesh() {
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    mainInterface.draw();
+    
+    
+    ofPushStyle();
+    ofSetColor(255, 255, 255);
+    for (int i = 0; i < mainInterfaceData.size();i ++){
+        if (mainInterfaceData[i].showString){
+            if (i < 13) {
+                font.setSize(32);
+                font.draw(mainInterfaceData[i].elementName, 32, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
+            } else {
+                font.setSize(16);
+                font.draw(mainInterfaceData[i].elementName, 16, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
+            }
+        }
+    }
+    ofPopStyle();
     
     
     //glShadeModel(GL_SMOOTH);
@@ -300,22 +317,7 @@ void ofApp::draw(){
     glDisable(GL_DEPTH_TEST);
 
     
-    mainInterface.draw();
     
-    
-    ofPushStyle();
-    ofSetColor(255, 255, 255);
-    for (int i = 0; i < mainInterfaceData.size();i ++){
-        if (mainInterfaceData[i].showString){
-            if (i < 13) {
-                font.draw(mainInterfaceData[i].elementName, 32, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
-            } else {
-                font.setSize(16);
-                font.draw(mainInterfaceData[i].elementName, 16, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
-            }
-        }
-    }
-    ofPopStyle();
     
 }
 
@@ -508,7 +510,9 @@ void ofApp::mousePressed(int x, int y, int button){
         intersectPlane(x, y);
         if ( (intersectPos.x < 100 && intersectPos.x > 0) && (intersectPos.y < 100 && intersectPos.y > 0) ) {
             synths[activeSynth].tapEvent(vectorPosX,vectorPosY);
-            cout <<"inside" << endl;
+            insideSynth = true;
+        } else {
+            insideSynth = false;
         }
     }
     }
@@ -608,9 +612,8 @@ void ofApp::mousePressed(int x, int y, int button){
      */
     
     lastTap = curTap;
-    
 
-    if (!interfaceMoving) {
+    if ( (!interfaceMoving) && (!insideSynth) ){
         
         
         if (currentState == STATE_DEFAULT) {
@@ -898,6 +901,8 @@ void ofApp::intersectPlane(float x_,float y_){
     
     thisIntersect.intersect(mouseRay, intersectPos);
     
+    bool test = thisIntersect.intersect(mouseRay);
+    
     ofNode temp;
     temp.setPosition(intersectPos-synths[activeSynth].myNode.getPosition());
     ofQuaternion tempRot = synths[activeSynth].myNode.getOrientationQuat();
@@ -917,17 +922,19 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     tempNode.setFov(camFov);
     tempNode.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
-    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0));
+    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), ofGetWindowWidth(), ofGetWindowHeight()));
     ofRay ray;
     ray.s = wMouse;
     ray.t = wMouse-tempNode.getPosition();
     
     ofPlanePrimitive planeTemp;
     planeTemp.set(2000, 2000);
+    planeTemp.setPosition(0, 0, 0);
     ofPlane iP;
     iP.setFrom(planeTemp);
     ofVec3f cord;
     iP.intersect(ray, cord);
+    
     return cord;
 }
 
@@ -1135,7 +1142,7 @@ void ofApp::setupStatesAndAnimation() {
 
 void ofApp::setupGlobalInterface() {
     ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/6,designGrid[0][0].y*2/6,0);
-    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2/12,0);
+    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2.5,designGrid[0][0].y,0);
     ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
     ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
@@ -1158,7 +1165,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(designGrid[0][0].x*1.5,0,0);
     temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
@@ -1168,7 +1175,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(designGrid[0][0].x*0.5,0,0);
     temp = GlobalGUI(7,string("activePreset"),horizontalSlider,ofColor(57,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
