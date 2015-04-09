@@ -45,7 +45,7 @@ public:
     
     void changeGroupColor(ofColor);
     
-    
+    float *attack;
     
     void setDefaultHeight(float);
 };

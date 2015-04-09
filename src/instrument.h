@@ -94,6 +94,7 @@ public:
     void setRotate(ofQuaternion);
     void setScale(float);
     void planeMovement(float);
+    void setNormals(ofVboMesh&);
     
     SynthPresetManager presetManager;
     
@@ -111,6 +112,7 @@ public:
     void applyNewScale();
     void applyPitchMod(float);
     int currentScaleVecPos;
+    float synthAttack;
     
     string instrumentId;
     void changeSynthVolume(float &);

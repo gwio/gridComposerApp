@@ -12,7 +12,8 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     //default sinewave adder
     if (preset_ == 0) {
         
-        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        attack = 0.007;
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         output_ = SineWave().freq(freq_)*0.5;
         
@@ -34,7 +35,8 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     } else if(preset_ ==1 ){
         
         //simple squarewave
-        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.009;
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         
         output_ = SquareWave().freq(freq_)*0.25;
@@ -43,7 +45,8 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         output_  = (output_ +har1) * 0.5 *vol_*adsr;
         
     } else if (preset_ == 2) {
-        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.010;
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         //donald duck
         Generator outputGen = SineWave()
@@ -58,8 +61,8 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         output_ = outputGen *vol_*adsr;
     } else if (preset_ == 3) {
-        
-        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.015;
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
 
         Generator outputGen = SineWave().freq( freq_+ ((LFNoise().setFreq(10.5)+10*vol_)*60) );
         Generator harmonic1 = SineWave().freq(freq_*vol_*2)*0.2;
@@ -69,16 +72,18 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         Generator hpNoise = (Noise() * dBToLin(-18.0)) >> HPF24().cutoff(3000.0) >> LPF12().cutoff(10000);
         Generator tones = SineWave().freq(freq_) * dBToLin(-6.0) + SineWave().freq(222) * dBToLin(-18.0);
 
-        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.002;
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         
         output_ = (hpNoise+tones +(tones*0.5)  )  *vol_ *adsr;
     } else if (preset_ == 5) {
         
-        ADSR adsr = ADSR(0.005, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.005;
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
 
         Compressor duckingComp = Compressor()
-        .attack(0.001)
+        .attack(0.01)
         .threshold( dBToLin(-52) )
         .ratio(16)
         .lookahead(0.001);

@@ -10,6 +10,7 @@ class SynthPresetManager {
 public:
     SynthPresetManager();
     int count;
+    float attack;
     
     void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&, ControlGenerator&);
 };

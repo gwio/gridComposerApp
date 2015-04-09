@@ -97,12 +97,12 @@ void ofApp::setup(){
     ofBackground(11, 65, 65);
    
     
-   // ofEnableLighting();
-    //light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,0));
+    ofEnableLighting();
+    light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,0));
     
     
     //temp sketch
-    light.setAmbientColor(ofColor::fireBrick);
+    light.setAmbientColor(ofColor::lightCoral);
     
     doubleClickTime = 300;
     curTap = 0;
@@ -263,8 +263,8 @@ void ofApp::draw(){
     
     glEnable(GL_MULTISAMPLE);
     
-    // ofEnableLighting();
-    //light.enable();
+     ofEnableLighting();
+    light.enable();
     
     if (!debugCam) {
         testCam.begin();

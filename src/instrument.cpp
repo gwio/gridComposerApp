@@ -1,9 +1,9 @@
 #include "instrument.h"
 
 //layer is 100x100
-#define CUBE_Z_HEIGHT 15
+#define CUBE_Z_HEIGHT 12.5
 #define EMPTY_Z 2.55
-#define SCAN_Z 30
+#define SCAN_Z 22
 
 #define COLOR_TARGET 55.0
 
@@ -138,7 +138,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
                 cubeVector[i*(gridTiles)+j].setColor(ofColor::white);
         //    }
             
-         
+            cubeVector[i*(gridTiles)+j].attack = &synthAttack;
         }
     }
     
@@ -264,7 +264,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         verticesInner[i] = verticesInner[i]+tranVec;
     }
     
-    
+    setNormals(cubes);
     
     
     //setup main tonic out
@@ -942,7 +942,8 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
     
     presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger);
-    
+    synthAttack = presetManager.attack;
+
     
 }
 
@@ -955,6 +956,7 @@ void Instrument::changePreset() {
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger);
         }
     }
+    synthAttack = presetManager.attack;
     
     updateTonicOut();
 }
@@ -1123,4 +1125,26 @@ ofPolyline Instrument::getEmptyPath(ofVec3f pos_) {
     return temp;
 }
 
+void Instrument::setNormals(ofVboMesh& mesh_) {
+    
+    mesh_.clearNormals();
+    
+    for (int i = 1; i< mesh_.getNumVertices(); i+=3) {
+        
+        ofVec3f temp = mesh_.getVertex(i);
+        ofVec3f tempA = temp - mesh_.getVertex(i-1) ;
+        ofVec3f tempB = temp - mesh_.getVertex(i+1);
+        
+        temp = tempA.getCrossed(tempB);
+        
+        temp.normalize();
+        
+        mesh_.addNormal(temp);
+        mesh_.addNormal(temp);
+        mesh_.addNormal(temp);
+        
+        
+    }
+    
 
+}

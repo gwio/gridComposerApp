@@ -46,14 +46,15 @@ void Cube::update(){
     if (defaultZ != vec0Ptr->z) {
         
         if (diff > 0) {
-            aniFac = ofClamp(1-pow(1-aniPct,2),0.0,1.0);
+            aniFac = ofClamp(1-pow(1-aniPct, 2),0.0,1.0);
             
-            
+            aniPct+= ofClamp( ofMap(*attack, 0.001, 0.01, 0.085, 0.01), 1.0, 0.1);
+
         }
         
         if (diff < 0) {
             aniFac = ofClamp(pow(aniPct,4),0.0,1.0);
-            
+            aniPct +=0.06;
         }
         
         // cout << aniFac << endl;
@@ -62,7 +63,8 @@ void Cube::update(){
         vec2Ptr->z = actualZ + (diff*aniFac);
         vec3Ptr->z = actualZ + (diff*aniFac);
         
-        aniPct+=SPEED;
+       // aniPct+=SPEED;
+       // aniPct+= ofClamp( ofMap(*attack, 0.001, 0.01, 0.95, 0.1), 1.0, 0.1);
     }
     
     
