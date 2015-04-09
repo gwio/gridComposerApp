@@ -19,17 +19,13 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     verticesOuter.clear();
     verticesInner.clear();
     cubeVector.clear();
-    fboMesh.clear();
     
     gridTiles = gTiles_;
     gridSize = gSize_;
     borderSize = border_;
     
     
-    //pickColors start wit 1,1,1
-    rCounter = 1;
-    gCounter = 1;
-    bCounter = 1;
+   
     
     soundsCounter = 1;
     synthHasChanged = false;
@@ -142,20 +138,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
                 cubeVector[i*(gridTiles)+j].setColor(ofColor::white);
         //    }
             
-            //add pickColor
-            ofColor tempColor = ofColor(rCounter,gCounter,bCounter);
-            cubeVector[i*(gridTiles)+j].fboColor = tempColor;
-            cubeMap[tempColor.getHex()] = ofVec2f(i,j);
-            if (rCounter%255==0) {
-                rCounter=1;
-                gCounter++;
-            }
-            
-            if (gCounter%255==0) {
-                gCounter=1;
-                bCounter++;
-            }
-            rCounter++;
+         
         }
     }
     
@@ -228,19 +211,8 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     cubes.setMode(OF_PRIMITIVE_TRIANGLES);
     raster.setMode(OF_PRIMITIVE_POINTS);
     
-    rCounter = 1;
-    gCounter = 1;
-    bCounter = 1;
     
-    fboMesh = cubes;
-    //set fboMeshColors
-    for (int j = 0; j < cubeVector.size(); j++) {
-        fboMesh.setColor(cubeVector[j].vIndex0, cubeVector[j].fboColor);
-        fboMesh.setColor(cubeVector[j].vIndex1, cubeVector[j].fboColor);
-        fboMesh.setColor(cubeVector[j].vIndex2, cubeVector[j].fboColor);
-        fboMesh.setColor(cubeVector[j].vIndex3, cubeVector[j].fboColor);
-    }
-    
+
     //setup interface planes
     interfacePlaneMesh.clear();
     interfacePlaneMesh.setMode(OF_PRIMITIVE_TRIANGLES);
@@ -274,9 +246,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         cubes.setVertex(i, cubes.getVertex(i)+tranVec);
     }
     
-    for (int i = 0; i < fboMesh.getNumVertices(); i++) {
-        fboMesh.setVertex(i, fboMesh.getVertex(i)+tranVec);
-    }
+
     
     for (int i = 0; i < interfacePlaneMesh.getNumVertices(); i++) {
         interfacePlaneMesh.setVertex(i, interfacePlaneMesh.getVertex(i)+tranVec);
@@ -331,10 +301,10 @@ void Instrument::draw() {
     if (trackSwitchOn) {
     
     cubes.draw();
-    
+    /*
     interfacePlaneMesh.drawWireframe();
     interfaceConnectedMesh.draw();
-    
+    */
     } else {
         
         raster.draw();
@@ -342,15 +312,6 @@ void Instrument::draw() {
     // ofPopMatrix();
 }
 
-void Instrument::drawFbo() {
-    ofPushMatrix();
-    
-    fboMesh.draw();
-    
-    interfacePlaneFboMesh.draw();
-    
-    ofPopMatrix();
-}
 
 
 
@@ -696,9 +657,7 @@ void Instrument::noteTriggerSouth() {
 }
 
 
-void Instrument::generateSynths() {
-    
-}
+
 
 void Instrument::drawDebug() {
     ofPushStyle();
@@ -755,15 +714,7 @@ void Instrument::updateCubeMesh(){
     
 }
 
-void Instrument::updateFboMesh(){
-    
-    for (int j = 0; j < cubeVector.size(); j++) {
-        fboMesh.setVertex(cubeVector[j].vIndex0, *cubeVector[j].vec0Ptr);
-        fboMesh.setVertex(cubeVector[j].vIndex1, *cubeVector[j].vec1Ptr);
-        fboMesh.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
-        fboMesh.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
-    }
-}
+
 
 void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
     
@@ -1020,13 +971,15 @@ void Instrument::updateTonicOut(){
     
     
     Tonic::StereoDelay delay = Tonic::StereoDelay(0.6f,0.6f)
-    .delayTimeLeft( 0.5 + Tonic::SineWave().freq(0.2) * 0.01)
-    .delayTimeRight(0.4 + Tonic::SineWave().freq(0.23) * 0.01)
+    .delayTimeLeft( 0.2 )
+    .delayTimeRight(0.2)
     .feedback(0.3)
     .dryLevel(0.90)
     .wetLevel(0.10);
     
-    instrumentOut = (temp >> delay) * outputRamp;
+    Tonic::Reverb reverb = Tonic::Reverb().inputHPFCutoff(2000).decayTime(0.2).roomSize(0.5).wetLevel(-2);
+    
+    instrumentOut = (temp ) * outputRamp;
     synthHasChanged = true;
 }
 

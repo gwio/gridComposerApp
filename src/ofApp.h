@@ -39,15 +39,12 @@ public:
     
     ofVec3f intersectPlane(ofVec2f);
     
-    void updateFboMesh();
     
-    void updateTapMap();
     
     void setupStatesAndAnimation();
     
     void setupGlobalInterface();
     
-    void setupOfxGui();
     
     void updateCamera(float);
     
@@ -141,19 +138,9 @@ public:
     ofPlane thisIntersect;
     ofPlanePrimitive planeForIntersect;
     
-    //colorpicking grid
-    ofVboMesh pickingRaster;
-    
-    //objects for colorpicking
-    ofFbo fbo;
-    ofPixels selection;
-    ofImage fboImage;
-    bool drawFboImage;
-    unsigned char RGB[3];
-    ofColor lastPickColor;
+ 
     
     
-    ofTexture mousePick;
     
     //light
     ofLight light;
@@ -175,10 +162,6 @@ public:
     int timeCounter;
     int bpm;
     
-    //ofx gui elements
-    bool showGui;
-    ofxPanel gui;
-    ofParameter<float> volumeRampValue;
     void volumeRampValueChanged(float&volumeRampValue);
     
     //GlobalGui
@@ -188,9 +171,7 @@ public:
     void updateSynthScaleInfo();
     void updateKeyNoteInfo(int);
     
-    //hack for ofxgui panel
-    ofFbo guiFbo;
-    void updateGuiFbo();
+   
     
     //interface stuff
     bool focusCam;

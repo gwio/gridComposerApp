@@ -30,7 +30,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
                                               )  *(0.1 * vol_);
         
         
-        output_ =  (output_ + harmonic + harmonic2 + harmonic3) * vol_ * adsr;
+        output_ =  (output_ + harmonic + harmonic2 + harmonic3) * vol_ *adsr;
     } else if(preset_ ==1 ){
         
         //simple squarewave

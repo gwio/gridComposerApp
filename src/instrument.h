@@ -67,7 +67,6 @@ public:
     void updateTonicOut();
     void update();
     void draw();
-    void drawFbo();
     
     
     void noteTrigger();
@@ -79,7 +78,6 @@ public:
     
     void nextDirection();
     
-    void generateSynths();
     void addCube(int,int);
     void removeCube(int,int);
     void replaceCube(int,int,float,ofColor);
@@ -87,7 +85,6 @@ public:
     void tapEvent(int,int);
     void moveEvent(int,int,float,ofColor);
     void updateCubeMesh();
-    void updateFboMesh();
     void updateSoundsMap(int,int, bool);
     void resetCubeGroup(unsigned long, int, int);
     void setupOneSynth(cubeGroup*);
@@ -137,7 +134,6 @@ public:
     bool pause;
     bool trackSwitchOn;
     //synthinfo
-    int rCounter,gCounter,bCounter;
     vector<vector<synthInfo> > layerInfo;
     map<unsigned long,cubeGroup> soundsMap;
     unsigned long soundsCounter;
@@ -157,7 +153,6 @@ public:
     vector<ofVec3f> verticesOuter;
     vector<ofVec3f> verticesInner;
     ofVboMesh raster;
-    ofVboMesh fboMesh;
     ofVboMesh cubes;
     float colorHue;
     
