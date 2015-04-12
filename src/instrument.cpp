@@ -58,7 +58,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, float *bpmTick_) {
     
     myNode = node_;
     
@@ -69,6 +69,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     stepperPos = stepperPos_;
     mainTonicPtr = mainTonicPtr_;
+    bpmTick = bpmTick_;
     
     layerInfo.resize(gridTiles);
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -213,28 +214,10 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
 
-    //setup interface planes
-    interfacePlaneMesh.clear();
-    interfacePlaneMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    interfacePlaneFboMesh.clear();
-    interfacePlaneFboMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    interfaceConnectedMesh.clear();
-    interfaceConnectedMesh.setMode(OF_PRIMITIVE_LINES);
-    planes.clear();
-    planes.reserve(4);
-    planes.resize(4);
-    
+       
+    pulsePlane = InterfacePlane(gridTiles);
     
     ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
-    
-    
-    
-    planes[0].setup(ofVec3f(0,(gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 0, gridSize, interfacePlaneMesh ,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    planes[1].setup(ofVec3f( (gridTiles*gridSize)/2, (gridTiles*gridSize),0 ), gridTiles*gridSize,1, gridSize,interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    planes[2].setup(ofVec3f( (gridTiles*gridSize), (gridTiles*gridSize)/2,0 ), gridTiles*gridSize, 2, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    planes[3].setup(ofVec3f( (gridTiles*gridSize)/2, 0 ), gridTiles*gridSize,3, gridSize, interfacePlaneMesh,interfacePlaneFboMesh,interfaceConnectedMesh,tranVec);
-    
-    
     
     //add displacement
     
@@ -247,19 +230,6 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     }
     
 
-    
-    for (int i = 0; i < interfacePlaneMesh.getNumVertices(); i++) {
-        interfacePlaneMesh.setVertex(i, interfacePlaneMesh.getVertex(i)+tranVec);
-    }
-    
-    for (int i = 0; i < interfaceConnectedMesh.getNumVertices(); i++) {
-        interfaceConnectedMesh.setVertex(i, interfaceConnectedMesh.getVertex(i)+tranVec);
-    }
-    
-    for (int i = 0; i < interfacePlaneFboMesh.getNumVertices(); i++) {
-        interfacePlaneFboMesh.setVertex(i, interfacePlaneFboMesh.getVertex(i)+tranVec);
-    }
-    
     for (int i = 0; i < verticesInner.size(); i++) {
         verticesInner[i] = verticesInner[i]+tranVec;
     }
@@ -287,11 +257,10 @@ void Instrument::update() {
     for (int i = 0; i < cubeVector.size(); i++) {
         cubeVector[i].update();
     }
+        pulsePlane.update(*stepperPos,*bpmTick);
     }
     
-    for (int i = 0; i < planes.size(); i++) {
-        planes[i].update();
-    }
+  
     
     updateCubeMesh();
 }
@@ -301,10 +270,7 @@ void Instrument::draw() {
     if (trackSwitchOn) {
     
     cubes.draw();
-    /*
-    interfacePlaneMesh.drawWireframe();
-    interfaceConnectedMesh.draw();
-    */
+        pulsePlane.draw();
     } else {
         
         raster.draw();
@@ -457,7 +423,6 @@ void Instrument::nextDirection() {
     } else {
         scanDirection = -1;
     }
-    planes[scanDirection%4].pulse();
     
     //  cout << scanDirection << endl;
 }

@@ -51,18 +51,18 @@ void ofApp::setup(){
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0]);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &bpmTick);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1]);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &bpmTick);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60);
     
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2]);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &bpmTick);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60);
     
@@ -112,6 +112,8 @@ void ofApp::setup(){
     drawInfo = false;
     
     timeCounter = -1;
+    bpmTick = 0.0;
+    tickTimes.resize(20);
     
     
     focusCam = false;
@@ -876,6 +878,7 @@ void ofApp::drawDebug() {
     ofDrawBitmapString("Grid X: "+ofToString(vectorPosX), 20, 60);
     ofDrawBitmapString("GridY: "+ofToString(vectorPosY), 20, 80);
     ofDrawBitmapString("BPM Counter: "+ofToString(timeCounter), 20, 120);
+    ofDrawBitmapString("Tick Time " + ofToString(bpmTick), 20, 140);
     ofPopStyle();
     
     
@@ -966,15 +969,38 @@ void ofApp::pulseEvent(float& val) {
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].noteTrigger();
+        if (synths[i].pulsePlane.stepCounter == ((TILES+1)*4)-1 ){
+            synths[i].pulsePlane.stepCounter = 0;
+        } else {
+        synths[i].pulsePlane.stepCounter++;
+        }
     }
     
-    
-    
-    
-    
-    
+    getBpmTick();
 }
 
+void ofApp::getBpmTick() {
+    
+    
+    bpmTick = ofGetElapsedTimeMillis() - lastTick;
+    lastTick = ofGetElapsedTimeMillis();
+    
+    
+    for (int i = 0; i < synths.size(); i++) {
+        synths[i].pulsePlane.lastTick = lastTick;
+    }
+    
+    tickTimes.pop_back();
+    tickTimes.push_front(bpmTick);
+    
+    
+    bpmTick = 0.0;
+    for (int i = 0; i < 20; i++) {
+        bpmTick+= tickTimes.at(i);
+    }
+    
+    bpmTick /= 20;
+}
 
 
 void ofApp::volumeRampValueChanged(float & volumeRampValue) {
@@ -1513,7 +1539,7 @@ void ofApp::makePresetString() {
 
 void ofApp::makeDesignGrid() {
     
-    ofVec2f third = ofVec2f(ofGetWidth()/3,ofGetHeight()/3);
+    ofVec2f third = ofVec2f(ofGetWindowWidth()/3,ofGetWindowHeight()/3);
     ofVec2f center = third/2;
     
     for (int i = 0; i < 3; i++) {
@@ -1789,7 +1815,6 @@ void ofApp::buttonThreePress(){
 }
 
 void ofApp::buttonEditDetail() {
-    
     
     if ( currentState == STATE_EDIT) {
         

@@ -63,7 +63,7 @@ public:
     Instrument();
     Instrument(string,int,float,float);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode, float *);
     void updateTonicOut();
     void update();
     void draw();
@@ -121,7 +121,10 @@ public:
     float gridSize;
     float borderSize;
     
+    //time
     int *stepperPos;
+    float *bpmTick;
+    
     int scanDirection;
     int preset;
     
@@ -166,11 +169,7 @@ public:
     vector<Cube> cubeVector;
     
     //interface planes
-    ofVboMesh interfacePlaneMesh;
-    ofVboMesh interfacePlaneFboMesh;
-    ofVboMesh interfaceConnectedMesh;
-    vector<InterfacePlane> planes;
-    
+    InterfacePlane pulsePlane;
     //tonic
     Tonic::ofxTonicSynth *mainTonicPtr;
     Tonic::Generator instrumentOut;

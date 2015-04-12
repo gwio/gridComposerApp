@@ -161,6 +161,10 @@ public:
     //sound time
     int timeCounter;
     int bpm;
+    float bpmTick;
+    float lastTick;
+    void getBpmTick();
+    deque<float>tickTimes;
     
     void volumeRampValueChanged(float&volumeRampValue);
     
