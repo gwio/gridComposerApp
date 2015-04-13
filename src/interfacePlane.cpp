@@ -27,6 +27,18 @@ InterfacePlane::InterfacePlane(int tiles_) {
         times.push_front(0.0);
     }
     
+    lineMesh.clear();
+    
+    lineMesh.addVertex(ofVec3f(-50,-50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(-50,50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(-50,50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(50,50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(50,50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(50,-50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(50,-50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(-50,-50,0)*1.1);
+
+    lineMesh.setMode(OF_PRIMITIVE_LINES);
 }
 
 
@@ -40,7 +52,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_) {
 
     if (thisTime >= tickTime_ ) {
         len = 1.0;
-    } else {
+   } else {
         len =ofMap( fmod(thisTime, tickTime_ ), 0.0  , tickTime_ , 0.0, 1.0);
     }
     
@@ -49,34 +61,39 @@ void InterfacePlane::update(int& stepper, float& tickTime_) {
     pctRotate = ofMap(stepCounter+len, 0, (tiles+1)*4, 0.0, 1.0);
 
     ofMatrix4x4 aaa;
-    aaa.rotateRad(ofLerp(0.0, TWO_PI, pctRotate), 0, 0, 1);
+    aaa.rotateRad(ofLerp(0.0, (PI+HALF_PI)*4, pctRotate), 0, 0, 1);
     
     float pctScale = ofMap(stepCounter+len,0, (tiles+1)*4,0.0,TWO_PI*2);
     
     
-    pulseRot.setRotate(aaa.getRotate());
+    pulseRot.setRotate(aaa.getRotate().inverse());
     
     posNode.setOrientation(pulseRot.getRotate());
     
     posNode.setPosition(circlePath.getVertices().at(stepCounter)+tempDir);
-    posNode.setPosition(posNode.getPosition()* ( (abs(sin(pctScale))*0.4) +0.8) );
-    posNode.setScale((abs(sin(pctScale-HALF_PI))*1) +1 );
     
-   // cout << sin(pctScale) << endl;
-  
-//    cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
+    
+    float scalePct = (abs(sin(pctScale-HALF_PI))*1);
+    float thisScale =  ofClamp(pow(scalePct, 4),0.0,1.0);
 
+    
+    posNode.setPosition( posNode.getPosition()* ((-thisScale*0.5) +1.2) ) ;
+    posNode.setScale( (thisScale*1) +1 );
+    
+       // cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
+
+    
 }
 
 void InterfacePlane::draw(){
     
-    
-    //circlePath.draw();
+   // lineMesh.draw();
+   // circlePath.draw();
     ofPushStyle();
     posNode.transformGL();
     
     ofSetColor(255, 255, 255,100);
-    ofLine(-8, 0, 8, 0);
+    ofLine(-10, 0, 10, 0);
     
 
     posNode.restoreTransformGL();

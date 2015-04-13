@@ -35,5 +35,7 @@ public:
     
     float pctRotate;
     ofMatrix4x4 pulseRot;
+    
+    ofVboMesh lineMesh;
 };
 

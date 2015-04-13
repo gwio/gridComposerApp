@@ -10,6 +10,7 @@
 #include "GlobalScales.h"
 #include "ofxFontStash.h"
 
+
 using namespace Tonic;
 
 
@@ -189,4 +190,4 @@ public:
     //designgrid
     ofVec2f designGrid[3][3];
     
-};
+   };

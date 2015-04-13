@@ -9,7 +9,7 @@ GlobalGUI::GlobalGUI(){
 GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_) {
     elementName = name_;
     drawString = name_;
-    elementColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(100,155), 255);
+    elementColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(100,155), 200);
     
     counter=counter_*4;
     index[0]=0;

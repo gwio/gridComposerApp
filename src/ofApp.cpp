@@ -2,7 +2,7 @@
 #define TILES 5
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.095
-#define BPM 130*4
+#define BPM 220
 #define ANI_SPEED 0.02;
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
@@ -95,7 +95,7 @@ void ofApp::setup(){
     thisIntersect.setFrom(planeForIntersect);
     
     ofBackground(11, 65, 65);
-   
+    //ofBackground(111,111,111);
     
     ofEnableLighting();
     light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,0));
@@ -132,7 +132,7 @@ void ofApp::setup(){
     debugCam = false;
     currentState = STATE_DEFAULT;
     interfacePadActive = false;
-}
+    }
 
 void ofApp::setupAudio(){
     Generator temp;
@@ -239,7 +239,7 @@ void ofApp::updateInterfaceMesh() {
     //  }
     
     //   if (currentState == STATE_EDIT) {
-    mainInterfaceData[5].updateMainMesh(mainInterface,  designGrid[1][1],tweenFloat);
+    mainInterfaceData[5].updateMainMesh(mainInterface,  designGrid[2][1],tweenFloat);
     mainInterfaceData[7].updateMainMesh(mainInterface,  designGrid[0][1],tweenFloat);
     
     mainInterfaceData[43].updateMainMesh(mainInterface,  designGrid[1][2],tweenFloat);
@@ -256,6 +256,11 @@ void ofApp::updateInterfaceMesh() {
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    
+    
+    
+    
+    glDisable(GL_MULTISAMPLE);
     
     mainInterface.draw();
     
@@ -274,16 +279,13 @@ void ofApp::draw(){
         }
     }
     ofPopStyle();
-    
-    
     //glShadeModel(GL_SMOOTH);
-    //glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     
-    glEnable(GL_MULTISAMPLE);
+   // glEnable(GL_MULTISAMPLE);
     
-     ofEnableLighting();
-    light.enable();
+    // ofEnableLighting();
+   // light.enable();
     
     if (!debugCam) {
         testCam.begin();
@@ -318,7 +320,7 @@ void ofApp::draw(){
  
     glDisable(GL_DEPTH_TEST);
 
-    
+   
     
     
 }
@@ -994,12 +996,19 @@ void ofApp::getBpmTick() {
     tickTimes.push_front(bpmTick);
     
     
+    /*
+    
     bpmTick = 0.0;
+    
     for (int i = 0; i < 20; i++) {
         bpmTick+= tickTimes.at(i);
     }
     
+    
     bpmTick /= 20;
+    */
+    
+
 }
 
 
@@ -1168,7 +1177,7 @@ void ofApp::setupStatesAndAnimation() {
 
 void ofApp::setupGlobalInterface() {
     ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/6,designGrid[0][0].y*2/6,0);
-    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2.5,designGrid[0][0].y,0);
+    ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y,0);
     ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
     ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
@@ -1191,7 +1200,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    place = ofVec3f(designGrid[0][0].x*1.5,0,0);
+    place = ofVec3f(0,0,0);
     temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
@@ -1201,7 +1210,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    place = ofVec3f(designGrid[0][0].x*0.5,0,0);
+    place = ofVec3f(0,0,0);
     temp = GlobalGUI(7,string("activePreset"),horizontalSlider,ofColor(57,0,0),place,offPlace);
     mainInterfaceData.push_back(temp);
     
