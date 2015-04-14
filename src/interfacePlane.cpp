@@ -8,6 +8,7 @@ InterfacePlane::InterfacePlane(){
 InterfacePlane::InterfacePlane(int tiles_) {
     tiles = tiles_;
     stepCounter = 0;
+    dirCounter = 0;
     
     resolution = 2;
 
@@ -29,16 +30,46 @@ InterfacePlane::InterfacePlane(int tiles_) {
     
     lineMesh.clear();
     
-    lineMesh.addVertex(ofVec3f(-50,-50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(-50,50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(-50,50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(50,50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(50,50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(50,-50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(50,-50,0)*1.1);
-    lineMesh.addVertex(ofVec3f(-50,-50,0)*1.1);
+    lineMesh.addVertex(ofVec3f(-54,0,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(-54,0,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(0,54,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(0,54,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(54,0,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(54,0,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(0,-54,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+    lineMesh.addVertex(ofVec3f(0,-54,0));
+    lineMesh.addColor(ofColor(255,255,255,0));
+
 
     lineMesh.setMode(OF_PRIMITIVE_LINES);
+    
+    lineMeshVerticesDefault.clear();
+    lineMeshVerticesDefault.reserve(8);
+    
+    for (int i = 0; i < lineMesh.getNumVertices(); i++) {
+        lineMeshVerticesDefault.push_back(lineMesh.getVertex(i));
+    }
+    
+    lineMeshVerticesTarget.clear();
+    lineMeshVerticesTarget.reserve(8);
+    lineMeshVerticesTarget.push_back( ofVec3f(0,-50,0));
+    lineMeshVerticesTarget.push_back( ofVec3f(0,50,0));
+        
+    lineMeshVerticesTarget.push_back( ofVec3f(-50,0,0));
+    lineMeshVerticesTarget.push_back( ofVec3f(50,0,0));
+
+    lineMeshVerticesTarget.push_back( ofVec3f(0,-50,0));
+    lineMeshVerticesTarget.push_back( ofVec3f(0,50,0));
+    
+    lineMeshVerticesTarget.push_back( ofVec3f(50,0,0));
+    lineMeshVerticesTarget.push_back( ofVec3f(-50,0,0));
 }
 
 
@@ -74,20 +105,40 @@ void InterfacePlane::update(int& stepper, float& tickTime_) {
     
     
     float scalePct = (abs(sin(pctScale-HALF_PI))*1);
-    float thisScale =  ofClamp(pow(scalePct, 4),0.0,1.0);
+    float thisScale =  ofClamp(pow(scalePct, 6),0.0,1.0);
 
     
-    posNode.setPosition( posNode.getPosition()* ((-thisScale*0.5) +1.2) ) ;
-    posNode.setScale( (thisScale*1) +1 );
+    posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.1) ) ;
+    posNode.setScale( (thisScale*1) +0.8 );
     
        // cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
+    //cout <<  fmod( double(pctRotate), 0.25) << endl;
+    
+     linePct =ofClamp( ofMap(fmod( double(pctRotate), 0.25), 0.0, 0.25, 0.0, 1.25)-0.25, 0.0, 1.0);
+    
+   // cout  << linePct <<  "  "<<  fmod( double(pctRotate), 0.25) << "  " << stepper  << endl;
 
+    for (int i = 0; i < lineMesh.getNumVertices(); i+=2) {
+        
+        if( (i == dirCounter*2)  && (stepper != 5) ){
+        lineMesh.setVertex(i, lineMeshVerticesDefault.at(i)+(lineMeshVerticesTarget.at(i)*linePct) );
+            lineMesh.setColor(i, ofColor(255,255,255,100));
+        lineMesh.setVertex(i+1, lineMeshVerticesDefault.at(i+1)+(lineMeshVerticesTarget.at(i+1)*linePct) );
+            lineMesh.setColor(i+1, ofColor(255,255,255,100));
+        } else {
+            lineMesh.setVertex(i, lineMeshVerticesDefault.at(i)+(lineMeshVerticesTarget.at(i)*1));
+            lineMesh.setColor(i, lineMesh.getColor(i).lerp(ofColor(255,255,255,0), 0.2) );
+            lineMesh.setVertex(i+1, lineMeshVerticesDefault.at(i+1)+(lineMeshVerticesTarget.at(i+1)*1 ));
+            lineMesh.setColor(i+1, lineMesh.getColor(i+1).lerp(ofColor(255,255,255,0), 0.2) );
+
+   
+        }
+    }
     
 }
 
 void InterfacePlane::draw(){
     
-   // lineMesh.draw();
    // circlePath.draw();
     ofPushStyle();
     posNode.transformGL();
@@ -98,5 +149,6 @@ void InterfacePlane::draw(){
 
     posNode.restoreTransformGL();
     ofPopStyle();
-    
+    lineMesh.draw();
+
 }

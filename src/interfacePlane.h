@@ -20,6 +20,7 @@ public:
     
     int tiles;
     int stepCounter;
+    int dirCounter;
     bool test;
     
     ofPolyline circlePath;
@@ -34,8 +35,11 @@ public:
     int resolution;
     
     float pctRotate;
+    float linePct;
     ofMatrix4x4 pulseRot;
     
     ofVboMesh lineMesh;
+    vector<ofVec3f> lineMeshVerticesTarget;
+    vector<ofVec3f> lineMeshVerticesDefault;
 };
 

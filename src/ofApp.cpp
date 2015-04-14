@@ -113,7 +113,7 @@ void ofApp::setup(){
     
     timeCounter = -1;
     bpmTick = 0.0;
-    tickTimes.resize(20);
+    tickTimes.resize(5);
     
     
     focusCam = false;
@@ -196,7 +196,7 @@ void ofApp::update(){
     }
     
     
-  //  intersectPlane(ofGetMouseX(),ofGetMouseY());
+    intersectPlane(ofGetMouseX(),ofGetMouseY());
     
 }
 
@@ -293,7 +293,7 @@ void ofApp::draw(){
         cam.begin();
     }
     
-    //   thisIntersect.draw();
+       //thisIntersect.draw();
     
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
@@ -966,6 +966,12 @@ void ofApp::pulseEvent(float& val) {
         timeCounter = 0;
         for (int i = 0; i < synths.size(); i++) {
             synths[i].nextDirection();
+            
+            if (synths[i].pulsePlane.dirCounter == 3) {
+                synths[i].pulsePlane.dirCounter = 0;
+            } else {
+            synths[i].pulsePlane.dirCounter++;
+            }
         }
     }
     
@@ -996,17 +1002,17 @@ void ofApp::getBpmTick() {
     tickTimes.push_front(bpmTick);
     
     
-    /*
+    
     
     bpmTick = 0.0;
     
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 5; i++) {
         bpmTick+= tickTimes.at(i);
     }
     
     
-    bpmTick /= 20;
-    */
+    bpmTick /= 5;
+    
     
 
 }
