@@ -282,7 +282,7 @@ void ofApp::draw(){
     //glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     
-   // glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     
     // ofEnableLighting();
    // light.enable();
@@ -966,12 +966,6 @@ void ofApp::pulseEvent(float& val) {
         timeCounter = 0;
         for (int i = 0; i < synths.size(); i++) {
             synths[i].nextDirection();
-            
-            if (synths[i].pulsePlane.dirCounter == 3) {
-                synths[i].pulsePlane.dirCounter = 0;
-            } else {
-            synths[i].pulsePlane.dirCounter++;
-            }
         }
     }
     

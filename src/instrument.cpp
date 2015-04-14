@@ -257,7 +257,7 @@ void Instrument::update() {
     for (int i = 0; i < cubeVector.size(); i++) {
         cubeVector[i].update();
     }
-        pulsePlane.update(*stepperPos,*bpmTick);
+        pulsePlane.update(*stepperPos,*bpmTick,scanDirection);
     }
     
   

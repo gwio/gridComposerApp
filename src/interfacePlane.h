@@ -11,7 +11,7 @@ public:
     
     InterfacePlane(int);
     
-    void update(int&, float&);
+    void update(int&, float&, int&);
     void draw();
 
     ofVec3f pos;
@@ -31,15 +31,15 @@ public:
     float thisTime;
     float len;
     
-    float sideRad[4];
     int resolution;
     
     float pctRotate;
     float linePct;
     ofMatrix4x4 pulseRot;
     
+    float lineAlpha;
+    
     ofVboMesh lineMesh;
-    vector<ofVec3f> lineMeshVerticesTarget;
-    vector<ofVec3f> lineMeshVerticesDefault;
+    vector<ofVec3f> lineMeshVertices;
 };
 
