@@ -5,20 +5,22 @@ InterfacePlane::InterfacePlane(){
     
 }
 
-InterfacePlane::InterfacePlane(int tiles_) {
+InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     tiles = tiles_;
     stepCounter = 0;
     dirCounter = 0;
     
-    resolution = 2;
+    tileSize = tileSize_;
 
-   
     posNode.setPosition(0, 0, 0);
     
     for (int i = 0; i < (tiles+1)*4; i++) {
+        
         ofVec3f temp = ofVec3f( sin( ofMap(i, 0, (tiles+1)*4, 0.0-HALF_PI, TWO_PI-HALF_PI)), cos( ofMap(i, 0, (tiles+1)*4, 0.0-HALF_PI, TWO_PI-HALF_PI)),0 );
         circlePath.addVertex(temp.x*75,temp.y*75 ,0);
+        
     }
+    
     circlePath.close();
     
     for (int i = 0; i < 20; i++) {
@@ -28,34 +30,95 @@ InterfacePlane::InterfacePlane(int tiles_) {
     
     lineMesh.clear();
     
-    lineMesh.addVertex(ofVec3f(-54,-50,0));
+    float zH = 12.5;
+    //pulse lines
+    lineMesh.addVertex(ofVec3f(-50,-50,zH));
     lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(-54,50,0));
+    lineMesh.addVertex(ofVec3f(-50,50,zH));
     lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(-50,54,0));
+    lineMesh.addVertex(ofVec3f(50,+50,zH));
     lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(50,54,0));
+    lineMesh.addVertex(ofVec3f(50,-50,zH));
     lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(54,50,0));
-    lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(54,-50,0));
-    lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(50,-54,0));
-    lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(-50,-54,0));
-    lineMesh.addColor(ofColor(255,255,255,0));
+   
+
+    
+    /*
+    lineMesh.addVertex(ofVec3f(-54,0,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+    lineMesh.addVertex(ofVec3f(-74,0,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+    
+    lineMesh.addVertex(ofVec3f(0,-54,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+    lineMesh.addVertex(ofVec3f(0,-74,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+
+    lineMesh.addVertex(ofVec3f(54,0,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+    lineMesh.addVertex(ofVec3f(74,0,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+
+    lineMesh.addVertex(ofVec3f(0,54,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+    lineMesh.addVertex(ofVec3f(0,74,0));
+    lineMesh.addColor(ofColor(255,255,255,100));
+*/
 
 
+    
+    //connect lines
+    
     lineMesh.setMode(OF_PRIMITIVE_LINES);
     
     lineMeshVertices.clear();
-    lineMeshVertices.reserve(8);
+    lineMeshVertices.reserve(8*2);
     
     for (int i = 0; i < lineMesh.getNumVertices(); i++) {
         lineMeshVertices.push_back(lineMesh.getVertex(i));
     }
     
    
+    pulseLine.addVertex(ofVec3f(-50,-50,0));
+    pulseLine.addVertex(ofVec3f(-50,-50,0));;
+    pulseLine.addColor(ofColor(255,255,255,0));
+    pulseLine.addColor(ofColor(255,255,255,100));
+    pulseLine.setMode(OF_PRIMITIVE_LINES);
+    
+    
+    //direction lines
+    directionMesh.setMode(OF_PRIMITIVE_LINES);
+
+        
+        for (int j = 1; j < tiles; j++) {
+            directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-10,0,0) + ofVec3f(0,tileSize*j,0) );
+            directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(0,tileSize*j,0));
+            directionMesh.addColor(ofColor(255,255,255,100));
+            directionMesh.addColor(ofColor(255,255,255,100));
+        }
+    
+    for (int j = 1; j < tiles; j++) {
+        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,10,0) + ofVec3f(tileSize*j,0,0) );
+        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(tileSize*j,0,0));
+        directionMesh.addColor(ofColor(255,255,255,100));
+        directionMesh.addColor(ofColor(255,255,255,100));
+    }
+    
+    for (int j = 1; j < tiles; j++) {
+        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(10,0,0) + ofVec3f(0,-tileSize*j,0) );
+        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(0,-tileSize*j,0));
+        directionMesh.addColor(ofColor(255,255,255,100));
+        directionMesh.addColor(ofColor(255,255,255,100));
+    }
+   
+    
+    for (int j = 1; j < tiles; j++) {
+        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-10,0) + ofVec3f(-tileSize*j,0,0) );
+        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(-tileSize*j,0,0));
+        directionMesh.addColor(ofColor(255,255,255,100));
+        directionMesh.addColor(ofColor(255,255,255,100));
+    }
+    
 }
 
 
@@ -97,16 +160,54 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_) {
     posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.1) ) ;
     posNode.setScale( (thisScale*1) +0.8 );
     
+    
+
+    if (scanDir_ == 0) {
+        pulseLine.setVertex(0, lineMeshVertices.at(0) +  (lineMeshVertices.at(3)-lineMeshVertices.at(0))*linePct/4);
+        pulseLine.setVertex(1, lineMeshVertices.at(0) + (lineMeshVertices.at(3)-lineMeshVertices.at(0))*linePct);
+        
+           } else if (scanDir_ == 1) {
+        pulseLine.setVertex(0, lineMeshVertices.at(1)+ (lineMeshVertices.at(0)-lineMeshVertices.at(1))*linePct/4);
+        pulseLine.setVertex(1, lineMeshVertices.at(1) + (lineMeshVertices.at(0)-lineMeshVertices.at(1))*linePct);
+        
+       
+    } else if (scanDir_ == 2) {
+        pulseLine.setVertex(0, lineMeshVertices.at(2)+ (lineMeshVertices.at(1)-lineMeshVertices.at(2))*linePct/4);
+        pulseLine.setVertex(1, lineMeshVertices.at(2) + (lineMeshVertices.at(1)-lineMeshVertices.at(2))*linePct);
+        
+        
+    } else if (scanDir_ == 3) {
+        pulseLine.setVertex(0, lineMeshVertices.at(3)+ (lineMeshVertices.at(2)-lineMeshVertices.at(3))*linePct/4);
+        pulseLine.setVertex(1, lineMeshVertices.at(3) + (lineMeshVertices.at(2)-lineMeshVertices.at(3))*linePct);
+        
+    }
+    
+    
+    
+    if (stepper == 5) {
+
+        // pulseLine.setColor(0, pulseLine.getColor(0).lerp(ofColor(255,255,255,0), 0.2));
+        pulseLine.setColor(1, pulseLine.getColor(1).lerp(ofColor(255,255,255,0), 0.1));
+    } else {
+        pulseLine.setColor(0, ofColor(255,255,255,0));
+        pulseLine.setColor(1, ofColor(255,255,255,100));
+    }
+
        // cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
     //cout <<  fmod( double(pctRotate), 0.25) << endl;
     
-     linePct =ofClamp( ofMap(fmod( double(pctRotate), 0.25), 0.0, 0.25, 0.0, 1.25)-0.25, 0.0, 1.0);
+  //  if (stepper != 5) {
+    linePct =ofClamp( ofMap(fmod( double(pctRotate), 0.25), 0.0, 0.25, 0.0, 1.25)-0.25, 0.0, 1.0);
     
+   
+   // } else {
+       // linePct = 1.0;
+    //}
    // cout  << linePct <<  "  "<<  fmod( double(pctRotate), 0.25) << "  " << stepper  << endl;
 
     int looper = scanDir_*2;
     
-    
+    /*
             lineMesh.setVertex( (looper+6)%8 , lineMeshVertices.at((looper+7)%8)+ (lineMeshVertices.at((looper+6)%8)-lineMeshVertices.at((looper+7)%8)) * linePct );
             lineMesh.setVertex( (looper+3)%8 , lineMeshVertices.at((looper+2)%8)+ (lineMeshVertices.at((looper+3)%8)-lineMeshVertices.at((looper+2)%8)) * linePct );
     lineMesh.setVertex( (looper+2)%8 , lineMeshVertices.at((looper+2)%8)  + (lineMeshVertices.at((looper+3)%8)-lineMeshVertices.at((looper+2)%8)) * linePct / 4);
@@ -117,32 +218,19 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_) {
     
     lineMesh.setColor((looper+6)%8, ofColor(255,255,255,150));
     lineMesh.setColor((looper+3)%8, ofColor(255,255,255,150));
-
+*/
 
     
-
-            /*
-            lineMesh.setVertex(i, lineMeshVertices.at(i));
-            lineMesh.setColor(i, ofColor(255,255,255,100));
-            lineMesh.setVertex(i+1, lineMeshVertices.at(i+1));
-            lineMesh.setColor(i+1, ofColor(255,255,255,100));
-
-            
-            lineMesh.setColor((i+4)%8, ofColor(255,255,255,0));
-            lineMesh.setColor((i+5)%8, ofColor(255,255,255,0));
-
-            lineMesh.setColor((i+3)%8, ofColor(255,255,255,0));
-            lineMesh.setColor((i+6)%8, ofColor(255,255,255,0));
-*/
-            
-      
        
     lineAlpha = abs(sin(pctScale-HALF_PI))*150;
-        
+    
+    cout << linePct << "  " << stepper  << endl;
+    
+    
     
 }
 
-void InterfacePlane::draw(){
+void InterfacePlane::draw(int& scanDir_){
     
    // circlePath.draw();
     ofPushStyle();
@@ -154,6 +242,27 @@ void InterfacePlane::draw(){
 
     posNode.restoreTransformGL();
     ofPopStyle();
-    lineMesh.draw();
+  //  lineMesh.draw();
+    directionMesh.draw();
+
+    ofPushMatrix();
+    
+    for (int i = 1; i < tiles; i++) {
+        
+        if (scanDir_ == 0) {
+            ofTranslate(0, tileSize);
+            pulseLine.draw();
+        } else if (scanDir_ == 1) {
+            ofTranslate(tileSize,0);
+            pulseLine.draw();
+        } else if (scanDir_ == 2) {
+            ofTranslate(0, -tileSize);
+            pulseLine.draw();
+        } else if (scanDir_ == 3) {
+            ofTranslate(-tileSize,0);
+            pulseLine.draw();
+        }
+    }
+    ofPopMatrix();
 
 }

@@ -1,7 +1,7 @@
 #include "ofApp.h"
 #define TILES 5
 #define TILESIZE 100/TILES
-#define TILEBORDER 0.095
+#define TILEBORDER 0.085
 #define BPM 220
 #define ANI_SPEED 0.02;
 
@@ -94,6 +94,7 @@ void ofApp::setup(){
     planeForIntersect.set(TILES*TILESIZE,TILES*TILESIZE);
     thisIntersect.setFrom(planeForIntersect);
     
+    //ofBackground(0, 0, 42);
     ofBackground(11, 65, 65);
     //ofBackground(111,111,111);
     
@@ -284,7 +285,7 @@ void ofApp::draw(){
     
     glEnable(GL_MULTISAMPLE);
     
-    // ofEnableLighting();
+   //  ofEnableLighting();
    // light.enable();
     
     if (!debugCam) {
@@ -293,7 +294,7 @@ void ofApp::draw(){
         cam.begin();
     }
     
-       //thisIntersect.draw();
+     //  thisIntersect.draw();
     
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();

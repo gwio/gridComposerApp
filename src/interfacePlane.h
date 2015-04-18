@@ -9,10 +9,10 @@ public:
     
     InterfacePlane();
     
-    InterfacePlane(int);
+    InterfacePlane(int, float);
     
     void update(int&, float&, int&);
-    void draw();
+    void draw(int&);
 
     ofVec3f pos;
     ofVec3f tempDir;
@@ -31,7 +31,7 @@ public:
     float thisTime;
     float len;
     
-    int resolution;
+    float tileSize;
     
     float pctRotate;
     float linePct;
@@ -40,6 +40,9 @@ public:
     float lineAlpha;
     
     ofVboMesh lineMesh;
+    ofVboMesh pulseLine;
+    ofVboMesh directionMesh;
     vector<ofVec3f> lineMeshVertices;
+    
 };
 

@@ -93,7 +93,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     //add outer vertices to mesh
     for (int i = 0; i < verticesOuter.size(); i++) {
         cubes.addVertex(verticesOuter[i]);
-        // cubes.addColor(ofColor(0,0,0));
+         //cubes.addColor(ofColor(0,0,44));
         cubes.addColor(ofColor(11, 65, 65));
        
     }
@@ -215,7 +215,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
 
        
-    pulsePlane = InterfacePlane(gridTiles);
+    pulsePlane = InterfacePlane(gridTiles, gridSize);
     
     ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
     
@@ -270,7 +270,7 @@ void Instrument::draw() {
     if (trackSwitchOn) {
     
     cubes.draw();
-        pulsePlane.draw();
+        pulsePlane.draw(scanDirection);
     } else {
         
         raster.draw();
@@ -946,7 +946,7 @@ void Instrument::updateTonicOut(){
     
     Tonic::Reverb reverb = Tonic::Reverb().inputHPFCutoff(2000).decayTime(0.2).roomSize(0.5).wetLevel(-2);
     
-    instrumentOut = (temp ) * outputRamp;
+    instrumentOut = (temp >> delay ) * outputRamp;
     synthHasChanged = true;
 }
 
