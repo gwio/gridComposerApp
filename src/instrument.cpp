@@ -136,7 +136,8 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             cubeVector[i*(gridTiles)+j].setDefaultHeight(emptyInnerZ);
             
            // if (trackSwitchOn){
-                cubeVector[i*(gridTiles)+j].setColor(ofColor::white);
+              //  cubeVector[i*(gridTiles)+j].setColor(ofColor::white);
+            cubeVector[i*(gridTiles)+j].setColor(ofColor(51, 105, 105));
         //    }
             
             cubeVector[i*(gridTiles)+j].attack = &synthAttack;
@@ -253,12 +254,12 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
 
 void Instrument::update() {
     
-    if (trackSwitchOn) {
+    //if (trackSwitchOn) {
     for (int i = 0; i < cubeVector.size(); i++) {
         cubeVector[i].update();
     }
-        pulsePlane.update(*stepperPos,*bpmTick,scanDirection);
-    }
+        pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection);
+  //  }
     
   
     
@@ -312,7 +313,9 @@ void Instrument::removeCube(int x_, int y_){
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setDefaultHeight(emptyInnerZ);
     
     
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
+   // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
+    
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor =  ofColor(51, 105, 105);
     //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
     
     
@@ -423,6 +426,11 @@ void Instrument::nextDirection() {
     } else {
         scanDirection = -1;
     }
+    
+    if( scanDirection >= 0) {
+        pulsePlane.pulseDir(scanDirection);
+    }
+    
     
     //  cout << scanDirection << endl;
 }

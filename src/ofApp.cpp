@@ -247,6 +247,10 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[44].updateMainMesh(mainInterface,  designGrid[0][0],tweenFloat);
     
     
+    for (int i = 45; i < 45+4; i++) {
+        mainInterfaceData[i].updateMainMesh(mainInterface,  designGrid[1][1],tweenFloat);
+    }
+    
     if (interfacePadActive) {
         mainInterfaceData[39].setColor(mainInterface, ofColor::fromHsb(mainInterfaceData[39].elementColor.getHue(), (sin(ofGetElapsedTimeMillis())+1)*50+100, (sin(ofGetElapsedTimeMillis())+1)*50+100));
         
@@ -261,7 +265,7 @@ void ofApp::draw(){
     
     
     
-    glDisable(GL_MULTISAMPLE);
+    //glDisable(GL_MULTISAMPLE);
     
     mainInterface.draw();
     
@@ -768,6 +772,20 @@ void ofApp::mousePressed(int x, int y, int button){
         
         else   if (currentState == STATE_EDIT) {
             
+            
+            for (int i =  45; i < 45+4; i++) {
+                if ( mainInterfaceData[i].isInside(ofVec2f(x,y))) {
+                    if(synths[activeSynth].connectedDirection[i-45] && synths[activeSynth].activeDirection[i-45] ) {
+                        synths[activeSynth].connectedDirection[i-45] =  false;
+                    } else if (!synths[activeSynth].connectedDirection[i-45] && synths[activeSynth].activeDirection[i-45]) {
+                        synths[activeSynth].activeDirection[i-45] =  false;
+                    } else {
+                        synths[activeSynth].connectedDirection[i-45] =  true;
+                        synths[activeSynth].activeDirection[i-45] =  true;
+                    }
+                    cout << mainInterfaceData[i].elementName << endl;
+                }
+            }
             
             if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonTwoPress();
@@ -1298,6 +1316,33 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     
+    //scandirection toogle,
+    
+    place = ofVec3f(-designGrid[0][0].y*1.4,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(45, string("west"), ofVec3f(40,designGrid[0][0].y*2,0), ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    place = ofVec3f(0,-designGrid[0][0].y*1.4,0);
+    offPlace = ofVec3f(0, -designGrid[0][0].y*6,0);
+    temp = GlobalGUI(46, string("north"), ofVec3f(designGrid[0][0].y*2,40,0), ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    place = ofVec3f(designGrid[0][0].y*1.4,0,0);
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(47, string("east"), ofVec3f(40,designGrid[0][0].y*2,0), ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+    
+    
+    place = ofVec3f(0,designGrid[0][0].y*1.4,0);
+    offPlace = ofVec3f(0 ,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(48, string("south"), ofVec3f(designGrid[0][0].y*2,40,0), ofColor(23,23,23), place, offPlace);
+    mainInterfaceData.push_back(temp);
+
+
+
+
+
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -1337,6 +1382,14 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[44].moveDir = 1;
     mainInterfaceData[44].animation = true;
     
+    
+    for (int i = 45; i < 45+4; i++) {
+        mainInterfaceData[i].showString = true;
+        mainInterfaceData[i].moveDir = 1;
+        mainInterfaceData[i].animation = true;
+    }
+    
+    
 }
 
 
@@ -1356,7 +1409,10 @@ void ofApp::editInterfaceOff(){
     mainInterfaceData[44].moveDir = 0;
     mainInterfaceData[44].animation = true;
     
-    
+    for (int i = 45; i < 45+4; i++) {
+        mainInterfaceData[i].moveDir = 0;
+        mainInterfaceData[i].animation = true;
+    }
 }
 
 void ofApp::detailEditInterfaceOn() {

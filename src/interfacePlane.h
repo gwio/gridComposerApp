@@ -11,8 +11,10 @@ public:
     
     InterfacePlane(int, float);
     
-    void update(int&, float&, int&);
+    void update(int&, float&, int&, bool[],bool[]);
     void draw(int&);
+    
+    void pulseDir(int);
 
     ofVec3f pos;
     ofVec3f tempDir;
@@ -43,6 +45,8 @@ public:
     ofVboMesh pulseLine;
     ofVboMesh directionMesh;
     vector<ofVec3f> lineMeshVertices;
+    
+   
     
 };
 
