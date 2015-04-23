@@ -6,12 +6,15 @@ InterfacePlane::InterfacePlane(){
 }
 
 InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
+    for (int i = 0; i < 4; i++) {
+        nextDirs[i] = 1;
+    }
+    
     tiles = tiles_;
     stepCounter = 0;
-    dirCounter = 0;
+    barCounter = 0;
     
     tileSize = tileSize_;
-    
     
     posNode.setPosition(0, 0, 0);
     
@@ -99,7 +102,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
-
+        
     }
     
     for (int j = 1; j < tiles; j++) {
@@ -110,7 +113,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
-
+        
     }
     
     for (int j = 1; j < tiles; j++) {
@@ -121,7 +124,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
-
+        
     }
     
     
@@ -133,7 +136,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
         directionMesh.addColor(ofColor(255,255,255,80));
-
+        
     }
     
 }
@@ -155,11 +158,64 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
     tempDir*= len;
     
-    pctRotate = ofMap(stepCounter+len, 0, (tiles+1)*4, 0.0, 1.0);
+    float alphaPart = TWO_PI/((tiles+1)*4);
+    
+    pctBar = ofMap(stepper+len, 0, tiles+1, 0.0, 1.0);
+    float pctQuarter = fmod(double(pctBar), 0.25);
     
     ofMatrix4x4 aaa;
-                aaa.rotateRad(ofLerp(0.0, (PI+HALF_PI)*4, pctRotate), 0, 0, 1);
     
+    float alpha;
+
+    int forwardTiles = 0;
+    float lastAlpha;
+    if (nextDirs[1] && nextDirs[0]) {
+        alpha = ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI) + scanDir_*HALF_PI;
+        alpha -= HALF_PI;
+          alpha += len*alphaPart;
+        aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+scanDir_*HALF_PI, 0, 0, 1) ;
+        // move normal +1
+    }else if (!nextDirs[1]){
+        if(nextDirs[2]) {
+            //move +2
+            alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
+            alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI);
+            alpha -= HALF_PI;
+            alpha+= len*(alphaPart*2);
+            //alpha +=  ofMap( stepper, 0,  (tiles+1), -HALF_PI, 0.0) ;
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+(HALF_PI*pctBar), 0, 0, 1) ;
+            // alphaPos = ofVec3f(sin(alpha)*75, cos(alpha)*75,0 );
+            
+        } else if (nextDirs[3]) {
+            alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
+            alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*2;
+            alpha -= HALF_PI;
+            alpha+= len*(alphaPart*3);
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*2), 0, 0, 1) ;
+
+        } else {
+            alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
+            alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*3;
+            alpha -= HALF_PI;
+            alpha+= len*(alphaPart*4);
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*3), 0, 0, 1) ;
+            
+            //no move
+        }
+        
+    }
+    
+    
+    for (int i = 0; i < 4; i++){
+        
+        cout << nextDirs[i] << "  " ;
+    }
+    cout << endl;
+    
+    
+  //  aaa.rotateRad(ofLerp(0.0, (HALF_PI+PI)*4, pctBar)-alphaPart, 0, 0, 1);
+    ofVec3f alphaPos = ofVec3f(sin(alpha)*75, cos(alpha)*75,0 );
+
     
     float pctScale = ofMap(stepCounter+len,0, (tiles+1)*4,0.0,TWO_PI*2);
     
@@ -168,15 +224,16 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
     posNode.setOrientation(pulseRot.getRotate());
     
-    posNode.setPosition(circlePath.getVertices().at(stepCounter)+tempDir);
-    
+   //posNode.setPosition(circlePath.getVertices().at(stepCounter)+tempDir);
+    posNode.setPosition(alphaPos);
     
     float scalePct = (abs(sin(pctScale-HALF_PI))*1);
     float thisScale =  ofClamp(pow(scalePct, 6),0.0,1.0);
     
+
     
-    posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.1) ) ;
-    posNode.setScale( (thisScale*1) +0.8 );
+  //  posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.1) ) ;
+   // posNode.setScale( (thisScale*1) +0.8 );
     
     
     
@@ -205,7 +262,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         pulseLine.setColor(1, ofColor(255,255,255,0));
     }
     
-
+    
     
     
     if (stepper == 5) {
@@ -218,11 +275,11 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     }
     
     // cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
-    //cout <<  fmod( double(pctRotate), 0.25) << endl;
+    //cout <<  fmod( double(pctBar), 0.25) << endl;
     
     
     //  if (stepper != 5) {
-    linePct =ofClamp( ofMap(fmod( double(pctRotate), 0.25), 0.0, 0.25, 0.0, 1.25)-0.25, 0.0, 1.0);
+    linePct =ofClamp( ofMap(fmod( double(pctBar), 0.25), 0.0, 0.25, 0.0, 1.25)-0.25, 0.0, 1.0);
     
     
     
@@ -295,9 +352,9 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
     if (!connected_[2]) {
         for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i+=3) {
-//            directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(10,-tileSize* (((i/3)+1)-(tiles*2)+2),10));
+            //            directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(10,-tileSize* (((i/3)+1)-(tiles*2)+2),10));
             directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(20,-tileSize* (((i/3)+1)-(tiles*2)+2),0));
-
+            
         }
     } else {
         for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i+=3) {
@@ -307,9 +364,9 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
     if (!connected_[3]) {
         for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i+=3) {
-//            directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-10,10));
+            //            directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-10,10));
             directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-20,0));
-
+            
         }
     } else {
         for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i+=3) {
@@ -322,7 +379,6 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     // } else {
     // linePct = 1.0;
     //}
-    // cout  << linePct <<  "  "<<  fmod( double(pctRotate), 0.25) << "  " << stepper  << endl;
     
     int looper = scanDir_*2;
     

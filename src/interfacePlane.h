@@ -22,7 +22,7 @@ public:
     
     int tiles;
     int stepCounter;
-    int dirCounter;
+    int barCounter;
     bool test;
     
     ofPolyline circlePath;
@@ -35,7 +35,7 @@ public:
     
     float tileSize;
     
-    float pctRotate;
+    float pctBar;
     float linePct;
     ofMatrix4x4 pulseRot;
     
@@ -46,7 +46,7 @@ public:
     ofVboMesh directionMesh;
     vector<ofVec3f> lineMeshVertices;
     
-   
+    bool nextDirs[4];
     
 };
 

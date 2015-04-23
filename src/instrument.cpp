@@ -406,6 +406,9 @@ void Instrument::nextDirection() {
     bool test = false;
     int counter = 0;
     
+   
+ 
+    
     if (!pause) {
         
         while (   test == false   &&  counter !=4 ) {
@@ -429,6 +432,19 @@ void Instrument::nextDirection() {
     
     if( scanDirection >= 0) {
         pulsePlane.pulseDir(scanDirection);
+        pulsePlane.barCounter++;
+    }
+    
+    if (scanDirection != -1) {
+        pulsePlane.nextDirs[0] = activeDirection[scanDirection];
+        pulsePlane.nextDirs[1] = activeDirection[(scanDirection+1)%4];
+        pulsePlane.nextDirs[2] = activeDirection[(scanDirection+2)%4];
+        pulsePlane.nextDirs[3] = activeDirection[(scanDirection+3)%4];
+    }
+    
+    
+    if (pulsePlane.nextDirs[3] == 0){
+        pulsePlane.barCounter++;
     }
     
     
