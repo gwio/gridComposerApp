@@ -12,7 +12,7 @@ public:
     InterfacePlane(int, float);
     
     void update(int&, float&, int&, bool[],bool[]);
-    void draw(int&);
+    void draw();
     
     void pulseDir(int);
 
@@ -20,15 +20,12 @@ public:
     ofVec3f tempDir;
     ofNode posNode;
     
-    int tiles;
+    float tiles;
     int stepCounter;
     int barCounter;
-    bool test;
+    int scanDir;
     
-    ofPolyline circlePath;
-    
-    deque<float> times;
-    
+    float alphaPart;
     float lastTick;
     float thisTime;
     float len;
@@ -39,7 +36,9 @@ public:
     float linePct;
     ofMatrix4x4 pulseRot;
     
+    float alpha;
     float lineAlpha;
+    ofVec3f alphaPos;
     
     ofVboMesh lineMesh;
     ofVboMesh pulseLine;
@@ -48,5 +47,8 @@ public:
     
     bool nextDirs[4];
     
+    ofColor connectedDir;
+    ofColor notActiveDir;
+    ofColor pulseColor;
 };
 

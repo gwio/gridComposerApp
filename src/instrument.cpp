@@ -271,7 +271,7 @@ void Instrument::draw() {
     if (trackSwitchOn) {
     
     cubes.draw();
-        pulsePlane.draw(scanDirection);
+        pulsePlane.draw();
     } else {
         
         raster.draw();
