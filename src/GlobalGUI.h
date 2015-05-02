@@ -9,7 +9,7 @@ public:
         
     
     
-    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f);
+    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f, int);
     
     int counter;
     
@@ -54,4 +54,9 @@ public:
     void setOn(ofVboMesh&);
     void setOff(ofVboMesh&);
     
+    bool touchDown;
+    ofVec2f touchStart;
+    int tempInt;
+    
+    int fontSize;
 };

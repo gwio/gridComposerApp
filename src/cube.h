@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "tapHelper.h"
 
 
 class Cube{

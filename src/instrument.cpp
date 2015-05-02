@@ -209,10 +209,8 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         
     }
     
-    
-    cubes.setMode(OF_PRIMITIVE_TRIANGLES);
-    raster.setMode(OF_PRIMITIVE_POINTS);
-    
+       cubes.setMode(OF_PRIMITIVE_TRIANGLES);
+    raster.setMode(OF_PRIMITIVE_LINE_STRIP);
     
 
        
@@ -248,7 +246,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     //   cout << cubes.getNumVertices() << endl;
     
-    
+   
 }
 
 
@@ -261,22 +259,20 @@ void Instrument::update() {
         pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection);
   //  }
     
-  
+
     
     updateCubeMesh();
 }
 
 void Instrument::draw() {
-    // ofPushMatrix();
     if (trackSwitchOn) {
     
     cubes.draw();
-        pulsePlane.draw();
+       pulsePlane.draw();
     } else {
         
-        raster.draw();
+     raster.draw();
     }
-    // ofPopMatrix();
 }
 
 
@@ -914,7 +910,7 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.22;
+    float rampLength = 0.15;
     float freqRamp = 0.16;
     
     //create volume ramp
@@ -961,16 +957,15 @@ void Instrument::updateTonicOut(){
     }
     
     
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.6f,0.6f)
-    .delayTimeLeft( 0.2 )
-    .delayTimeRight(0.2)
-    .feedback(0.3)
-    .dryLevel(0.90)
-    .wetLevel(0.10);
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.14f,0.24f)
+    .delayTimeLeft( 0.14 )
+    .delayTimeRight(0.22)
+    .feedback(0.18)
+    .dryLevel(0.95)
+    .wetLevel(0.1);
     
-    Tonic::Reverb reverb = Tonic::Reverb().inputHPFCutoff(2000).decayTime(0.2).roomSize(0.5).wetLevel(-2);
     
-    instrumentOut = (temp >> delay ) * outputRamp;
+      instrumentOut = (temp>>delay) * outputRamp;
     synthHasChanged = true;
 }
 

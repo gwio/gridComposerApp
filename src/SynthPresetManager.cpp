@@ -13,7 +13,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     if (preset_ == 0) {
         
         attack = 0.007;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.2, 0.3, 0.05).doesSustain(false).legato(false).trigger(trigger_);
 
         output_ = SineWave().freq(freq_)*0.5;
         
@@ -31,18 +31,21 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
                                               )  *(0.1 * vol_);
         
         
-        output_ =  (output_ + harmonic + harmonic2 + harmonic3) * vol_ *adsr;
+        output_ =  (output_ + harmonic + harmonic2 + harmonic3) *vol_ *adsr;
     } else if(preset_ ==1 ){
         
         //simple squarewave
         attack = 0.009;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.22, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         
-        output_ = SquareWave().freq(freq_)*0.25;
+        output_ = SquareWave().freq(freq_)*0.35;
         Generator har1 =   SquareWave().freq(freq_* 4)*0.15;
         
-        output_  = (output_ +har1) * 0.5 *vol_*adsr;
+        Generator har2 =   SquareWave().freq(freq_* 8)*0.15;
+
+        
+        output_  = (output_ +har1+har2) * 0.5 *vol_*adsr;
         
     } else if (preset_ == 2) {
         attack = 0.010;
@@ -73,14 +76,14 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         Generator tones = SineWave().freq(freq_) * dBToLin(-6.0) + SineWave().freq(222) * dBToLin(-18.0);
 
         attack = 0.002;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
 
         
-        output_ = (hpNoise+tones +(tones*0.5)  )  *vol_ *adsr;
+        output_ = (hpNoise+tones +(tones*0.5)  )*vol_ *adsr ;
     } else if (preset_ == 5) {
         
         attack = 0.005;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         Compressor duckingComp = Compressor()
         .attack(0.01)

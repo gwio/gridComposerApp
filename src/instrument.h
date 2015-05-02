@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "cube.h"
-#include "tapHelper.h"
 #include "ofxTonic.h"
 #include "interfacePlane.h"
 #include "GlobalScales.h"

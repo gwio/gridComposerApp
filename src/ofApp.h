@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "ofxRay.h"
 #include "instrument.h"
-#include "tapHelper.h"
 #include "ofxTonic.h"
 #include "ofxGui.h"
 #include "GlobalGUI.h"
@@ -65,6 +64,8 @@ public:
     void editInterfaceOn();
     void editInterfaceOff();
     
+    void bothEditInterfaceOff();
+    
     void makeDesignGrid();
     
     void makePresetString();
@@ -72,6 +73,7 @@ public:
     void buttonOnePress();
     void buttonTwoPress();
     void buttonThreePress();
+    void buttonFourPress();
     void buttonEditDetail();
     
     //tonic
@@ -148,7 +150,6 @@ public:
     
     //misc tap
     unsigned long doubleClickTime, curTap, lastTap;
-    map<unsigned long,TapHelper> tapMap;
     bool mouseDragging;
     unsigned long tapCounter;
     
@@ -182,12 +183,12 @@ public:
     bool focusCam;
     int synthButton[3];
     int currentState;
-    bool interfacePadActive;
-    ofVec3f interfacePadStart;
     bool debugCam;
     bool insideSynth;
     
     //designgrid
     ofVec2f designGrid[3][3];
     
+    
+    ofShader shader;
    };

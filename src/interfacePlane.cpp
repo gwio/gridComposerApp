@@ -39,7 +39,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     
     //connect lines
     
-    lineMesh.setMode(OF_PRIMITIVE_LINES);
+    lineMesh.setMode(OF_PRIMITIVE_TRIANGLES);
     
     lineMeshVertices.clear();
     lineMeshVertices.reserve(8*2);
@@ -53,6 +53,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     pulseLine.addVertex(ofVec3f(-50,-50,0));;
     pulseLine.addColor(ofColor(255,255,255,0));
     pulseLine.addColor(ofColor(255,255,255,100));
+    pulseLine.setUsage( GL_DYNAMIC_DRAW );
     pulseLine.setMode(OF_PRIMITIVE_LINES);
     
     
@@ -325,6 +326,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
 }
 
 void InterfacePlane::draw(){
+    
     
     ofPushStyle();
     posNode.transformGL();

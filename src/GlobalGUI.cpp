@@ -6,7 +6,7 @@ GlobalGUI::GlobalGUI(){
 }
 
 //colors for this start with 50,0,0
-GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_) {
+GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_) {
     elementName = name_;
     drawString = name_;
     elementColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(100,155), 200);
@@ -30,6 +30,10 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     showString = false;
     
     animation = false;
+    
+    touchDown = false;
+    
+    fontSize = fontS_;
 }
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
