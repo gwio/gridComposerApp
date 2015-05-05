@@ -210,7 +210,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     }
     
        cubes.setMode(OF_PRIMITIVE_TRIANGLES);
-    raster.setMode(OF_PRIMITIVE_LINE_STRIP);
+    raster.setMode(OF_PRIMITIVE_POINTS);
     
 
        
@@ -1029,8 +1029,8 @@ void Instrument::setKeyNote(int keyNote_) {
     
     
     int change = keyNote_;
-    keyNote += change;
-    
+    keyNote = ofClamp(keyNote+change,0, 120);
+    cout << keyNote << endl;
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             it->second.groupNote+=keyNote_;

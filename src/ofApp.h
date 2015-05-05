@@ -175,7 +175,7 @@ public:
     ofVboMesh mainInterface;
     ofVboMesh mainInterfaceFbo;
     void updateSynthScaleInfo();
-    void updateKeyNoteInfo(int);
+    void updateKeyNoteInfo();
     
    
     

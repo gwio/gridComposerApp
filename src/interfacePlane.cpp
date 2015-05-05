@@ -33,8 +33,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     lineMesh.addVertex(ofVec3f(50,-50,zH));
     lineMesh.addColor(ofColor(255,255,255,0));
     
-    connectedDir = ofColor::fromHsb(120, 120, 255, 100);
-    notActiveDir = ofColor::fromHsb(1, 120, 255,100);
+    connectedDir = ofColor::fromHsb(120, 120, 255, 44);
+    notActiveDir = ofColor::fromHsb(1, 120, 255,44);
     pulseColor = ofColor::fromHsb(0, 0, 255,200);
     
     //connect lines
