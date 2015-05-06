@@ -5,10 +5,10 @@
 
 
 Cube::Cube(){
-    displayColor =ofColor( 1, 55, 65,0);
-    cubeColor = ofColor( 1, 55, 65,0);
-    groupColor = ofColor( 1, 55, 65,0);
-    scanColor=ofColor( 11, 55, 65,0);
+    displayColor =ofColor( 0,0,0,255);
+    cubeColor = ofColor( 0, 0, 0,255);
+    groupColor = ofColor( 1, 55, 65,255);
+    scanColor=ofColor( 11, 55, 65,255);
     
     aniPct = 0.0;
     diff = 0.0;

@@ -25,7 +25,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     borderSize = border_;
     
     
-   
+    innerColorDefault = ofColor::grey;
+    outerColorDefault = ofColor::black;
+    rasterColor = ofColor::white;
     
     soundsCounter = 1;
     synthHasChanged = false;
@@ -34,8 +36,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     layerZ = CUBE_Z_HEIGHT;
     emptyInnerZ = EMPTY_Z;
     scanZ = SCAN_Z;
+   
     
-    colorHue = ofRandom(255);
     animate = false;
     inFocus = false;
     scaling = false;
@@ -59,6 +61,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
 }
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, float *bpmTick_) {
+    colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
+
+    cout <<  "chue" << colorHue << endl;
     
     myNode = node_;
     
@@ -83,7 +88,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         for (int j = 0; j < gridTiles+1; j++) {
             ofVec3f tPoint = ofVec3f(i*gridSize,j*gridSize,0);
             raster.addVertex(tPoint+ofVec3f(0,0,0));
-                raster.addColor(ofColor(255,255,255,190));
+                raster.addColor(rasterColor);
            
             verticesOuter[indexCounter] = tPoint;
             indexCounter++;
@@ -94,7 +99,9 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     for (int i = 0; i < verticesOuter.size(); i++) {
         cubes.addVertex(verticesOuter[i]);
          //cubes.addColor(ofColor(0,0,44));
-        cubes.addColor(ofColor(11, 65, 65));
+        cubes.addColor(outerColorDefault);
+      
+        
        
     }
     
@@ -135,10 +142,8 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             //add starting zHeight
             cubeVector[i*(gridTiles)+j].setDefaultHeight(emptyInnerZ);
             
-           // if (trackSwitchOn){
-              //  cubeVector[i*(gridTiles)+j].setColor(ofColor::white);
-            cubeVector[i*(gridTiles)+j].setColor(ofColor(51, 105, 105));
-        //    }
+            cubeVector[i*(gridTiles)+j].setColor(innerColorDefault);
+            
             
             cubeVector[i*(gridTiles)+j].attack = &synthAttack;
         }
@@ -151,11 +156,12 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     for (int i = 0; i < verticesInner.size(); i++) {
         cubes.addVertex(verticesInner[i]);
-        if (trackSwitchOn){
-        cubes.addColor(ofColor(0,0,0));
+        if(trackSwitchOn) {
+       cubes.addColor(innerColorDefault);
         } else {
-            cubes.addColor(ofColor(11, 65, 65));
+            cubes.addColor(ofColor(0,0,0,0));
         }
+        
     }
     
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -252,13 +258,13 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
 
 void Instrument::update() {
     
-    //if (trackSwitchOn) {
+    if (trackSwitchOn) {
     for (int i = 0; i < cubeVector.size(); i++) {
         cubeVector[i].update();
     }
-        pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection);
-  //  }
+    }
     
+    pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection);
 
     
     updateCubeMesh();
@@ -311,7 +317,7 @@ void Instrument::removeCube(int x_, int y_){
     
    // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
     
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor =  ofColor(51, 105, 105);
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor =  innerColorDefault;
     //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
     
     
@@ -935,13 +941,34 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
 void Instrument::changePreset() {
     
     preset++;
-    
+    colorHue = ofWrap( ofMap(preset, 0, presetManager.count, 0, 255),0,255);
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger);
+            it->second.groupColor = ofColor::fromHsb(ofWrap(it->second.groupColor.getHue()+(255/presetManager.count), 0, 255),
+                                                     it->second.groupColor.getSaturation(),
+                                                     it->second.groupColor.getBrightness()
+                                                     );
         }
     }
     synthAttack = presetManager.attack;
+    
+   
+    
+    for (int x = 0; x < gridTiles; x++) {
+        for (int y = 0; y <gridTiles; y++) {
+         
+            if (layerInfo.at(x).at(y).hasCube){
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(
+                                                                              ofColor::fromHsb(
+                                                                                              ofWrap(cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getHue()+(255/presetManager.count),0,255),
+                                                                                               cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getSaturation(),
+                                                                                               cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getBrightness()
+                                                                                               )
+                                                                              );
+            }
+        }
+    }
     
     updateTonicOut();
 }

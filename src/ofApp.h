@@ -66,6 +66,8 @@ public:
     
     void bothEditInterfaceOff();
     
+    void changeGUIColor();
+    
     void makeDesignGrid();
     
     void makePresetString();
@@ -159,6 +161,7 @@ public:
     //music
     
     vector<string> notes;
+    float pianoKeys[12];
     
     //sound time
     int timeCounter;

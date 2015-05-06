@@ -120,6 +120,8 @@ public:
     float gridSize;
     float borderSize;
     
+    ofColor innerColorDefault, outerColorDefault, rasterColor;
+    
     //time
     int *stepperPos;
     float *bpmTick;

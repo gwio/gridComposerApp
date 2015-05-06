@@ -6,10 +6,15 @@ GlobalGUI::GlobalGUI(){
 }
 
 //colors for this start with 50,0,0
-GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_) {
+GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_, bool trans_) {
     elementName = name_;
     drawString = name_;
-    elementColor = ofColor(ofRandom(255),ofRandom(255),ofRandom(100,155), 200);
+    
+    if (!trans_) {
+    elementColorOn = ofColor::gray;
+    } else {
+        elementColorOn = ofColor(0,0,0,0);
+    }
     
     counter=counter_*4;
     index[0]=0;
@@ -19,7 +24,6 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     index[4]=3;
     index[5]=0;
     
-    elementColorOff = ofColor::fromHsb(elementColor.getHue(), elementColor.getBrightness(), elementColor.getSaturation(), 25 );
     placement =  placement_;
     offPlacement = offPlacement_;
     
@@ -34,6 +38,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     touchDown = false;
     
     fontSize = fontS_;
+    
 }
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
@@ -47,7 +52,7 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
     minY = -elementSize.y/2+placement.y+vec_.y;
     maxY = elementSize.y/2+placement.y+vec_.y;
     
-    drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement);
+    drawStringPos = vec_+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement);
 }
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
@@ -62,7 +67,7 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
         minY = -elementSize.y/2+placement.y+vec_.y;
         maxY = elementSize.y/2+placement.y+vec_.y;
         
-        drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-tween_)));
+        drawStringPos = vec_+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement*(abs(moveDir-tween_)));
         curPos = vec_;
     }
     
@@ -84,7 +89,7 @@ void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
     minY = -elementSize.y/2+placement.y+curPos.y;
     maxY = elementSize.y/2+placement.y+curPos.y;
     
-    drawStringPos = curPos+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-1)));
+    drawStringPos = curPos+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement*(abs(moveDir-1)));
     
 }
 
@@ -101,7 +106,7 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
         minY = -elementSize.y/2+placement.y+vec_.y;
         maxY = elementSize.y/2+placement.y+vec_.y;
         
-        drawStringPos = vec_+placement+ofVec3f(-(elementSize.x/2),0,0)+(offPlacement*(abs(moveDir-tween_)));
+        drawStringPos = vec_+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement*(abs(moveDir-tween_)));
         curPos = vec_;
     }
     if(animation && tween_ >= 1.0){
@@ -109,13 +114,27 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
     }
 }
 
-void GlobalGUI::setColor(ofVboMesh& mesh_, ofColor c_) {
+void GlobalGUI::setColor(float hue_) {
     
-    mesh_.setColor(0+counter, ofColor(c_));
-    mesh_.setColor(1+counter, ofColor(c_));
-    mesh_.setColor(2+counter, ofColor(c_));
-    mesh_.setColor(3+counter, ofColor(c_));
+    elementColorOn = ofColor::fromHsb(hue_, 100, 100);
+    elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
+    elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
     
+
+}
+
+void GlobalGUI::activateOnColor(ofVboMesh& mesh_){
+    mesh_.setColor(0+counter, elementColorOn);
+    mesh_.setColor(1+counter, elementColorOn);
+    mesh_.setColor(2+counter, elementColorOn);
+    mesh_.setColor(3+counter, elementColorOn);
+}
+
+void GlobalGUI::activateDarkerColor(ofVboMesh& mesh_){
+    mesh_.setColor(0+counter, elementColorDarker);
+    mesh_.setColor(1+counter, elementColorDarker);
+    mesh_.setColor(2+counter, elementColorDarker);
+    mesh_.setColor(3+counter, elementColorDarker);
     
 }
 
@@ -134,10 +153,10 @@ bool GlobalGUI::isInside(ofVec2f click_) {
 void GlobalGUI::switchColor(ofVboMesh& mesh_) {
     onOff = !onOff;
     if (onOff) {
-        mesh_.setColor(0+counter, elementColor);
-        mesh_.setColor(1+counter,elementColor);
-        mesh_.setColor(2+counter, elementColor);
-        mesh_.setColor(3+counter, elementColor);
+        mesh_.setColor(0+counter, elementColorOn);
+        mesh_.setColor(1+counter,elementColorOn);
+        mesh_.setColor(2+counter, elementColorOn);
+        mesh_.setColor(3+counter, elementColorOn);
     } else {
         mesh_.setColor(0+counter, elementColorOff);
         mesh_.setColor(1+counter,elementColorOff);
@@ -148,10 +167,10 @@ void GlobalGUI::switchColor(ofVboMesh& mesh_) {
 }
 
 void GlobalGUI::setOn(ofVboMesh& mesh_) {
-    mesh_.setColor(0+counter, elementColor);
-    mesh_.setColor(1+counter,elementColor);
-    mesh_.setColor(2+counter, elementColor);
-    mesh_.setColor(3+counter, elementColor);
+    mesh_.setColor(0+counter, elementColorOn);
+    mesh_.setColor(1+counter,elementColorOn);
+    mesh_.setColor(2+counter, elementColorOn);
+    mesh_.setColor(3+counter, elementColorOn);
     onOff = true;
 }
 
@@ -164,4 +183,9 @@ void GlobalGUI::setOff(ofVboMesh& mesh_) {
     onOff = false;
 }
 
+
+void GlobalGUI::setStringWidth(float sW_) {
+    stringWidth = sW_/2;
+    drawStringPos.x = (((maxX-minX)/2)-stringWidth)+minX ;
+}
 

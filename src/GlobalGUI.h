@@ -9,7 +9,7 @@ public:
         
     
     
-    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f, int);
+    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f, int, bool);
     
     int counter;
     
@@ -28,18 +28,24 @@ public:
     
     ofVec3f drawStringPos;
     
+    void setStringWidth(float);
+    float stringWidth, stringHeight;
+    
     int moveDir;
     
     float minVal, maxVal, curVal;
     float minX,minY,maxX,maxY;
     
-    ofColor elementColor, elementColorOff;
+    ofColor elementColorOn, elementColorOff, elementColorDarker;
     
     ofVec3f vertices[4];
     int index[6];
     void update();
     
-    void setColor(ofVboMesh&, ofColor);
+    void setColor(float);
+    void activateOnColor(ofVboMesh&);
+    void activateDarkerColor(ofVboMesh&);
+
     
     void updateMainMesh(ofVboMesh&, ofVec3f);
     void updateMainMesh(ofVboMesh&, ofVec3f, float&);
