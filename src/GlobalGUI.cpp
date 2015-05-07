@@ -52,7 +52,7 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
     minY = -elementSize.y/2+placement.y+vec_.y;
     maxY = elementSize.y/2+placement.y+vec_.y;
     
-    drawStringPos = vec_+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement);
+    drawStringPos = vec_+placement+(offPlacement);
 }
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
@@ -67,7 +67,7 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
         minY = -elementSize.y/2+placement.y+vec_.y;
         maxY = elementSize.y/2+placement.y+vec_.y;
         
-        drawStringPos = vec_+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement*(abs(moveDir-tween_)));
+        drawStringPos = vec_+placement+(offPlacement*(abs(moveDir-tween_)));
         curPos = vec_;
     }
     
@@ -89,7 +89,7 @@ void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
     minY = -elementSize.y/2+placement.y+curPos.y;
     maxY = elementSize.y/2+placement.y+curPos.y;
     
-    drawStringPos = curPos+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement*(abs(moveDir-1)));
+    drawStringPos = curPos+placement+(offPlacement*(abs(moveDir-1)));
     
 }
 
@@ -106,7 +106,7 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
         minY = -elementSize.y/2+placement.y+vec_.y;
         maxY = elementSize.y/2+placement.y+vec_.y;
         
-        drawStringPos = vec_+placement+ofVec3f(-stringWidth,stringHeight,0)+(offPlacement*(abs(moveDir-tween_)));
+        drawStringPos = vec_+placement+(offPlacement*(abs(moveDir-tween_)));
         curPos = vec_;
     }
     if(animation && tween_ >= 1.0){
@@ -116,7 +116,7 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
 
 void GlobalGUI::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 100, 100);
+    elementColorOn = ofColor::fromHsb(hue_, 100, 100,100);
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
     
@@ -186,6 +186,5 @@ void GlobalGUI::setOff(ofVboMesh& mesh_) {
 
 void GlobalGUI::setStringWidth(float sW_) {
     stringWidth = sW_/2;
-    drawStringPos.x = (((maxX-minX)/2)-stringWidth)+minX ;
 }
 

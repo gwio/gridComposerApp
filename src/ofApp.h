@@ -66,7 +66,7 @@ public:
     
     void bothEditInterfaceOff();
     
-    void changeGUIColor();
+    void setNewGUI();
     
     void makeDesignGrid();
     
@@ -177,9 +177,7 @@ public:
     vector<GlobalGUI> mainInterfaceData;
     ofVboMesh mainInterface;
     ofVboMesh mainInterfaceFbo;
-    void updateSynthScaleInfo();
-    void updateKeyNoteInfo();
-    
+  
    
     
     //interface stuff

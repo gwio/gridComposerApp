@@ -22,16 +22,17 @@ void ofApp::setup(){
    
     font.setup("quest.ttf", //font file, ttf only
                1.0,					//lineheight percent
-               1024*2,					//texture atlas dimension
+               1024,					//texture atlas dimension
                false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
-               8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
-               2.0f					//dpi scaleup, render textures @2x the reso
+               1,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+               1.0f					//dpi scaleup, render textures @2x the reso
                );				//lower res mipmaps wil bleed into each other
     
     
     //font.loadFont("quest.ttf", 12);
     //font.setup("quest.ttf", 1.0, 1024,false,8,2.0 );
     //font.setLodBias(0);
+    font.setCharacterSpacing(4);
     font.setKerning(font.getKerning());
     scaleCollection.loadScales();
     makeDesignGrid();
@@ -108,7 +109,7 @@ void ofApp::setup(){
     
     
     //temp sketch
-    light.setAmbientColor(ofColor::lightCoral);
+    light.setAmbientColor(ofColor::white);
     
     doubleClickTime = 300;
     curTap = 0;
@@ -223,25 +224,28 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[42].updateMainMesh(mainInterface, designGrid[2][2], tweenFloat);
     
     
-       mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
+    mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
     mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
     mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
     
     
-    mainInterfaceData[4].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
-    mainInterfaceData[6].updateMainMesh(mainInterface,designGrid[2][0],tweenFloat);
+    mainInterfaceData[4].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y,0),tweenFloat);
+    mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y,0),tweenFloat);
     mainInterfaceData[39].updateMainMesh(mainInterface, designGrid[2][1], tweenFloat);
     
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[13+i].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
+        mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f(0,designGrid[0][0].y,0),tweenFloat);
     }
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[25+i].updateMainMesh(mainInterface, designGrid[0][0] ,tweenFloat);
+        mainInterfaceData[25+i].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y,0) ,tweenFloat);
     }
     
 
     mainInterfaceData[5].updateMainMesh(mainInterface,  designGrid[2][1],tweenFloat);
+    
     mainInterfaceData[7].updateMainMesh(mainInterface,  designGrid[0][1],tweenFloat);
+    cout << mainInterfaceData[7].minX << endl;
+
     
     mainInterfaceData[43].updateMainMesh(mainInterface,  designGrid[1][2],tweenFloat);
     mainInterfaceData[44].updateMainMesh(mainInterface,  designGrid[0][0],tweenFloat);
@@ -260,8 +264,7 @@ void ofApp::updateInterfaceMesh() {
 void ofApp::draw(){
     
     
-    
-    
+  
     glDisable(GL_MULTISAMPLE);
     mainInterface.draw();
     
@@ -270,7 +273,11 @@ void ofApp::draw(){
     ofSetColor(255, 255, 255,170);
     for (int i = 0; i < mainInterfaceData.size();i ++){
         if (mainInterfaceData[i].showString){
-                font.draw(mainInterfaceData[i].elementName, mainInterfaceData[i].fontSize, mainInterfaceData[i].drawStringPos.x, mainInterfaceData[i].drawStringPos.y);
+                font.draw(mainInterfaceData[i].elementName,
+                          mainInterfaceData[i].fontSize,
+                          mainInterfaceData[i].drawStringPos.x-mainInterfaceData[i].stringWidth,
+                          mainInterfaceData[i].drawStringPos.y+mainInterfaceData[i].stringHeight
+                          );
         }
     }
     ofPopStyle();
@@ -280,9 +287,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-    
-   //  ofEnableLighting();
-   // light.enable();
+    ofEnableLighting();
+    light.enable();
+   
     
     if (!debugCam) {
         testCam.begin();
@@ -457,7 +464,7 @@ void ofApp::mouseDragged(int x, int y, int button){
                     if ( abs(keyMod) > 0 ){
                         mainInterfaceData[39].touchStart.x = x;
                         synths[activeSynth].setKeyNote(keyMod);
-                        updateKeyNoteInfo();
+                        //setNewGUI();
                         mainInterfaceData[39].elementName = "Pitch Note " + notes[  (synths[activeSynth].keyNote)%12 ];
                     }
                         
@@ -486,7 +493,7 @@ void ofApp::mouseDragged(int x, int y, int button){
                        // if ( keyMod > 0 || synths[activeSynth].keyNote > 0) {
                         mainInterfaceData[49].touchStart.x = x;
                         synths[activeSynth].setKeyNote(ofClamp(keyMod,-1,1));
-                        updateKeyNoteInfo();
+                        setNewGUI();
                         //cout <<  "midinote " << synths[activeSynth].keyNote << endl;
                        // } else {
                             
@@ -679,26 +686,25 @@ void ofApp::mousePressed(int x, int y, int button){
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].currentScaleVecPos++;
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
-                mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-                updateSynthScaleInfo();
+                setNewGUI();
                // detailEditInterfaceOn();
                 cout << synths[activeSynth].activeScale.name  << endl;
             }
             
             if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].changePreset();
-                mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
-                changeGUIColor();
+                //mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
+                setNewGUI();
             }
             
             if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(-12);
-                updateKeyNoteInfo();
+                setNewGUI();
                 cout << "-12"  << endl;
             }
             if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(12);
-                updateKeyNoteInfo();
+                setNewGUI();
                 cout << "+12"  << endl;
             }
             
@@ -764,8 +770,8 @@ void ofApp::mousePressed(int x, int y, int button){
             */
             if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].changePreset();
-                mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
-                changeGUIColor();
+                //mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
+                setNewGUI();
             }
             
             if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
@@ -1170,8 +1176,8 @@ void ofApp::setupGlobalInterface() {
     ofVec3f smallButton = ofVec3f(designGrid[0][0].x*2/6,designGrid[0][0].y*2/6,0);
     ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y,0);
     ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
-    ofVec3f keyNoteButton = ofVec3f(designGrid[0][0].x*4/12 ,designGrid[0][0].y*2/8,0);
-    ofVec3f scaleButton = ofVec3f(designGrid[0][0].x*4/12 ,designGrid[0][0].y,0);
+    ofVec3f keyNoteButton = ofVec3f(designGrid[0][0].x*6/14 ,designGrid[0][0].y*2/8,0);
+    ofVec3f scaleButton = ofVec3f(designGrid[0][0].x*6/14 ,designGrid[0][0].y-(keyNoteButton.y/2),0);
 
     
     ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
@@ -1188,9 +1194,9 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place,offPlace,fontDefault,false);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(-smallButton.x/2,0,0);
+    place = ofVec3f(+scaleButton.x/2,-(designGrid[0][0].y/2)+(keyNoteButton.y/4),0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*12,0);
-    temp = GlobalGUI(4,string("OctaveDown"),smallButton,ofColor(54,0,0),place,offPlace,fontSmall,false);
+    temp = GlobalGUI(4,string("<"),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(54,0,0),place,offPlace,fontDefault,false);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
@@ -1198,9 +1204,9 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace,fontDefault,false);
     mainInterfaceData.push_back(temp);
     
+    place = ofVec3f(-scaleButton.x/2, -(designGrid[0][0].y/2)+(keyNoteButton.y/4),0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*12,0);
-    place = ofVec3f(smallButton.x/2, 0,0);
-    temp = GlobalGUI(6,string("OctaveUp"),smallButton,ofColor(56,0,0),place,offPlace,fontSmall,false);
+    temp = GlobalGUI(6,string(">"),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(56,0,0),place,offPlace,fontDefault,false);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
@@ -1240,15 +1246,15 @@ void ofApp::setupGlobalInterface() {
     //scale
     offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f( ((designGrid[0][0].x*4)/12)*i+(scaleButton.x/2),-(scaleButton.y/2)-(keyNoteButton.y/2),0);
-        temp = GlobalGUI(13+i,notes[i],scaleButton,ofColor(0,0,0),place,offPlace,fontSmall,false);
+        place = ofVec3f( (scaleButton.x*(i+1))+(scaleButton.x/2),-(scaleButton.y/2)-(keyNoteButton.y/2),0);
+        temp = GlobalGUI(13+i,notes[i],scaleButton,ofColor(0,0,0),place,offPlace,fontDefault,false);
         mainInterfaceData.push_back(temp);
         
     }
     //keynote
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     for (int i = 0; i < 12; i++) {
-        place = ofVec3f( ((designGrid[0][0].x*4)/12)*i+(keyNoteButton.x/2),0,0);
+        place = ofVec3f( (keyNoteButton.x*(i+1))+(keyNoteButton.x/2),0,0);
         temp = GlobalGUI(25+i,notes[i],keyNoteButton,ofColor(0,0,0),place, offPlace, fontSmall,false);
         mainInterfaceData.push_back(temp);
     }
@@ -1388,7 +1394,6 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[37].animation = true;
     }
     
-    mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
 }
 
 
@@ -1442,8 +1447,7 @@ void ofApp::detailEditInterfaceOn() {
     mainInterfaceData[39].animation = true;
     }
     
-    updateSynthScaleInfo();
-    updateKeyNoteInfo();
+
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].moveDir = 1;
@@ -1642,44 +1646,6 @@ void ofApp::bothEditInterfaceOff() {
     mainInterfaceData[37].animation = true;
 }
 
-void ofApp::updateSynthScaleInfo() {
-    
-    for (int i = 0; i < 12; i++) {
-        
-        if (   synths[activeSynth].activeScale.steps[i] ) {
-            mainInterfaceData[13+i].setOn(mainInterface);
-        } else {
-            mainInterfaceData[13+i].setOff(mainInterface);
-        }
-    }
-    mainInterfaceData[5].setStringWidth(font.getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
-   // mainInterfaceData[7].setStringWidth(font.getBBox(mainInterfaceData[7].elementName, mainInterfaceData[7].fontSize, 0, 0).getWidth());
-
-
-}
-
-void ofApp::updateKeyNoteInfo() {
-    //if (synths[activeSynth].keyNote >= 1) {
-    for (int i = 0; i < 12; i++) {
-        mainInterfaceData[13+i].elementName = notes[  (synths[activeSynth].keyNote+i)%12 ];
-        mainInterfaceData[13+i].setStringWidth(font.getBBox(mainInterfaceData[13+i].elementName, mainInterfaceData[13+i].fontSize, 0, 0).getWidth());
-        cout << mainInterfaceData[13+i].elementName << endl;
-        
-        mainInterfaceData[25+i].elementName = ofToString(synths[activeSynth].keyNote+i);
-        mainInterfaceData[25+i].setStringWidth(font.getBBox(mainInterfaceData[25+i].elementName, mainInterfaceData[25+i].fontSize, 0, 0).getWidth());
-
-
-        if(pianoKeys[(synths[activeSynth].keyNote+i)%12] == 0) {
-            mainInterfaceData[25+i].activateOnColor(mainInterface);
-        } else {
-            mainInterfaceData[25+i].activateDarkerColor(mainInterface);
-        }
-     //  mainInterfaceData[25+i].setColor( ofColor::fromHsb(synths[activeSynth].colorHue,  int((synths[activeSynth].keyNote+i)/12)%2 *150+55 , 155));
-       // cout << synths[activeSynth].keyNote << endl;
-    //}
-    }
-    
-}
 void ofApp::makePresetString() {
     presetNames.push_back("Sinu");
     presetNames.push_back("simple");
@@ -1722,7 +1688,7 @@ void ofApp::buttonOnePress(){
         
         synths[temp].inFocus = true;
         synths[temp].animate = true;
-        synths[ temp ].aniPath = oneToActive;
+        synths[temp].aniPath = oneToActive;
         synths[temp].myTarget = synthActivePos.getOrientationQuat();
         synths[temp].myDefault = synthPos[0].getOrientationQuat();
         
@@ -1738,16 +1704,14 @@ void ofApp::buttonOnePress(){
         synthButton[1] = temp;
         aniPct = 0.0;
         interfaceMoving = true;
-        changeGUIColor();
+        
+        setNewGUI();
         
         editInterfaceOn();
         if (currentState == STATE_EDIT_DETAIL){
             detailEditInterfaceOn();
         }
         
-        mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-        updateSynthScaleInfo();
-        updateKeyNoteInfo();
         
     } else {
         synths[temp].inFocus = true;
@@ -1787,13 +1751,11 @@ void ofApp::buttonOnePress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
-        changeGUIColor();
-
+        setNewGUI();
         
         if (currentState == STATE_DEFAULT){
             editInterfaceOn();
             pauseInterfaceOff();
-            mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
         }
         
         currentState = STATE_EDIT;
@@ -1875,13 +1837,12 @@ void ofApp::buttonTwoPress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
-        changeGUIColor();
 
+        setNewGUI();
         
         if (currentState == STATE_DEFAULT){
             editInterfaceOn();
             pauseInterfaceOff();
-            mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
         }
         currentState = STATE_EDIT;
         
@@ -1924,20 +1885,14 @@ void ofApp::buttonThreePress(){
         synthButton[1] = temp;
         aniPct = 0.0;
         interfaceMoving = true;
-        changeGUIColor();
-
+        
+        setNewGUI();
         
         editInterfaceOn();
 
         if (currentState == STATE_EDIT_DETAIL){
             detailEditInterfaceOn();
         }
-
-
-        
-        mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-        updateSynthScaleInfo();
-        updateKeyNoteInfo();
         
         
     }else {
@@ -1974,13 +1929,12 @@ void ofApp::buttonThreePress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
-        changeGUIColor();
 
+        setNewGUI();
         
         if (currentState == STATE_DEFAULT){
             editInterfaceOn();
             pauseInterfaceOff();
-            mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
         }
         
         currentState = STATE_EDIT;
@@ -2053,22 +2007,49 @@ void ofApp::buttonEditDetail() {
     }
 }
 
-void ofApp::changeGUIColor() {
+void ofApp::setNewGUI() {
+
+    //scale information
+    mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+    mainInterfaceData[5].setStringWidth(font.getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].setColor(synths[activeSynth].colorHue);
         mainInterfaceData[13+i].activateOnColor(mainInterface);
+        
+        mainInterfaceData[13+i].elementName = notes[  (synths[activeSynth].keyNote+i)%12 ];
+        mainInterfaceData[13+i].setStringWidth(font.getBBox(mainInterfaceData[13+i].elementName, mainInterfaceData[13+i].fontSize, 0, 0).getWidth());
     }
+
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[25+i].setColor(synths[activeSynth].colorHue);
-        mainInterfaceData[25+i].activateOnColor(mainInterface);
+        if (synths[activeSynth].activeScale.steps[i] ) {
+            mainInterfaceData[13+i].setOn(mainInterface);
+        } else {
+            mainInterfaceData[13+i].setOff(mainInterface);
+        }
     }
-    updateSynthScaleInfo();
-    updateKeyNoteInfo();
+    
+    //preset information
+    mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
+    mainInterfaceData[7].setStringWidth(font.getBBox(mainInterfaceData[7].elementName, mainInterfaceData[7].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[7].setColor(synths[activeSynth].colorHue);
     mainInterfaceData[7].activateOnColor(mainInterface);
-    mainInterfaceData[7].setStringWidth(font.getBBox(mainInterfaceData[7].elementName, mainInterfaceData[7].fontSize, 0, 0).getWidth());
 
+    //notes row
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[25+i].setColor(synths[activeSynth].colorHue);
+
+        if(pianoKeys[(synths[activeSynth].keyNote+i)%12] == 0) {
+            mainInterfaceData[25+i].activateOnColor(mainInterface);
+        } else {
+            mainInterfaceData[25+i].activateDarkerColor(mainInterface);
+        }
+        
+        mainInterfaceData[25+i].elementName = ofToString(synths[activeSynth].keyNote+i);
+        mainInterfaceData[25+i].setStringWidth(font.getBBox(mainInterfaceData[25+i].elementName, mainInterfaceData[25+i].fontSize, 0, 0).getWidth());
+    }
+    
+   
     
 }

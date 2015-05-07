@@ -25,8 +25,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     borderSize = border_;
     
     
-    innerColorDefault = ofColor::grey;
-    outerColorDefault = ofColor::black;
+    innerColorDefault = ofColor(222,222,222);
+    outerColorDefault = ofColor(22,22,22);
     rasterColor = ofColor::white;
     
     soundsCounter = 1;
