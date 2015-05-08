@@ -11,9 +11,13 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     drawString = name_;
     
     if (!trans_) {
-    elementColorOn = ofColor::gray;
+    elementColorOn = ofColor::darkCyan;
+        //setColor(0);
+        targetColor = elementColorOn;
+       // targetColor = elementColorOn;
     } else {
         elementColorOn = ofColor(0,0,0,0);
+        targetColor = elementColorOff;
     }
     
     counter=counter_*4;
@@ -34,10 +38,13 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     showString = false;
     
     animation = false;
-    
+    animationB = false;
     touchDown = false;
     
     fontSize = fontS_;
+    
+    myTween = 0.0;
+    blink = false;
     
 }
 
@@ -74,6 +81,74 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
     if(animation && tween_ >= 1.0){
         animation = false;
     }
+
+    
+    if (blink) {
+        myTween = (myTween*1.12)+0.01;
+
+    if (displayColor != targetColor) {
+            displayColor = displayColor.lerp(targetColor, myTween);
+            mesh_.setColor(0+counter,filterColor( displayColor));
+            mesh_.setColor(1+counter, filterColor( displayColor));
+            mesh_.setColor(2+counter, filterColor( displayColor));
+            mesh_.setColor(3+counter, filterColor( displayColor));
+    }
+        if (myTween >= 1.0) {
+            displayColor = targetColor;
+            mesh_.setColor(0+counter, filterColor( displayColor));
+            mesh_.setColor(1+counter, filterColor( displayColor));
+            mesh_.setColor(2+counter, filterColor( displayColor));
+            mesh_.setColor(3+counter, filterColor( displayColor));
+            blink = false;
+            myTween = 1.0;
+        }
+    }
+    
+}
+
+
+void GlobalGUI::updateMainMeshB(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
+    if (animationB){
+        mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement);
+        mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement);
+        mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2, elementSize.y/2,0)+placement);
+        mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2, -elementSize.y/2,0)+placement);
+        
+        minX = -elementSize.x/2+placement.x+vec_.x;
+        maxX = elementSize.x/2+placement.x+vec_.x;
+        minY = -elementSize.y/2+placement.y+vec_.y;
+        maxY = elementSize.y/2+placement.y+vec_.y;
+        
+        drawStringPos = vec_+placement;
+        curPos = vec_;
+    }
+    
+    if(animationB && tween_ >= 1.0){
+        animationB = false;
+    }
+    
+    
+    if (blink) {
+        myTween = (myTween*1.12)+0.01;
+        
+        if (displayColor != targetColor) {
+            displayColor = displayColor.lerp(targetColor, myTween);
+            mesh_.setColor(0+counter,filterColor( displayColor));
+            mesh_.setColor(1+counter, filterColor( displayColor));
+            mesh_.setColor(2+counter, filterColor( displayColor));
+            mesh_.setColor(3+counter, filterColor( displayColor));
+        }
+        if (myTween >= 1.0) {
+            displayColor = targetColor;
+            mesh_.setColor(0+counter, filterColor( displayColor));
+            mesh_.setColor(1+counter, filterColor( displayColor));
+            mesh_.setColor(2+counter, filterColor( displayColor));
+            mesh_.setColor(3+counter, filterColor( displayColor));
+            blink = false;
+            myTween = 1.0;
+        }
+    }
+    
 }
 
 void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
@@ -116,26 +191,36 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
 
 void GlobalGUI::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 100, 100,100);
+    elementColorOn = ofColor::fromHsb(hue_, 100, 160,255);
+    
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
-    
+    elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
 
 }
 
 void GlobalGUI::activateOnColor(ofVboMesh& mesh_){
-    mesh_.setColor(0+counter, elementColorOn);
-    mesh_.setColor(1+counter, elementColorOn);
-    mesh_.setColor(2+counter, elementColorOn);
-    mesh_.setColor(3+counter, elementColorOn);
+    targetColor = elementColorOn;
+    myTween = 0.0;
+    blink = true;
+    /*
+    mesh_.setColor(0+counter, displayColor);
+    mesh_.setColor(1+counter, displayColor);
+    mesh_.setColor(2+counter, displayColor);
+    mesh_.setColor(3+counter, displayColor);
+     */
 }
 
 void GlobalGUI::activateDarkerColor(ofVboMesh& mesh_){
-    mesh_.setColor(0+counter, elementColorDarker);
-    mesh_.setColor(1+counter, elementColorDarker);
-    mesh_.setColor(2+counter, elementColorDarker);
-    mesh_.setColor(3+counter, elementColorDarker);
-    
+    targetColor = elementColorDarker;
+    myTween = 0.0;
+    blink = true;
+    /*
+    mesh_.setColor(0+counter, displayColor);
+    mesh_.setColor(1+counter, displayColor);
+    mesh_.setColor(2+counter, displayColor);
+    mesh_.setColor(3+counter, displayColor);
+    */
 }
 
 
@@ -151,35 +236,48 @@ bool GlobalGUI::isInside(ofVec2f click_) {
 }
 
 void GlobalGUI::switchColor(ofVboMesh& mesh_) {
-    onOff = !onOff;
+    
     if (onOff) {
-        mesh_.setColor(0+counter, elementColorOn);
-        mesh_.setColor(1+counter,elementColorOn);
-        mesh_.setColor(2+counter, elementColorOn);
-        mesh_.setColor(3+counter, elementColorOn);
+       
+        targetColor = elementColorOff;
+        myTween = 0.0;
+        blink = true;
     } else {
-        mesh_.setColor(0+counter, elementColorOff);
-        mesh_.setColor(1+counter,elementColorOff);
-        mesh_.setColor(2+counter, elementColorOff);
-        mesh_.setColor(3+counter, elementColorOff);
+       
+        targetColor = elementColorOn;
+        myTween = 0.0;
+        blink = true;
     }
+ onOff = !onOff;
     
 }
 
 void GlobalGUI::setOn(ofVboMesh& mesh_) {
+    targetColor = elementColorOn;
+    myTween = 0.0;
+    blink = true;
+/*
     mesh_.setColor(0+counter, elementColorOn);
     mesh_.setColor(1+counter,elementColorOn);
     mesh_.setColor(2+counter, elementColorOn);
     mesh_.setColor(3+counter, elementColorOn);
+ */
     onOff = true;
 }
 
 
 void GlobalGUI::setOff(ofVboMesh& mesh_) {
+    
+    
+    targetColor = elementColorOff;
+    myTween = 0.0;
+    blink = true;
+/*
     mesh_.setColor(0+counter, elementColorOff);
     mesh_.setColor(1+counter,elementColorOff);
     mesh_.setColor(2+counter, elementColorOff);
     mesh_.setColor(3+counter, elementColorOff);
+ */
     onOff = false;
 }
 
@@ -188,3 +286,18 @@ void GlobalGUI::setStringWidth(float sW_) {
     stringWidth = sW_/2;
 }
 
+void GlobalGUI::blinkOn(){
+    displayColor = elementColorTouch;
+    myTween = 0.0;
+    blink = true;
+}
+
+
+ofColor GlobalGUI::filterColor(ofColor c_){
+    ofColor temp;
+    temp.r = ofClamp(c_.r+14, 10, 230);
+    temp.g = ofClamp(c_.g+5, 10, 230);
+    temp.b = ofClamp(c_.b-5, 10, 230);
+    temp.a = ofClamp(c_.a, 10, 255);
+    return temp;
+}

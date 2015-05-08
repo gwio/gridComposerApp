@@ -121,6 +121,7 @@ public:
     float borderSize;
     
     ofColor innerColorDefault, outerColorDefault, rasterColor;
+    ofColor filterColor(ofColor);
     
     //time
     int *stepperPos;

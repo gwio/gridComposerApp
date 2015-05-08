@@ -15,6 +15,7 @@ public:
     
     bool showString;
     bool animation;
+    bool animationB;
     
     ofVec3f curPos;
     ofVec3f elementSize;
@@ -36,7 +37,8 @@ public:
     float minVal, maxVal, curVal;
     float minX,minY,maxX,maxY;
     
-    ofColor elementColorOn, elementColorOff, elementColorDarker;
+    ofColor elementColorOn, elementColorOff, elementColorDarker, elementColorTouch, displayColor, targetColor;
+    ofColor filterColor(ofColor);
     
     ofVec3f vertices[4];
     int index[6];
@@ -49,9 +51,13 @@ public:
     
     void updateMainMesh(ofVboMesh&, ofVec3f);
     void updateMainMesh(ofVboMesh&, ofVec3f, float&);
+    void updateMainMeshB(ofVboMesh&, ofVec3f, float&);
+
     void updateMainMeshSlider(ofVboMesh&, ofVec3f, float, float&);
     
     void setSlider(ofVboMesh&, float);
+    
+    void blinkOn();
     
     bool isInside(ofVec2f);
     bool onOff;
@@ -65,4 +71,7 @@ public:
     int tempInt;
     
     int fontSize;
+    
+    float myTween;
+    bool blink;
 };

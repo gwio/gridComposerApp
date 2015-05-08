@@ -104,6 +104,7 @@ public:
     ofNode camNotActiveSynth;
     ofNode synthActivePos;
     ofNode volumeMatrix;
+    ofNode camEditDetailPos;
     float camFov;
     float camActiveFov;
     float camTargetFov;
@@ -124,6 +125,7 @@ public:
     ofPolyline camUsePath;
     ofPolyline OneVolumeLayerPathOn,TwoVolumeLayerPathOn,ThreeVolumeLayerPathOn;
     ofPolyline OneVolumeLayerPathOff,TwoVolumeLayerPathOff,ThreeVolumeLayerPathOff;
+    ofPolyline camEditToDetail, camDetailToEdit;
     float aniPct;
     float aniCam;
     bool animCam;
@@ -144,7 +146,7 @@ public:
     ofPlanePrimitive planeForIntersect;
     
  
-    
+    ofColor filterColor(ofColor);
     
     
     //light
@@ -192,4 +194,7 @@ public:
     
     
     ofShader shader;
+    ofTexture border;
+    
+    int editDetailMoveDirection;
    };

@@ -21,6 +21,8 @@ public:
     float diff;
     float aniFac;
     
+    float myTween;
+    
     void setup();
     void update();
     
@@ -39,6 +41,7 @@ public:
     bool active;
     bool tapActive;
     
+    bool fastChange, slowChange;
     
     void setColor(ofColor);
     
@@ -47,4 +50,5 @@ public:
     float *attack;
     
     void setDefaultHeight(float);
+    
 };

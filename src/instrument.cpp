@@ -25,9 +25,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     borderSize = border_;
     
     
-    innerColorDefault = ofColor(222,222,222);
-    outerColorDefault = ofColor(22,22,22);
-    rasterColor = ofColor::white;
+    innerColorDefault = filterColor( ofColor(222,222,222,255));
+    outerColorDefault = filterColor( ofColor(22,22,22,255) );
+    rasterColor = filterColor( ofColor::white);
     
     soundsCounter = 1;
     synthHasChanged = false;
@@ -317,7 +317,7 @@ void Instrument::removeCube(int x_, int y_){
     
    // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
     
-    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor =  innerColorDefault;
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(innerColorDefault);
     //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
     
     
@@ -468,7 +468,7 @@ void Instrument::noteTriggerWest(){
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(gridTiles-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].groupColor);
             }
         }
     } else if (*stepperPos > 0 && *stepperPos < gridTiles) {
@@ -482,7 +482,7 @@ void Instrument::noteTriggerWest(){
             }
             if (layerInfo.at(*stepperPos-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].groupColor);
                 
             }
         }
@@ -520,7 +520,7 @@ void Instrument::noteTriggerNorth() {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(i).at(0).hasCube) {
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(i).at(0).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(0).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(i).at(0).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(i).at(0).cubeVecNum].groupColor);
             }
         }
     } else  if (*stepperPos > 0 && *stepperPos < gridTiles) {
@@ -533,7 +533,7 @@ void Instrument::noteTriggerNorth() {
             }
             if (layerInfo.at(i).at(gridTiles-*stepperPos).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].groupColor);
             }
         }
     }
@@ -569,7 +569,7 @@ void Instrument::noteTriggerEast() {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(0).at(i).hasCube) {
                 cubeVector[layerInfo.at(0).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(0).at(i).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(0).at(i).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(0).at(i).cubeVecNum].groupColor);
             }
         }
     } else if (*stepperPos > 0 && *stepperPos < gridTiles) {
@@ -582,7 +582,7 @@ void Instrument::noteTriggerEast() {
             }
             if (layerInfo.at(gridTiles-*stepperPos).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].groupColor);
                 
             }
         }
@@ -615,7 +615,7 @@ void Instrument::noteTriggerSouth() {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(i).at(gridTiles-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].groupColor);
             }
         }
     } else if (*stepperPos > 0 && *stepperPos < gridTiles) {
@@ -627,7 +627,7 @@ void Instrument::noteTriggerSouth() {
             }
             if (layerInfo.at(i).at(*stepperPos-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].groupColor);
+                cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].changeGroupColor(   cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].groupColor);
             }
         }
         
@@ -697,10 +697,10 @@ void Instrument::updateCubeMesh(){
         cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
         cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
         
-        cubes.setColor(cubeVector[j].vIndex0, cubeVector[j].displayColor);
-        cubes.setColor(cubeVector[j].vIndex1, cubeVector[j].displayColor);
-        cubes.setColor(cubeVector[j].vIndex2, cubeVector[j].displayColor);
-        cubes.setColor(cubeVector[j].vIndex3, cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex0,filterColor (cubeVector[j].displayColor));
+        cubes.setColor(cubeVector[j].vIndex1,filterColor( cubeVector[j].displayColor));
+        cubes.setColor(cubeVector[j].vIndex2,filterColor( cubeVector[j].displayColor));
+        cubes.setColor(cubeVector[j].vIndex3,filterColor( cubeVector[j].displayColor));
     }
     
 }
@@ -766,6 +766,8 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         layerInfo.at(x_).at(y_).cubeGroupId = soundsCounter;
         
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(gColor);
+        cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(gColor);
+
         
         soundsCounter++;
         //add to neightbours, here to the biggest neighbouring group, or random
@@ -785,14 +787,16 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
             layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
             
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-            
+            cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(tempPtr->groupColor);
+
             
             updateGroupInfo(soundMapIndex, x_, y_);
         } else {
             layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
             
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-            
+            cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(tempPtr->groupColor);
+
         }
         
         //with different neighbours -> change all neighbours
@@ -808,7 +812,8 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 layerInfo.at(x).at(y).cubeGroupId = soundMapIndex;
                                 
                                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-                                
+                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(tempPtr->groupColor);
+
                                 
                                 tempPtr->size++;
                                 //check for max,min, x,y
@@ -945,7 +950,7 @@ void Instrument::changePreset() {
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger);
-            it->second.groupColor = ofColor::fromHsb(ofWrap(it->second.groupColor.getHue()+(255/presetManager.count), 0, 255),
+            it->second.groupColor = ofColor::fromHsb(colorHue,
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
                                                      );
@@ -961,11 +966,14 @@ void Instrument::changePreset() {
             if (layerInfo.at(x).at(y).hasCube){
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(
                                                                               ofColor::fromHsb(
-                                                                                              ofWrap(cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getHue()+(255/presetManager.count),0,255),
+                                                                                              colorHue,
                                                                                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getSaturation(),
                                                                                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getBrightness()
                                                                                                )
                                                                               );
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor( cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor );
+
+                //cubeVector[layerInfo.at(x).at(y).cubeVecNum].displayColor = cubeVector[layerInfo.at(x).at(y).cubeVecNum].scanColor;
             }
         }
     }
@@ -1156,6 +1164,14 @@ void Instrument::setNormals(ofVboMesh& mesh_) {
         
         
     }
-    
+}
 
+ofColor Instrument::filterColor(ofColor c_){
+    ofColor temp;
+    temp.r = ofClamp(c_.r+14, 10, 230);
+    temp.g = ofClamp(c_.g+5, 10, 230);
+    temp.b = ofClamp(c_.b-5, 10, 230);
+    temp.a = ofClamp(c_.a, 10, 255);
+
+    return temp;
 }
