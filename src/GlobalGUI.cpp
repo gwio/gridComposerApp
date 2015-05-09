@@ -13,7 +13,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     isTrans = trans_;
     
     if (!trans_) {
-    elementColorOn = ofColor::darkCyan;
+    elementColorOn = filterColor( ofColor::darkCyan );
         //setColor(0);
         targetColor = elementColorOn;
        // targetColor = elementColorOn;
@@ -207,6 +207,34 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width
     if(animation && tween_ >= 1.0){
         animation = false;
     }
+   
+    
+    
+    if (blink) {
+        myTween = (myTween*1.12)+0.01;
+        
+        if (displayColor != targetColor) {
+            displayColor = displayColor.lerp(targetColor, myTween);
+            if (!isTrans){
+                mesh_.setColor(0+counter,filterColor( displayColor));
+                mesh_.setColor(1+counter, filterColor( displayColor));
+                mesh_.setColor(2+counter, filterColor( displayColor));
+                mesh_.setColor(3+counter, filterColor( displayColor));
+            }
+        }
+        if (myTween >= 1.0) {
+            displayColor = targetColor;
+            if(!isTrans) {
+                mesh_.setColor(0+counter, filterColor( displayColor));
+                mesh_.setColor(1+counter, filterColor( displayColor));
+                mesh_.setColor(2+counter, filterColor( displayColor));
+                mesh_.setColor(3+counter, filterColor( displayColor));
+            }
+            blink = false;
+            myTween = 1.0;
+        }
+    }
+    
 }
 
 void GlobalGUI::setColor(float hue_) {
@@ -329,6 +357,6 @@ ofColor GlobalGUI::filterColor(ofColor c_){
     temp.r = ofClamp(c_.r+15, 30, 220);
     temp.g = ofClamp(c_.g-5, 30, 220);
     temp.b = ofClamp(c_.b-10, 30, 220);
-    temp.a = ofClamp(c_.a-10, 10, 240);
+    temp.a = ofClamp(c_.a-10, 10, 230);
     return temp;
 }

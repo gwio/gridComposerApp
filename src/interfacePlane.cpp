@@ -62,8 +62,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     
     
     for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-10,0,0) + ofVec3f(0,tileSize*j-4,0) );
-        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-10,0,0) + ofVec3f(0,tileSize*j+4,0) );
+        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-6,0,0) + ofVec3f(0,tileSize*j-5,0) );
+        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-6,0,0) + ofVec3f(0,tileSize*j+5,0) );
         directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(0,tileSize*j,0));
         
         directionMesh.addColor(connectedDir);
@@ -72,8 +72,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     }
     
     for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,10,0) + ofVec3f(tileSize*j-4,0,0) );
-        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,10,0) + ofVec3f(tileSize*j+4,0,0) );
+        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,6,0) + ofVec3f(tileSize*j-5,0,0) );
+        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,6,0) + ofVec3f(tileSize*j+5,0,0) );
         directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(tileSize*j,0,0));
         
         directionMesh.addColor(connectedDir);
@@ -82,8 +82,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     }
     
     for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(10,0,0) + ofVec3f(0,-tileSize*j-4,0) );
-        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(10,0,0) + ofVec3f(0,-tileSize*j+4,0) );
+        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(6,0,0) + ofVec3f(0,-tileSize*j-5,0) );
+        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(6,0,0) + ofVec3f(0,-tileSize*j+5,0) );
         directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(0,-tileSize*j,0));
         
         directionMesh.addColor(connectedDir);
@@ -93,8 +93,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     
     
     for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-10,0) + ofVec3f(-tileSize*j-4,0,0) );
-        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-10,0) + ofVec3f(-tileSize*j+4,0,0) );
+        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-6,0) + ofVec3f(-tileSize*j-5,0,0) );
+        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-6,0) + ofVec3f(-tileSize*j+5,0,0) );
         directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(-tileSize*j,0,0));
         
         directionMesh.addColor(connectedDir);
@@ -105,8 +105,9 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
 }
 
 
-void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[]) {
+void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_) {
     
+    if (!pause_) {
     
     thisTime = (ofGetElapsedTimeMillis()- lastTick) ;
     scanDir = scanDir_;
@@ -156,7 +157,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     }
     
  
-     alphaPos = ofVec3f(sin(alpha)*85, cos(alpha)*85,0 );
+     alphaPos = ofVec3f(sin(alpha)*80, cos(alpha)*80,0 );
 
     
     float pctScale = ofMap(stepCounter+len,0, (tiles+1)*4,0.0,TWO_PI*2);
@@ -168,14 +169,14 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
     posNode.setPosition(alphaPos);
     
-    float scalePct = (abs(sin(pctScale-HALF_PI))*1);
+    float scalePct = (abs(sin(pctScale-(HALF_PI*1.25)))*1);
     float thisScale =  ofClamp(pow(scalePct, 6),0.0,1.0);
     
     linePct = ofClamp(ofMap(pctBar, 0.0, 1.0, 0.0, (1.0+(1/tiles))), 0.0, 1.0);
     
   
- //   posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.1) ) ;
-  //  posNode.setScale( (thisScale*1) +0.8 );
+    posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.0) ) ;
+    posNode.setScale( (thisScale*1) +0.8 );
     
     //cout << linePct << endl;
     
@@ -271,7 +272,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     if (!connected_[0]) {
         for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i+=3) {
             //directionMesh.setVertex(i+2, lineMeshVertices.at(0)+ ofVec3f(-10,tileSize*((i/3)+1),+10));
-            directionMesh.setVertex(i+2, lineMeshVertices.at(0)+ ofVec3f(-20,tileSize*((i/3)+1),0));
+            directionMesh.setVertex(i+2, lineMeshVertices.at(0)+ ofVec3f(-12,tileSize*((i/3)+1),0));
         }
     } else {
         for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i+=3) {
@@ -282,7 +283,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     if (!connected_[1]) {
         for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i+=3) {
             //directionMesh.setVertex(i+2,lineMeshVertices.at(1)+ ofVec3f(tileSize* (((i/3)+1)-(tiles*1)+1),10,10));
-            directionMesh.setVertex(i+2,lineMeshVertices.at(1)+ ofVec3f(tileSize* (((i/3)+1)-(tiles*1)+1),20,0));
+            directionMesh.setVertex(i+2,lineMeshVertices.at(1)+ ofVec3f(tileSize* (((i/3)+1)-(tiles*1)+1),12,0));
         }
     } else {
         for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i+=3) {
@@ -294,7 +295,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     if (!connected_[2]) {
         for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i+=3) {
             //            directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(10,-tileSize* (((i/3)+1)-(tiles*2)+2),10));
-            directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(20,-tileSize* (((i/3)+1)-(tiles*2)+2),0));
+            directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(12,-tileSize* (((i/3)+1)-(tiles*2)+2),0));
             
         }
     } else {
@@ -306,7 +307,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     if (!connected_[3]) {
         for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i+=3) {
             //            directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-10,10));
-            directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-20,0));
+            directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-12,0));
             
         }
     } else {
@@ -318,21 +319,24 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
  
     
     
-    lineAlpha = abs(sin(pctScale-HALF_PI))*150;
+   // lineAlpha = abs(sin(pctScale-HALF_PI))*150;
     
     
-    
+    }
     
 }
 
-void InterfacePlane::draw(){
+void InterfacePlane::draw( bool& pause_){
     
+    if (!pause_) {
     
     ofPushStyle();
     posNode.transformGL();
     
-    ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
-    ofLine(-10, 0, 10, 0);
+   // ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
+    ofSetColor(filterColor( ofColor( 255, 255, 255,200)) );
+
+    ofLine(-8, 0, 8, 0);
     
     
     posNode.restoreTransformGL();
@@ -362,6 +366,8 @@ void InterfacePlane::draw(){
     }
     
     ofPopMatrix();
+    }
+        
     }
 }
 

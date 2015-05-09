@@ -264,7 +264,7 @@ void Instrument::update() {
     }
     }
     
-    pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection);
+    pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection, pause);
 
     
     updateCubeMesh();
@@ -274,7 +274,7 @@ void Instrument::draw() {
     if (trackSwitchOn) {
     
     cubes.draw();
-       pulsePlane.draw();
+       pulsePlane.draw(pause);
     } else {
         
      raster.draw();

@@ -11,8 +11,8 @@ public:
     
     InterfacePlane(int, float);
     
-    void update(int&, float&, int&, bool[],bool[]);
-    void draw();
+    void update(int&, float&, int&, bool[],bool[], bool&);
+    void draw(bool&);
     
     void pulseDir(int);
 

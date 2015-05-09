@@ -58,6 +58,7 @@ public:
     void updateMainMeshSlider(ofVboMesh&, ofVec3f, float, float&);
     
     void setSlider(ofVboMesh&, float);
+    float sliderPos;
     
     void blinkOn();
     
