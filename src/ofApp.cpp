@@ -1,9 +1,9 @@
 #include "ofApp.h"
 #define TILES 5
 #define TILESIZE 100/TILES
-#define TILEBORDER 0.08
+#define TILEBORDER 0.06
 #define BPM 220*2
-#define ANI_SPEED 0.032;
+#define ANI_SPEED 0.025;
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
@@ -20,7 +20,7 @@ void ofApp::setup(){
     ofEnableDepthTest();
     
    
-    font.setup("roboto_thin.ttf", //font file, ttf only
+    robotoLight.setup("fonts/Roboto-Light.ttf", //font file, ttf only
                1.0,					//lineheight percent
                1024,					//texture atlas dimension
                false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
@@ -29,11 +29,33 @@ void ofApp::setup(){
                );				//lower res mipmaps wil bleed into each other
     
     
-    //font.loadFont("quest.ttf", 12);
-    //font.setup("quest.ttf", 1.0, 1024,false,8,2.0 );
-    //font.setLodBias(0);
-    font.setCharacterSpacing(6.5);
-    font.setKerning(font.getKerning());
+   // robotoLight.setCharacterSpacing(1);
+    robotoLight.setKerning(robotoLight.getKerning());
+    
+    robotoBold.setup("fonts/Roboto-Bold.ttf", //font file, ttf only
+                      1.0,					//lineheight percent
+                      1024,					//texture atlas dimension
+                      false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
+                      8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+                      2.0f					//dpi scaleup, render textures @2x the reso
+                      );				//lower res mipmaps wil bleed into each other
+    
+    
+   // robotoBold.setCharacterSpacing(1);
+    robotoBold.setKerning(robotoBold.getKerning());
+    
+    robotoCon.setup("fonts/RobotoCondensed-Italic.ttf", //font file, ttf only
+                      1.0,					//lineheight percent
+                      1024,					//texture atlas dimension
+                      false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
+                      8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+                      2.0f					//dpi scaleup, render textures @2x the reso
+                      );				//lower res mipmaps wil bleed into each other
+    
+    
+   // robotoCon.setCharacterSpacing(1);
+    robotoCon.setKerning(robotoCon.getKerning());
+    
     scaleCollection.loadScales();
     makeDesignGrid();
     
@@ -137,12 +159,28 @@ void ofApp::setup(){
     debugCam = false;
     currentState = STATE_DEFAULT;
     
-    shader.load("noise.vert","noise.frag");
     
+    
+    //load icons
     ofImage temp;
-    temp.loadImage("border.png");
-    border.loadData(temp.getPixelsRef(),GL_RGBA);
     
+    temp.loadImage("icons/back.png");
+    back.loadData(temp.getPixelsRef(),GL_RGBA);
+    
+    temp.loadImage("icons/detail.png");
+    detail.loadData(temp.getPixelsRef(), GL_RGBA);
+    
+    temp.loadImage("icons/volume.png");
+    volume.loadData(temp.getPixelsRef(), GL_RGBA);
+    
+    temp.loadImage("icons/pause.png");
+    pause.loadData(temp.getPixelsRef(), GL_RGBA);
+    
+    temp.loadImage("icons/play.png");
+    play.loadData(temp.getPixelsRef(), GL_RGBA);
+    
+    scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
+    scaleFac *= 0.55;
     }
 
 void ofApp::setupAudio(){
@@ -215,9 +253,9 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),mainInterfaceData[0].sliderWidth,tweenFloat);
     
-    mainInterfaceData[8].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()),tweenFloat);
-    mainInterfaceData[9].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
-    mainInterfaceData[10].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()),tweenFloat);
+    mainInterfaceData[8].updateMainMesh(mainInterface,designGrid[0][1],tweenFloat);
+    mainInterfaceData[9].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[10].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     
     mainInterfaceData[11].updateMainMesh(mainInterface, ofVec3f(designGrid[1][0].x, designGrid[0][0].y*6,0),tweenFloat);
 
@@ -239,7 +277,7 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0),tweenFloat);
   //  mainInterfaceData[39].updateMainMesh(mainInterface, designGrid[2][1], tweenFloat);
     
-    
+   
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f(0,designGrid[0][0].y*2,0),tweenFloat);
     }
@@ -247,6 +285,8 @@ void ofApp::updateInterfaceMesh() {
         mainInterfaceData[25+i].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y*2,0) ,tweenFloat);
     }
     
+    mainInterfaceData[50].updateMainMesh(mainInterface,ofVec3f(0,designGrid[0][0].y*2,0),tweenFloat);
+
  
     mainInterfaceData[5].updateMainMesh(mainInterface, designGrid[2][1] ,tweenFloat);
     
@@ -321,23 +361,71 @@ void ofApp::draw(){
     glDisable(GL_DEPTH_TEST);
 
     
-    glDisable(GL_MULTISAMPLE);
+  //  glDisable(GL_MULTISAMPLE);
     
     
     mainInterface.draw();
     
+    
     ofPushStyle();
-    ofSetColor(255, 255, 255,200);
+    ofSetColor(255, 255, 255,255);
+    
     for (int i = 0; i < mainInterfaceData.size();i ++){
-        if (mainInterfaceData[i].showString){
-            font.draw(mainInterfaceData[i].elementName,
-                      mainInterfaceData[i].fontSize,
-                      mainInterfaceData[i].drawStringPos.x-mainInterfaceData[i].stringWidth,
-                      mainInterfaceData[i].drawStringPos.y+mainInterfaceData[i].stringHeight
-                      );
-        }
         
+        if(i >= 13 && i <= 36) {
+            ofSetColor(255, 255, 255,190);
+        } else {
+            ofSetColor(255, 255, 255,255);
+        }
+            mainInterfaceData[i].drawFontString();
     }
+    
+    float tempTrans = 72*scaleFac;
+    
+    
+    ofSetColor(mainInterfaceData[43].displayColor);
+    back.draw(mainInterfaceData[43].drawStringPos.x-tempTrans, mainInterfaceData[43].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
+    ofSetColor(mainInterfaceData[44].displayColor);
+    detail.draw(mainInterfaceData[44].drawStringPos.x-tempTrans, mainInterfaceData[44].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
+    
+    ofSetColor(mainInterfaceData[11].displayColor);
+    back.draw(mainInterfaceData[11].drawStringPos.x-tempTrans, mainInterfaceData[11].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    
+    
+    ofSetColor(mainInterfaceData[37].displayColor);
+
+    if(currentState == STATE_DEFAULT){
+    volume.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        
+        
+    } else if (currentState == STATE_VOLUME) {
+        back.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    }
+    
+    ofSetColor(mainInterfaceData[8].displayColor);
+
+    if(!synths[synthButton[0]].pause) {
+        play.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    } else {
+        pause.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    }
+    
+    ofSetColor(mainInterfaceData[9].displayColor);
+
+    if(!synths[synthButton[1]].pause) {
+        play.draw(mainInterfaceData[9].drawStringPos.x-tempTrans, mainInterfaceData[9].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    } else {
+        pause.draw(mainInterfaceData[9].drawStringPos.x-tempTrans, mainInterfaceData[9].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    }
+    
+    ofSetColor(mainInterfaceData[10].displayColor);
+
+    if(!synths[synthButton[2]].pause) {
+        play.draw(mainInterfaceData[10].drawStringPos.x-tempTrans, mainInterfaceData[10].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    } else {
+        pause.draw(mainInterfaceData[10].drawStringPos.x-tempTrans, mainInterfaceData[10].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    }
+    
     ofPopStyle();
     
 
@@ -413,7 +501,7 @@ void ofApp::mouseDragged(int x, int y, int button){
                 
                 if (mainInterfaceData[38].touchDown) {
                     
-                    int bpmMod = (mainInterfaceData[38].touchStart.x - x)/10;
+                    int bpmMod = (mainInterfaceData[38].touchStart.x - x)/6;
                     mainInterfaceData[38].tempInt = bpmMod;
                     
                     if ( abs(bpmMod) > 0 ){
@@ -504,7 +592,7 @@ void ofApp::mouseDragged(int x, int y, int button){
                 
                 if (mainInterfaceData[49].touchDown) {
                     
-                    int keyMod = (mainInterfaceData[49].touchStart.x - x)/20;
+                    int keyMod = (mainInterfaceData[49].touchStart.x - x)/54;
                     mainInterfaceData[49].tempInt = keyMod;
                     
                     if ( abs(keyMod) > 0){
@@ -616,19 +704,19 @@ void ofApp::mousePressed(int x, int y, int button){
         if (currentState == STATE_DEFAULT) {
             
             if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
-                cout << "0 pause"  << endl;
-                mainInterfaceData[8].switchColor(mainInterface);
+                //cout << "0 pause"  << endl;
+                mainInterfaceData[8].blinkOn();
                 synths[synthButton[0]].pause = !synths[synthButton[0]].pause;
             }
             if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
-                cout << "1 pause"  << endl;
-                mainInterfaceData[9].switchColor(mainInterface);
+                //cout << "1 pause"  << endl;
+                mainInterfaceData[9].blinkOn();
                 synths[synthButton[1]].pause = !synths[synthButton[1]].pause;
                 
             }
             if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
-                cout << "2 pause"  << endl;
-                mainInterfaceData[10].switchColor(mainInterface);
+               // cout << "2 pause"  << endl;
+                mainInterfaceData[10].blinkOn();
                 synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
             }
         
@@ -807,7 +895,6 @@ void ofApp::mousePressed(int x, int y, int button){
             
             if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
                 buttonEditDetail();
-                mainInterfaceData[44].elementName = "<o";
                 mainInterfaceData[44].blinkOn();
                 cout << "<o>" << endl;
             }
@@ -1188,10 +1275,10 @@ void ofApp::setupStatesAndAnimation() {
     volumeMatrix.rotate(45, -1, 0, 0);
     
     TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
-    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,(TILESIZE*TILES)/2,-(TILESIZE*TILES)/2));
+    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
     // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
-    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,(TILESIZE*TILES)/2,-(TILESIZE*TILES)/2));
+    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
     TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
@@ -1212,7 +1299,7 @@ void ofApp::setupStatesAndAnimation() {
 
 void ofApp::setupGlobalInterface() {
     
-    int fontDefault = designGrid[0][0].y*0.4;
+    int fontDefault = designGrid[0][0].y*0.38;
     int fontSmall = designGrid[0][0].y*0.165;
     
     ofVec3f smallButton = ofVec3f(designGrid[0][0].y,designGrid[0][0].y,0);
@@ -1223,56 +1310,58 @@ void ofApp::setupGlobalInterface() {
 
     
     ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
-    ofVec3f offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    GlobalGUI temp = GlobalGUI(0,string("mainVolume"), horizontalSlider, ofColor(50,0,0),place,offPlace,fontDefault,false);
+    ofVec3f offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
+    GlobalGUI temp = GlobalGUI(0,string("mainVolume"), horizontalSlider, ofColor(50,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
-    place = ofVec3f(0,designGrid[0][0].y/2,0);
-    offPlace = ofVec3f(0,designGrid[0][0].y*6);
-    temp = GlobalGUI(1,string("OneVolume"),horizontalSlider,ofColor(51,0,0),place,offPlace,fontDefault,false);
+    place = ofVec3f(0,-designGrid[0][0].y/2,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    temp = GlobalGUI(1,string("OneVolume"),horizontalSlider,ofColor(51,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(2,string("TwoVolume"),horizontalSlider,ofColor(52,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(2,string("TwoVolume"),horizontalSlider,ofColor(52,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(3,string("ThreeVolume"),horizontalSlider,ofColor(53,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(+scaleButton.x/2,-(scaleButton.y/2),0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*12,0);
-    temp = GlobalGUI(4,string("<"),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(54,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(4,string("<"),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(54,0,0),place,offPlace,fontDefault,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
     place = ofVec3f(0,0,0);
-    temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(5,string("activeScale"),horizontalSlider,ofColor(55,0,0),place,offPlace,fontDefault,false,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(-scaleButton.x/2, -(scaleButton.y/2),0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*12,0);
-    temp = GlobalGUI(6,string(">"),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(56,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(6,string(">"),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(56,0,0),place,offPlace,fontDefault,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
     place = ofVec3f(0,0,0);
-    temp = GlobalGUI(7,string(presetNames.at(0)),horizontalSlider,ofColor(57,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(7,string(presetNames.at(0)),horizontalSlider,ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     
-    place = ofVec3f(0,designGrid[0][0].y*2,0);
-    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(8,string("OnePlayPause"),smallButton,ofColor(59,0,0),place,offPlace,fontDefault,false);
+    place = ofVec3f(0,designGrid[0][0].y*1.5,0);
+    offPlace = ofVec3f(designGrid[0][0].x*12,0,0);
+    temp = GlobalGUI(8,string("OnePlayPause"),smallButton*0.5,ofColor(59,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(9,string("TwoPlayPause"),smallButton,ofColor(60,0,0),place,offPlace,fontDefault,false);
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(9,string("TwoPlayPause"),smallButton*0.5,ofColor(60,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(10,string("ThreePlayPause"),smallButton,ofColor(61,0,0),place,offPlace,fontDefault,false);
+    offPlace = ofVec3f(designGrid[0][0].x*4,0,0);
+    temp = GlobalGUI(10,string("ThreePlayPause"),smallButton*0.5,ofColor(61,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
     place = ofVec3f(0,-smallButton.y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
 
-    temp = GlobalGUI(11,string("vvvvv"),smallButton,ofColor(62,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(11,string(""),smallButton,ofColor(62,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(12,string("SwitchActiveOptions"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(12,string("SwitchActiveOptions"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
@@ -1293,7 +1382,7 @@ void ofApp::setupGlobalInterface() {
     offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
     for (int i = 0; i < 12; i++) {
         place = ofVec3f( (scaleButton.x*(i+1))+(scaleButton.x/2),-(scaleButton.y/2)-(keyNoteButton.y/2),0);
-        temp = GlobalGUI(13+i,notes[i],scaleButton,ofColor(0,0,0),place,offPlace,fontDefault,false);
+        temp = GlobalGUI(13+i,notes[i],scaleButton,ofColor(0,0,0),place,offPlace,fontDefault*1.2,false,&robotoCon);
         mainInterfaceData.push_back(temp);
         
     }
@@ -1301,41 +1390,41 @@ void ofApp::setupGlobalInterface() {
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     for (int i = 0; i < 12; i++) {
         place = ofVec3f( (keyNoteButton.x*(i+1))+(keyNoteButton.x/2),0,0);
-        temp = GlobalGUI(25+i,notes[i],keyNoteButton,ofColor(0,0,0),place, offPlace, fontSmall,false);
+        temp = GlobalGUI(25+i,notes[i],keyNoteButton,ofColor(0,0,0),place, offPlace, fontSmall*1.3,false,&robotoCon);
         mainInterfaceData.push_back(temp);
     }
     
     place = ofVec3f(0,-smallButton.y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(37, string("Volume"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,false);
+    temp = GlobalGUI(37, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(0,0,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(38, string(ofToString(bpm)), horizontalSlider, ofColor(23,23,23), place, offPlace,fontDefault,false);
+    offPlace = ofVec3f(-designGrid[0][0].x*12,0,0);
+    temp = GlobalGUI(38, string(ofToString(bpm)), horizontalSlider, ofColor(23,23,23), place, offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
     place = ofVec3f(0,0,0);
-    temp = GlobalGUI(39,string("Pitch_slider"),horizontalSlider,ofColor(55,0,0),place,offPlace,fontDefault,false);
+    temp = GlobalGUI(39,string("Pitch_slider"),horizontalSlider,ofColor(55,0,0),place,offPlace,fontDefault,false,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     //toggle 1,2,3
     
     place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(40, string("+++"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(40, string("+++"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(41, string("^^^^^^"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(41, string("^^^^^^"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(42, string("+++"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(42, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
@@ -1343,14 +1432,14 @@ void ofApp::setupGlobalInterface() {
     
     place = ofVec3f(0,-smallButton.y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(43, string("vvv"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(43, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     //toggle edit detail
     
     place = ofVec3f(0,smallButton.y/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
-    temp = GlobalGUI(44, string("DetailON"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(44, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
@@ -1358,30 +1447,37 @@ void ofApp::setupGlobalInterface() {
     
     place = ofVec3f(-designGrid[0][0].y*1.4,0,0);
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(45, string("west"), ofVec3f(40,designGrid[0][0].y*2,0), ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(45, string("west"), ofVec3f(40,designGrid[0][0].y*2,0), ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(0,-designGrid[0][0].y*1.4,0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*6,0);
-    temp = GlobalGUI(46, string("north"), ofVec3f(designGrid[0][0].y*2,40,0), ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(46, string("north"), ofVec3f(designGrid[0][0].y*2,40,0), ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(designGrid[0][0].y*1.4,0,0);
     offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(47, string("east"), ofVec3f(40,designGrid[0][0].y*2,0), ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(47, string("east"), ofVec3f(40,designGrid[0][0].y*2,0), ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     
     place = ofVec3f(0,designGrid[0][0].y*1.4,0);
     offPlace = ofVec3f(0 ,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(48, string("south"), ofVec3f(designGrid[0][0].y*2,40,0), ofColor(23,23,23), place, offPlace,fontSmall,false);
+    temp = GlobalGUI(48, string("south"), ofVec3f(designGrid[0][0].y*2,40,0), ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoLight);
     mainInterfaceData.push_back(temp);
 
     
     place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0 ,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(49, string("keynote_slider"), ofVec3f(designGrid[0][0].x*6/14*12,keyNoteButton.y,0), ofColor(23,23,23), place, offPlace,fontSmall,true);
+    temp = GlobalGUI(49, string("keynote_slider"), ofVec3f(designGrid[0][0].x*6/14*12,keyNoteButton.y,0), ofColor(23,23,23), place, offPlace,fontSmall,true,&robotoCon);
     mainInterfaceData.push_back(temp);
+    
+    place = ofVec3f( (scaleButton.x*(0+1))+(scaleButton.x/2),-(scaleButton.y/2)-(keyNoteButton.y/2),0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
+    temp = GlobalGUI(50, string("KEY"), scaleButton,ofColor(0,0,0),place,offPlace,fontSmall*1.2,false,&robotoCon);
+    mainInterfaceData.push_back(temp);
+    mainInterfaceData[50].elementColorOn = ofColor(255,255,255,100);
+    
 
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
@@ -1399,8 +1495,11 @@ void ofApp::setupGlobalInterface() {
             mainInterface.addIndex(mainInterfaceData.at(i).index[j]+(4*i));
         }
         
-        mainInterfaceData[i].setStringWidth(font.getBBox(mainInterfaceData[i].elementName, mainInterfaceData[i].fontSize, 0, 0).getWidth());
-        mainInterfaceData[i].stringHeight = font.getBBox("o", mainInterfaceData[i].fontSize, 0, 0).getHeight()/2;
+        mainInterfaceData[i].setStringWidth(mainInterfaceData[i].fsPtr->getBBox(mainInterfaceData[i].elementName, mainInterfaceData[i].fontSize, 0, 0).getWidth());
+        mainInterfaceData[i].stringHeight = mainInterfaceData[i].fsPtr->getBBox("o", mainInterfaceData[i].fontSize, 0, 0).getHeight()*0.7;
+        
+        //offset for scale key string
+        mainInterfaceData[50].stringHeight-=scaleButton.y/3;
     }
     
     pauseInterfaceOn();
@@ -1419,11 +1518,11 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[7].animation = true;
     
     
-    mainInterfaceData[43].showString = true;
+    mainInterfaceData[43].showString = false;
     mainInterfaceData[43].moveDir = 1;
     mainInterfaceData[43].animation = true;
     
-    mainInterfaceData[44].showString = true;
+    mainInterfaceData[44].showString = false;
     mainInterfaceData[44].moveDir = 1;
     mainInterfaceData[44].animation = true;
     
@@ -1464,7 +1563,7 @@ void ofApp::editInterfaceOff(){
         mainInterfaceData[i].animation = true;
     }
     
-    mainInterfaceData[37].showString = true;
+    mainInterfaceData[37].showString = false;
     mainInterfaceData[37].moveDir = 1;
     mainInterfaceData[37].animation = true;
 }
@@ -1478,7 +1577,7 @@ void ofApp::detailEditInterfaceOn() {
     mainInterfaceData[4].moveDir = 1;
     mainInterfaceData[4].animation = true;
     
-    mainInterfaceData[11].showString = true;
+    mainInterfaceData[11].showString = false;
     mainInterfaceData[11].moveDir = 1;
     mainInterfaceData[11].animation = true;
     
@@ -1511,6 +1610,11 @@ void ofApp::detailEditInterfaceOn() {
         mainInterfaceData[25+i].animation = true;
         
     }
+    
+    mainInterfaceData[50].moveDir = 1;
+    mainInterfaceData[50].showString = true;
+    mainInterfaceData[50].animation = true;
+
 }
 
 
@@ -1544,11 +1648,14 @@ void ofApp::detailEditInterfaceOff() {
         mainInterfaceData[25+i].moveDir = 0;
     }
     
-    mainInterfaceData[43].showString = true;
+    mainInterfaceData[50].animation = true;
+    mainInterfaceData[50].moveDir = 0;
+    
+    mainInterfaceData[43].showString = false;
     mainInterfaceData[43].moveDir = 1;
     mainInterfaceData[43].animation = true;
     
-    mainInterfaceData[44].showString = true;
+    mainInterfaceData[44].showString = false;
     mainInterfaceData[44].moveDir = 1;
     mainInterfaceData[44].animation = true;
     
@@ -1607,7 +1714,7 @@ void ofApp::pauseInterfaceOn() {
     mainInterfaceData[10].animation = true;
     
     if (currentState == !STATE_VOLUME){
-    mainInterfaceData[37].showString = true;
+    mainInterfaceData[37].showString = false;
     mainInterfaceData[37].moveDir = 1;
     mainInterfaceData[37].animation = true;
     }
@@ -1709,7 +1816,7 @@ void ofApp::bothEditInterfaceOff() {
         mainInterfaceData[i].animation = true;
     }
     
-    mainInterfaceData[37].showString = true;
+    mainInterfaceData[37].showString = false;
     mainInterfaceData[37].moveDir = 1;
     mainInterfaceData[37].animation = true;
 }
@@ -2183,14 +2290,15 @@ void ofApp::setNewGUI() {
 
     //scale information
     mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-    mainInterfaceData[5].setStringWidth(font.getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
+    mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
+    
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].setColor(synths[activeSynth].colorHue);
         mainInterfaceData[13+i].activateOnColor(mainInterface);
         
         mainInterfaceData[13+i].elementName = notes[  (synths[activeSynth].keyNote+i)%12 ];
-        mainInterfaceData[13+i].setStringWidth(font.getBBox(mainInterfaceData[13+i].elementName, mainInterfaceData[13+i].fontSize, 0, 0).getWidth());
+        mainInterfaceData[13+i].setStringWidth(mainInterfaceData[13+i].fsPtr->getBBox(mainInterfaceData[13+i].elementName, mainInterfaceData[13+i].fontSize, 0, 0).getWidth());
     }
 
     for (int i = 0; i < 12; i++) {
@@ -2203,11 +2311,12 @@ void ofApp::setNewGUI() {
     
     //preset information
     mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
-    mainInterfaceData[7].setStringWidth(font.getBBox(mainInterfaceData[7].elementName, mainInterfaceData[7].fontSize, 0, 0).getWidth());
+    mainInterfaceData[7].setStringWidth(mainInterfaceData[7].fsPtr->getBBox(mainInterfaceData[7].elementName, mainInterfaceData[7].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[7].setColor(synths[activeSynth].colorHue);
     mainInterfaceData[7].activateOnColor(mainInterface);
 
+    
     //notes row
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[25+i].setColor(synths[activeSynth].colorHue);
@@ -2217,9 +2326,9 @@ void ofApp::setNewGUI() {
         } else {
             mainInterfaceData[25+i].activateDarkerColor(mainInterface);
         }
-        
+   
         mainInterfaceData[25+i].elementName = ofToString(synths[activeSynth].keyNote+i);
-        mainInterfaceData[25+i].setStringWidth(font.getBBox(mainInterfaceData[25+i].elementName, mainInterfaceData[25+i].fontSize, 0, 0).getWidth());
+        mainInterfaceData[25+i].setStringWidth(mainInterfaceData[25+i].fsPtr->getBBox(mainInterfaceData[25+i].elementName, mainInterfaceData[25+i].fontSize, 0, 0).getWidth());
     }
     
    
@@ -2228,9 +2337,9 @@ void ofApp::setNewGUI() {
 
 ofColor ofApp::filterColor(ofColor c_){
     ofColor temp;
-    temp.r = ofClamp(c_.r+10, 10, 240);
-    temp.g = ofClamp(c_.g+5, 10, 240);
-    temp.b = ofClamp(c_.b-5, 10, 240);
+    temp.r = ofClamp(c_.r+20, 20, 230);
+    temp.g = ofClamp(c_.g+5, 20, 230);
+    temp.b = ofClamp(c_.b-20, 20, 230);
     temp.a = ofClamp(c_.a, 10, 255);
 
     

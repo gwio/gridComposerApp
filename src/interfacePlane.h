@@ -50,5 +50,7 @@ public:
     ofColor connectedDir;
     ofColor notActiveDir;
     ofColor pulseColor;
+    
+    ofColor filterColor(ofColor);
 };
 

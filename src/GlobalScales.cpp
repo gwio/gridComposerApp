@@ -16,7 +16,7 @@ void GlobalScales::loadScales() {
     //___________________
     
     tempNotes.clear();
-    temp.name = "Ionian";
+    temp.name = "IONIAN";
     {
         bool notes[] = {1,0,1,0,1,1,0,1,0,1,0,1};
         for (int i = 0; i < 12; i++) {
@@ -32,7 +32,7 @@ void GlobalScales::loadScales() {
     //___________________
     
     tempNotes.clear();
-    temp.name = "Dorian";
+    temp.name = "DORIAN";
     {
         bool notes[] = {1,0,1,1,0,1,0,1,0,1,1,0};
         for (int i = 0; i < 12; i++) {
@@ -48,7 +48,7 @@ void GlobalScales::loadScales() {
     //___________________
     
     tempNotes.clear();
-    temp.name = "Phrygian";
+    temp.name = "PHRYGIAN";
     {
         bool notes[] = {1,1,0,1,0,1,0,1,1,0,1,0};
         for (int i = 0; i < 12; i++) {
@@ -64,7 +64,7 @@ void GlobalScales::loadScales() {
     //___________________
     
     tempNotes.clear();
-    temp.name = "Lydian";
+    temp.name = "LYDIAN";
     {
         bool notes[] = {1,0,1,0,1,0,1,1,0,1,0,1};
         for (int i = 0; i < 12; i++) {
@@ -80,7 +80,7 @@ void GlobalScales::loadScales() {
     //___________________
     
     tempNotes.clear();
-    temp.name = "Mixolydian";
+    temp.name = "MIXOLYDIAN";
     {
         bool notes[] = {1,0,1,0,1,1,0,1,0,1,1,0};
         for (int i = 0; i < 12; i++) {
@@ -97,7 +97,7 @@ void GlobalScales::loadScales() {
     //___________________
     
     tempNotes.clear();
-    temp.name = "Aeolian";
+    temp.name = "AEOLIAN";
     {
         bool notes[] = {1,0,1,1,0,1,0,1,1,0,1,0};
         for (int i = 0; i < 12; i++) {
@@ -114,7 +114,7 @@ void GlobalScales::loadScales() {
     
     
     tempNotes.clear();
-    temp.name = "Locrian";
+    temp.name = "LOCRIAN";
     {
         bool notes[] = {1,1,0,1,0,1,1,0,1,0,1,0};
         for (int i = 0; i < 12; i++) {

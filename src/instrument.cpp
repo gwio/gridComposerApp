@@ -1168,10 +1168,11 @@ void Instrument::setNormals(ofVboMesh& mesh_) {
 
 ofColor Instrument::filterColor(ofColor c_){
     ofColor temp;
-    temp.r = ofClamp(c_.r+14, 10, 230);
-    temp.g = ofClamp(c_.g+5, 10, 230);
-    temp.b = ofClamp(c_.b-5, 10, 230);
+    temp.r = ofClamp(c_.r+20, 20, 230);
+    temp.g = ofClamp(c_.g+5, 20, 230);
+    temp.b = ofClamp(c_.b-20, 20, 230);
     temp.a = ofClamp(c_.a, 10, 255);
+
 
     return temp;
 }

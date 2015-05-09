@@ -91,7 +91,7 @@ public:
     GlobalScales scaleCollection;
     
     //font
-    ofxFontStash font;
+    ofxFontStash robotoLight, robotoBold, robotoCon;
     
     vector<string> presetNames;
     //3d scene
@@ -197,4 +197,9 @@ public:
     ofTexture border;
     
     int editDetailMoveDirection;
+    
+    //icons
+    ofTexture back, detail, pause, play, volume;
+    
+    float scaleFac;
    };

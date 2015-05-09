@@ -1,5 +1,6 @@
 #pragma once
 #include "ofMain.h"
+#include "ofxFontstash.h"
 
 
 class GlobalGUI{
@@ -9,7 +10,8 @@ public:
         
     
     
-    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f, int, bool);
+    GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f, int, bool,ofxFontStash*);
+    ofxFontStash* fsPtr;
     
     int counter;
     
@@ -59,6 +61,8 @@ public:
     
     void blinkOn();
     
+    void drawFontString();
+    
     bool isInside(ofVec2f);
     bool onOff;
     
@@ -74,4 +78,5 @@ public:
     
     float myTween;
     bool blink;
+    bool isTrans;
 };

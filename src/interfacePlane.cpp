@@ -227,42 +227,42 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     //set active[]
     if (!active_[0]) {
         for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i,  directionMesh.getColor(i).lerp(notActiveDir, 0.02));
+            directionMesh.setColor(i,filterColor(  directionMesh.getColor(i).lerp(notActiveDir, 0.02))) ;
         }
     } else {
         for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i, directionMesh.getColor(i).lerp(connectedDir, 0.02));
+            directionMesh.setColor(i, filterColor(directionMesh.getColor(i).lerp(connectedDir, 0.02)));
         }
     }
     
     if (!active_[1]) {
         for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i,  directionMesh.getColor(i).lerp(notActiveDir, 0.02));
+            directionMesh.setColor(i, filterColor( directionMesh.getColor(i).lerp(notActiveDir, 0.02)));
         }
     } else {
         for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i, directionMesh.getColor(i).lerp(connectedDir, 0.02));
+            directionMesh.setColor(i, filterColor(directionMesh.getColor(i).lerp(connectedDir, 0.02)));
         }
     }
     
     
     if (!active_[2]) {
         for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i,  directionMesh.getColor(i).lerp(notActiveDir, 0.02));
+            directionMesh.setColor(i, filterColor( directionMesh.getColor(i).lerp(notActiveDir, 0.02)));
         }
     } else {
         for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i, directionMesh.getColor(i).lerp(connectedDir, 0.02));
+            directionMesh.setColor(i,filterColor( directionMesh.getColor(i).lerp(connectedDir, 0.02)));
         }
     }
     
     if (!active_[3]) {
         for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i,  directionMesh.getColor(i).lerp(notActiveDir, 0.02));
+            directionMesh.setColor(i, filterColor( directionMesh.getColor(i).lerp(notActiveDir, 0.02)));
         }
     } else {
         for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i++) {
-            directionMesh.setColor(i, directionMesh.getColor(i).lerp(connectedDir, 0.02));
+            directionMesh.setColor(i,filterColor( directionMesh.getColor(i).lerp(connectedDir, 0.02)));
         }
     }
     
@@ -331,7 +331,7 @@ void InterfacePlane::draw(){
     ofPushStyle();
     posNode.transformGL();
     
-    ofSetColor(255, 255, 255,lineAlpha);
+    ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
     ofLine(-10, 0, 10, 0);
     
     
@@ -370,6 +370,17 @@ void InterfacePlane::pulseDir(int dir_) {
     
     
     for (int i = (dir_*((tiles-1)*3)) ; i < (dir_*((tiles-1)*3))+((tiles-1)*3); i++) {
-        directionMesh.setColor(i, pulseColor);
+        directionMesh.setColor(i,filterColor( pulseColor));
     }
+}
+
+ofColor InterfacePlane::filterColor(ofColor c_){
+    ofColor temp;
+    temp.r = ofClamp(c_.r, 20, 230);
+    temp.g = ofClamp(c_.g, 20, 230);
+    temp.b = ofClamp(c_.b, 20, 230);
+    temp.a = ofClamp(c_.a, 10, 255);
+    
+    
+    return temp;
 }

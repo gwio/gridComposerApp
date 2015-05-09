@@ -6,18 +6,28 @@ GlobalGUI::GlobalGUI(){
 }
 
 //colors for this start with 50,0,0
-GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_, bool trans_) {
+GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_, bool trans_, ofxFontStash* fsPtr_) {
     elementName = name_;
     drawString = name_;
+    
+    isTrans = trans_;
     
     if (!trans_) {
     elementColorOn = ofColor::darkCyan;
         //setColor(0);
         targetColor = elementColorOn;
        // targetColor = elementColorOn;
+        elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
+        elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
+
     } else {
         elementColorOn = ofColor(0,0,0,0);
         targetColor = elementColorOff;
+        ofColor whiteColor = filterColor( ofColor(255,255,255,200));
+        displayColor = whiteColor;
+        targetColor = whiteColor;
+        elementColorTouch = ofColor::fromHsb(whiteColor.getHue(), whiteColor.getSaturation()-50, whiteColor.getBrightness()+90, 255);
+
     }
     
     counter=counter_*4;
@@ -45,6 +55,8 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     
     myTween = 0.0;
     blink = false;
+    
+    fsPtr = fsPtr_;
     
 }
 
@@ -88,17 +100,21 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
 
     if (displayColor != targetColor) {
             displayColor = displayColor.lerp(targetColor, myTween);
+        if (!isTrans){
             mesh_.setColor(0+counter,filterColor( displayColor));
             mesh_.setColor(1+counter, filterColor( displayColor));
             mesh_.setColor(2+counter, filterColor( displayColor));
             mesh_.setColor(3+counter, filterColor( displayColor));
+        }
     }
         if (myTween >= 1.0) {
             displayColor = targetColor;
+            if(!isTrans) {
             mesh_.setColor(0+counter, filterColor( displayColor));
             mesh_.setColor(1+counter, filterColor( displayColor));
             mesh_.setColor(2+counter, filterColor( displayColor));
             mesh_.setColor(3+counter, filterColor( displayColor));
+            }
             blink = false;
             myTween = 1.0;
         }
@@ -133,17 +149,21 @@ void GlobalGUI::updateMainMeshB(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
         
         if (displayColor != targetColor) {
             displayColor = displayColor.lerp(targetColor, myTween);
+            if (!isTrans){
             mesh_.setColor(0+counter,filterColor( displayColor));
             mesh_.setColor(1+counter, filterColor( displayColor));
             mesh_.setColor(2+counter, filterColor( displayColor));
             mesh_.setColor(3+counter, filterColor( displayColor));
+            }
         }
         if (myTween >= 1.0) {
             displayColor = targetColor;
+            if (!isTrans){
             mesh_.setColor(0+counter, filterColor( displayColor));
             mesh_.setColor(1+counter, filterColor( displayColor));
             mesh_.setColor(2+counter, filterColor( displayColor));
             mesh_.setColor(3+counter, filterColor( displayColor));
+            }
             blink = false;
             myTween = 1.0;
         }
@@ -193,7 +213,7 @@ void GlobalGUI::setColor(float hue_) {
     
     elementColorOn = ofColor::fromHsb(hue_, 100, 160,255);
     
-    elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
+    elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
 
@@ -292,12 +312,23 @@ void GlobalGUI::blinkOn(){
     blink = true;
 }
 
+void GlobalGUI::drawFontString() {
+    
+    if (showString){
+    fsPtr->draw(elementName,
+             fontSize,
+              drawStringPos.x-stringWidth,
+              drawStringPos.y+stringHeight
+              );
+    }
+
+}
 
 ofColor GlobalGUI::filterColor(ofColor c_){
     ofColor temp;
-    temp.r = ofClamp(c_.r+14, 10, 230);
-    temp.g = ofClamp(c_.g+5, 10, 230);
-    temp.b = ofClamp(c_.b-5, 10, 230);
-    temp.a = ofClamp(c_.a, 10, 255);
+    temp.r = ofClamp(c_.r+15, 30, 220);
+    temp.g = ofClamp(c_.g-5, 30, 220);
+    temp.b = ofClamp(c_.b-10, 30, 220);
+    temp.a = ofClamp(c_.a-10, 10, 240);
     return temp;
 }
