@@ -7,13 +7,15 @@
 Cube::Cube(){
     displayColor = ( ofColor( 0,0,0,255) );
     cubeColor =  (ofColor( 0, 0, 0,255));
-    groupColor = (ofColor( 1, 55, 65,255));
+    groupColor = (ofColor( 222, 222, 222,255));
     scanColor= (ofColor( 11, 55, 65,255));
     
     aniPct = 0.0;
     diff = 0.0;
     aniFac = 0.0;
     myTween = 1.0;
+    
+    noSaturation = false;
     
 }
 
@@ -28,7 +30,7 @@ Cube::Cube(ofVec3f* ptr0_,ofVec3f* ptr1_,ofVec3f* ptr2_, ofVec3f* ptr3_, int v0_
     vIndex1 = v1_;
     vIndex2 = v2_;
     vIndex3 = v3_;
-    
+    noSaturation = false;
     
 }
 
@@ -105,21 +107,28 @@ void Cube::update(){
 
 
 void Cube::changeGroupColor(ofColor c_) {
-    cubeColor = c_;
-    // displayColor = c_;
+    
+    if (!noSaturation) {
     groupColor = c_;
     scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, c_.getBrightness()+75) ;
-    myTween = 0.0;
-    fastChange = false;
-    slowChange = true;
+    }
+    
+       
+    
 }
 
-void Cube::setColor(ofColor c_){
+void Cube::setColor(ofColor c_,bool fast){
+    
+    if (!noSaturation) {
     cubeColor = c_;
+    //displayColor = c_;
+    
     myTween = 0.0;
-    fastChange = true;
-    slowChange = false;
-    // displayColor = c_;
+    fastChange = fast;
+    slowChange = !fast;
+    }
+    
+    
 }
 void Cube::setDefaultHeight(float height_) {
     diff = height_-vec0Ptr->z;
@@ -128,3 +137,17 @@ void Cube::setDefaultHeight(float height_) {
     aniPct = 0.0;
 }
 
+void Cube::satOff(){
+    tempColor = groupColor;
+    changeGroupColor(ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-200,0,255) , groupColor.getBrightness(), 255));
+    setColor(groupColor,false );
+    noSaturation = true;
+
+
+}
+
+void Cube::satOn() {
+    noSaturation = false;
+    changeGroupColor(tempColor);
+    setColor(groupColor, true);
+}

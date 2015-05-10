@@ -41,11 +41,17 @@ public:
     bool active;
     bool tapActive;
     
+    bool noSaturation;
+    
     bool fastChange, slowChange;
     
-    void setColor(ofColor);
+    void setColor(ofColor,bool);
     
     void changeGroupColor(ofColor);
+    
+    void satOn();
+    void satOff();
+    ofColor tempColor;
     
     float *attack;
     

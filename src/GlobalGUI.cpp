@@ -58,6 +58,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     
     fsPtr = fsPtr_;
     
+    drawStringPos = ofVec3f(-2000,-2000,0);
 }
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){

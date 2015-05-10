@@ -87,13 +87,16 @@ public:
     void updateSoundsMap(int,int, bool);
     void resetCubeGroup(unsigned long, int, int);
     void setupOneSynth(cubeGroup*);
-    void changePreset();
+    void changePreset(bool);
     void updateGroupInfo(unsigned long,int,int);
     void setTranslate(ofVec3f);
     void setRotate(ofQuaternion);
     void setScale(float);
     void planeMovement(float);
     void setNormals(ofVboMesh&);
+    
+    void setSaturationOff();
+    void setSaturationOn();
     
     SynthPresetManager presetManager;
     
