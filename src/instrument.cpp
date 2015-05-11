@@ -51,6 +51,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     pitchMod = 0;
     octaveRange = 0;
     
+    userScale = false;
+    
     if ( ofIsStringInString(instrumentId,"b") ) {
         trackSwitchOn = true;
     } else {
@@ -211,6 +213,9 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
                 cubes.addIndex(indexex[i]);
             }
             
+            
+            
+            
         }
         
     }
@@ -268,6 +273,9 @@ void Instrument::update() {
     
     
     updateCubeMesh();
+    
+    
+    
 }
 
 void Instrument::draw() {
@@ -968,7 +976,7 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
 
 void Instrument::changePreset(bool test_) {
     if(preset == 0){
-        preset = (presetManager.count*10)-1;
+        preset = (presetManager.count*100);
     }
     
     if (test_) {
@@ -1183,7 +1191,13 @@ ofPolyline Instrument::getEmptyPath(ofVec3f pos_) {
 }
 
 void Instrument::setNormals(ofVboMesh& mesh_) {
+    mesh_.clearNormals();
     
+    for (int i = 0; i < mesh_.getNumVertices(); i++) {
+        mesh_.addNormal(ofVec3f(1,0.5,0));
+    }
+    
+    /*
     mesh_.clearNormals();
     
     for (int i = 1; i< mesh_.getNumVertices(); i+=3) {
@@ -1202,6 +1216,7 @@ void Instrument::setNormals(ofVboMesh& mesh_) {
         
         
     }
+     */
 }
 
 void Instrument::setSaturationOff(){

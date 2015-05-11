@@ -176,7 +176,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
   
     posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.0) ) ;
-    posNode.setScale( (thisScale*1) +0.8 );
+    posNode.setScale( (thisScale*1) +0.65 );
     
     //cout << linePct << endl;
     
@@ -214,7 +214,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         pulseLine.setColor(1, pulseLine.getColor(1).lerp(ofColor(255,255,255,0), 0.1));
     } else {
         pulseLine.setColor(0, ofColor(255,255,255,0));
-        pulseLine.setColor(1, pulseColor);
+        pulseLine.setColor(1, ofColor::fromHsb(0, 0, 255,200));
     }
     
     // cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
@@ -334,7 +334,7 @@ void InterfacePlane::draw( bool& pause_){
     posNode.transformGL();
     
    // ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
-    ofSetColor(filterColor( ofColor( 255, 255, 255,200)) );
+    ofSetColor(filterColor( ofColor( 255, 255, 255,180)) );
 
     ofLine(-8, 0, 8, 0);
     

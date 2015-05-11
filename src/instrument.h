@@ -181,7 +181,7 @@ public:
     Tonic::RampedValue outputRamp;
     
     bool synthHasChanged;
-    
+    bool userScale;
     
     
 };

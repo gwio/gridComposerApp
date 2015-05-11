@@ -58,6 +58,8 @@ void ofApp::setup(){
     
     scaleCollection.loadScales();
     makeDesignGrid();
+    currentState = STATE_DEFAULT;
+
     
     synthPos.resize(3);
     
@@ -79,7 +81,7 @@ void ofApp::setup(){
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
     synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &bpmTick);
     synths[0].setMusicScale(scaleCollection, 0);
-    synths[0].setKeyNote(60);
+    synths[0].setKeyNote(60-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
     synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &bpmTick);
@@ -90,7 +92,7 @@ void ofApp::setup(){
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
     synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &bpmTick);
     synths[2].setMusicScale(scaleCollection, 0);
-    synths[2].setKeyNote(60);
+    synths[2].setKeyNote(60+12);
     
     
     activeSynth = 1;
@@ -124,12 +126,12 @@ void ofApp::setup(){
     
     ofBackground( filterColor(ofColor(22,22,22)) );
     
-    ofEnableLighting();
-    light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,0));
+  //  ofEnableLighting();
+   // light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
     
     
     //temp sketch
-    light.setAmbientColor( filterColor(ofColor::white) );
+  //  light.setAmbientColor( filterColor(ofColor::white) );
     
     doubleClickTime = 300;
     curTap = 0;
@@ -157,7 +159,6 @@ void ofApp::setup(){
     animCam = false;
     interfaceMoving = false;
     debugCam = false;
-    currentState = STATE_DEFAULT;
     
     
     
@@ -333,8 +334,8 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-    //  ofEnableLighting();
-    //light.enable();
+   //   ofEnableLighting();
+   // light.enable();
     
     
     if (!debugCam) {
@@ -662,8 +663,8 @@ void ofApp::mousePressed(int x, int y, int button){
         }
     }
     
-    curTap = ofGetElapsedTimeMillis();
-    if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
+ //   curTap = ofGetElapsedTimeMillis();
+ //   if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
         
         if (!interfaceMoving) {
             
@@ -722,9 +723,9 @@ void ofApp::mousePressed(int x, int y, int button){
         
         
         
-    }
+  //  }
     
-    lastTap = curTap;
+ //   lastTap = curTap;
     
     if ( (!interfaceMoving) && (!insideSynth) ){
         
@@ -849,12 +850,15 @@ void ofApp::mousePressed(int x, int y, int button){
             
             //scale
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
+                if (synths[activeSynth].currentScaleVecPos == 0) {
+                    synths[activeSynth].currentScaleVecPos = (scaleCollection.scaleVec.size()*100);
+                }
                 if (  (x-mainInterfaceData[5].minX) > ((mainInterfaceData[5].maxX-mainInterfaceData[5].minX)/2)) {
                     synths[activeSynth].currentScaleVecPos++;
                 } else {
                     synths[activeSynth].currentScaleVecPos--;
                 }
-                
+                synths[activeSynth].userScale = false;
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                 setNewGUI();
                 mainInterfaceData[5].blinkOn();
@@ -897,6 +901,9 @@ void ofApp::mousePressed(int x, int y, int button){
                 if (   mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
                     synths[activeSynth].changeMusicScale(i);
                     mainInterfaceData[13+i].switchColor(mainInterface);
+                    mainInterfaceData[5].elementName = "INDIVIDUAL";
+                    mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
+                    synths[activeSynth].userScale = true;
                     cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
@@ -932,11 +939,15 @@ void ofApp::mousePressed(int x, int y, int button){
             
             //scale
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
+                if (synths[activeSynth].currentScaleVecPos == 0) {
+                    synths[activeSynth].currentScaleVecPos = (scaleCollection.scaleVec.size()*100);
+                }
                 if (  (x-mainInterfaceData[5].minX) > ((mainInterfaceData[5].maxX-mainInterfaceData[5].minX)/2)) {
                 synths[activeSynth].currentScaleVecPos++;
                 } else {
                     synths[activeSynth].currentScaleVecPos--;
                 }
+                synths[activeSynth].userScale = false;
                 synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                 setNewGUI();
                 mainInterfaceData[5].blinkOn();
@@ -1952,12 +1963,12 @@ void ofApp::bothEditInterfaceOff() {
 }
 
 void ofApp::makePresetString() {
-    presetNames.push_back("Sinu");
+    presetNames.push_back("sine");
     presetNames.push_back("simple");
-    presetNames.push_back("simple2");
-    presetNames.push_back("simple3");
-    presetNames.push_back("simple4");
-    presetNames.push_back("simple5");
+    presetNames.push_back("dukken");
+    presetNames.push_back("whistler");
+    presetNames.push_back("box");
+    presetNames.push_back("bender");
     
     
 }
@@ -2433,8 +2444,13 @@ void ofApp::buttonEditDetail() {
 void ofApp::setNewGUI() {
     
     //scale information
+    if(!synths[activeSynth].userScale) {
     mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
     mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
+    } else {
+        mainInterfaceData[5].elementName = "INDIVIDUAL";
+        mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
+    }
     
     
     for (int i = 0; i < 12; i++) {
