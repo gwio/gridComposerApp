@@ -1613,9 +1613,11 @@ void ofApp::setupGlobalInterface() {
         mainInterfaceData[i].setStringWidth(mainInterfaceData[i].fsPtr->getBBox(mainInterfaceData[i].elementName, mainInterfaceData[i].fontSize, 0, 0).getWidth());
         mainInterfaceData[i].stringHeight = mainInterfaceData[i].fsPtr->getBBox("o", mainInterfaceData[i].fontSize, 0, 0).getHeight()*0.7;
         
-        //offset for scale key string
-        mainInterfaceData[50].stringHeight-=scaleButton.y/3;
-    }
+            }
+    
+    //offset for scale key string
+    mainInterfaceData[50].stringHeight-=scaleButton.y/3;
+
     
     pauseInterfaceOn();
     aniPct = 0.0;
