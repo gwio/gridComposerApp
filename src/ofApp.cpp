@@ -12,7 +12,7 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofSoundStreamSetup(2, 2, this, 44100, 256, 4);
+    ofSoundStreamSetup(2, 1, this, 44100, 256, 4);
     
     ofSetFrameRate(60);
     //ofDisableAntiAliasing();
@@ -276,6 +276,7 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
     mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
     
+   
     mainInterfaceData[51].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
     mainInterfaceData[52].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
     mainInterfaceData[53].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
@@ -542,7 +543,8 @@ void ofApp::mouseDragged(int x, int y, int button){
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x);
                 mainInterfaceData[1].sliderPos = mainInterfaceData[1].maxX - x;
-                mainInterfaceData[1].elementName ="A "+ofToString( int(value*100));
+               // mainInterfaceData[1].elementName ="A "+ofToString( int(value*100));
+
                 synths[synthButton[0]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -550,15 +552,17 @@ void ofApp::mouseDragged(int x, int y, int button){
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x);
                 mainInterfaceData[2].sliderPos = mainInterfaceData[1].maxX - x;
-                mainInterfaceData[2].elementName ="B "+ofToString( int(value*100));
-                synths[synthButton[1]].changeSynthVolume(value);
+              //  mainInterfaceData[2].elementName ="B "+ofToString( int(value*100));
+
+             synths[synthButton[1]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x);
                 mainInterfaceData[3].sliderPos = mainInterfaceData[1].maxX - x;
-                mainInterfaceData[3].elementName ="C "+ofToString(int( value*100));
+               // mainInterfaceData[3].elementName ="C "+ofToString(int( value*100));
+            
                 synths[synthButton[2]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -566,9 +570,9 @@ void ofApp::mouseDragged(int x, int y, int button){
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, mainInterfaceData[0].maxX - x);
-                mainInterfaceData[0].elementName = "GLOBAL "+ofToString(int( value*100));
-                
-                volumeRampValueChanged(value);
+               // mainInterfaceData[0].elementName = "GLOBAL "+ofToString(int( value*100));
+               float newVol =  Tonic::mapLinToLog(value,0.0,1.0);
+                volumeRampValueChanged(newVol);
                 cout << value  << endl;
             }
             
@@ -800,6 +804,7 @@ void ofApp::mousePressed(int x, int y, int button){
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x );
+                mainInterfaceData[1].sliderPos = mainInterfaceData[1].maxX - x;
                 
                 synths[synthButton[0]].changeSynthVolume(value);
                 cout << value  << endl;
@@ -807,6 +812,7 @@ void ofApp::mousePressed(int x, int y, int button){
             if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x );
+                mainInterfaceData[2].sliderPos = mainInterfaceData[1].maxX - x;
                 
                 synths[synthButton[1]].changeSynthVolume(value);
                 cout << value  << endl;
@@ -814,6 +820,7 @@ void ofApp::mousePressed(int x, int y, int button){
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x );
+                mainInterfaceData[3].sliderPos = mainInterfaceData[1].maxX - x;
                 
                 synths[synthButton[2]].changeSynthVolume(value);
                 cout << value  << endl;
@@ -1388,16 +1395,16 @@ void ofApp::setupGlobalInterface() {
     
     ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
     ofVec3f offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
-    GlobalGUI temp = GlobalGUI(0,string("Global 100"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0), ofColor(50,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    GlobalGUI temp = GlobalGUI(0,string("GLOBAL"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0), ofColor(50,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(0,-designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(1,string("A 100"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    temp = GlobalGUI(1,string("SLOT A"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(2,string("B 100"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(52,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    temp = GlobalGUI(2,string("SLOT B"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(52,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(3,string("C 100"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(53,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    temp = GlobalGUI(3,string("SLOT C"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(53,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(+scaleButton.x/2,-(scaleButton.y/2),0);
@@ -2070,6 +2077,10 @@ void ofApp::buttonOnePress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
+        
+        mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
+        mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
+
         setNewGUI();
         
         if (currentState == STATE_DEFAULT){
@@ -2268,6 +2279,10 @@ void ofApp::buttonThreePress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
+        
+        mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
+        mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
+
         
         setNewGUI();
         

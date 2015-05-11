@@ -42,7 +42,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     inFocus = false;
     scaling = false;
     keyNote = 0;
-    preset = 0;
+    preset = presetManager.count*1;
     
     pause = false;
     myScaleTarget = 1.0;
@@ -967,12 +967,17 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
 }
 
 void Instrument::changePreset(bool test_) {
+    if(preset == 0){
+        preset = (presetManager.count*10)-1;
+    }
+    
     if (test_) {
     preset++;
     } else {
         preset--;
     }
-    colorHue = ofWrap( ofMap(preset, 0, presetManager.count, 0, 255),0,255);
+    colorHue = ofWrap( ofMap(preset%presetManager.count, 0, presetManager.count, 0, 255),0,255);
+    
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger);
@@ -1053,8 +1058,8 @@ void Instrument::setScale(float scale_){
 
 void Instrument::changeSynthVolume(float & vol_) {
     sVolume = vol_;
-    mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, vol_);
-    //  scanZ =  (30*vol_);
+    mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId,Tonic::mapLinToLog(vol_,0.0,1.0));
+      scanZ =  (30*vol_);
 }
 
 
