@@ -244,6 +244,10 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         verticesInner[i] = verticesInner[i]+tranVec;
     }
     
+    
+    cubes.clearNormals();
+    
+    for( int i=0; i < cubes.getVertices().size(); i++ ) cubes.addNormal(ofPoint(0,0,0));
     setNormals(cubes);
     
     
@@ -274,7 +278,7 @@ void Instrument::update() {
     
     updateCubeMesh();
     
-    
+    setNormals(cubes);
     
 }
 
@@ -1191,31 +1195,31 @@ ofPolyline Instrument::getEmptyPath(ofVec3f pos_) {
 }
 
 void Instrument::setNormals(ofVboMesh& mesh_) {
+   
     mesh_.clearNormals();
     
-    for (int i = 0; i < mesh_.getNumVertices(); i++) {
-        mesh_.addNormal(ofVec3f(1,0.5,0));
+    for( int i=0; i < mesh_.getIndices().size(); i+=3 ){
+        const int ia = mesh_.getIndices()[i];
+        const int ib = mesh_.getIndices()[i+1];
+        const int ic = mesh_.getIndices()[i+2];
+        
+        ofVec3f e1 = mesh_.getVertices()[ia] - mesh_.getVertices()[ib];
+        ofVec3f e2 = mesh_.getVertices()[ic] - mesh_.getVertices()[ib];
+        ofVec3f no = e2.cross( e1 );
+        
+        // depending on your clockwise / winding order, you might want to reverse the e2 / e1 above if your normals are flipped.
+        
+        mesh_.getNormals()[ia] += no;
+        mesh_.getNormals()[ib] += no;
+        mesh_.getNormals()[ic] += no;
     }
     
     /*
-    mesh_.clearNormals();
-    
-    for (int i = 1; i< mesh_.getNumVertices(); i+=3) {
-        
-        ofVec3f temp = mesh_.getVertex(i);
-        ofVec3f tempA = temp - mesh_.getVertex(i-1) ;
-        ofVec3f tempB = temp - mesh_.getVertex(i+1);
-        
-        temp = tempA.getCrossed(tempB);
-        
-        temp.normalize();
-        
-        mesh_.addNormal(temp);
-        mesh_.addNormal(temp);
-        mesh_.addNormal(temp);
-        
-        
-    }
+    if (bNormalize)
+        for(int i=0; i < mesh.getNormals().size(); i++ ) {
+            mesh.getNormals()[i].normalize();
+        }
+     }
      */
 }
 

@@ -151,6 +151,7 @@ public:
     
     //light
     ofLight light;
+    ofMaterial material;
     
     //misc tap
     unsigned long doubleClickTime, curTap, lastTap;

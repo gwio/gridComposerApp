@@ -1,7 +1,7 @@
 #include "ofApp.h"
 #define TILES 5
 #define TILESIZE 100/TILES
-#define TILEBORDER 0.075
+#define TILEBORDER 0.055
 #define BPM 220
 #define ANI_SPEED 0.025;
 
@@ -127,11 +127,12 @@ void ofApp::setup(){
     ofBackground( filterColor(ofColor(22,22,22)) );
     
   //  ofEnableLighting();
-   // light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
-    
-    
+    light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
+    light.setDiffuseColor( ofColor(100,100,100));
+    material.setShininess(111);
+    material.setSpecularColor( filterColor(ofColor::white));
     //temp sketch
-  //  light.setAmbientColor( filterColor(ofColor::white) );
+    light.setAmbientColor( filterColor(ofColor::white) );
     
     doubleClickTime = 300;
     curTap = 0;
@@ -250,6 +251,10 @@ void ofApp::update(){
     
     intersectPlane(ofGetMouseX(),ofGetMouseY());
     
+    
+    //light
+    light.setPosition( synthActivePos.getPosition().x, synthActivePos.getPosition().y-200,synthActivePos.getPosition().z );
+   // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -334,9 +339,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-   //   ofEnableLighting();
-   // light.enable();
-    
+      ofEnableLighting();
+    light.enable();
+    material.begin();
     
     if (!debugCam) {
         testCam.begin();
@@ -363,8 +368,9 @@ void ofApp::draw(){
         cam.end();
     }
     
-    
+    material.end();
     ofDisableLighting();
+    
     if (drawInfo) {
         drawDebug();
     }
