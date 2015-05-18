@@ -1,3 +1,5 @@
+//information for all patches
+
 #pragma  once
 #include "ofMain.h"
 #include "ofxTonic.h"

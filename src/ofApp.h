@@ -6,6 +6,7 @@
 #include "ofxTonic.h"
 #include "ofxGui.h"
 #include "GlobalGUI.h"
+#include "MusterContainer.h"
 #include "GlobalScales.h"
 #include "ofxFontStash.h"
 
@@ -21,6 +22,7 @@ public:
     void setup();
     void update();
     void draw();
+    void drawStringAndIcons();
     
     void keyPressed(int key);
     void keyReleased(int key);
@@ -92,6 +94,10 @@ public:
     
     //font
     ofxFontStash robotoLight, robotoBold, robotoCon;
+    
+    
+    //save function
+    MusterContainer muster;
     
     vector<string> presetNames;
     //3d scene

@@ -1,3 +1,5 @@
+//Synth Plane, includes all Meshes and Tonic Presets
+
 #pragma once
 
 #include "ofMain.h"
@@ -94,6 +96,7 @@ public:
     void setScale(float);
     void planeMovement(float);
     void setNormals(ofVboMesh&);
+    void loadMuster(vector< vector<bool> >&);
     
     void setSaturationOff();
     void setSaturationOn();

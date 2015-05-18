@@ -1102,6 +1102,23 @@ void Instrument::applyNewScale(){
 }
 
 
+void Instrument::loadMuster(vector< vector<bool> >& info_){
+    
+    for (int i = 0; i < info_.size(); i++) {
+        for (int j = 0; j < info_.at(i).size(); j++) {
+            if (info_.at(i).at(j) ){
+                if (!layerInfo.at(i).at(j).hasCube) {
+                    tapEvent(i, j);
+                }
+            } else {
+                if (layerInfo.at(i).at(j).hasCube) {
+                    tapEvent(i, j);
+                }
+            }
+        }
+    }
+}
+
 void Instrument::setMusicScale(GlobalScales& scale_,int num_){
     scaleNoteSteps.clear();
     scaleNoteSteps = scale_.scaleNotes.at(num_);

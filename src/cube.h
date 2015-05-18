@@ -1,3 +1,7 @@
+
+//Mesh information for single cubes
+
+
 #pragma once
 
 #include "ofMain.h"

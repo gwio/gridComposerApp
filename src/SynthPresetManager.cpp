@@ -3,6 +3,7 @@
 
 
 SynthPresetManager::SynthPresetManager() {
+    //update manual
     count = 6;
 }
 

@@ -1,3 +1,5 @@
+//musical scales
+
 #pragma once
 #include "ofMain.h"
 
