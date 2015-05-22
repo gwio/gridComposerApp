@@ -19,8 +19,18 @@ void MusterFlip::setup(int size_,int tiles_){
         layerInfo.at(i).resize(tiles_);
     }
     
-    makeTex(tempFbo);
+    //makeTex(tempFbo);
     
+}
+
+void MusterFlip::loadData(bool** data_, int tilesX_, int tilesY_) {
+    for (int i = 0; i < tilesX_; i++) {
+        for (int j = 0; j < tilesY_; j++) {
+            layerInfo.at(i).at(j) = data_[j][i];
+        }
+    }
+    
+    makeTex();
 }
 
 void MusterFlip::draw(ofVec3f pos_){
@@ -28,9 +38,9 @@ void MusterFlip::draw(ofVec3f pos_){
     
 }
 
-void MusterFlip::makeTex(ofFbo& fbo_){
+void MusterFlip::makeTex(){
 
-    
+    ofFbo fbo_;
     
     fbo_.allocate( (size/gridTiles)*gridTiles, (size/gridTiles)*gridTiles, GL_RGBA);
     
@@ -40,12 +50,9 @@ void MusterFlip::makeTex(ofFbo& fbo_){
     ofSetColor(255,255,255,230);
     float rSize = size/gridTiles;
     for (int i = 0; i < gridTiles; i++) {
-        for (int j =gridTiles-1 ; j >= 0 ; j--) {
-            if(ofRandom(100) > 65){
+        for (int j =0 ; j < gridTiles ; j++) {
+            if( layerInfo.at(i).at(j) ){
                 ofRect(i*rSize, j*rSize, rSize, rSize);
-                layerInfo.at(i).at((gridTiles-1)-j) = true;
-            } else {
-                layerInfo.at(i).at((gridTiles-1)-j) = false;
             }
         }
     }

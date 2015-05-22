@@ -1,4 +1,4 @@
-//One Grid Preset
+//One Grid Preset, texture and drawing
 
 #pragma once
 #include "ofMain.h"
@@ -9,10 +9,11 @@ public:
   
     
     void setup(int,int);
+    void loadData(bool**,int,int);
     void update();
     void draw(ofVec3f);
     
-    void makeTex(ofFbo&);
+    void makeTex();
     
     ofTexture texture;
     ofVec3f pos;

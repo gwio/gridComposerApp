@@ -1,10 +1,10 @@
 
 #include "MusterContainer.h"
 
-#define DISPLAY_NUMX 5
-#define DISPLAY_NUMY 5
+#define DISPLAY_NUMX 3
+#define DISPLAY_NUMY 3
 #define FLIP_SIZE_FAC 0.666
-#define FLIP_MAX 5*5
+#define FLIP_MAX 3*3
 
 MusterContainer::MusterContainer() {
     
@@ -16,7 +16,7 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     designGrid.x = (designGrid_.x)/(DISPLAY_NUMX);
     designGrid.y = (designGrid_.y)/(DISPLAY_NUMY);
     //designGrid*=0.8;
-
+    
     flipSize = designGrid.x*FLIP_SIZE_FAC;
     
     displayGrid.clear();
@@ -33,10 +33,28 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     flips.clear();
     flips.resize(FLIP_MAX);
     
+    //uajjjai, 9presets
+    
+    
+    bool tempA[5][5] = {
+        {0,0,1,0,0},
+        {0,0,1,0,0},
+        {0,0,1,0,0},
+        {0,0,1,0,0},
+        {0,0,1,0,0}
+    };
+    
+    bool *tempB[5];
+    for (int i = 0; i < 5; i++) {
+        tempB[i] = tempA[i];
+    }
     
     for (int i = 0; i < FLIP_MAX; i++) {
+        
         flips.at(i).setup(designGrid.x*FLIP_SIZE_FAC, gridTiles);
+        flips.at(i).loadData(tempB, tiles_,tiles_);
     }
+    
 }
 
 
@@ -66,7 +84,7 @@ int MusterContainer::isInside(ofVec2f click_) {
             temp = i;
             break;
             cout << "flip " << i << endl;
-        } 
+        }
     }
     
     return temp;
