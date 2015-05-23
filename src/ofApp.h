@@ -206,7 +206,7 @@ public:
     int editDetailMoveDirection;
     
     //icons
-    ofTexture back, detail, pause, play, volume;
+    ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon ;
     
     float scaleFac;
    };

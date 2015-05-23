@@ -101,6 +101,9 @@ public:
     void setSaturationOff();
     void setSaturationOn();
     
+    
+    void getLayerInfo(vector< vector <bool> >&);
+    
     SynthPresetManager presetManager;
     
     int getRandomNote();

@@ -40,25 +40,35 @@ void MusterFlip::draw(ofVec3f pos_){
 
 void MusterFlip::makeTex(){
 
+    
+    ofPushStyle();
     ofFbo fbo_;
     
     fbo_.allocate( (size/gridTiles)*gridTiles, (size/gridTiles)*gridTiles, GL_RGBA);
     
     fbo_.begin();
-    ofClear(ofColor::darkCyan);
-    
-    ofSetColor(255,255,255,230);
+   
+    // ofEnableDepthTest();
+    ofClear(255, 255, 255,100);
     float rSize = size/gridTiles;
+    ofSetColor(ofColor::darkCyan);
+
+   // ofRect(0,0, rSize*gridTiles, rSize*gridTiles);
+    //ofNoFill();
+    //   ofTranslate(size/10, size/10);
+    //ofScale(0.8, 0.8);
+    ofSetColor(255, 255, 255,230);
     for (int i = 0; i < gridTiles; i++) {
         for (int j =0 ; j < gridTiles ; j++) {
             if( layerInfo.at(i).at(j) ){
-                ofRect(i*rSize, j*rSize, rSize, rSize);
+                ofRect(i*rSize, ( (gridTiles-1)-j)*rSize, rSize, rSize);
             }
         }
     }
     fbo_.end();
     
+    texture.clear();
     texture = fbo_.getTextureReference();
   
-    
+    ofPopStyle();
 }

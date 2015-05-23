@@ -18,6 +18,8 @@ public:
     void update(ofVec3f);
     void draw();
     
+    void saveToFlip(int);
+    
     vector<MusterFlip> flips;
     ofVec3f centerPos;
     ofVec2f designGrid;
@@ -28,5 +30,7 @@ public:
     vector<ofVec3f>  displayGrid;
     
     int isInside(ofVec2f);
+    
+    bool saveReady;
 
 };

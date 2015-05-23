@@ -18,7 +18,7 @@ void ofApp::setup(){
     //ofDisableAntiAliasing();
     ofSetVerticalSync(true);
     ofEnableDepthTest();
-    
+    ofEnableAlphaBlending();
     
     robotoLight.setup("fonts/Roboto-Light.ttf", //font file, ttf only
                       1.0,					//lineheight percent
@@ -59,7 +59,7 @@ void ofApp::setup(){
     scaleCollection.loadScales();
     makeDesignGrid();
     currentState = STATE_DEFAULT;
-
+    
     
     synthPos.resize(3);
     
@@ -126,7 +126,7 @@ void ofApp::setup(){
     
     ofBackground( filterColor(ofColor(22,22,22)) );
     
-  //  ofEnableLighting();
+    //  ofEnableLighting();
     light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
     light.setDiffuseColor( ofColor(100,100,100));
     material.setShininess(111);
@@ -167,26 +167,32 @@ void ofApp::setup(){
     ofImage temp;
     
     temp.loadImage("icons/back.png");
-    back.loadData(temp.getPixelsRef(),GL_RGBA);
+    backIcon.loadData(temp.getPixelsRef(),GL_RGBA);
     
     temp.loadImage("icons/detail.png");
-    detail.loadData(temp.getPixelsRef(), GL_RGBA);
+    detailIcon.loadData(temp.getPixelsRef(), GL_RGBA);
     
     temp.loadImage("icons/volume.png");
-    volume.loadData(temp.getPixelsRef(), GL_RGBA);
+    volumeIcon.loadData(temp.getPixelsRef(), GL_RGBA);
     
     temp.loadImage("icons/pause.png");
-    pause.loadData(temp.getPixelsRef(), GL_RGBA);
+    pauseIcon.loadData(temp.getPixelsRef(), GL_RGBA);
     
     temp.loadImage("icons/play.png");
-    play.loadData(temp.getPixelsRef(), GL_RGBA);
+    playIcon.loadData(temp.getPixelsRef(), GL_RGBA);
+    
+    temp.loadImage("icons/save.png");
+    saveIcon.loadData(temp.getPixelsRef(), GL_RGBA);
+    
+    temp.loadImage("icons/random.png");
+    randomIcon.loadData(temp.getPixelsRef(), GL_RGBA);
     
     scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
     scaleFac *= 0.55;
     
     setNewGUI();
     muster = MusterContainer(mainInterfaceData[39].drawStringPos, ofVec2f( mainInterfaceData[39].elementSize), TILES);
-    
+    muster.setup();
 }
 
 void ofApp::setupAudio(){
@@ -258,7 +264,7 @@ void ofApp::update(){
     
     //light
     light.setPosition( synthActivePos.getPosition().x, synthActivePos.getPosition().y-200,synthActivePos.getPosition().z );
-   // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+    // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -286,7 +292,7 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
     mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
     
-   
+    
     mainInterfaceData[51].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
     mainInterfaceData[52].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
     mainInterfaceData[53].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
@@ -295,10 +301,18 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[4].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y*2,0),tweenFloat);
     mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0),tweenFloat);
-    mainInterfaceData[39].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[2][1].y,0), tweenFloat);
-    mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[2][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+    mainInterfaceData[39].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
+    mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
-
+    
+    mainInterfaceData[12].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
+    mainInterfaceData[12].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+                                          ,tweenFloat);
+    
+    mainInterfaceData[40].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
+    mainInterfaceData[40].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+                                          ,tweenFloat);
+    
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f(0,designGrid[0][0].y*2,0),tweenFloat);
@@ -345,7 +359,7 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-      ofEnableLighting();
+    ofEnableLighting();
     light.enable();
     material.begin();
     
@@ -393,7 +407,7 @@ void ofApp::draw(){
     drawStringAndIcons();
     
     muster.draw();
- 
+    
     
     
 }
@@ -426,46 +440,52 @@ void ofApp::drawStringAndIcons(){
     
     //draw icons
     ofSetColor(mainInterfaceData[43].displayColor);
-    back.draw(mainInterfaceData[43].drawStringPos.x-tempTrans, mainInterfaceData[43].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
+    backIcon.draw(mainInterfaceData[43].drawStringPos.x-tempTrans, mainInterfaceData[43].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
     ofSetColor(mainInterfaceData[44].displayColor);
-    detail.draw(mainInterfaceData[44].drawStringPos.x-tempTrans, mainInterfaceData[44].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
+    detailIcon.draw(mainInterfaceData[44].drawStringPos.x-tempTrans, mainInterfaceData[44].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
     
     ofSetColor(mainInterfaceData[11].displayColor);
-    back.draw(mainInterfaceData[11].drawStringPos.x-tempTrans, mainInterfaceData[11].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    backIcon.draw(mainInterfaceData[11].drawStringPos.x-tempTrans, mainInterfaceData[11].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    
+    ofSetColor(mainInterfaceData[12].displayColor);
+    saveIcon.draw(mainInterfaceData[12].drawStringPos.x-tempTrans, mainInterfaceData[12].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    
+    ofSetColor(mainInterfaceData[40].displayColor);
+    randomIcon.draw(mainInterfaceData[40].drawStringPos.x-tempTrans, mainInterfaceData[12].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     
     
     ofSetColor(mainInterfaceData[37].displayColor);
     
     if(currentState == STATE_DEFAULT){
-        volume.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        volumeIcon.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
         
         
     } else if (currentState == STATE_VOLUME) {
-        back.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        backIcon.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     }
     
     ofSetColor(mainInterfaceData[8].displayColor);
     
     if(!synths[synthButton[0]].pause) {
-        pause.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        pauseIcon.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     } else {
-        play.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        playIcon.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     }
     
     ofSetColor(mainInterfaceData[9].displayColor);
     
     if(!synths[synthButton[1]].pause) {
-        pause.draw(mainInterfaceData[9].drawStringPos.x-tempTrans, mainInterfaceData[9].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        pauseIcon.draw(mainInterfaceData[9].drawStringPos.x-tempTrans, mainInterfaceData[9].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     } else {
-        play.draw(mainInterfaceData[9].drawStringPos.x-tempTrans, mainInterfaceData[9].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        playIcon.draw(mainInterfaceData[9].drawStringPos.x-tempTrans, mainInterfaceData[9].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     }
     
     ofSetColor(mainInterfaceData[10].displayColor);
     
     if(!synths[synthButton[2]].pause) {
-        pause.draw(mainInterfaceData[10].drawStringPos.x-tempTrans, mainInterfaceData[10].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        pauseIcon.draw(mainInterfaceData[10].drawStringPos.x-tempTrans, mainInterfaceData[10].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     } else {
-        play.draw(mainInterfaceData[10].drawStringPos.x-tempTrans, mainInterfaceData[10].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+        playIcon.draw(mainInterfaceData[10].drawStringPos.x-tempTrans, mainInterfaceData[10].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     }
     
     ofPopStyle();
@@ -508,6 +528,8 @@ void ofApp::keyPressed(int key){
     
     if (key == 'c') {
         debugCam = !debugCam;
+        
+        muster.setup();
     }
     
     
@@ -566,8 +588,8 @@ void ofApp::mouseDragged(int x, int y, int button){
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x);
                 mainInterfaceData[1].sliderPos = mainInterfaceData[1].maxX - x;
-               // mainInterfaceData[1].elementName ="A "+ofToString( int(value*100));
-
+                // mainInterfaceData[1].elementName ="A "+ofToString( int(value*100));
+                
                 synths[synthButton[0]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -575,17 +597,17 @@ void ofApp::mouseDragged(int x, int y, int button){
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x);
                 mainInterfaceData[2].sliderPos = mainInterfaceData[1].maxX - x;
-              //  mainInterfaceData[2].elementName ="B "+ofToString( int(value*100));
-
-             synths[synthButton[1]].changeSynthVolume(value);
+                //  mainInterfaceData[2].elementName ="B "+ofToString( int(value*100));
+                
+                synths[synthButton[1]].changeSynthVolume(value);
                 cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x);
                 mainInterfaceData[3].sliderPos = mainInterfaceData[1].maxX - x;
-               // mainInterfaceData[3].elementName ="C "+ofToString(int( value*100));
-            
+                // mainInterfaceData[3].elementName ="C "+ofToString(int( value*100));
+                
                 synths[synthButton[2]].changeSynthVolume(value);
                 cout << value  << endl;
             }
@@ -593,8 +615,8 @@ void ofApp::mouseDragged(int x, int y, int button){
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, mainInterfaceData[0].maxX - x);
-               // mainInterfaceData[0].elementName = "GLOBAL "+ofToString(int( value*100));
-               float newVol =  Tonic::mapLinToLog(value,0.0,1.0);
+                // mainInterfaceData[0].elementName = "GLOBAL "+ofToString(int( value*100));
+                float newVol =  Tonic::mapLinToLog(value,0.0,1.0);
                 volumeRampValueChanged(newVol);
                 cout << value  << endl;
             }
@@ -685,69 +707,69 @@ void ofApp::mousePressed(int x, int y, int button){
         }
     }
     
- //   curTap = ofGetElapsedTimeMillis();
- //   if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
+    //   curTap = ofGetElapsedTimeMillis();
+    //   if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
+    
+    if (!interfaceMoving) {
         
-        if (!interfaceMoving) {
+        if (currentState == STATE_DEFAULT) {
             
-            if (currentState == STATE_DEFAULT) {
-                
-                if( (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x) &&
-                   (y > designGrid[0][1].y-designGrid[0][0].y && y < designGrid[0][1].y+designGrid[0][0].y) ){
-                    if(!synths[synthButton[0]].trackSwitchOn) {
-                        synths[synthButton[0]].trackSwitchOn = true;
-                    } else {
-                        buttonOnePress();
-                    }
-                }
-                
-                if( (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) &&
-                   (y > designGrid[1][1].y-designGrid[0][0].y && y < designGrid[1][1].y+designGrid[0][0].y) ){
-                    buttonTwoPress();
-                }
-                
-                if( (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) &&
-                   (y > designGrid[2][1].y-designGrid[0][0].y && y < designGrid[2][1].y+designGrid[0][0].y) ){
-                    if(!synths[synthButton[2]].trackSwitchOn) {
-                        synths[synthButton[2]].trackSwitchOn = true;
-                    } else {
-                        buttonThreePress();
-                    }
+            if( (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x) &&
+               (y > designGrid[0][1].y-designGrid[0][0].y && y < designGrid[0][1].y+designGrid[0][0].y) ){
+                if(!synths[synthButton[0]].trackSwitchOn) {
+                    synths[synthButton[0]].trackSwitchOn = true;
+                } else {
+                    buttonOnePress();
                 }
             }
             
-            
-            
-            if (currentState == STATE_EDIT) {
-                
-                if( (x > designGrid[0][2].x-designGrid[0][0].x && x < designGrid[0][2].x+designGrid[0][0].x) &&
-                   (y > designGrid[0][2].y-designGrid[0][0].y && y < designGrid[0][2].y+designGrid[0][0].y) ){
-                    if(synths[synthButton[0]].trackSwitchOn) {
-                        buttonOnePress();
-                    } else {
-                        synths[synthButton[0]].trackSwitchOn = true;
-                    }
-                }
-                
-                if( (x > designGrid[2][2].x-designGrid[0][0].x && x < designGrid[2][2].x+designGrid[0][0].x) &&
-                   (y > designGrid[2][2].y-designGrid[0][0].y && y < designGrid[2][2].y+designGrid[0][0].y) ){
-                    if(synths[synthButton[2]].trackSwitchOn) {
-                        buttonThreePress();
-                    } else {
-                        synths[synthButton[2]].trackSwitchOn = true;
-                    }
-                }
-                
+            if( (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) &&
+               (y > designGrid[1][1].y-designGrid[0][0].y && y < designGrid[1][1].y+designGrid[0][0].y) ){
+                buttonTwoPress();
             }
             
-            
+            if( (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) &&
+               (y > designGrid[2][1].y-designGrid[0][0].y && y < designGrid[2][1].y+designGrid[0][0].y) ){
+                if(!synths[synthButton[2]].trackSwitchOn) {
+                    synths[synthButton[2]].trackSwitchOn = true;
+                } else {
+                    buttonThreePress();
+                }
+            }
         }
         
         
         
-  //  }
+        if (currentState == STATE_EDIT) {
+            
+            if( (x > designGrid[0][2].x-designGrid[0][0].x && x < designGrid[0][2].x+designGrid[0][0].x) &&
+               (y > designGrid[0][2].y-designGrid[0][0].y && y < designGrid[0][2].y+designGrid[0][0].y) ){
+                if(synths[synthButton[0]].trackSwitchOn) {
+                    buttonOnePress();
+                } else {
+                    synths[synthButton[0]].trackSwitchOn = true;
+                }
+            }
+            
+            if( (x > designGrid[2][2].x-designGrid[0][0].x && x < designGrid[2][2].x+designGrid[0][0].x) &&
+               (y > designGrid[2][2].y-designGrid[0][0].y && y < designGrid[2][2].y+designGrid[0][0].y) ){
+                if(synths[synthButton[2]].trackSwitchOn) {
+                    buttonThreePress();
+                } else {
+                    synths[synthButton[2]].trackSwitchOn = true;
+                }
+            }
+            
+        }
+        
+        
+    }
     
- //   lastTap = curTap;
+    
+    
+    //  }
+    
+    //   lastTap = curTap;
     
     if ( (!interfaceMoving) && (!insideSynth) ){
         
@@ -861,8 +883,14 @@ void ofApp::mousePressed(int x, int y, int button){
         
         else    if (currentState == STATE_EDIT_DETAIL) {
             
+            //muster container
+            if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
+                int musterIndex =  muster.isInside(ofVec2f(x,y));
+                if ( musterIndex >= 0) {
+                    synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                }
+            }
             
-           
             
             //scale
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
@@ -908,7 +936,7 @@ void ofApp::mousePressed(int x, int y, int button){
                 synths[activeSynth].setKeyNote(12);
                 setNewGUI();
                 mainInterfaceData[6].blinkOn();
-               // cout << "+12"  << endl;
+                // cout << "+12"  << endl;
             }
             
             for (int i = 1; i < 12; i++) {
@@ -923,7 +951,20 @@ void ofApp::mousePressed(int x, int y, int button){
                 }
             }
             
+            //toogle grid preset container
             muster.isInside(ofVec2f(x,y));
+            
+            //toggle save grid
+            if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
+                //leer
+                mainInterfaceData[12].blinkOn();
+            }
+            
+            //toggle get ranomd grid
+            if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
+                //leer
+                mainInterfaceData[40].blinkOn();
+            }
             
             //note in use with slider
             /*
@@ -941,27 +982,36 @@ void ofApp::mousePressed(int x, int y, int button){
         
         else if (currentState == STATE_EDIT) {
             
+            
+            //muster container
             if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
                 int musterIndex =  muster.isInside(ofVec2f(x,y));
-                if ( musterIndex >= 0) {
-                    synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                
+                if (!muster.saveReady) {
+                    if ( musterIndex >= 0) {
+                        synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                    }
+                } else if (musterIndex >= 0){
+                    synths[activeSynth].getLayerInfo(muster.flips.at(musterIndex).layerInfo);
+                    muster.flips.at(musterIndex).makeTex();
+                    muster.saveReady = false;
                 }
             }
-
-           //back to State_default
+            
+            //back to State_default
             if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonTwoPress();
                 mainInterfaceData[43].blinkOn();
                 //cout << "vvv" << endl;
             }
-        
+            
             //scale
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 if (synths[activeSynth].currentScaleVecPos == 0) {
                     synths[activeSynth].currentScaleVecPos = (scaleCollection.scaleVec.size()*100);
                 }
                 if (  (x-mainInterfaceData[5].minX) > ((mainInterfaceData[5].maxX-mainInterfaceData[5].minX)/2)) {
-                synths[activeSynth].currentScaleVecPos++;
+                    synths[activeSynth].currentScaleVecPos++;
                 } else {
                     synths[activeSynth].currentScaleVecPos--;
                 }
@@ -975,7 +1025,7 @@ void ofApp::mousePressed(int x, int y, int button){
             //synth
             if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
-                synths[activeSynth].changePreset(true);
+                    synths[activeSynth].changePreset(true);
                 } else {
                     synths[activeSynth].changePreset(false);
                 }
@@ -989,6 +1039,20 @@ void ofApp::mousePressed(int x, int y, int button){
             if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
                 buttonEditDetail();
                 mainInterfaceData[44].blinkOn();
+            }
+            
+            //toggle save grid
+            if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
+                //leer
+                muster.saveReady = true;
+                mainInterfaceData[12].blinkOn();
+            }
+            
+            //toggle get random grid
+            if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
+                //leer
+                
+                mainInterfaceData[40].blinkOn();
             }
             
             //pulse direction
@@ -1474,7 +1538,16 @@ void ofApp::setupGlobalInterface() {
     
     temp = GlobalGUI(11,string(""),smallButton,ofColor(62,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(12,string("SwitchActiveOptions"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    
+    
+    //save to presets button
+    place = ofVec3f(
+                    -(horizontalSlider.x*0.86)+((horizontalSlider.x*0.86)/4),
+                    (designGrid[0][0].y*1.65)+(designGrid[0][0].y*0.35*0.5),
+                    0
+                    );
+    offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(12,string(""), ofVec3f( (horizontalSlider.x*0.86)/2,designGrid[0][0].y*0.35,0),ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
@@ -1519,16 +1592,23 @@ void ofApp::setupGlobalInterface() {
     
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    place = ofVec3f(-(horizontalSlider.x*0.86)/2,0,0);
-    temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&robotoLight);
+    place = ofVec3f(-(horizontalSlider.x*0.86)/2,(designGrid[0][0].y*1.65)/2,0);
+    temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*1.65,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     //toggle 1,2,3
     
-    place = ofVec3f(0,designGrid[0][0].y,0);
-    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(40, string("+++"), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false,&robotoCon);
+    //make random grid icon
+    place = ofVec3f(
+                    -((horizontalSlider.x*0.86)/4),
+                    (designGrid[0][0].y*1.65)+(designGrid[0][0].y*0.35*0.5),
+                    0
+                    );
+    offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(40,string(""), ofVec3f( (horizontalSlider.x*0.86)/2,designGrid[0][0].y*0.35,0),ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
+    
+    
     
     place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
@@ -1631,11 +1711,11 @@ void ofApp::setupGlobalInterface() {
         mainInterfaceData[i].setStringWidth(mainInterfaceData[i].fsPtr->getBBox(mainInterfaceData[i].elementName, mainInterfaceData[i].fontSize, 0, 0).getWidth());
         mainInterfaceData[i].stringHeight = mainInterfaceData[i].fsPtr->getBBox("o", mainInterfaceData[i].fontSize, 0, 0).getHeight()*0.7;
         
-            }
+    }
     
     //offset for scale key string
     mainInterfaceData[50].stringHeight-=scaleButton.y/3;
-
+    
     
     pauseInterfaceOn();
     aniPct = 0.0;
@@ -1655,6 +1735,14 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[39].showString = false;
     mainInterfaceData[39].moveDir = 1;
     mainInterfaceData[39].animation = true;
+    
+    mainInterfaceData[40].showString = false;
+    mainInterfaceData[40].moveDir = 1;
+    mainInterfaceData[40].animation = true;
+    
+    mainInterfaceData[12].showString = false;
+    mainInterfaceData[12].moveDir = 1;
+    mainInterfaceData[12].animation = true;
     
     mainInterfaceData[43].showString = false;
     mainInterfaceData[43].moveDir = 1;
@@ -1690,6 +1778,12 @@ void ofApp::editInterfaceOff(){
     
     mainInterfaceData[39].moveDir = 0;
     mainInterfaceData[39].animation = true;
+    
+    mainInterfaceData[40].moveDir = 0;
+    mainInterfaceData[40].animation = true;
+    
+    mainInterfaceData[12].moveDir = 0;
+    mainInterfaceData[12].animation = true;
     
     mainInterfaceData[43].moveDir = 0;
     mainInterfaceData[43].animation = true;
@@ -2116,7 +2210,7 @@ void ofApp::buttonOnePress(){
         
         mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
         mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
-
+        
         setNewGUI();
         
         if (currentState == STATE_DEFAULT){
@@ -2318,7 +2412,7 @@ void ofApp::buttonThreePress(){
         
         mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
         mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
-
+        
         
         setNewGUI();
         
@@ -2416,7 +2510,8 @@ void ofApp::buttonEditDetail() {
         mainInterfaceData[5].animationB = true;
         mainInterfaceData[7].animationB = true;
         mainInterfaceData[39].animationB = true;
-
+        mainInterfaceData[12].animationB = true;
+        
         
         
         aniPct = 0.0;
@@ -2462,7 +2557,8 @@ void ofApp::buttonEditDetail() {
         mainInterfaceData[5].animationB = true;
         mainInterfaceData[7].animationB = true;
         mainInterfaceData[39].animationB = true;
-
+        mainInterfaceData[12].animationB = true;
+        
         
         detailEditInterfaceOff();
         aniPct = 0.0;
@@ -2474,8 +2570,8 @@ void ofApp::setNewGUI() {
     
     //scale information
     if(!synths[activeSynth].userScale) {
-    mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
-    mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
+        mainInterfaceData[5].elementName = scaleCollection.scaleVec.at(synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size()).name;
+        mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());
     } else {
         mainInterfaceData[5].elementName = "INDIVIDUAL";
         mainInterfaceData[5].setStringWidth(mainInterfaceData[5].fsPtr->getBBox(mainInterfaceData[5].elementName, mainInterfaceData[5].fontSize, 0, 0).getWidth());

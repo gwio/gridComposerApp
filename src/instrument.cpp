@@ -1261,6 +1261,20 @@ void Instrument::setSaturationOn(){
     }
 }
 
+
+void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
+    for (int x = 0; x < gridTiles; x++) {
+        for (int y = 0; y <gridTiles; y++) {
+            if ( layerInfo.at(x).at(y).hasCube) {
+                flipInfoPtr_.at(x).at(y) = true;
+            } else {
+                flipInfoPtr_.at(x).at(y) = false;
+            }
+            
+        }
+    }
+}
+
 ofColor Instrument::filterColor(ofColor c_){
     ofColor temp;
     temp.r = ofClamp(c_.r+20, 20, 230);
