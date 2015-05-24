@@ -191,12 +191,14 @@ void ofApp::setup(){
     scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
     scaleFac *= 0.55;
     
-    setNewGUI();
     muster = MusterContainer(mainInterfaceData[39].drawStringPos, ofVec2f( mainInterfaceData[39].elementSize), TILES);
     muster.setup();
     
     //load saves
     loadFromXml();
+    
+    setNewGUI();
+
 }
 
 void ofApp::setupAudio(){
@@ -968,18 +970,7 @@ void ofApp::mousePressed(int x, int y, int button){
                 mainInterfaceData[40].blinkOn();
             }
             
-            //note in use with slider
-            /*
-             for (int i = 1; i < 12; i++) {
-             
-             if (   mainInterfaceData[25+i].isInside(ofVec2f(x,y))) {
-             updateKeyNoteInfo(i);
-             synths[activeSynth].setKeyNote(i);
-             cout <<  "midinote " << synths[activeSynth].keyNote << endl;
-             }
-             }
-             */
-            
+      
         }
         
         else if (currentState == STATE_EDIT) {
@@ -2699,27 +2690,14 @@ void ofApp::saveToXml(){
     }
     settings.popTag();
     
-    //--------------------------------
-    
-    //save trackSwitchOn
-    settings.addTag("TrackSwitchOn");
-    settings.pushTag("TrackSwitchOn");
-    for (int i = 0; i < 3; i++) {
-        settings.addTag("synth");
-        settings.pushTag("synth",i);
-        settings.addValue("status", synths[synthButton[i]].trackSwitchOn);
-        settings.popTag();
-    }
-    settings.popTag();
-    
     
     //--------------------------------
     
     //save current grid
-    
     settings.addTag("currentGrids");
     settings.pushTag("currentGrids");
     for (int i = 0; i < 3; i++) {
+        int counter = 0;
         settings.addTag("grid");
         settings.pushTag("grid",i);
         string temp = "0000000000000000000000000";
@@ -2727,6 +2705,13 @@ void ofApp::saveToXml(){
             for (int y  = 0; y < synths[synthButton[i]].layerInfo.at(x).size(); y++) {
                 if (synths[synthButton[i]].layerInfo.at(x).at(y).hasCube) {
                     temp.at(x+(TILES*y)) = '1';
+                    settings.addTag("Note");
+                    settings.pushTag("Note",counter++);
+                    settings.addValue("x", x);
+                    settings.addValue("y", y);
+                    int pitch =  synths[ synthButton[i] ].soundsMap[ synths[synthButton[i]].layerInfo.at(x).at(y).cubeGroupId ].groupNote;
+                    settings.addValue("pitch", pitch);
+                    settings.popTag();
                 } else {
                     temp.at(x+(TILES*y)) = '0';
                 }
@@ -2757,54 +2742,84 @@ void ofApp::saveToXml(){
     settings.popTag();
     
     
-    
     //--------------------------------
     
-    //save preset
-    settings.addTag("Preset");
-    settings.pushTag("Preset");
+    
+    
+    //synth globals
+    settings.addTag("SynthSettings");
+    settings.pushTag("SynthSettings");
     for (int i = 0; i < 3; i++) {
         settings.addTag("synth");
         settings.pushTag("synth",i);
-        settings.addValue("index", synths[synthButton[i]].preset);
-        settings.popTag();
-    }
-    settings.popTag();
-    
-    //--------------------------------
-
-    //save synth color hue
-    settings.addTag("ColorHue");
-    settings.pushTag("ColorHue");
-    for (int i = 0; i < 3; i++) {
-        settings.addTag("synth");
-        settings.pushTag("synth",i);
-        settings.addValue("cHue", synths[synthButton[i]].colorHue);
-        settings.popTag();
-    }
-    settings.popTag();
-    
-    
-    //--------------------------------
-    
-    //save scaleVecPosition and scale string
-    settings.addTag("ScaleVecPos");
-    settings.pushTag("ScaleVecPos");
-    for (int i = 0; i < 3; i++) {
-        settings.addTag("synth");
-        settings.pushTag("synth",i);
-        settings.addValue("index", synths[synthButton[i]].currentScaleVecPos);
+        
+        settings.addValue("ScaleVecPos", synths[synthButton[i]].currentScaleVecPos);
         settings.addValue("userScaleBool", synths[synthButton[i]].userScale);
+        settings.addValue("cHue", synths[synthButton[i]].colorHue);
+        settings.addValue("patchPreset", synths[synthButton[i]].preset);
+        settings.addValue("StartStatus", synths[synthButton[i]].trackSwitchOn);
+        settings.addValue("pauseStatus", synths[synthButton[i]].pause);
+        settings.addValue("keyNote", synths[synthButton[i]].keyNote);
+        //activeScale Bools[12]
+        string scaleBool = "000000000000";
+        for (int j = 0; j < 12; j++) {
+            if (synths[synthButton[i]].activeScale.steps[j]) {
+                scaleBool.at(j) = '1';
+            }
+        }
+        settings.addValue("ActiveScaleBool", scaleBool);
+        
+        //activeScaleSteps INT
+        settings.addTag("scaleSteps");
+        settings.pushTag("scaleSteps");
+        for (int j = 0; j < synths[synthButton[i]].scaleNoteSteps.size(); j++) {
+            settings.addTag("steps");
+            settings.pushTag("steps",j);
+            settings.addValue("step", synths[synthButton[i]].scaleNoteSteps.at(j));
+            settings.popTag();
+        }
+        settings.popTag();
+        
+        //activeDirection
+        settings.addTag("activeDirection");
+        settings.pushTag("activeDirection");
+        string activeDirection = "0000";
+        for (int j = 0; j < 4; j++) {
+            if (synths[synthButton[i]].activeDirection[j]) {
+                activeDirection.at(j) = '1';
+            }
+        }
+        settings.addValue("bools", activeDirection);
+        settings.popTag();
+        
+        
+        //connectedDirection
+        settings.addTag("connectedDirection");
+        settings.pushTag("connectedDirection");
+        string connectedDirection = "0000";
+        for (int j = 0; j < 4; j++) {
+            if (synths[synthButton[i]].connectedDirection[j]) {
+                connectedDirection.at(j) = '1';
+            }
+        }
+        settings.addValue("bools", connectedDirection);
+        settings.popTag();
+        
         settings.popTag();
     }
     settings.popTag();
     
     
     //--------------------------------
+    //misc , bpm
     
+    settings.addTag("BPM");
+    settings.pushTag("BPM");
+    settings.addValue("value", bpm);
+    settings.popTag();
     
     settings.saveFile("settings.xml");
-
+    
     
 }
 
@@ -2841,14 +2856,100 @@ void ofApp::loadFromXml(){
         
         //--------------------------------
         
-        //get trackswitchOn status
-        settings.pushTag("TrackSwitchOn");
+        //load volume
+        settings.pushTag("Volumes");
+        settings.pushTag("global");
+        mainVol = settings.getValue("volume", 1.0);
+        volumeRampValueChanged(mainVol);
+        settings.popTag();
+        settings.pushTag("slots");
         for (int i = 0; i < 3; i++) {
-            settings.pushTag("synth",i);
-            synths[synthButton[i]].trackSwitchOn = settings.getValue("status", 0);
+            settings.pushTag("slot",i);
+            synths[synthButton[i]].sVolume = settings.getValue("volume", 1.0);
+            synths[synthButton[i]].changeSynthVolume(synths[synthButton[i]].sVolume);
             settings.popTag();
         }
         settings.popTag();
+        settings.popTag();
+        
+        
+        
+        //--------------------------------
+        
+        
+        //synth global settings
+        
+        settings.pushTag("SynthSettings");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("synth",i);
+            synths[synthButton[i]].currentScaleVecPos = settings.getValue("ScaleVecPos", 0);
+         //   synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos);
+            
+            synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
+            
+            synths[synthButton[i]].colorHue = settings.getValue("cHue", 0);
+            
+            synths[synthButton[i]].preset = settings.getValue("patchPreset", 0);
+            
+            synths[synthButton[i]].trackSwitchOn = settings.getValue("StartStatus", 0);
+            
+            synths[synthButton[i]].pause = settings.getValue("pauseStatus", 0);
+            
+            synths[synthButton[i]].keyNote = settings.getValue("keyNote", 0);
+
+            //scaleNoteSteps
+            string tempActiveScale = settings.getValue("ActiveScaleBool", "100000000000");
+            for (int j = 0; j < 12; j++) {
+                if (tempActiveScale.at(j) == '1') {
+                    synths[synthButton[i]].activeScale.steps[j] = true;
+                } else {
+                    synths[synthButton[i]].activeScale.steps[j] = false;
+
+                }
+            }
+            
+            
+            //activeScaleSteps INT
+            settings.pushTag("scaleSteps");
+            synths[synthButton[i]].scaleNoteSteps.clear();
+            for (int j = 0; j < settings.getNumTags("steps"); j++) {
+                settings.pushTag("steps",j);
+                synths[synthButton[i]].scaleNoteSteps.push_back(settings.getValue("step", 1));
+                settings.popTag();
+            }
+            settings.popTag();
+
+            
+            //activeDirection
+            settings.pushTag("activeDirection");
+            string activeDirection = settings.getValue("bools", "1111");
+            for (int j = 0; j < 4; j++) {
+                if (activeDirection.at(j) == '1') {
+                    synths[synthButton[i]].activeDirection[j] = true;;
+                } else{
+                    synths[synthButton[i]].activeDirection[j] = false;;
+                }
+            }
+            settings.popTag();
+            
+            
+            //connectedDirection
+            settings.pushTag("connectedDirection");
+            string connectedDirection = settings.getValue("bools", "1111");
+            for (int j = 0; j < 4; j++) {
+                if (connectedDirection.at(j) == '1') {
+                    synths[synthButton[i]].connectedDirection[j] = true;
+                } else {
+                    synths[synthButton[i]].connectedDirection[j] = false;
+                }
+            }
+            settings.popTag();
+            
+            
+            settings.popTag();
+        }
+        settings.popTag();
+        
         
         
         //--------------------------------
@@ -2871,61 +2972,47 @@ void ofApp::loadFromXml(){
         }
         settings.popTag();
         
+        //---------------------------
         
+        //load notes
         
-        //--------------------------------
-        //load volume
-        settings.pushTag("Volumes");
-        settings.pushTag("global");
-        mainVol = settings.getValue("volume", 1.0);
-        volumeRampValueChanged(mainVol);
-        settings.popTag();
-        settings.pushTag("slots");
+        settings.pushTag("currentGrids");
         for (int i = 0; i < 3; i++) {
-            settings.pushTag("slot",i);
-            synths[synthButton[i]].sVolume = settings.getValue("volume", 1.0);
-            synths[synthButton[i]].changeSynthVolume(synths[synthButton[i]].sVolume);
-            settings.popTag();
-        }
-        settings.popTag();
-        settings.popTag();
-        
-        
-        //--------------------------------
-        
-        //load sound patch
-        settings.pushTag("Preset");
-        for (int i = 0;  i < 3 ; i++) {
-            settings.pushTag("synth",i);
-            synths[synthButton[i]].preset = settings.getValue("index", 0);
-            settings.popTag();
-        }
-        settings.popTag();
-        
-        
-        //--------------------------------
-
-        //save synth color hue
-        settings.pushTag("ColorHue");
-        for (int i = 0; i < 3; i++) {
-            settings.pushTag("synth",i);
-            synths[synthButton[i]].colorHue = settings.getValue("cHue", 0);
+            settings.pushTag("grid",i);
+            if (settings.getNumTags("Note") > 0) {
+                for (int j = 0; j < settings.getNumTags("Note"); j++) {
+                    settings.pushTag("Note",j);
+                    
+                    int tempPitch =
+                    synths[synthButton[i]].soundsMap[
+                                                     synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
+                                                     ].groupNote;
+                    
+                    
+                    if (tempPitch != settings.getValue("pitch", 60)) {
+                        //load groupnote
+                        synths[synthButton[i]].soundsMap[
+                                                         synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
+                                                         ].groupNote = settings.getValue("pitch", 60);
+                        //set groupnote
+                        synths[synthButton[i]].soundsMap[
+                                                         synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
+                                                         ].groupSynth.setParameter("rampFreqTarget", Tonic::mtof(settings.getValue("pitch", 60) ));
+                    }
+                    settings.popTag();
+                }
+            }
             settings.popTag();
         }
         settings.popTag();
         
-        
-        //--------------------------------
-        
-        //save scaleVecPosition and scale string
-        settings.pushTag("ScaleVecPos");
-        for (int i = 0; i < 3; i++) {
-            settings.pushTag("synth",i);
-            synths[synthButton[i]].currentScaleVecPos = settings.getValue("index", 0);
-            synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
-            settings.popTag();
-        }
+        //bpm
+        settings.pushTag("BPM");
+        bpm =ofClamp(settings.getValue("value", 200), 1, 1000);
+        tonicSynth.setParameter("BPM", bpm);
+        mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
         settings.popTag();
+        
     }
     
     
