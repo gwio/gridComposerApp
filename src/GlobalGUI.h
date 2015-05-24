@@ -29,7 +29,7 @@ public:
     
     string drawString;
     
-    float sliderWidth;
+    float sliderPct;
     
     ofVec3f drawStringPos;
     
@@ -57,7 +57,7 @@ public:
     void updateMainMesh(ofVboMesh&, ofVec3f, float&);
     void updateMainMeshB(ofVboMesh&, ofVec3f, float&);
 
-    void updateMainMeshSlider(ofVboMesh&, ofVec3f, float, float&);
+    void updateMainMeshSlider(ofVboMesh&, ofVec3f, float&);
     
     void setSlider(ofVboMesh&, float);
     float sliderPos;

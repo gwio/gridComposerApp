@@ -3,7 +3,7 @@
 //layer is 100x100
 #define CUBE_Z_HEIGHT 12.5
 #define EMPTY_Z 2.55
-#define SCAN_Z 22
+#define SCAN_Z 28
 
 #define COLOR_TARGET 55.0
 
@@ -1071,7 +1071,8 @@ void Instrument::setScale(float scale_){
 void Instrument::changeSynthVolume(float & vol_) {
     sVolume = vol_;
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId,Tonic::mapLinToLog(vol_,0.0,1.0));
-      scanZ =  (30*vol_);
+    cout << instrumentId << Tonic::mapLinToLog(vol_,0.0,1.0) << endl;
+      scanZ = ofClamp( (SCAN_Z*vol_), CUBE_Z_HEIGHT, SCAN_Z) ;
 }
 
 

@@ -96,6 +96,7 @@ public:
     //mainout
     ofxTonicSynth tonicSynth;
     RampedValue volumeRamp;
+    float mainVol;
     Generator mainOut;
     
     //scales

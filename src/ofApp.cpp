@@ -100,6 +100,7 @@ void ofApp::setup(){
     
     ControlParameter rampTarget = tonicSynth.addParameter("mainVolumeRamp").max(1.0).min(0.0);
     tonicSynth.setParameter("mainVolumeRamp", 1.0);
+    mainVol = 1.0;
     volumeRamp = RampedValue().value(0.7).length(0.1).target(rampTarget);
     
     
@@ -272,8 +273,8 @@ void ofApp::update(){
 
 void ofApp::updateInterfaceMesh() {
     
-    mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),mainInterfaceData[0].sliderWidth,tweenFloat);
-    mainInterfaceData[54].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),mainInterfaceData[0].sliderWidth,tweenFloat);
+    mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
+    mainInterfaceData[54].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
     
     
     mainInterfaceData[8].updateMainMesh(mainInterface,designGrid[0][1],tweenFloat);
@@ -291,14 +292,14 @@ void ofApp::updateInterfaceMesh() {
     // mainInterfaceData[42].updateMainMesh(mainInterface, designGrid[2][2], tweenFloat);
     
     
-    mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
-    mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
-    mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
+    mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), tweenFloat);
+    mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
+    mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()),tweenFloat);
     
     
-    mainInterfaceData[51].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), mainInterfaceData[1].sliderWidth,tweenFloat);
-    mainInterfaceData[52].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()), mainInterfaceData[2].sliderWidth,tweenFloat);
-    mainInterfaceData[53].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()), mainInterfaceData[3].sliderWidth,tweenFloat);
+    mainInterfaceData[51].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()),tweenFloat);
+    mainInterfaceData[52].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
+    mainInterfaceData[53].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()),tweenFloat);
     
     
     
@@ -589,39 +590,24 @@ void ofApp::mouseDragged(int x, int y, int button){
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x);
-                mainInterfaceData[1].sliderPos = mainInterfaceData[1].maxX - x;
-                // mainInterfaceData[1].elementName ="A "+ofToString( int(value*100));
-                
+                mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                cout << value  << endl;
             }
             if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x);
-                mainInterfaceData[2].sliderPos = mainInterfaceData[1].maxX - x;
-                //  mainInterfaceData[2].elementName ="B "+ofToString( int(value*100));
-                
+                mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x);
-                mainInterfaceData[3].sliderPos = mainInterfaceData[1].maxX - x;
-                // mainInterfaceData[3].elementName ="C "+ofToString(int( value*100));
-                
+                mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                cout << value  << endl;
             }
             
             if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[0].setSlider(mainInterface, mainInterfaceData[0].maxX - x);
-                // mainInterfaceData[0].elementName = "GLOBAL "+ofToString(int( value*100));
-                float newVol =  Tonic::mapLinToLog(value,0.0,1.0);
-                volumeRampValueChanged(newVol);
-                cout << value  << endl;
+                mainInterfaceData[0].setSlider(mainInterface, value);
+                volumeRampValueChanged(value);
             }
             
             
@@ -851,28 +837,26 @@ void ofApp::mousePressed(int x, int y, int button){
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[1].maxX - x );
-                mainInterfaceData[1].sliderPos = mainInterfaceData[1].maxX - x;
-                
+                mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                cout << value  << endl;
             }
             if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[2].maxX - x );
-                mainInterfaceData[2].sliderPos = mainInterfaceData[1].maxX - x;
-                
+                mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                cout << value  << endl;
             }
             if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
-                mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[3].maxX - x );
-                mainInterfaceData[3].sliderPos = mainInterfaceData[1].maxX - x;
-                
+                mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                cout << value  << endl;
             }
+            
+            if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[0].setSlider(mainInterface, value);
+                volumeRampValueChanged(value);
+            }
+            
             if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
                 buttonFourPress();
                 mainInterfaceData[37].blinkOn();
@@ -1329,7 +1313,10 @@ void ofApp::getBpmTick() {
 
 
 void ofApp::volumeRampValueChanged(float & volumeRampValue) {
-    tonicSynth.setParameter("mainVolumeRamp", volumeRampValue);
+    mainVol = volumeRampValue;
+    cout << "main " << Tonic::mapLinToLog(mainVol,0.0,1.0) << endl;
+    tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(mainVol,0.0,1.0));
+    
 }
 
 void ofApp::audioRequested (float * output, int bufferSize, int nChannels){
@@ -1929,9 +1916,10 @@ void ofApp::detailEditInterfaceOff() {
 }
 
 void ofApp::volumeInterfacOn() {
-    mainInterfaceData[1].sliderWidth = mainInterfaceData[1].maxX- ofMap(synths[synthButton[0]].sVolume, 0.0, 1.0, mainInterfaceData[1].minX, mainInterfaceData[1].maxX);
-    mainInterfaceData[2].sliderWidth = mainInterfaceData[2].maxX- ofMap(synths[synthButton[1]].sVolume, 0.0, 1.0, mainInterfaceData[2].minX, mainInterfaceData[2].maxX);
-    mainInterfaceData[3].sliderWidth = mainInterfaceData[3].maxX- ofMap(synths[synthButton[2]].sVolume, 0.0, 1.0, mainInterfaceData[3].minX, mainInterfaceData[3].maxX);
+    mainInterfaceData[0].sliderPct = ofMap( mainVol, 0.0,1.0,-1.0,1.0);
+    mainInterfaceData[1].sliderPct = ofMap( synths[synthButton[0]].sVolume, 0.0,1.0,-1.0,1.0);
+    mainInterfaceData[2].sliderPct = ofMap( synths[synthButton[1]].sVolume, 0.0,1.0,-1.0,1.0);
+    mainInterfaceData[3].sliderPct = ofMap( synths[synthButton[2]].sVolume, 0.0,1.0,-1.0,1.0);
     mainInterfaceData[1].showString = true;
     mainInterfaceData[1].animation = true;
     mainInterfaceData[1].moveDir = 1;
@@ -2181,8 +2169,8 @@ void ofApp::buttonOnePress(){
             mainInterfaceData[7].blinkOn();
         }
         
-        mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
-        mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
+        //  mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
+        // mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
         
         setNewGUI();
         
@@ -2233,8 +2221,8 @@ void ofApp::buttonOnePress(){
         aniPct = 0.0;
         interfaceMoving = true;
         
-        mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
-        mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
+        // mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
+        // mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
         
         setNewGUI();
         
@@ -2387,8 +2375,8 @@ void ofApp::buttonThreePress(){
             mainInterfaceData[7].blinkOn();
         }
         
-        mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
-        mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
+        // mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
+        //  mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
         
         setNewGUI();
         
@@ -2435,8 +2423,8 @@ void ofApp::buttonThreePress(){
         aniPct = 0.0;
         interfaceMoving = true;
         
-        mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
-        mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
+        //  mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
+        // mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
         
         
         setNewGUI();
@@ -2689,7 +2677,7 @@ void ofApp::saveToXml(){
     
     settings.clear();
     
-    
+    //--------------------------------
     //save grid presets
     settings.addTag("presets");
     settings.pushTag("presets");
@@ -2710,6 +2698,22 @@ void ofApp::saveToXml(){
         settings.popTag();
     }
     settings.popTag();
+    
+    //--------------------------------
+    
+    //save trackSwitchOn
+    settings.addTag("TrackSwitchOn");
+    settings.pushTag("TrackSwitchOn");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("synth");
+        settings.pushTag("synth",i);
+        settings.addValue("status", synths[synthButton[i]].trackSwitchOn);
+        settings.popTag();
+    }
+    settings.popTag();
+    
+    
+    //--------------------------------
     
     //save current grid
     
@@ -2733,30 +2737,74 @@ void ofApp::saveToXml(){
     }
     settings.popTag();
     
-    
-    
-    //save patch
-    settings.addTag("SynthPatch");
-    settings.pushTag("SynthPatch");
-    
-    settings.addTag("synth");
-    settings.pushTag("synth",0);
-    settings.addValue("patch", synths[synthButton[0]].preset);
+    //--------------------------------
+    //save volume
+    settings.addTag("Volumes");
+    settings.pushTag("Volumes");
+    settings.addTag("global");
+    settings.pushTag("global");
+    settings.addValue("volume",mainVol);
+    settings.popTag();
+    settings.addTag("slots");
+    settings.pushTag("slots");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("slot");
+        settings.pushTag("slot",i);
+        settings.addValue("volume", synths[synthButton[i]].sVolume);
+        settings.popTag();
+    }
+    settings.popTag();
     settings.popTag();
     
-    settings.addTag("synth");
-    settings.pushTag("synth",1);
-    settings.addValue("patch", synths[synthButton[1]].preset);
+    
+    
+    //--------------------------------
+    
+    //save preset
+    settings.addTag("Preset");
+    settings.pushTag("Preset");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("synth");
+        settings.pushTag("synth",i);
+        settings.addValue("index", synths[synthButton[i]].preset);
+        settings.popTag();
+    }
     settings.popTag();
     
-    settings.addTag("synth");
-    settings.pushTag("synth",2);
-    settings.addValue("patch", synths[synthButton[2]].preset);
+    //--------------------------------
+
+    //save synth color hue
+    settings.addTag("ColorHue");
+    settings.pushTag("ColorHue");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("synth");
+        settings.pushTag("synth",i);
+        settings.addValue("cHue", synths[synthButton[i]].colorHue);
+        settings.popTag();
+    }
     settings.popTag();
+    
+    
+    //--------------------------------
+    
+    //save scaleVecPosition and scale string
+    settings.addTag("ScaleVecPos");
+    settings.pushTag("ScaleVecPos");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("synth");
+        settings.pushTag("synth",i);
+        settings.addValue("index", synths[synthButton[i]].currentScaleVecPos);
+        settings.addValue("userScaleBool", synths[synthButton[i]].userScale);
+        settings.popTag();
+    }
+    settings.popTag();
+    
+    
+    //--------------------------------
+    
     
     settings.saveFile("settings.xml");
-    
-    
+
     
 }
 
@@ -2790,6 +2838,21 @@ void ofApp::loadFromXml(){
         }
         settings.popTag();
         
+        
+        //--------------------------------
+        
+        //get trackswitchOn status
+        settings.pushTag("TrackSwitchOn");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("synth",i);
+            synths[synthButton[i]].trackSwitchOn = settings.getValue("status", 0);
+            settings.popTag();
+        }
+        settings.popTag();
+        
+        
+        //--------------------------------
+        
         //load current grids
         settings.pushTag("currentGrids");
         for (int i = 0; i < 3; i++) {
@@ -2809,6 +2872,60 @@ void ofApp::loadFromXml(){
         settings.popTag();
         
         
+        
+        //--------------------------------
+        //load volume
+        settings.pushTag("Volumes");
+        settings.pushTag("global");
+        mainVol = settings.getValue("volume", 1.0);
+        volumeRampValueChanged(mainVol);
+        settings.popTag();
+        settings.pushTag("slots");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("slot",i);
+            synths[synthButton[i]].sVolume = settings.getValue("volume", 1.0);
+            synths[synthButton[i]].changeSynthVolume(synths[synthButton[i]].sVolume);
+            settings.popTag();
+        }
+        settings.popTag();
+        settings.popTag();
+        
+        
+        //--------------------------------
+        
+        //load sound patch
+        settings.pushTag("Preset");
+        for (int i = 0;  i < 3 ; i++) {
+            settings.pushTag("synth",i);
+            synths[synthButton[i]].preset = settings.getValue("index", 0);
+            settings.popTag();
+        }
+        settings.popTag();
+        
+        
+        //--------------------------------
+
+        //save synth color hue
+        settings.pushTag("ColorHue");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("synth",i);
+            synths[synthButton[i]].colorHue = settings.getValue("cHue", 0);
+            settings.popTag();
+        }
+        settings.popTag();
+        
+        
+        //--------------------------------
+        
+        //save scaleVecPosition and scale string
+        settings.pushTag("ScaleVecPos");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("synth",i);
+            synths[synthButton[i]].currentScaleVecPos = settings.getValue("index", 0);
+            synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
+            settings.popTag();
+        }
+        settings.popTag();
     }
     
     

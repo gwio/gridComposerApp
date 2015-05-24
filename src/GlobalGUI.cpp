@@ -44,7 +44,8 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     elementSize = elementSize_;
     onOff = true;
     
-    sliderWidth = 0.0;
+    sliderPct = 1.0;
+    sliderPos = 0.0;
     showString = false;
     
     animation = false;
@@ -173,12 +174,12 @@ void GlobalGUI::updateMainMeshB(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
 }
 
 void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
-    sliderWidth = width_;
+    sliderPct =ofMap(width_, 0.0, 1.0, -1.0, 1.0);
     
     mesh_.setVertex(0+counter, curPos+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
     mesh_.setVertex(1+counter, curPos+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
-    mesh_.setVertex(2+counter, curPos+ofVec3f(elementSize.x/2-sliderWidth, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
-    mesh_.setVertex(3+counter, curPos+ofVec3f(elementSize.x/2-sliderWidth, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
+    mesh_.setVertex(2+counter, curPos+ofVec3f( (elementSize.x/2)*sliderPct , elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
+    mesh_.setVertex(3+counter, curPos+ofVec3f( (elementSize.x/2)*sliderPct , -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-1))));
     
     minX = -elementSize.x/2+placement.x+curPos.x;
     maxX = elementSize.x/2+placement.x+curPos.x;
@@ -189,13 +190,13 @@ void GlobalGUI::setSlider(ofVboMesh& mesh_, float width_) {
     
 }
 
-void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float width_, float& tween_){
+void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float& tween_){
     
     if (animation) {
         mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
         mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-        mesh_.setVertex(2+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
-        mesh_.setVertex(3+counter, vec_+ofVec3f(elementSize.x/2-sliderWidth, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+        mesh_.setVertex(2+counter, vec_+ofVec3f( (elementSize.x/2)*sliderPct , elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
+        mesh_.setVertex(3+counter, vec_+ofVec3f( (elementSize.x/2)*sliderPct, -elementSize.y/2,0)+placement+(offPlacement*(abs(moveDir-tween_))));
         
         minX = -elementSize.x/2+placement.x+vec_.x;
         maxX = elementSize.x/2+placement.x+vec_.x;
