@@ -9,6 +9,7 @@
 #include "MusterContainer.h"
 #include "GlobalScales.h"
 #include "ofxFontStash.h"
+#include "ofxXmlSettings.h"
 
 
 using namespace Tonic;
@@ -22,6 +23,7 @@ public:
     void setup();
     void update();
     void draw();
+    void exit();
     void drawStringAndIcons();
     
     void keyPressed(int key);
@@ -79,6 +81,13 @@ public:
     void buttonThreePress();
     void buttonFourPress();
     void buttonEditDetail();
+    
+    
+    void loadFromXml();
+    void saveToXml();
+    
+    //xml
+    ofxXmlSettings settings;
     
     //tonic
     void setupAudio();

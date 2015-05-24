@@ -193,6 +193,9 @@ void ofApp::setup(){
     setNewGUI();
     muster = MusterContainer(mainInterfaceData[39].drawStringPos, ofVec2f( mainInterfaceData[39].elementSize), TILES);
     muster.setup();
+    
+    //load saves
+    loadFromXml();
 }
 
 void ofApp::setupAudio(){
@@ -886,8 +889,15 @@ void ofApp::mousePressed(int x, int y, int button){
             //muster container
             if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
                 int musterIndex =  muster.isInside(ofVec2f(x,y));
-                if ( musterIndex >= 0) {
-                    synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                
+                if (!muster.saveReady) {
+                    if ( musterIndex >= 0) {
+                        synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                    }
+                } else if (musterIndex >= 0){
+                    synths[activeSynth].getLayerInfo(muster.flips.at(musterIndex).layerInfo);
+                    muster.flips.at(musterIndex).makeTex();
+                    muster.saveReady = false;
                 }
             }
             
@@ -957,12 +967,20 @@ void ofApp::mousePressed(int x, int y, int button){
             //toggle save grid
             if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
                 //leer
+                muster.saveReady = true;
                 mainInterfaceData[12].blinkOn();
             }
             
-            //toggle get ranomd grid
+            //toggle get random grid
             if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
                 //leer
+                for (int i = 0; i < TILES; i++) {
+                    for (int j = 0; j < TILES; j++) {
+                        if (ofRandom(100)>60) {
+                            synths[activeSynth].tapEvent(i, j);
+                        }
+                    }
+                }
                 mainInterfaceData[40].blinkOn();
             }
             
@@ -1048,10 +1066,17 @@ void ofApp::mousePressed(int x, int y, int button){
                 mainInterfaceData[12].blinkOn();
             }
             
+            
             //toggle get random grid
             if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
                 //leer
-                
+                for (int i = 0; i < TILES; i++) {
+                    for (int j = 0; j < TILES; j++) {
+                        if (ofRandom(100)>60) {
+                            synths[activeSynth].tapEvent(i, j);
+                        }
+                    }
+                }
                 mainInterfaceData[40].blinkOn();
             }
             
@@ -2511,6 +2536,8 @@ void ofApp::buttonEditDetail() {
         mainInterfaceData[7].animationB = true;
         mainInterfaceData[39].animationB = true;
         mainInterfaceData[12].animationB = true;
+        mainInterfaceData[40].animationB = true;
+        
         
         
         
@@ -2558,6 +2585,8 @@ void ofApp::buttonEditDetail() {
         mainInterfaceData[7].animationB = true;
         mainInterfaceData[39].animationB = true;
         mainInterfaceData[12].animationB = true;
+        mainInterfaceData[40].animationB = true;
+        
         
         
         detailEditInterfaceOff();
@@ -2648,4 +2677,140 @@ ofColor ofApp::filterColor(ofColor c_){
     
     
     return temp;
+}
+
+void ofApp::exit(){
+    
+    saveToXml();
+}
+
+
+void ofApp::saveToXml(){
+    
+    settings.clear();
+    
+    
+    //save grid presets
+    settings.addTag("presets");
+    settings.pushTag("presets");
+    for (int i = 0; i < muster.flips.size(); i++) {
+        settings.addTag("muster");
+        settings.pushTag("muster",i);
+        string temp = "0000000000000000000000000";
+        for (int x = 0; x < muster.flips.at(i).layerInfo.size(); x++) {
+            for (int y = 0; y < muster.flips.at(i).layerInfo.at(x).size(); y++) {
+                if (muster.flips.at(i).layerInfo.at(x).at(y)) {
+                    temp.at(x+(TILES*y)) = '1';
+                } else {
+                    temp.at(x+(TILES*y)) = '0';
+                }
+            }
+        }
+        settings.addValue("info", temp);
+        settings.popTag();
+    }
+    settings.popTag();
+    
+    //save current grid
+    
+    settings.addTag("currentGrids");
+    settings.pushTag("currentGrids");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("grid");
+        settings.pushTag("grid",i);
+        string temp = "0000000000000000000000000";
+        for (int x  = 0; x < synths[synthButton[i]].layerInfo.size(); x++) {
+            for (int y  = 0; y < synths[synthButton[i]].layerInfo.at(x).size(); y++) {
+                if (synths[synthButton[i]].layerInfo.at(x).at(y).hasCube) {
+                    temp.at(x+(TILES*y)) = '1';
+                } else {
+                    temp.at(x+(TILES*y)) = '0';
+                }
+            }
+        }
+        settings.addValue("info", temp);
+        settings.popTag();
+    }
+    settings.popTag();
+    
+    
+    
+    //save patch
+    settings.addTag("SynthPatch");
+    settings.pushTag("SynthPatch");
+    
+    settings.addTag("synth");
+    settings.pushTag("synth",0);
+    settings.addValue("patch", synths[synthButton[0]].preset);
+    settings.popTag();
+    
+    settings.addTag("synth");
+    settings.pushTag("synth",1);
+    settings.addValue("patch", synths[synthButton[1]].preset);
+    settings.popTag();
+    
+    settings.addTag("synth");
+    settings.pushTag("synth",2);
+    settings.addValue("patch", synths[synthButton[2]].preset);
+    settings.popTag();
+    
+    settings.saveFile("settings.xml");
+    
+    
+    
+}
+
+void ofApp::loadFromXml(){
+    
+    //load grid presets from xml
+    if (settings.loadFile("settings.xml")) {
+        settings.pushTag("presets");
+        int nMuster = settings.getNumTags("muster");
+        
+        if (nMuster == muster.flips.size()) {
+            for (int i = 0; i < nMuster; i++) {
+                settings.pushTag("muster",i);
+                string temp = settings.getValue("info", "0");
+                
+                if (temp.size() == TILES*TILES){
+                    for (int x = 0; x < muster.flips.at(i).layerInfo.size(); x++) {
+                        for (int y = 0; y < muster.flips.at(i).layerInfo.at(x).size(); y++) {
+                            if (temp.at(x+(TILES*y)) == '1') {
+                                muster.flips.at(i).layerInfo.at(x).at(y) = true;
+                            }
+                            if (temp.at(x+(TILES*y)) == '0') {
+                                muster.flips.at(i).layerInfo.at(x).at(y) = false;
+                            }
+                        }
+                    }
+                    muster.flips.at(i).makeTex();
+                }
+                settings.popTag();
+            }
+        }
+        settings.popTag();
+        
+        //load current grids
+        settings.pushTag("currentGrids");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("grid",i);
+            string temp = settings.getValue("info", "0");
+            if (temp.size() == TILES*TILES){
+                for (int x = 0; x < TILES; x++) {
+                    for (int y = 0; y <TILES; y++) {
+                        if (temp.at(x+(TILES*y)) == '1') {
+                            synths[synthButton[i]].tapEvent(x, y);
+                        }
+                    }
+                }
+            }
+            settings.popTag();
+        }
+        settings.popTag();
+        
+        
+    }
+    
+    
+    
 }
