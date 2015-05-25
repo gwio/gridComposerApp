@@ -49,15 +49,15 @@ void MusterFlip::makeTex(){
     fbo_.begin();
    
     // ofEnableDepthTest();
-    ofClear(255, 255, 255,100);
+    ofClear(255, 255, 255,0);
     float rSize = size/gridTiles;
-    ofSetColor(ofColor::darkCyan);
+    //ofSetColor(ofColor::darkCyan);
 
    // ofRect(0,0, rSize*gridTiles, rSize*gridTiles);
     //ofNoFill();
-    //   ofTranslate(size/10, size/10);
+      // ofTranslate(size/10, size/10);
     //ofScale(0.8, 0.8);
-    ofSetColor(255, 255, 255,230);
+    ofSetColor(255, 255, 255,255);
     for (int i = 0; i < gridTiles; i++) {
         for (int j =0 ; j < gridTiles ; j++) {
             if( layerInfo.at(i).at(j) ){

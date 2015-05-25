@@ -23,7 +23,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     } else {
         elementColorOn = ofColor(0,0,0,0);
         targetColor = elementColorOff;
-        ofColor whiteColor = filterColor( ofColor(255,255,255,200));
+        ofColor whiteColor = filterColor( ofColor(255,255,255,230));
         displayColor = whiteColor;
         targetColor = whiteColor;
         elementColorTouch = ofColor::fromHsb(whiteColor.getHue(), whiteColor.getSaturation()-50, whiteColor.getBrightness()+90, 255);

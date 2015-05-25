@@ -3,7 +3,7 @@
 
 #define DISPLAY_NUMX 5
 #define DISPLAY_NUMY 4
-#define FLIP_SIZE_FAC 0.75
+#define FLIP_SIZE_FAC 0.8
 #define FLIP_MAX 5*4
 
 MusterContainer::MusterContainer() {
@@ -67,17 +67,41 @@ void MusterContainer::setup() {
 }
 void MusterContainer::draw(){
     
+    ofPushStyle();
+    ofSetColor(filterColor(elementColorTouch));
     for (int i = 0; i < displayGrid.size(); i++) {
         flips.at(i).draw(displayGrid.at(i)+centerPos);
     }
-    
+    ofPopStyle();
     
 }
+
+void MusterContainer::setColor(float hue_) {
+    
+    elementColorOn = ofColor::fromHsb(hue_, 100, 160,255);
+    
+    elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
+    elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
+    elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
+    
+    targetColor = elementColorOn;
+}
+
+ofColor MusterContainer::filterColor(ofColor c_){
+    ofColor temp;
+    temp.r = ofClamp(c_.r+15, 30, 220);
+    temp.g = ofClamp(c_.g-5, 30, 220);
+    temp.b = ofClamp(c_.b-10, 30, 220);
+    temp.a = ofClamp(c_.a-10, 10, 230);
+    return temp;
+}
+
+
 
 void MusterContainer::update(ofVec3f pos_) {
     
     centerPos = pos_;
-}
+    }
 
 void MusterContainer::saveToFlip(int index_) {
     

@@ -81,7 +81,7 @@ public:
     void buttonThreePress();
     void buttonFourPress();
     void buttonEditDetail();
-    
+    void bpmButtonPress();
     
     void loadFromXml();
     void saveToXml();
@@ -216,7 +216,12 @@ public:
     int editDetailMoveDirection;
     
     //icons
-    ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon ;
+    ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon, leftIcon, rightIcon, bpmIcon ;
     
     float scaleFac;
+    
+    bool startUp;
+    
+    float volumeRestart, volumeRestartTarget;
+    bool bpmButton;
    };

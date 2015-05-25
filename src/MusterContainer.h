@@ -18,6 +18,8 @@ public:
     void update(ofVec3f);
     void draw();
     
+    void setColor(float);
+    
     void saveToFlip(int);
     
     vector<MusterFlip> flips;
@@ -32,5 +34,9 @@ public:
     int isInside(ofVec2f);
     
     bool saveReady;
+    
+    ofColor displayColor, targetColor;
+    ofColor elementColorOn, elementColorOff,elementColorDarker,elementColorTouch;
+    ofColor filterColor(ofColor);
 
 };
