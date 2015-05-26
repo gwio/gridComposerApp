@@ -36,7 +36,7 @@ public:
     bool saveReady;
     
     ofColor displayColor, targetColor;
-    ofColor elementColorOn, elementColorOff,elementColorDarker,elementColorTouch;
+    ofColor elementColorOn, elementColorOff,elementColorDarker,elementColorTouch, elementColorDarkerTrans;
     ofColor filterColor(ofColor);
 
 };

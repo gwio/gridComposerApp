@@ -68,7 +68,11 @@ void MusterContainer::setup() {
 void MusterContainer::draw(){
     
     ofPushStyle();
-    ofSetColor(filterColor(elementColorTouch));
+    if (saveReady) {
+    ofSetColor(filterColor(elementColorDarkerTrans));
+    } else {
+        ofSetColor(filterColor(elementColorDarker));
+    }
     for (int i = 0; i < displayGrid.size(); i++) {
         flips.at(i).draw(displayGrid.at(i)+centerPos);
     }
@@ -82,6 +86,7 @@ void MusterContainer::setColor(float hue_) {
     
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
+    elementColorDarkerTrans = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 100 );
     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
     
     targetColor = elementColorOn;
