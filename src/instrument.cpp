@@ -674,7 +674,7 @@ void Instrument::drawDebug() {
             ofSetColor(255);
             
             if (layerInfo.at(i).at(j).hasCube) {
-                ofDrawBitmapString(ofToString( soundsMap[ layerInfo.at(i).at(j).cubeGroupId ].size), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
+                ofDrawBitmapString(ofToString( soundsMap[ layerInfo.at(i).at(j).cubeGroupId ].groupNote), cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->x, cubeVector[layerInfo.at(i).at(j).cubeVecNum].vec0Ptr->y);
                 
                 //ofRect(i*gridSize, j*gridSize, 10, gridSize, gridSize);
                 if (layerInfo.at(i).at(j).blocked) {
@@ -819,7 +819,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
             layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
             
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-          cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(tempPtr->groupColor,true);
+            cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(tempPtr->groupColor,true);
             //if pauseMode
             if (pause) {
                 cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].satOff();
@@ -840,7 +840,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 layerInfo.at(x).at(y).cubeGroupId = soundMapIndex;
                                 
                                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(tempPtr->groupColor);
-                               cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(tempPtr->groupColor,false);
+                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(tempPtr->groupColor,false);
                                 //if pauseMode
                                 if (pause) {
                                     cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor = tempPtr->groupColor;
@@ -899,7 +899,7 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
     
     for (int i = 0; i < tempPosis.size(); i++) {
         if (pause) {
-        cubeVector[layerInfo.at(tempPosis[i].x).at(tempPosis[i].y).cubeVecNum].satOn();
+            cubeVector[layerInfo.at(tempPosis[i].x).at(tempPosis[i].y).cubeVecNum].satOn();
         }
         addCube(tempPosis[i].x, tempPosis[i].y);
     }
@@ -984,7 +984,7 @@ void Instrument::changePreset(bool test_) {
     }
     
     if (test_) {
-    preset++;
+        preset++;
     } else {
         preset--;
     }
@@ -1015,7 +1015,7 @@ void Instrument::changePreset(bool test_) {
                                                                                                )
                                                                               );
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor( cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor,true);
-               
+                
                 //if in pause mode
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor = ofColor::fromHsb(
                                                                                           colorHue,
@@ -1042,7 +1042,7 @@ void Instrument::updateTonicOut(){
     }
     
     
-   
+    
     
     
     instrumentOut = (temp * outputRamp);
@@ -1067,7 +1067,7 @@ void Instrument::changeSynthVolume(float & vol_) {
     sVolume = vol_;
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId,Tonic::mapLinToLog(vol_,0.0,1.0));
     cout << instrumentId << Tonic::mapLinToLog(vol_,0.0,1.0) << endl;
-      scanZ = ofClamp( (SCAN_Z*vol_), CUBE_Z_HEIGHT, SCAN_Z) ;
+    scanZ = ofClamp( (SCAN_Z*vol_), CUBE_Z_HEIGHT, SCAN_Z) ;
 }
 
 
@@ -1125,14 +1125,15 @@ void Instrument::setMusicScale(GlobalScales& scale_,int num_){
 
 void Instrument::setKeyNote(int keyNote_) {
     
-    
-    int change = keyNote_;
-    keyNote = ofClamp(keyNote+change,0, 120);
-    cout << keyNote << endl;
-    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
-        if(it->second.size > 0){
-            it->second.groupNote+=keyNote_;
-            it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
+    if ( keyNote+keyNote_ >= 0 && keyNote+keyNote_ <= 120) {
+        int change = keyNote_;
+        keyNote = ofClamp(keyNote+change,0, 120);
+        cout << keyNote << endl;
+        for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+            if(it->second.size > 0){
+                it->second.groupNote+=change;
+                it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
+            }
         }
     }
     
@@ -1208,7 +1209,7 @@ ofPolyline Instrument::getEmptyPath(ofVec3f pos_) {
 }
 
 void Instrument::setNormals(ofVboMesh& mesh_) {
-   
+    
     mesh_.clearNormals();
     
     for( int i=0; i < mesh_.getIndices().size(); i+=3 ){
@@ -1228,10 +1229,10 @@ void Instrument::setNormals(ofVboMesh& mesh_) {
     }
     
     /*
-    if (bNormalize)
-        for(int i=0; i < mesh.getNormals().size(); i++ ) {
-            mesh.getNormals()[i].normalize();
-        }
+     if (bNormalize)
+     for(int i=0; i < mesh.getNormals().size(); i++ ) {
+     mesh.getNormals()[i].normalize();
+     }
      }
      */
 }

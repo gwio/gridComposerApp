@@ -46,7 +46,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
     } else if (preset_ == 2) {
         attack = 0.010;
-        ADSR adsr = ADSR(attack, 0.3, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.3, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
 
         //donald duck
         Generator outputGen = SineWave()
@@ -80,7 +80,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     } else if (preset_ == 5) {
         
         attack = 0.005;
-        ADSR adsr = ADSR(attack, 0.2, 0.3, 0.15).doesSustain(true).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.2, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
 
         
         Generator randomBass = (RectWave().freq( freq_ * SineWave().freq(3)) * 0.8) >> LPF24().cutoff( 2000 * (1 + ((SineWave().freq(0.1) + 1) * 0.5))).Q(1.5)  ;

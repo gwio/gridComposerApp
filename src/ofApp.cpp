@@ -253,7 +253,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-   tonicSynth.setOutputGen( (mainOut>>compressor)*volumeRamp );
+   tonicSynth.setOutputGen( ((mainOut>>delay)*volumeRamp)>>compressor );
 }
 
 //--------------------------------------------------------------
