@@ -1,9 +1,9 @@
 #include "ofApp.h"
 #define TILES 5
 #define TILESIZE 100/TILES
-#define TILEBORDER 0.055
+#define TILEBORDER 0.075
 #define BPM 220
-#define ANI_SPEED 0.025;
+#define ANI_SPEED 0.03;
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
@@ -12,14 +12,24 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    
+    //11025 samplerate changed in toniccore.h, only ios project
+#if TARGET_OS_IPHONE
+    ofSetOrientation(OF_ORIENTATION_90_RIGHT);
+    ofSoundStreamSetup(2, 1, this, 11025, 256, 4);
+#else
     ofSoundStreamSetup(2, 1, this, 44100, 256, 4);
+#endif
     
     ofSetFrameRate(60);
-    //ofDisableAntiAliasing();
     ofSetVerticalSync(true);
     ofEnableDepthTest();
     ofEnableAlphaBlending();
     
+    
+#if TARGET_OS_IPHONE
+    robotoLight.loadFont("fonts/Roboto-Light.ttf", 120);
+#else
     robotoLight.setup("fonts/Roboto-Light.ttf", //font file, ttf only
                       1.0,					//lineheight percent
                       1024,					//texture atlas dimension
@@ -27,11 +37,13 @@ void ofApp::setup(){
                       8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                       2.0f					//dpi scaleup, render textures @2x the reso
                       );				//lower res mipmaps wil bleed into each other
-    
-    
-    // robotoLight.setCharacterSpacing(1);
+    //robotoLight.setCharacterSpacing(1);
     robotoLight.setKerning(robotoLight.getKerning());
+#endif
     
+#if TARGET_OS_IPHONE
+    robotoBold.loadFont("fonts/Roboto-Bold.ttf", 120);
+#else
     robotoBold.setup("fonts/Roboto-Bold.ttf", //font file, ttf only
                      1.0,					//lineheight percent
                      1024,					//texture atlas dimension
@@ -39,11 +51,13 @@ void ofApp::setup(){
                      8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                      2.0f					//dpi scaleup, render textures @2x the reso
                      );				//lower res mipmaps wil bleed into each other
-    
-    
     // robotoBold.setCharacterSpacing(1);
     robotoBold.setKerning(robotoBold.getKerning());
+#endif
     
+#if TARGET_OS_IPHONE
+    robotoCon.loadFont("fonts/RobotoCondensed-Italic.ttf", 120);
+#else
     robotoCon.setup("fonts/RobotoCondensed-Italic.ttf", //font file, ttf only
                     1.0,					//lineheight percent
                     1024,					//texture atlas dimension
@@ -51,15 +65,15 @@ void ofApp::setup(){
                     8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                     2.0f					//dpi scaleup, render textures @2x the reso
                     );				//lower res mipmaps wil bleed into each other
-    
-    
     // robotoCon.setCharacterSpacing(1);
     robotoCon.setKerning(robotoCon.getKerning());
+#endif
     
     scaleCollection.loadScales();
     makeDesignGrid();
     currentState = STATE_DEFAULT;
-    
+    bpmButton = false;
+
     
     synthPos.resize(3);
     
@@ -97,7 +111,7 @@ void ofApp::setup(){
     
     activeSynth = 1;
     
-    
+    //global volume
     ControlParameter rampTarget = tonicSynth.addParameter("mainVolumeRamp").max(1.0).min(0.0);
     tonicSynth.setParameter("mainVolumeRamp", 0.0);
     mainVol = 0.0;
@@ -105,6 +119,8 @@ void ofApp::setup(){
     startUp = true;
     volumeRestart = 0.0;
     volumeRestartTarget = 0.0;
+    
+   
     
     bpm = BPM;
     
@@ -115,7 +131,6 @@ void ofApp::setup(){
     ofAddListener(*pulseEvent, this, &ofApp::pulseEvent );
     
     
-    setupAudio();
     
     makePresetString();
     
@@ -129,7 +144,6 @@ void ofApp::setup(){
     
     ofBackground( filterColor(ofColor(22,22,22)) );
     
-    //  ofEnableLighting();
     light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
     light.setDiffuseColor( ofColor(100,100,100));
     material.setShininess(55);
@@ -163,8 +177,7 @@ void ofApp::setup(){
     animCam = false;
     interfaceMoving = false;
     debugCam = false;
-    bpmButton = false;
-    
+    insideSynth = false;
     
     //load icons
     ofImage temp;
@@ -209,17 +222,38 @@ void ofApp::setup(){
     loadFromXml();
     
     setNewGUI();
-    
+    setupAudio();
+
 }
 
 void ofApp::setupAudio(){
+    
     Generator temp;
     for (int i = 0; i < synths.size(); i++) {
         temp = temp + synths[i].instrumentOut;
     }
     mainOut = temp ;
     
-    tonicSynth.setOutputGen(mainOut*volumeRamp);
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.14f,0.24f)
+    .delayTimeLeft( 0.14 )
+    .delayTimeRight(0.22)
+    .feedback(0.18)
+    .dryLevel(0.95)
+    .wetLevel(0.1);
+    
+    
+   
+    
+    //compressor
+    Tonic::Compressor compressor = Compressor()
+    .release(0.015)
+    .attack(0.001)
+    .threshold( dBToLin(-22.f) )
+    .ratio(4)
+    .lookahead(0.001)
+    .bypass(false);
+    
+   tonicSynth.setOutputGen( (mainOut>>compressor)*volumeRamp );
 }
 
 //--------------------------------------------------------------
@@ -284,12 +318,11 @@ void ofApp::update(){
     }
     
     
-    intersectPlane(ofGetMouseX(),ofGetMouseY());
+    // intersectPlane(ofGetMouseX(),ofGetMouseY());
     
     
-    //light
-    //light.setPosition( synthActivePos.getPosition().x, synthActivePos.getPosition().y+200,synthActivePos.getPosition().z-500 );
-     light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+    
+    light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -307,11 +340,6 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[37].updateMainMesh(mainInterface, designGrid[0][0], tweenFloat);
     mainInterfaceData[38].updateMainMesh(mainInterface, designGrid[2][0], tweenFloat);
-    
-    // mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[0][2], tweenFloat);
-    // mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[1][2], tweenFloat);
-    // mainInterfaceData[42].updateMainMesh(mainInterface, designGrid[2][2], tweenFloat);
-    
     
     mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), tweenFloat);
     mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
@@ -365,7 +393,7 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[44].updateMainMesh(mainInterface, designGrid[1][0] ,tweenFloat);
     
     mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[1][0] ,tweenFloat);
-
+    
     
     
     for (int i = 45; i < 45+4; i++) {
@@ -398,7 +426,7 @@ void ofApp::draw(){
     }
     
     //  thisIntersect.draw();
-    //   shader.begin();
+    
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
         
@@ -408,7 +436,6 @@ void ofApp::draw(){
         
     }
     
-    //  shader.end();
     
     if (!debugCam) {
         testCam.end();
@@ -426,8 +453,7 @@ void ofApp::draw(){
     glDisable(GL_DEPTH_TEST);
     
     
-    //  glDisable(GL_MULTISAMPLE);
-    
+    glDisable(GL_MULTISAMPLE);
     
     
     mainInterface.draw();
@@ -435,8 +461,6 @@ void ofApp::draw(){
     drawStringAndIcons();
     
     muster.draw();
-    
-    
     
 }
 
@@ -491,10 +515,10 @@ void ofApp::drawStringAndIcons(){
     bpmIcon.draw(mainInterfaceData[41].drawStringPos.x-tempTrans, mainInterfaceData[41].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
     
     ofSetColor(mainInterfaceData[37].displayColor);
-        volumeIcon.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
-        
-        
-        ofSetColor(mainInterfaceData[8].displayColor);
+    volumeIcon.draw(mainInterfaceData[37].drawStringPos.x-tempTrans, mainInterfaceData[37].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    
+    
+    ofSetColor(mainInterfaceData[8].displayColor);
     
     if(!synths[synthButton[0]].pause) {
         pauseIcon.draw(mainInterfaceData[8].drawStringPos.x-tempTrans, mainInterfaceData[8].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
@@ -523,10 +547,11 @@ void ofApp::drawStringAndIcons(){
     
 }
 
+#if !TARGET_OS_IPHONE
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
-    //setupAudio();
     if (key == 's') {
         ofImage pix;
         pix.allocate(ofGetWidth(), ofGetHeight(), OF_IMAGE_COLOR);
@@ -573,10 +598,26 @@ void ofApp::keyReleased(int key){
 void ofApp::mouseMoved(int x, int y ){
     
 }
+#endif
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
+
+#if TARGET_OS_IPHONE
+void ofApp::touchMoved(ofTouchEventArgs & touch){
     
+    int x = touch.x;
+    int y = touch.y;
+    
+    replaceMouseDragged(x, y);
+}
+#else
+void ofApp::mouseDragged(int x, int y, int button){
+    replaceMouseDragged(x, y);
+}
+#endif
+//--------------------------------------------------------------
+
+void ofApp::replaceMouseDragged(int x, int y){
     
     if (!interfaceMoving) {
         
@@ -584,27 +625,27 @@ void ofApp::mouseDragged(int x, int y, int button){
         if (currentState == STATE_DEFAULT) {
             
             if(bpmButton) {
-            if(mainInterfaceData[38].isInside(ofVec2f(x,y))) {
-                if (!mainInterfaceData[38].touchDown){
-                    mainInterfaceData[38].touchStart = ofVec2f(x,y);
-                    mainInterfaceData[38].touchDown = true;
-                }
-                
-                if (mainInterfaceData[38].touchDown) {
-                    
-                    int bpmMod = (mainInterfaceData[38].touchStart.x - x)/6;
-                    mainInterfaceData[38].tempInt = bpmMod;
-                    
-                    if ( abs(bpmMod) > 0 ){
-                        mainInterfaceData[38].touchStart.x = x;
-                        bpm=ofClamp(bpm+bpmMod,1 ,1000);
-                        tonicSynth.setParameter("BPM",bpm);
-                        mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
+                if(mainInterfaceData[38].isInside(ofVec2f(x,y))) {
+                    if (!mainInterfaceData[38].touchDown){
+                        mainInterfaceData[38].touchStart = ofVec2f(x,y);
+                        mainInterfaceData[38].touchDown = true;
                     }
                     
-                    cout <<     mainInterfaceData[38].touchStart.x << endl;
-                    
-                }
+                    if (mainInterfaceData[38].touchDown) {
+                        
+                        int bpmMod = (mainInterfaceData[38].touchStart.x - x)/6;
+                        mainInterfaceData[38].tempInt = bpmMod;
+                        
+                        if ( abs(bpmMod) > 0 ){
+                            mainInterfaceData[38].touchStart.x = x;
+                            bpm=ofClamp(bpm+bpmMod,1 ,1000);
+                            tonicSynth.setParameter("BPM",bpm);
+                            mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
+                        }
+                        
+                        cout <<     mainInterfaceData[38].touchStart.x << endl;
+                        
+                    }
                 }
             }
             
@@ -639,34 +680,7 @@ void ofApp::mouseDragged(int x, int y, int button){
             
         }
         
-        if (currentState == STATE_EDIT) {
-            
-            /*
-             if(mainInterfaceData[39].isInside(ofVec2f(x,y))) {
-             if (!mainInterfaceData[39].touchDown){
-             mainInterfaceData[39].touchStart = ofVec2f(x,y);
-             mainInterfaceData[39].touchDown = true;
-             }
-             
-             if (mainInterfaceData[39].touchDown) {
-             
-             int keyMod = (mainInterfaceData[39].touchStart.x - x)/20;
-             mainInterfaceData[39].tempInt = keyMod;
-             
-             if ( abs(keyMod) > 0 ){
-             mainInterfaceData[39].touchStart.x = x;
-             synths[activeSynth].setKeyNote(keyMod);
-             //setNewGUI();
-             mainInterfaceData[39].elementName = "Pitch Note " + notes[  (synths[activeSynth].keyNote)%12 ];
-             }
-             
-             cout <<     mainInterfaceData[39].touchStart.x << endl;
-             
-             
-             }
-             }
-             */
-        }
+        
         
         if (currentState == STATE_EDIT_DETAIL) {
             
@@ -705,9 +719,27 @@ void ofApp::mouseDragged(int x, int y, int button){
     }
 }
 
+
+
+#if TARGET_OS_IPHONE
+//--------------------------------------------------------------
+void ofApp::touchDown(ofTouchEventArgs & touch){
+    
+    int x = touch.x;
+    int y = touch.y;
+    
+    replaceMousePressed(x, y);
+}
+#else
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
+    replaceMousePressed(x, y);
+}
+#endif
+//--------------------------------------------------------------
+
+void ofApp::replaceMousePressed(int x, int y) {
     
     if (!interfaceMoving) {
         if (currentState == STATE_EDIT) {
@@ -721,8 +753,7 @@ void ofApp::mousePressed(int x, int y, int button){
         }
     }
     
-    //   curTap = ofGetElapsedTimeMillis();
-    //   if ( lastTap != 0 && (curTap-lastTap < doubleClickTime)) {
+    
     
     if (!interfaceMoving) {
         
@@ -779,19 +810,12 @@ void ofApp::mousePressed(int x, int y, int button){
         
     }
     
-    
-    
-    //  }
-    
-    //   lastTap = curTap;
-    
     if ( (!interfaceMoving) && (!insideSynth) ){
         
         
         if (currentState == STATE_DEFAULT) {
             
             if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
-                //cout << "0 pause"  << endl;
                 mainInterfaceData[8].blinkOn();
                 
                 if (!synths[synthButton[0]].pause) {
@@ -805,7 +829,6 @@ void ofApp::mousePressed(int x, int y, int button){
                 
             }
             if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
-                //cout << "1 pause"  << endl;
                 mainInterfaceData[9].blinkOn();
                 
                 if (!synths[synthButton[1]].pause) {
@@ -818,7 +841,6 @@ void ofApp::mousePressed(int x, int y, int button){
                 
             }
             if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
-                // cout << "2 pause"  << endl;
                 mainInterfaceData[10].blinkOn();
                 
                 if (!synths[synthButton[2]].pause) {
@@ -833,15 +855,13 @@ void ofApp::mousePressed(int x, int y, int button){
             if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
                 buttonFourPress();
                 mainInterfaceData[37].blinkOn();
-                cout << "button 4" << endl;
             }
             
-                       if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
-                           mainInterfaceData[41].blinkOn();
+            if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
+                mainInterfaceData[41].blinkOn();
                 bpmButtonPress();
-                cout << "bpm"   << endl;
             }
-        
+            
         }
         
         else  if (currentState == STATE_VOLUME) {
@@ -920,7 +940,7 @@ void ofApp::mousePressed(int x, int y, int button){
                     synths[activeSynth].changePreset(true);
                 } else {
                     synths[activeSynth].changePreset(false);
-                }                //mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
+                }
                 setNewGUI();
                 mainInterfaceData[7].blinkOn();
             }
@@ -934,13 +954,11 @@ void ofApp::mousePressed(int x, int y, int button){
                 synths[activeSynth].setKeyNote(-12);
                 setNewGUI();
                 mainInterfaceData[4].blinkOn();
-                //cout << "-12"  << endl;
             }
             if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(12);
                 setNewGUI();
                 mainInterfaceData[6].blinkOn();
-                // cout << "+12"  << endl;
             }
             
             for (int i = 1; i < 12; i++) {
@@ -978,7 +996,7 @@ void ofApp::mousePressed(int x, int y, int button){
                 mainInterfaceData[40].blinkOn();
             }
             
-      
+            
         }
         
         else if (currentState == STATE_EDIT) {
@@ -1003,7 +1021,6 @@ void ofApp::mousePressed(int x, int y, int button){
             if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonTwoPress();
                 mainInterfaceData[43].blinkOn();
-                //cout << "vvv" << endl;
             }
             
             //scale
@@ -1030,7 +1047,6 @@ void ofApp::mousePressed(int x, int y, int button){
                 } else {
                     synths[activeSynth].changePreset(false);
                 }
-                //mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
                 setNewGUI();
                 mainInterfaceData[7].blinkOn();
                 
@@ -1087,15 +1103,24 @@ void ofApp::mousePressed(int x, int y, int button){
     }
 }
 
+#if TARGET_OS_IPHONE
+//--------------------------------------------------------------
+void ofApp::touchUp(ofTouchEventArgs & touch){
+    int x = touch.x;
+    int y = touch.y;
+    
+    replaceMouseReleased(x, y);
+}
+#else
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    
-    /*
-     if (mainInterfaceData[39].touchDown){
-     mainInterfaceData[39].touchDown = !mainInterfaceData[39].touchDown;
-     }
-     */
-    
+    replaceMouseReleased(x, y);
+}
+#endif
+//--------------------------------------------------------------
+
+
+void ofApp::replaceMouseReleased(int x,int y) {
     if (mainInterfaceData[38].touchDown){
         mainInterfaceData[38].touchDown = !mainInterfaceData[38].touchDown;
     }
@@ -1106,6 +1131,53 @@ void ofApp::mouseReleased(int x, int y, int button){
     
 }
 
+#if TARGET_OS_IPHONE
+//--------------------------------------------------------------
+void ofApp::touchDoubleTap(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::touchCancelled(ofTouchEventArgs & touch){
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::lostFocus(){
+     startUp = true;
+    volumeRestartTarget = mainVol;
+    volumeRestart = 0.0;
+    tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
+    saveToXml();
+    //volumeRampValueChanged(mainVol);
+    
+    //    mainVol = 0.0;
+    
+    cout << "lost focus"  << endl;
+}
+
+//--------------------------------------------------------------
+void ofApp::gotFocus(){
+    // startUp = true;
+    //volumeRestartTarget = mainVol;
+    //volumeRestart = 0.0;
+    //tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
+    
+    cout <<"gotfocus" << endl;
+}
+
+//--------------------------------------------------------------
+void ofApp::gotMemoryWarning(){
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::deviceOrientationChanged(int newOrientation){
+    
+}
+#endif
+
+#if !TARGET_OS_IPHONE
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
     makeDesignGrid();
@@ -1121,7 +1193,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
     
 }
 
-
+#endif
 
 void ofApp::drawDebug() {
     
@@ -1314,8 +1386,8 @@ void ofApp::getBpmTick() {
 void ofApp::volumeRampValueChanged(float & volumeRampValue) {
     
     mainVol = volumeRampValue;
-   
-    cout << "main " << Tonic::mapLinToLog(mainVol,0.0,1.0) << endl;
+    
+    // cout << "main " << Tonic::mapLinToLog(mainVol,0.0,1.0) << endl;
     tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(mainVol,0.0,1.0));
     
 }
@@ -1626,7 +1698,7 @@ void ofApp::setupGlobalInterface() {
     
     //toggle bpm icon
     place = ofVec3f(0,0,0);
-    offPlace = ofVec3f(designGrid[0][0].y*6,0,0);
+    offPlace = ofVec3f(designGrid[0][0].y*12,0,0);
     temp = GlobalGUI(41, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
@@ -2001,11 +2073,12 @@ void ofApp::volumeInterfaceOff() {
     mainInterfaceData[41].showString = false;
     mainInterfaceData[41].animation = true;
     mainInterfaceData[41].moveDir = 1;
-    
+    /*
     if(bpmButton) {
         mainInterfaceData[38].animation = true;
         mainInterfaceData[38].moveDir = 1;
     }
+     */
 }
 
 void ofApp::pauseInterfaceOn() {
@@ -2026,7 +2099,7 @@ void ofApp::pauseInterfaceOn() {
         mainInterfaceData[37].moveDir = 1;
         mainInterfaceData[37].animation = true;
     }
-   
+    
     if (bpmButton) {
         mainInterfaceData[38].moveDir = 1;
         mainInterfaceData[38].animation = true;
@@ -2035,7 +2108,7 @@ void ofApp::pauseInterfaceOn() {
     mainInterfaceData[41].showString = false;
     mainInterfaceData[41].moveDir = 1;
     mainInterfaceData[41].animation = true;
-
+    
 }
 
 void ofApp::pauseInterfaceOff() {
@@ -2052,12 +2125,12 @@ void ofApp::pauseInterfaceOff() {
     mainInterfaceData[10].animation = true;
     
     if (bpmButton) {
-    mainInterfaceData[38].moveDir = 0;
-    mainInterfaceData[38].animation = true;
+        mainInterfaceData[38].moveDir = 0;
+        mainInterfaceData[38].animation = true;
     }
-         
-     mainInterfaceData[41].moveDir = 0;
-     mainInterfaceData[41].animation = true;
+    
+    mainInterfaceData[41].moveDir = 0;
+    mainInterfaceData[41].animation = true;
     
     
 }
@@ -2118,6 +2191,7 @@ void ofApp::makePresetString() {
     presetNames.push_back("whistler");
     presetNames.push_back("box");
     presetNames.push_back("bender");
+    presetNames.push_back("box2");
     
     
 }
@@ -2604,8 +2678,8 @@ void ofApp::buttonEditDetail() {
 void ofApp::bpmButtonPress() {
     
     if (!bpmButton){
-    aniPct = 0.0;
-    interfaceMoving = true;
+        aniPct = 0.0;
+        interfaceMoving = true;
         
         mainInterfaceData[38].showString = true;
         mainInterfaceData[38].moveDir = 1;
@@ -2872,8 +2946,11 @@ void ofApp::saveToXml(){
     settings.addValue("value", bpm);
     settings.popTag();
     
+#if TARGET_OS_IPHONE
+    settings.saveFile(ofxiOSGetDocumentsDirectory()+"settings.xml");
+#else
     settings.saveFile("settings.xml");
-    
+#endif
     
 }
 
@@ -2881,7 +2958,14 @@ void ofApp::loadFromXml(){
     startUp = true;
     
     //load grid presets from xml
-    if (settings.loadFile("settings.xml")) {
+#if TARGET_OS_IPHONE
+    if (settings.loadFile(ofxiOSGetDocumentsDirectory()+"settings.xml")) {
+#else
+        if (settings.loadFile("settings.xml")) {
+#endif
+        }else if (settings.loadFile("settingsDefault.xml")) {
+            
+        }
         settings.pushTag("presets");
         int nMuster = settings.getNumTags("muster");
         
@@ -2938,7 +3022,7 @@ void ofApp::loadFromXml(){
         for (int i = 0; i < 3; i++) {
             settings.pushTag("synth",i);
             synths[synthButton[i]].currentScaleVecPos = settings.getValue("ScaleVecPos", 0);
-         //   synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos);
+            //   synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos);
             
             synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
             
@@ -2951,7 +3035,7 @@ void ofApp::loadFromXml(){
             synths[synthButton[i]].pause = settings.getValue("pauseStatus", 0);
             
             synths[synthButton[i]].keyNote = settings.getValue("keyNote", 0);
-
+            
             //scaleNoteSteps
             string tempActiveScale = settings.getValue("ActiveScaleBool", "100000000000");
             for (int j = 0; j < 12; j++) {
@@ -2959,7 +3043,7 @@ void ofApp::loadFromXml(){
                     synths[synthButton[i]].activeScale.steps[j] = true;
                 } else {
                     synths[synthButton[i]].activeScale.steps[j] = false;
-
+                    
                 }
             }
             
@@ -2973,7 +3057,7 @@ void ofApp::loadFromXml(){
                 settings.popTag();
             }
             settings.popTag();
-
+            
             
             //activeDirection
             settings.pushTag("activeDirection");
@@ -3072,4 +3156,4 @@ void ofApp::loadFromXml(){
     
     
     
-}
+    

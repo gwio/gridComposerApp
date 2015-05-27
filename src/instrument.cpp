@@ -960,7 +960,7 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     float freqRamp = 0.16;
     
     //create volume ramp
-    Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget");
+    Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget").max(1.0).min(0.0);
     cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
     cgPtr->rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
     
@@ -1042,15 +1042,10 @@ void Instrument::updateTonicOut(){
     }
     
     
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.14f,0.24f)
-    .delayTimeLeft( 0.14 )
-    .delayTimeRight(0.22)
-    .feedback(0.18)
-    .dryLevel(0.95)
-    .wetLevel(0.1);
+   
     
     
-    instrumentOut = (temp>>delay) * outputRamp;
+    instrumentOut = (temp * outputRamp);
     synthHasChanged = true;
 }
 

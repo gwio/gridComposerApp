@@ -4,21 +4,27 @@
 #include "ofxRay.h"
 #include "instrument.h"
 #include "ofxTonic.h"
-#include "ofxGui.h"
 #include "GlobalGUI.h"
 #include "MusterContainer.h"
 #include "GlobalScales.h"
 #include "ofxFontStash.h"
 #include "ofxXmlSettings.h"
 
+#if TARGET_OS_IPHONE
+#include "ofxiOS.h"
+#include "ofxiOSExtras.h"
+#endif
 
 using namespace Tonic;
 
 
 
+#if TARGET_OS_IPHONE
+class ofApp : public ofxiOSApp{
+#else
+    class ofApp : public ofBaseApp{
+#endif
 
-class ofApp : public ofBaseApp{
-    
 public:
     void setup();
     void update();
@@ -26,6 +32,17 @@ public:
     void exit();
     void drawStringAndIcons();
     
+#if TARGET_OS_IPHONE
+    void touchDown(ofTouchEventArgs & touch);
+    void touchMoved(ofTouchEventArgs & touch);
+    void touchUp(ofTouchEventArgs & touch);
+    void touchDoubleTap(ofTouchEventArgs & touch);
+    void touchCancelled(ofTouchEventArgs & touch);
+    void lostFocus();
+    void gotFocus();
+    void gotMemoryWarning();
+    void deviceOrientationChanged(int newOrientation);
+#else
     void keyPressed(int key);
     void keyReleased(int key);
     void mouseMoved(int x, int y );
@@ -35,6 +52,13 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+
+#endif
+    
+    void replaceMousePressed(int x,int y);
+    void replaceMouseDragged(int x,int y);
+    void replaceMouseReleased(int x,int y);
+    
     
     void updateInterfaceMesh();
     
@@ -96,6 +120,8 @@ public:
     //mainout
     ofxTonicSynth tonicSynth;
     RampedValue volumeRamp;
+     
+        
     float mainVol;
     Generator mainOut;
     
@@ -161,7 +187,7 @@ public:
     ofPlane thisIntersect;
     ofPlanePrimitive planeForIntersect;
     
- 
+    
     ofColor filterColor(ofColor);
     
     
@@ -196,8 +222,8 @@ public:
     vector<GlobalGUI> mainInterfaceData;
     ofVboMesh mainInterface;
     ofVboMesh mainInterfaceFbo;
-  
-   
+    
+    
     
     //interface stuff
     bool focusCam;
@@ -224,4 +250,4 @@ public:
     
     float volumeRestart, volumeRestartTarget;
     bool bpmButton;
-   };
+};
