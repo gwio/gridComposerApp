@@ -250,4 +250,6 @@ public:
     
     float volumeRestart, volumeRestartTarget;
     bool bpmButton;
+        
+        string appVersion;
 };

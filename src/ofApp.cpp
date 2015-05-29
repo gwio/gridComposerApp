@@ -4,6 +4,7 @@
 #define TILEBORDER 0.075
 #define BPM 220
 #define ANI_SPEED 0.03;
+#define VERSION "0.91.6";
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
@@ -12,7 +13,6 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    
     //11025 samplerate changed in toniccore.h, only ios project
 #if TARGET_OS_IPHONE
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);
@@ -73,7 +73,7 @@ void ofApp::setup(){
     makeDesignGrid();
     currentState = STATE_DEFAULT;
     bpmButton = false;
-
+    appVersion = VERSION;
     
     synthPos.resize(3);
     
@@ -120,7 +120,7 @@ void ofApp::setup(){
     volumeRestart = 0.0;
     volumeRestartTarget = 0.0;
     
-   
+    
     
     bpm = BPM;
     
@@ -223,7 +223,7 @@ void ofApp::setup(){
     
     setNewGUI();
     setupAudio();
-
+    
 }
 
 void ofApp::setupAudio(){
@@ -242,7 +242,7 @@ void ofApp::setupAudio(){
     .wetLevel(0.1);
     
     
-   
+    
     
     //compressor
     Tonic::Compressor compressor = Compressor()
@@ -253,7 +253,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-   tonicSynth.setOutputGen( ((mainOut>>delay)*volumeRamp)>>compressor );
+    tonicSynth.setOutputGen( ((mainOut>>delay)*volumeRamp)>>compressor );
 }
 
 //--------------------------------------------------------------
@@ -358,13 +358,9 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
     
-    mainInterfaceData[12].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
-    mainInterfaceData[12].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-                                          ,tweenFloat);
+    mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[1][0], tweenFloat);
     
-    mainInterfaceData[40].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
-    mainInterfaceData[40].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-                                          ,tweenFloat);
+    mainInterfaceData[40].updateMainMesh(mainInterface,designGrid[1][0], tweenFloat);
     
     
     for (int i = 0; i < 12; i++) {
@@ -426,7 +422,6 @@ void ofApp::draw(){
     }
     
     //  thisIntersect.draw();
-    
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
         
@@ -461,7 +456,6 @@ void ofApp::draw(){
     drawStringAndIcons();
     
     muster.draw();
-    
 }
 
 void ofApp::drawStringAndIcons(){
@@ -976,27 +970,10 @@ void ofApp::replaceMousePressed(int x, int y) {
             //toogle grid preset container
             muster.isInside(ofVec2f(x,y));
             
-            //toggle save grid
-            if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
-                //leer
-                muster.saveReady = true;
-                mainInterfaceData[12].blinkOn();
-            }
+                       
             
-            //toggle get random grid
-            if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
-                //leer
-                for (int i = 0; i < TILES; i++) {
-                    for (int j = 0; j < TILES; j++) {
-                        if (ofRandom(100)>60) {
-                            synths[activeSynth].tapEvent(i, j);
-                        }
-                    }
-                }
-                mainInterfaceData[40].blinkOn();
-            }
-            
-            
+        
+        
         }
         
         else if (currentState == STATE_EDIT) {
@@ -1144,7 +1121,7 @@ void ofApp::touchCancelled(ofTouchEventArgs & touch){
 
 //--------------------------------------------------------------
 void ofApp::lostFocus(){
-     startUp = true;
+    startUp = true;
     volumeRestartTarget = mainVol;
     volumeRestart = 0.0;
     tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
@@ -1628,13 +1605,9 @@ void ofApp::setupGlobalInterface() {
     
     
     //save to presets button
-    place = ofVec3f(
-                    -(horizontalSlider.x*0.86)+((horizontalSlider.x*0.86)/4),
-                    (designGrid[0][0].y*1.65)+(designGrid[0][0].y*0.35*0.5)+(designGrid[0][0].y*0.2),
-                    0
-                    );
-    offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(12,string(""), ofVec3f( (horizontalSlider.x*0.86)/2,designGrid[0][0].y*0.35,0),ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
+    place = ofVec3f(smallButton.x,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
+    temp = GlobalGUI(12,string(""),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
@@ -1679,20 +1652,16 @@ void ofApp::setupGlobalInterface() {
     
     
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    place = ofVec3f(-(horizontalSlider.x*0.86)/2,(designGrid[0][0].y*1.65)/2,0);
-    temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*1.65,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&robotoLight);
+    place = ofVec3f(-(horizontalSlider.x*0.86)/2,(designGrid[0][0].y*2)/2,0);
+    temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&robotoLight);
     mainInterfaceData.push_back(temp);
     
     //toggle 1,2,3
     
     //make random grid icon
-    place = ofVec3f(
-                    -((horizontalSlider.x*0.86)/4),
-                    (designGrid[0][0].y*1.65)+(designGrid[0][0].y*0.35*0.5)+(designGrid[0][0].y*0.2),
-                    0
-                    );
-    offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(40,string(""), ofVec3f( (horizontalSlider.x*0.86)/2,designGrid[0][0].y*0.35,0),ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
+    place = ofVec3f(-smallButton.x,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
+    temp = GlobalGUI(40,string(""), smallButton ,ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
@@ -1919,7 +1888,11 @@ void ofApp::detailEditInterfaceOn() {
     mainInterfaceData[44].moveDir = 0;
     mainInterfaceData[44].animation = true;
     
+    mainInterfaceData[40].moveDir = 0;
+    mainInterfaceData[40].animation = true;
     
+    mainInterfaceData[12].moveDir = 0;
+    mainInterfaceData[12].animation = true;
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].moveDir = 1;
@@ -1981,7 +1954,13 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[44].moveDir = 1;
     mainInterfaceData[44].animation = true;
     
+    mainInterfaceData[12].showString = false;
+    mainInterfaceData[12].moveDir = 1;
+    mainInterfaceData[12].animation = true;
     
+    mainInterfaceData[40].showString = false;
+    mainInterfaceData[40].moveDir = 1;
+    mainInterfaceData[40].animation = true;
     
     /*
      mainInterfaceData[39].showString = true;
@@ -2074,10 +2053,10 @@ void ofApp::volumeInterfaceOff() {
     mainInterfaceData[41].animation = true;
     mainInterfaceData[41].moveDir = 1;
     /*
-    if(bpmButton) {
-        mainInterfaceData[38].animation = true;
-        mainInterfaceData[38].moveDir = 1;
-    }
+     if(bpmButton) {
+     mainInterfaceData[38].animation = true;
+     mainInterfaceData[38].moveDir = 1;
+     }
      */
 }
 
@@ -2191,7 +2170,6 @@ void ofApp::makePresetString() {
     presetNames.push_back("whistler");
     presetNames.push_back("box");
     presetNames.push_back("bender");
-    presetNames.push_back("box2");
     
     
 }
@@ -2206,6 +2184,8 @@ void ofApp::makeDesignGrid() {
             designGrid[i][j] = ofVec2f(third.x*i+center.x,third.y*j+center.y);
         }
     }
+    
+
 }
 
 
@@ -2946,6 +2926,12 @@ void ofApp::saveToXml(){
     settings.addValue("value", bpm);
     settings.popTag();
     
+    //version
+    settings.addTag("Version");
+    settings.pushTag("Version");
+    settings.addValue("number", appVersion);
+    settings.popTag();
+    
 #if TARGET_OS_IPHONE
     settings.saveFile(ofxiOSGetDocumentsDirectory()+"settings.xml");
 #else
@@ -2963,9 +2949,19 @@ void ofApp::loadFromXml(){
 #else
         if (settings.loadFile("settings.xml")) {
 #endif
-        }else if (settings.loadFile("settingsDefault.xml")) {
+            settings.pushTag("Version");
+            //dont load old xmlsettings
+            if (ofToString( settings.getValue("number", "") ) != appVersion) {
+                cout << "old xml settings" << endl;
+                settings.loadFile("settingsDefault.xml");
+            } else {
+            settings.popTag();
+            }
             
+        }else if (settings.loadFile("settingsDefault.xml")) {
+            cout << "loadDefault" << endl;
         }
+        
         settings.pushTag("presets");
         int nMuster = settings.getNumTags("muster");
         

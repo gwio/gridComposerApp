@@ -49,7 +49,7 @@ void MusterFlip::makeTex(){
     fbo_.begin();
    
     // ofEnableDepthTest();
-    ofClear(255, 255, 255,0);
+    ofClear(255, 255, 255,80);
     float rSize = size/gridTiles;
     //ofSetColor(ofColor::darkCyan);
 

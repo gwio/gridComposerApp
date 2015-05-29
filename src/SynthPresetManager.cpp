@@ -4,7 +4,7 @@
 
 SynthPresetManager::SynthPresetManager() {
     //update manual
-    count = 7;
+    count = 6;
 }
 
 
@@ -85,26 +85,6 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         Generator randomBass = (RectWave().freq( freq_ * SineWave().freq(3)) * 0.8) >> LPF24().cutoff( 2000 * (1 + ((SineWave().freq(0.1) + 1) * 0.5))).Q(1.5)  ;
         output_ = (randomBass)*adsr *vol_;
-    } else if (preset_ == 6) {
-        
-        attack  = 0.001;
-        ADSR adsr = ADSR(attack, 0.002, 0.5, 0.05).doesSustain(false).legato(true).trigger(trigger_);
-
-        ADSR toneADSR = ADSR(0.0005, 0.03, 0.0, 0.01).trigger(trigger_).doesSustain(true);
-        
-        Generator hpNoise = (Noise() ) >> HPF24().cutoff(freq_) >> LPF12().cutoff(vol_*1000+6000);
-        Generator noiseEnv = adsr * adsr;
-
-        //compressor
-        Tonic::Compressor compressor = Compressor()
-        .release(0.035)
-        .attack(0.001)
-        .threshold( dBToLin(-22.f) )
-        .ratio(4)
-        .lookahead(0.001)
-        .bypass(false);
-        
-        output_ =  ((hpNoise*toneADSR)+(hpNoise*noiseEnv)>>compressor)*vol_;
     }
     
 }

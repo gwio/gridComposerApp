@@ -1,10 +1,10 @@
 
 #include "MusterContainer.h"
 
-#define DISPLAY_NUMX 5
-#define DISPLAY_NUMY 4
-#define FLIP_SIZE_FAC 0.8
-#define FLIP_MAX 5*4
+#define DISPLAY_NUMX 4
+#define DISPLAY_NUMY 3
+#define FLIP_SIZE_FAC 0.65
+#define FLIP_MAX 4*3
 
 MusterContainer::MusterContainer() {
     
@@ -28,7 +28,7 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
             displayGrid.at(index).x = (x*designGrid.x)+( (designGrid.x-flipSize)/2);
           //  displayGrid.at(index).y = (y*designGrid.x)+( (designGrid.x-flipSize)/2);
 
-            displayGrid.at(index).y = (y*designGrid.y);
+            displayGrid.at(index).y = (y*(designGrid.y*1.17));
         }
     }
     
@@ -49,7 +49,7 @@ void MusterContainer::setup() {
         {1,0,1,0,1},
         {1,0,1,0,1},
         {1,0,1,0,1},
-        {0,0,0,0,0}
+        {1,1,1,1,1}
     };
     
     bool *tempB[5];
