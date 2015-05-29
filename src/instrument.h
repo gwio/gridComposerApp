@@ -64,7 +64,7 @@ public:
     Instrument();
     Instrument(string,int,float,float);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode, float *);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode, float *, int* pitchCorrect_);
     void updateTonicOut();
     void update();
     void draw();
@@ -189,5 +189,5 @@ public:
     bool synthHasChanged;
     bool userScale;
     
-    
+    int* pitchCorrect;
 };

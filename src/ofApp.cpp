@@ -15,10 +15,14 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 void ofApp::setup(){
     //11025 samplerate changed in toniccore.h, only ios project
 #if TARGET_OS_IPHONE
+    setSampleRate(9000);
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);
-    ofSoundStreamSetup(2, 1, this, 11025, 256, 4);
+    ofSoundStreamSetup(2, 1, this, 9000, 256*2, 1);
+    pitchCorrect = 24;
 #else
-    ofSoundStreamSetup(2, 1, this, 44100, 256, 4);
+    setSampleRate(44100);
+    ofSoundStreamSetup(2, 1, this, 44100, 256*2, 4);
+    pitchCorrect = 0;
 #endif
     
     ofSetFrameRate(60);
@@ -93,18 +97,18 @@ void ofApp::setup(){
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &bpmTick);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &bpmTick, &pitchCorrect);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &bpmTick);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &bpmTick, &pitchCorrect);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60);
     
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &bpmTick);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &bpmTick, &pitchCorrect);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+12);
     
@@ -234,21 +238,39 @@ void ofApp::setupAudio(){
     }
     mainOut = temp ;
     
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.14f,0.24f)
-    .delayTimeLeft( 0.14 )
-    .delayTimeRight(0.22)
+    /*
+     //delay compressor ios
+     
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.06f,0.10f)
+    .delayTimeLeft( 0.06 )
+    .delayTimeRight(0.10)
     .feedback(0.18)
-    .dryLevel(0.95)
-    .wetLevel(0.1);
+    .dryLevel( dBToLin(0))
+    .wetLevel( dBToLin(-25));
     
+    //compressor
+    Tonic::Compressor compressor = Compressor()
+    .release(0.015)
+    .attack(0.002)
+    .threshold( dBToLin(-10) )
+    .ratio(6)
+    .lookahead(0.001)
+    .bypass(false);
     
+*/
     
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.01f,0.02f)
+    .delayTimeLeft( 0.010 )
+    .delayTimeRight(0.020)
+    .feedback(0.18)
+    .dryLevel(0.75)
+    .wetLevel(0.35);
     
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
     .attack(0.001)
-    .threshold( dBToLin(-22.f) )
+    .threshold( dBToLin(-20) )
     .ratio(4)
     .lookahead(0.001)
     .bypass(false);

@@ -62,7 +62,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, float *bpmTick_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, float *bpmTick_, int* pitchCorrect_) {
+    pitchCorrect = pitchCorrect_;
     colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
     cout <<  "chue" << colorHue << endl;
@@ -956,8 +957,8 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
 void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
-    float rampLength = 0.15;
-    float freqRamp = 0.16;
+    float rampLength = 0.06;
+    float freqRamp = 0.12;
     
     //create volume ramp
     Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget").max(1.0).min(0.0);
@@ -971,7 +972,6 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
     
     cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
-    
     presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger);
     synthAttack = presetManager.attack;
     
@@ -1125,7 +1125,7 @@ void Instrument::setMusicScale(GlobalScales& scale_,int num_){
 
 void Instrument::setKeyNote(int keyNote_) {
     
-    if ( keyNote+keyNote_ >= 0 && keyNote+keyNote_ <= 120) {
+    if ( keyNote+keyNote_ >= 12 && keyNote+keyNote_ <= 108) {
         int change = keyNote_;
         keyNote = ofClamp(keyNote+change,0, 120);
         cout << keyNote << endl;
@@ -1192,11 +1192,11 @@ void Instrument::planeMovement(float pct_){
 int Instrument::getRandomNote(){
     int note;
     if ( ofRandom(100) > 80) {
-        note = scaleNoteSteps[ 0 ] + keyNote;
+        note = scaleNoteSteps[ 0 ] + (keyNote+*pitchCorrect);
     } else {
         int ranPos = ofRandom(scaleNoteSteps.size());
         //cout << ranPos << endl;
-        note = scaleNoteSteps[ ranPos ] + keyNote;
+        note = scaleNoteSteps[ ranPos ] + (keyNote+*pitchCorrect);
     }
     return note;
 }

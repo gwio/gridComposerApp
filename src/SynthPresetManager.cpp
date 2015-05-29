@@ -14,13 +14,13 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     if (preset_ == 0) {
         
         attack = 0.007;
-        ADSR adsr = ADSR(attack, 0.2, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.2, 0.1, 0.05).doesSustain(true).legato(true).trigger(trigger_);
 
         output_ = SineWave().freq(freq_)*0.5;
       
         Generator harmonic = SineWave().freq(
                                              freq_ * 1.8
-                                             ) * (0.30);
+                                             ) * (0.35);
         
         Generator harmonic2 = SineWave().freq(
                                               freq_*4 + (vol_*40)
@@ -28,7 +28,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         
         
-        output_ =  (output_ + harmonic + harmonic2 )*adsr*vol_;
+        output_ =  (output_+harmonic+harmonic2*adsr )*adsr*vol_;
     } else if(preset_ ==1 ){
         
         //simple squarewave
@@ -59,28 +59,50 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
                  )
               * ((SineWave().freq(0.15f) + 1.f) * 0.75f / vol_ + 0.25));
         
-        output_ = (outputGen *vol_*adsr) >> HPF24().cutoff(freq_-5000) >> LPF12().cutoff(freq_+6000) ;
+        //compressor
+        Tonic::Compressor compressor = Compressor()
+        .release(0.015)
+        .attack(0.001)
+        .threshold( dBToLin(-22) )
+        .ratio(8)
+        .lookahead(0.001)
+        .bypass(false);
+
+        
+        output_ = (outputGen *vol_*adsr)>>compressor ;
     } else if (preset_ == 3) {
         attack = 0.015;
         ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
 
         Generator outputGen = SineWave().freq( freq_+ ((LFNoise().setFreq(10.5)+10*vol_)*60) );
-        Generator harmonic1 = SineWave().freq(freq_*vol_*2)*0.2;
         output_ =( outputGen )* 0.7 * vol_*adsr;
         
     } else if (preset_ == 4) {
-        Generator hpNoise = (Noise() * 0.5) >> HPF24().cutoff(3000.0) >> LPF12().cutoff(7500);
-        Generator tones = SineWave().freq(freq_) * dBToLin(-6.0) + SineWave().freq(222) * dBToLin(-18.0);
+        
+        Generator hpNoise = (Noise() * 0.8) >> HPF24().cutoff(freq_-3000.0) >> LPF12().cutoff(freq_+7500);
 
-        attack = 0.002;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.0005;
+        ADSR adsr = ADSR(attack, 0.04, 0.08, 0.07).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsrTone = ADSR(0.0015, 0.06, 0.03, 0.02).doesSustain(false).legato(true).trigger(trigger_);
+
         
+        Generator tones = SineWave().freq(freq_) * 0.4 + SineWave().freq(freq_*0.8) * 0.23;
+
+     
+        //compressor
+        Tonic::Compressor compressor = Compressor()
+        .release(0.015)
+        .attack(0.001)
+        .threshold( dBToLin(-10) )
+        .ratio(8)
+        .lookahead(0.001)
+        .bypass(false);
         
-        output_ = (hpNoise+tones +(tones*0.5)  )*vol_ *adsr ;
+        output_ = (((hpNoise*adsr*adsr)+(tones*adsrTone))*vol_ )>>compressor ;
     } else if (preset_ == 5) {
         
         attack = 0.005;
-        ADSR adsr = ADSR(attack, 0.2, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.02, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
 
         
         Generator randomBass = (RectWave().freq( freq_ * SineWave().freq(3)) * 0.8) >> LPF24().cutoff( 2000 * (1 + ((SineWave().freq(0.1) + 1) * 0.5))).Q(1.5)  ;

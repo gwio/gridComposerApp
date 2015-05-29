@@ -252,4 +252,6 @@ public:
     bool bpmButton;
         
         string appVersion;
+        
+        int pitchCorrect;
 };

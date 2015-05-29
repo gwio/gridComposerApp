@@ -69,9 +69,18 @@ void MusterContainer::draw(){
     
     ofPushStyle();
     if (saveReady) {
-    ofSetColor(filterColor(elementColorDarkerTrans));
+        elementColorTouch.setBrightness( ((sin(ofGetElapsedTimef()*8)+1)/2)*200 );
+        if (displayColor != elementColorTouch) {
+            displayColor = displayColor.lerp(elementColorTouch, 0.04);
+        }
+        ofSetColor(filterColor(  displayColor));
+        
     } else {
-        ofSetColor(filterColor(elementColorDarker));
+        if (displayColor!= targetColor) {
+            displayColor = displayColor.lerp(targetColor, 0.04);
+        }
+        ofSetColor(filterColor(displayColor));
+
     }
     for (int i = 0; i < displayGrid.size(); i++) {
         flips.at(i).draw(displayGrid.at(i)+centerPos);
@@ -89,7 +98,8 @@ void MusterContainer::setColor(float hue_) {
     elementColorDarkerTrans = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 100 );
     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
     
-    targetColor = elementColorOn;
+    targetColor = elementColorDarker;
+    displayColor = elementColorDarker;
 }
 
 ofColor MusterContainer::filterColor(ofColor c_){
