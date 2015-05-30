@@ -46,13 +46,13 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
     } else if (preset_ == 2) {
         attack = 0.010;
-        ADSR adsr = ADSR(attack, 0.3, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.12, 0.3, 0.05).doesSustain(false).legato(true).trigger(trigger_);
 
         //donald duck
         Generator outputGen = SineWave()
         .freq( freq_
               + (
-                 SineWave().freq( freq_*2 *vol_) *
+                 SineWave().freq( freq_*1.2 *vol_) *
                  freq_/2 *
                  ( (1.0f + SineWave().freq((LFNoise().setFreq(0.5f) + 1.f) * 2.f + 0.2f)  )
                   )
@@ -69,7 +69,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         .bypass(false);
 
         
-        output_ = (outputGen *vol_*adsr)>>compressor ;
+        output_ = (outputGen*adsr*vol_)>>compressor ;
     } else if (preset_ == 3) {
         attack = 0.015;
         ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
@@ -79,10 +79,10 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
     } else if (preset_ == 4) {
         
-        Generator hpNoise = (Noise() * 0.8) >> HPF24().cutoff(freq_-3000.0) >> LPF12().cutoff(freq_+7500);
+        Generator hpNoise = (Noise() * 0.75) >> HPF24().cutoff(freq_-3000.0) >> LPF12().cutoff(freq_+7500);
 
-        attack = 0.0005;
-        ADSR adsr = ADSR(attack, 0.04, 0.08, 0.07).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.00025;
+        ADSR adsr = ADSR(attack, 0.035, 0.08, 0.03).doesSustain(false).legato(true).trigger(trigger_);
         ADSR adsrTone = ADSR(0.0015, 0.06, 0.03, 0.02).doesSustain(false).legato(true).trigger(trigger_);
 
         
@@ -93,16 +93,16 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         Tonic::Compressor compressor = Compressor()
         .release(0.015)
         .attack(0.001)
-        .threshold( dBToLin(-10) )
+        .threshold( dBToLin(-15) )
         .ratio(8)
         .lookahead(0.001)
         .bypass(false);
         
-        output_ = (((hpNoise*adsr*adsr)+(tones*adsrTone))*vol_ )>>compressor ;
+        output_ = (((hpNoise*adsr)+(tones*adsrTone))*vol_ )>>compressor ;
     } else if (preset_ == 5) {
         
         attack = 0.005;
-        ADSR adsr = ADSR(attack, 0.02, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
 
         
         Generator randomBass = (RectWave().freq( freq_ * SineWave().freq(3)) * 0.8) >> LPF24().cutoff( 2000 * (1 + ((SineWave().freq(0.1) + 1) * 0.5))).Q(1.5)  ;

@@ -4,7 +4,7 @@
 #define TILEBORDER 0.075
 #define BPM 220
 #define ANI_SPEED 0.03;
-#define VERSION "0.91.6";
+#define VERSION "0.91.8";
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
@@ -241,21 +241,21 @@ void ofApp::setupAudio(){
     /*
      //delay compressor ios
      
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.06f,0.10f)
-    .delayTimeLeft( 0.06 )
-    .delayTimeRight(0.10)
-    .feedback(0.18)
-    .dryLevel( dBToLin(0))
-    .wetLevel( dBToLin(-25));
-    
-    //compressor
-    Tonic::Compressor compressor = Compressor()
-    .release(0.015)
-    .attack(0.002)
-    .threshold( dBToLin(-10) )
-    .ratio(6)
-    .lookahead(0.001)
-    .bypass(false);
+     Tonic::StereoDelay delay = Tonic::StereoDelay(0.04f,0.08f)
+     .delayTimeLeft( 0.04 )
+     .delayTimeRight(0.08)
+     .feedback(0.08)
+     .dryLevel(0.9)
+     .wetLevel( 0.1);
+     
+     //compressor
+     Tonic::Compressor compressor = Compressor()
+     .release(0.015)
+     .attack(0.002)
+     .threshold( dBToLin(0) )
+     .ratio(4)
+     .lookahead(0.001)
+     .bypass(false);
     
 */
     
