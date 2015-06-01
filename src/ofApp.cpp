@@ -4,7 +4,7 @@
 #define TILEBORDER 0.075
 #define BPM 220
 #define ANI_SPEED 0.03;
-#define VERSION "0.91.8";
+#define VERSION "0.92.0";
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 
@@ -239,43 +239,31 @@ void ofApp::setupAudio(){
     mainOut = temp ;
     
     /*
-     //delay compressor ios
-     
-     Tonic::StereoDelay delay = Tonic::StereoDelay(0.04f,0.08f)
-     .delayTimeLeft( 0.04 )
-     .delayTimeRight(0.08)
-     .feedback(0.08)
-     .dryLevel(0.9)
-     .wetLevel( 0.1);
-     
-     //compressor
-     Tonic::Compressor compressor = Compressor()
-     .release(0.015)
-     .attack(0.002)
-     .threshold( dBToLin(0) )
-     .ratio(4)
-     .lookahead(0.001)
-     .bypass(false);
+     Tonic::StereoDelay delay = Tonic::StereoDelay(0.10f,0.2f)
+     .delayTimeLeft( 0.10 )
+     .delayTimeRight(0.20)
+     .feedback(0.18)
+     .dryLevel(0.95)
+     .wetLevel(0.1);
+     */
     
-*/
-    
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.01f,0.02f)
-    .delayTimeLeft( 0.010 )
-    .delayTimeRight(0.020)
-    .feedback(0.18)
-    .dryLevel(0.75)
-    .wetLevel(0.35);
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.09f,0.13f)
+    .delayTimeLeft( 0.09)
+    .delayTimeRight(0.13)
+    .feedback(0.08)
+    .dryLevel(0.9)
+    .wetLevel( 0.1);
     
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
-    .attack(0.001)
-    .threshold( dBToLin(-20) )
+    .attack(0.002)
+    .threshold( dBToLin(0) )
     .ratio(4)
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut>>delay)*volumeRamp)>>compressor );
+    tonicSynth.setOutputGen( ((mainOut>>delay)*volumeRamp)>>compressor) ;
 }
 
 //--------------------------------------------------------------
@@ -992,10 +980,10 @@ void ofApp::replaceMousePressed(int x, int y) {
             //toogle grid preset container
             muster.isInside(ofVec2f(x,y));
             
-                       
             
-        
-        
+            
+            
+            
         }
         
         else if (currentState == STATE_EDIT) {
@@ -2192,6 +2180,9 @@ void ofApp::makePresetString() {
     presetNames.push_back("whistler");
     presetNames.push_back("box");
     presetNames.push_back("bender");
+    presetNames.push_back("templateA");
+    presetNames.push_back("TableLookupTest");
+
     
     
 }
@@ -2207,7 +2198,7 @@ void ofApp::makeDesignGrid() {
         }
     }
     
-
+    
 }
 
 
@@ -2977,7 +2968,7 @@ void ofApp::loadFromXml(){
                 cout << "old xml settings" << endl;
                 settings.loadFile("settingsDefault.xml");
             } else {
-            settings.popTag();
+                settings.popTag();
             }
             
         }else if (settings.loadFile("settingsDefault.xml")) {
