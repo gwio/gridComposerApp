@@ -2,11 +2,11 @@
 #define TILES 5
 #define TILESIZE 100/TILES
 #define TILEBORDER 0.075
-#define BPM 220
+#define BPM 220*4
 #define ANI_SPEED 0.03;
 #define VERSION "0.92.0";
 
-enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
+enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL, STATE_BPM};
 
 
 
@@ -15,10 +15,10 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL};
 void ofApp::setup(){
     //11025 samplerate changed in toniccore.h, only ios project
 #if TARGET_OS_IPHONE
-    setSampleRate(9000);
+    setSampleRate(44100);
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);
-    ofSoundStreamSetup(2, 1, this, 9000, 256*2, 1);
-    pitchCorrect = 24;
+    ofSoundStreamSetup(2, 1, this, 44100, 256*2, 1);
+    pitchCorrect = 0;
 #else
     setSampleRate(44100);
     ofSoundStreamSetup(2, 1, this, 44100, 256*2, 4);
@@ -76,7 +76,6 @@ void ofApp::setup(){
     scaleCollection.loadScales();
     makeDesignGrid();
     currentState = STATE_DEFAULT;
-    bpmButton = false;
     appVersion = VERSION;
     
     synthPos.resize(3);
@@ -87,33 +86,7 @@ void ofApp::setup(){
     nearClip = 10;
     farClip = 10000;
     
-    for (int i = -1; i < 2; i++) {
-        ofNode temp;
-        //temp.setPosition( i*(TILES*TILESIZE*2), 0, 0);
-        temp.setPosition( intersectPlane( designGrid[i+1][1] ) );
-        synthPos[i+1]=temp;
-    }
     
-    synths.resize(3);
-    
-    synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &bpmTick, &pitchCorrect);
-    synths[0].setMusicScale(scaleCollection, 0);
-    synths[0].setKeyNote(60-12);
-    
-    synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &bpmTick, &pitchCorrect);
-    synths[1].setMusicScale(scaleCollection, 0);
-    synths[1].setKeyNote(60);
-    
-    
-    synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &bpmTick, &pitchCorrect);
-    synths[2].setMusicScale(scaleCollection, 0);
-    synths[2].setKeyNote(60+12);
-    
-    
-    activeSynth = 1;
     
     //global volume
     ControlParameter rampTarget = tonicSynth.addParameter("mainVolumeRamp").max(1.0).min(0.0);
@@ -125,14 +98,56 @@ void ofApp::setup(){
     volumeRestartTarget = 0.0;
     
     
-    
     bpm = BPM;
     
     ControlParameter bpmpara = tonicSynth.addParameter("BPM");
-    tonicSynth.setParameter("BPM", bpm);
+    tonicSynth.setParameter("BPM", bpm*4);
     ControlGenerator pulse = ControlMetro().bpm(bpmpara);
-    ofEvent<float>* pulseEvent = tonicSynth.createOFEvent(pulse);
-    ofAddListener(*pulseEvent, this, &ofApp::pulseEvent );
+    ControlMetroDivider pulseDiv2 = ControlMetroDivider().divisions(2).input(pulse);
+    ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
+    ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(4).input(pulse);
+    
+    ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
+    ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1 );
+    
+    ofEvent<float>* pulseEventDiv2 = tonicSynth.createOFEvent(pulseDiv2);
+    ofAddListener(*pulseEventDiv2, this, &ofApp::pulseEventDiv2 );
+    
+    ofEvent<float>* pulseEventDiv3 = tonicSynth.createOFEvent(pulseDiv3);
+    ofAddListener(*pulseEventDiv3, this, &ofApp::pulseEventDiv3 );
+    
+    ofEvent<float>* pulseEventDiv4= tonicSynth.createOFEvent(pulseDiv4);
+    ofAddListener(*pulseEventDiv4, this, &ofApp::pulseEventDiv4 );
+    
+    
+    for (int i = -1; i < 2; i++) {
+        ofNode temp;
+        //temp.setPosition( i*(TILES*TILESIZE*2), 0, 0);
+        temp.setPosition( intersectPlane( designGrid[i+1][1] ) );
+        synthPos[i+1]=temp;
+    }
+    
+    synths.resize(3);
+    
+    synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0] );
+    synths[0].setMusicScale(scaleCollection, 0);
+    synths[0].setKeyNote(60-12);
+    
+    synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1]);
+    synths[1].setMusicScale(scaleCollection, 0);
+    synths[1].setKeyNote(60);
+    
+    
+    synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2] );
+    synths[2].setMusicScale(scaleCollection, 0);
+    synths[2].setKeyNote(60+12);
+    
+    
+    activeSynth = 1;
+    
     
     
     
@@ -163,8 +178,6 @@ void ofApp::setup(){
     drawInfo = false;
     
     timeCounter = -1;
-    bpmTick = 0.0;
-    tickTimes.resize(5);
     
     
     focusCam = false;
@@ -257,13 +270,13 @@ void ofApp::setupAudio(){
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
-    .attack(0.002)
-    .threshold( dBToLin(0) )
-    .ratio(4)
+    .attack(0.0001)
+    .threshold( dBToLin(-40) )
+    .ratio(6)
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut>>delay)*volumeRamp)>>compressor) ;
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp)>>compressor>>delay) ;
 }
 
 //--------------------------------------------------------------
@@ -337,8 +350,8 @@ void ofApp::update(){
 
 void ofApp::updateInterfaceMesh() {
     
-    mainInterfaceData[0].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
-    mainInterfaceData[54].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
+    mainInterfaceData[0].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
+    mainInterfaceData[54].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
     
     
     mainInterfaceData[8].updateMainMesh(mainInterface,designGrid[0][2],tweenFloat);
@@ -349,16 +362,16 @@ void ofApp::updateInterfaceMesh() {
     
     
     mainInterfaceData[37].updateMainMesh(mainInterface, designGrid[0][0], tweenFloat);
-    mainInterfaceData[38].updateMainMesh(mainInterface, designGrid[2][0], tweenFloat);
+    mainInterfaceData[38].updateMainMesh(mainInterface, designGrid[1][0], tweenFloat);
     
-    mainInterfaceData[1].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()), tweenFloat);
-    mainInterfaceData[2].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
-    mainInterfaceData[3].updateMainMeshSlider(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()),tweenFloat);
+    mainInterfaceData[1].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[2].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[3].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
     
     
-    mainInterfaceData[51].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[0].getPosition()),tweenFloat);
-    mainInterfaceData[52].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[1].getPosition()),tweenFloat);
-    mainInterfaceData[53].updateMainMesh(mainInterface, testCam.worldToScreen(synthPos[2].getPosition()),tweenFloat);
+    mainInterfaceData[51].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
+    mainInterfaceData[52].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[53].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     
     
     
@@ -368,7 +381,7 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
     
-    mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[1][0], tweenFloat);
+    mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[2][0], tweenFloat);
     
     mainInterfaceData[40].updateMainMesh(mainInterface,designGrid[1][0], tweenFloat);
     
@@ -396,9 +409,9 @@ void ofApp::updateInterfaceMesh() {
     
     
     mainInterfaceData[43].updateMainMesh(mainInterface,   designGrid[1][2],tweenFloat);
-    mainInterfaceData[44].updateMainMesh(mainInterface, designGrid[1][0] ,tweenFloat);
+    mainInterfaceData[44].updateMainMesh(mainInterface, designGrid[0][0] ,tweenFloat);
     
-    mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[1][0] ,tweenFloat);
+    mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[2][0] ,tweenFloat);
     
     
     
@@ -409,6 +422,9 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[49].updateMainMesh(mainInterface,  ofVec3f(designGrid[1][0].x,designGrid[0][0].y*2,0),tweenFloat);
     
+    mainInterfaceData[55].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[56].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[57].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
     
 }
 
@@ -591,6 +607,17 @@ void ofApp::keyPressed(int key){
     }
     
     
+    if (key == '1') {
+        synths[activeSynth].nextPulseDivision = 4;
+    }
+    
+    if (key == '2') {
+        synths[activeSynth].nextPulseDivision = 2;
+    }
+    if (key == '4') {
+        synths[activeSynth].nextPulseDivision = 1;
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -626,33 +653,92 @@ void ofApp::replaceMouseDragged(int x, int y){
     if (!interfaceMoving) {
         
         
-        if (currentState == STATE_DEFAULT) {
+        if (currentState == STATE_BPM) {
             
-            if(bpmButton) {
-                if(mainInterfaceData[38].isInside(ofVec2f(x,y))) {
-                    if (!mainInterfaceData[38].touchDown){
-                        mainInterfaceData[38].touchStart = ofVec2f(x,y);
-                        mainInterfaceData[38].touchDown = true;
+            if(mainInterfaceData[38].isInside(ofVec2f(x,y))) {
+                if (!mainInterfaceData[38].touchDown){
+                    mainInterfaceData[38].touchStart = ofVec2f(x,y);
+                    mainInterfaceData[38].touchDown = true;
+                }
+                
+                if (mainInterfaceData[38].touchDown) {
+                    
+                    int bpmMod = (mainInterfaceData[38].touchStart.x - x)/6;
+                    mainInterfaceData[38].tempInt = bpmMod;
+                    
+                    if ( abs(bpmMod) > 0 ){
+                        mainInterfaceData[38].touchStart.x = x;
+                        bpm=ofClamp(bpm+bpmMod,1 ,1000);
+                        tonicSynth.setParameter("BPM",bpm*4);
+                        mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
                     }
                     
-                    if (mainInterfaceData[38].touchDown) {
-                        
-                        int bpmMod = (mainInterfaceData[38].touchStart.x - x)/6;
-                        mainInterfaceData[38].tempInt = bpmMod;
-                        
-                        if ( abs(bpmMod) > 0 ){
-                            mainInterfaceData[38].touchStart.x = x;
-                            bpm=ofClamp(bpm+bpmMod,1 ,1000);
-                            tonicSynth.setParameter("BPM",bpm);
-                            mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
-                        }
-                        
-                        cout <<     mainInterfaceData[38].touchStart.x << endl;
-                        
-                    }
+                    cout <<     mainInterfaceData[38].touchStart.x << endl;
+                    
                 }
+                
             }
             
+            if (mainInterfaceData[55].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[55].minX, mainInterfaceData[55].maxX, 0.0, 1.0), 0.0, 1.0);
+                if (value > 0.5){
+                    mainInterfaceData[55].setSlider(mainInterface, 1.0);
+                    synths[synthButton[0]].nextPulseDivision = 4;
+                }else if (value <= 0.5 && value > 0.333 ){
+                    mainInterfaceData[55].setSlider(mainInterface, 0.5);
+                    synths[synthButton[0]].nextPulseDivision = 3;
+                } else if (value <= 0.333 && value > 0.25 ){
+                    mainInterfaceData[55].setSlider(mainInterface, 0.333);
+                    synths[synthButton[0]].nextPulseDivision = 2;
+                } else {
+                    mainInterfaceData[55].setSlider(mainInterface, 0.25);
+                    synths[synthButton[0]].nextPulseDivision = 1;
+                }
+                mainInterfaceData[55].elementName = "1/"+ofToString(5-synths[synthButton[0]].nextPulseDivision);
+                mainInterfaceData[55].setStringWidth(mainInterfaceData[55].fsPtr->getBBox(mainInterfaceData[55].elementName, mainInterfaceData[55].fontSize, 0, 0).getWidth());
+                
+            }
+            
+            if (mainInterfaceData[56].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[56].minX, mainInterfaceData[56].maxX, 0.0, 1.0), 0.0, 1.0);
+                if (value > 0.5){
+                    mainInterfaceData[56].setSlider(mainInterface, 1.0);
+                    synths[synthButton[1]].nextPulseDivision = 4;
+                }else if (value <= 0.5 && value > 0.333 ){
+                    mainInterfaceData[56].setSlider(mainInterface, 0.5);
+                    synths[synthButton[1]].nextPulseDivision = 3;
+                } else if (value <= 0.333 && value > 0.25 ){
+                    mainInterfaceData[56].setSlider(mainInterface, 0.333);
+                    synths[synthButton[1]].nextPulseDivision = 2;
+                } else {
+                    mainInterfaceData[56].setSlider(mainInterface, 0.25);
+                    synths[synthButton[1]].nextPulseDivision = 1;
+                }
+                mainInterfaceData[56].elementName = "1/"+ofToString(5-synths[synthButton[1]].nextPulseDivision);
+                mainInterfaceData[56].setStringWidth(mainInterfaceData[55].fsPtr->getBBox(mainInterfaceData[56].elementName, mainInterfaceData[56].fontSize, 0, 0).getWidth());
+                
+
+            }
+            
+            if (mainInterfaceData[57].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[57].minX, mainInterfaceData[57].maxX, 0.0, 1.0), 0.0, 1.0);
+                if (value > 0.5){
+                    mainInterfaceData[57].setSlider(mainInterface, 1.0);
+                    synths[synthButton[2]].nextPulseDivision = 4;
+                }else if (value <= 0.5 && value > 0.333 ){
+                    mainInterfaceData[57].setSlider(mainInterface, 0.5);
+                    synths[synthButton[2]].nextPulseDivision = 3;
+                } else if (value <= 0.333 && value > 0.25 ){
+                    mainInterfaceData[57].setSlider(mainInterface, 0.333);
+                    synths[synthButton[2]].nextPulseDivision = 2;
+                } else {
+                    mainInterfaceData[57].setSlider(mainInterface, 0.25);
+                    synths[synthButton[2]].nextPulseDivision = 1;
+                }
+                mainInterfaceData[57].elementName = "1/"+ofToString(5-synths[synthButton[2]].nextPulseDivision);
+                mainInterfaceData[57].setStringWidth(mainInterfaceData[57].fsPtr->getBBox(mainInterfaceData[57].elementName, mainInterfaceData[57].fontSize, 0, 0).getWidth());
+                
+            }
             
         }
         
@@ -986,6 +1072,16 @@ void ofApp::replaceMousePressed(int x, int y) {
             
         }
         
+        else if (currentState == STATE_BPM){
+            
+            
+            
+            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                bpmButtonPress();
+                mainInterfaceData[43].blinkOn();
+            }
+        }
+        
         else if (currentState == STATE_EDIT) {
             
             
@@ -1238,7 +1334,6 @@ void ofApp::drawDebug() {
     ofDrawBitmapString("Grid X: "+ofToString(vectorPosX), 20, 60);
     ofDrawBitmapString("GridY: "+ofToString(vectorPosY), 20, 80);
     ofDrawBitmapString("BPM Counter: "+ofToString(timeCounter), 20, 120);
-    ofDrawBitmapString("Tick Time " + ofToString(bpmTick), 20, 140);
     ofPopStyle();
     
     
@@ -1314,60 +1409,77 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
     return rVal;
 }
 
-void ofApp::pulseEvent(float& val) {
-    
-    
-    timeCounter++;
-    
-    
-    if (timeCounter > TILES) {
-        timeCounter = 0;
-        for (int i = 0; i < synths.size(); i++) {
-            synths[i].nextDirection();
+void ofApp::pulseEvent(int div){
+    if (currentState == STATE_BPM) {
+        for (int i = 0; i < 3; i++) {
+            if (synths[synthButton[i]].pulseDivision == div) {
+                mainInterfaceData[55+i].blinkOn();
+            }
         }
     }
     
     for (int i = 0; i < synths.size(); i++) {
-        synths[i].noteTrigger();
-        if (synths[i].pulsePlane.stepCounter == ((TILES+1)*4)-1 ){
-            synths[i].pulsePlane.stepCounter = 0;
-        } else {
-            synths[i].pulsePlane.stepCounter++;
+        if (synths[i].pulseDivision == div) {
+            
+            synths[i].timeCounter++;
+            if (synths[i].timeCounter > TILES) {
+                synths[i].timeCounter = 0;
+                synths[i].nextDirection();
+                
+            }
+            
+            synths[i].noteTrigger();
+            if (synths[i].pulsePlane.stepCounter == ((TILES+1)*4)-1 ){
+                synths[i].pulsePlane.stepCounter = 0;
+            } else {
+                synths[i].pulsePlane.stepCounter++;
+            }
+            
+            synths[i].bpmTick = ofGetElapsedTimeMillis() - synths[i].lastTick;
+            synths[i].lastTick = ofGetElapsedTimeMillis();
+            
+            
+            synths[i].pulsePlane.lastTick = synths[i].lastTick;
+            
+            
+            synths[i].tickTimes.pop_back();
+            synths[i].tickTimes.push_front(synths[i].bpmTick);
+            
+            
+            
+            
+            synths[i].bpmTick = 0.0;
+            
+            for (int j = 0; j < 5; j++) {
+                synths[i].bpmTick+= synths[i].tickTimes.at(j);
+            }
+            
+            
+            synths[i].bpmTick /= 5;
+            
         }
     }
     
-    getBpmTick();
 }
 
-void ofApp::getBpmTick() {
-    
-    
-    bpmTick = ofGetElapsedTimeMillis() - lastTick;
-    lastTick = ofGetElapsedTimeMillis();
-    
-    
-    for (int i = 0; i < synths.size(); i++) {
-        synths[i].pulsePlane.lastTick = lastTick;
-    }
-    
-    tickTimes.pop_back();
-    tickTimes.push_front(bpmTick);
-    
-    
-    
-    
-    bpmTick = 0.0;
-    
-    for (int i = 0; i < 5; i++) {
-        bpmTick+= tickTimes.at(i);
-    }
-    
-    
-    bpmTick /= 5;
-    
-    
-    
+void ofApp::pulseEventDiv1(float& val) {
+    pulseEvent(1);
 }
+
+
+void ofApp::pulseEventDiv2(float & val){
+    pulseEvent(2);
+}
+
+void ofApp::pulseEventDiv3(float & val){
+    pulseEvent(3);
+}
+
+void ofApp::pulseEventDiv4(float & val){
+    pulseEvent(4);
+}
+
+
 
 
 void ofApp::volumeRampValueChanged(float & volumeRampValue) {
@@ -1558,7 +1670,7 @@ void ofApp::setupGlobalInterface() {
     ofVec3f scaleButton = ofVec3f(designGrid[0][0].x*6/14 ,designGrid[0][0].y,0);
     
     
-    ofVec3f place = ofVec3f(0,-designGrid[0][0].y*2,0);
+    ofVec3f place = ofVec3f(0,0,0);
     ofVec3f offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
     GlobalGUI temp = GlobalGUI(0,string("GLOBAL"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0), ofColor(50,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
@@ -1615,7 +1727,7 @@ void ofApp::setupGlobalInterface() {
     
     
     //save to presets button
-    place = ofVec3f(smallButton.x,0,0);
+    place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
     temp = GlobalGUI(12,string(""),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
@@ -1656,7 +1768,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     place = ofVec3f(0,0,0);
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
     temp = GlobalGUI(38,"BPM "+ string(ofToString(bpm)), ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0), ofColor(23,23,23), place, offPlace,fontDefault*1.2,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
@@ -1669,7 +1781,7 @@ void ofApp::setupGlobalInterface() {
     //toggle 1,2,3
     
     //make random grid icon
-    place = ofVec3f(-smallButton.x,0,0);
+    place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
     temp = GlobalGUI(40,string(""), smallButton ,ofColor(63,0,0),place,offPlace,fontDefault,true,&robotoCon);
     mainInterfaceData.push_back(temp);
@@ -1677,7 +1789,7 @@ void ofApp::setupGlobalInterface() {
     
     //toggle bpm icon
     place = ofVec3f(0,0,0);
-    offPlace = ofVec3f(designGrid[0][0].y*12,0,0);
+    offPlace = ofVec3f(designGrid[0][0].y*6,0,0);
     temp = GlobalGUI(41, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,true,&robotoCon);
     mainInterfaceData.push_back(temp);
     
@@ -1751,13 +1863,20 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     mainInterfaceData[53].elementColorOn = ofColor(255,255,255,100);
     
-    place = ofVec3f(0,-designGrid[0][0].y*2,0);
+    place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
     temp = GlobalGUI(54,"",ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     
     
-    
+    place = ofVec3f(0,-designGrid[0][0].y/2,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    temp = GlobalGUI(55,string("BPM A"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(56,string("BPM B"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(52,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    mainInterfaceData.push_back(temp);
+    temp = GlobalGUI(57,string("BPM C"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(53,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    mainInterfaceData.push_back(temp);
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -2024,10 +2143,7 @@ void ofApp::volumeInterfacOn() {
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 1;
     
-    if(bpmButton) {
-        mainInterfaceData[38].animation = true;
-        mainInterfaceData[38].moveDir = 0;
-    }
+    
 }
 
 void ofApp::volumeInterfaceOff() {
@@ -2062,12 +2178,7 @@ void ofApp::volumeInterfaceOff() {
     mainInterfaceData[41].showString = false;
     mainInterfaceData[41].animation = true;
     mainInterfaceData[41].moveDir = 1;
-    /*
-     if(bpmButton) {
-     mainInterfaceData[38].animation = true;
-     mainInterfaceData[38].moveDir = 1;
-     }
-     */
+    
 }
 
 void ofApp::pauseInterfaceOn() {
@@ -2089,10 +2200,7 @@ void ofApp::pauseInterfaceOn() {
         mainInterfaceData[37].animation = true;
     }
     
-    if (bpmButton) {
-        mainInterfaceData[38].moveDir = 1;
-        mainInterfaceData[38].animation = true;
-    }
+    
     
     mainInterfaceData[41].showString = false;
     mainInterfaceData[41].moveDir = 1;
@@ -2113,10 +2221,6 @@ void ofApp::pauseInterfaceOff() {
     mainInterfaceData[10].moveDir = 0;
     mainInterfaceData[10].animation = true;
     
-    if (bpmButton) {
-        mainInterfaceData[38].moveDir = 0;
-        mainInterfaceData[38].animation = true;
-    }
     
     mainInterfaceData[41].moveDir = 0;
     mainInterfaceData[41].animation = true;
@@ -2124,6 +2228,52 @@ void ofApp::pauseInterfaceOff() {
     
 }
 
+void ofApp::bpmInterfaceOn() {
+    mainInterfaceData[37].animation = true;
+    mainInterfaceData[37].moveDir = 0;
+    
+    mainInterfaceData[43].animation = true;
+    mainInterfaceData[43].moveDir = 1;
+    
+    mainInterfaceData[38].animation = true;
+    mainInterfaceData[38].moveDir = 1;
+    mainInterfaceData[38].showString = true;
+    
+    mainInterfaceData[55].showString = true;
+    mainInterfaceData[55].animation = true;
+    mainInterfaceData[55].moveDir = 1;
+    mainInterfaceData[56].showString = true;
+    mainInterfaceData[56].animation = true;
+    mainInterfaceData[56].moveDir = 1;
+    mainInterfaceData[57].showString = true;
+    mainInterfaceData[57].animation = true;
+    mainInterfaceData[57].moveDir = 1;
+    
+    mainInterfaceData[55].sliderPct =ofMap( (1/(4/float(synths[synthButton[0]].nextPulseDivision))), 0.0,1.0,-1.0,1.0);
+    mainInterfaceData[56].sliderPct =ofMap( (1/(4/float(synths[synthButton[1]].nextPulseDivision))), 0.0, 1.0, -1.0, 1.0);
+    mainInterfaceData[57].sliderPct =ofMap( (1/(4/float(synths[synthButton[2]].nextPulseDivision))), 0.0, 1.0, -1.0, 1.0);
+    
+}
+
+void ofApp::bpmInterfaceOff(){
+    
+    mainInterfaceData[43].animation = true;
+    mainInterfaceData[43].moveDir = 0;
+    
+    mainInterfaceData[37].animation = true;
+    mainInterfaceData[37].moveDir = 1;
+    
+    mainInterfaceData[38].animation = true;
+    mainInterfaceData[38].moveDir = 0;
+    mainInterfaceData[38].showString = true;
+    
+    mainInterfaceData[55].animation = true;
+    mainInterfaceData[55].moveDir = 0;
+    mainInterfaceData[56].animation = true;
+    mainInterfaceData[56].moveDir = 0;
+    mainInterfaceData[57].animation = true;
+    mainInterfaceData[57].moveDir = 0;
+}
 
 void ofApp::bothEditInterfaceOff() {
     
@@ -2181,8 +2331,8 @@ void ofApp::makePresetString() {
     presetNames.push_back("box");
     presetNames.push_back("bender");
     presetNames.push_back("templateA");
-    presetNames.push_back("TableLookupTest");
-
+    presetNames.push_back("Table");
+    
     
     
 }
@@ -2253,17 +2403,8 @@ void ofApp::buttonOnePress(){
             mainInterfaceData[7].blinkOn();
         }
         
-        //  mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
-        // mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
         
         setNewGUI();
-        
-        /*
-         editInterfaceOn();
-         if (currentState == STATE_EDIT_DETAIL){
-         detailEditInterfaceOn();
-         }
-         */
         
         
     } else {
@@ -2305,8 +2446,6 @@ void ofApp::buttonOnePress(){
         aniPct = 0.0;
         interfaceMoving = true;
         
-        // mainInterfaceData[1].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
-        // mainInterfaceData[2].setSlider(mainInterface,mainInterfaceData[1].sliderPos);
         
         setNewGUI();
         
@@ -2459,19 +2598,7 @@ void ofApp::buttonThreePress(){
             mainInterfaceData[7].blinkOn();
         }
         
-        // mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
-        //  mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
-        
         setNewGUI();
-        
-        /*
-         editInterfaceOn();
-         
-         if (currentState == STATE_EDIT_DETAIL){
-         detailEditInterfaceOn();
-         }
-         */
-        
     }else {
         synths[temp].inFocus = true;
         synths[temp].aniPath = threeToActive;
@@ -2670,22 +2797,50 @@ void ofApp::buttonEditDetail() {
 
 void ofApp::bpmButtonPress() {
     
-    if (!bpmButton){
-        aniPct = 0.0;
-        interfaceMoving = true;
+    if(currentState != STATE_BPM && currentState != STATE_EDIT ) {
         
-        mainInterfaceData[38].showString = true;
-        mainInterfaceData[38].moveDir = 1;
-        mainInterfaceData[38].animation = true;
-        bpmButton = true;
-    } else if (bpmButton) {
-        aniPct = 0.0;
-        interfaceMoving = true;
+        synths[synthButton[0]].aniPath = OneVolumeLayerPathOn;
+        synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
+        synths[synthButton[0]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[0]].animate = true ;
+        synths[synthButton[1]].aniPath = TwoVolumeLayerPathOn;
+        synths[synthButton[1]].myDefault = synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[1]].animate = true ;
+        synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOn;
+        synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
+        synths[synthButton[2]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[2]].animate = true ;
         
-        mainInterfaceData[38].showString = true;
-        mainInterfaceData[38].moveDir = 0;
-        mainInterfaceData[38].animation = true;
-        bpmButton = false;
+        
+        
+        aniPct = 0.0;
+        
+        pauseInterfaceOff();
+        bpmInterfaceOn();
+        currentState = STATE_BPM;
+        
+    } else if (currentState == STATE_BPM) {
+        
+        synths[synthButton[0]].aniPath = OneVolumeLayerPathOff;
+        synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
+        synths[synthButton[0]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[0]].animate = true ;
+        synths[synthButton[1]].aniPath = TwoVolumeLayerPathOff;
+        synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
+        synths[synthButton[1]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[1]].animate = true ;
+        synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOff;
+        synths[synthButton[2]].myTarget = synthPos[0].getOrientationQuat();
+        synths[synthButton[2]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[2]].animate = true ;
+        
+        aniPct = 0.0;
+        
+        pauseInterfaceOn();
+        bpmInterfaceOff();
+        currentState = STATE_DEFAULT;
+        
     }
 }
 
@@ -2765,6 +2920,27 @@ void ofApp::setNewGUI() {
     mainInterfaceData[53].activateOnColor(mainInterface);
     
     muster.setColor(synths[activeSynth].colorHue);
+    
+    //bpm slider
+    
+    mainInterfaceData[55].setColor(synths[synthButton[0]].colorHue);
+    mainInterfaceData[55].activateOnColor(mainInterface);
+    mainInterfaceData[55].elementName = "1/"+ofToString(5-synths[synthButton[0]].nextPulseDivision);
+    mainInterfaceData[55].setStringWidth(mainInterfaceData[55].fsPtr->getBBox(mainInterfaceData[55].elementName, mainInterfaceData[55].fontSize, 0, 0).getWidth());
+    
+    
+    mainInterfaceData[56].setColor(synths[synthButton[1]].colorHue);
+    mainInterfaceData[56].activateOnColor(mainInterface);
+    mainInterfaceData[56].elementName = "1/"+ofToString(5-synths[synthButton[1]].nextPulseDivision);
+    mainInterfaceData[56].setStringWidth(mainInterfaceData[56].fsPtr->getBBox(mainInterfaceData[56].elementName, mainInterfaceData[56].fontSize, 0, 0).getWidth());
+    
+    
+    mainInterfaceData[57].setColor(synths[synthButton[2]].colorHue);
+    mainInterfaceData[57].activateOnColor(mainInterface);
+    mainInterfaceData[57].elementName = "1/"+ofToString(5-synths[synthButton[2]].nextPulseDivision);
+    mainInterfaceData[57].setStringWidth(mainInterfaceData[57].fsPtr->getBBox(mainInterfaceData[57].elementName, mainInterfaceData[57].fontSize, 0, 0).getWidth());
+    
+    
     
 }
 
@@ -3156,8 +3332,8 @@ void ofApp::loadFromXml(){
         
         //bpm
         settings.pushTag("BPM");
-        bpm =ofClamp(settings.getValue("value", 200), 1, 1000);
-        tonicSynth.setParameter("BPM", bpm);
+        bpm =ofClamp(settings.getValue("value", 200), 1, 2000);
+        tonicSynth.setParameter("BPM", bpm*4);
         mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
         settings.popTag();
         

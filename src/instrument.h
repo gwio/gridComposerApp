@@ -64,7 +64,7 @@ public:
     Instrument();
     Instrument(string,int,float,float);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode, float *, int* pitchCorrect_);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode );
     void updateTonicOut();
     void update();
     void draw();
@@ -134,7 +134,6 @@ public:
     
     //time
     int *stepperPos;
-    float *bpmTick;
     
     int scanDirection;
     int preset;
@@ -189,5 +188,12 @@ public:
     bool synthHasChanged;
     bool userScale;
     
-    int* pitchCorrect;
+    int timeCounter;
+    int pulseDivision;
+    int nextPulseDivision;
+    deque<float>tickTimes;
+    float bpmTick;
+    float lastTick;
+
+    
 };

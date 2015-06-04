@@ -59,14 +59,20 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
         trackSwitchOn = false;
     }
     
+    timeCounter = -1;
+    pulseDivision = 4;
+    nextPulseDivision = pulseDivision;
     
+    bpmTick = 0.0;
+    lastTick = 0.0;
+    tickTimes.resize(5);
+
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, float *bpmTick_, int* pitchCorrect_) {
-    pitchCorrect = pitchCorrect_;
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_) {
+  
     colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
-    cout <<  "chue" << colorHue << endl;
     
     myNode = node_;
     
@@ -75,9 +81,9 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         activeDirection[i]= true;
     }
     
-    stepperPos = stepperPos_;
+   // stepperPos = stepperPos_;
+    stepperPos = &timeCounter;
     mainTonicPtr = mainTonicPtr_;
-    bpmTick = bpmTick_;
     
     layerInfo.resize(gridTiles);
     for (int i = 0; i < layerInfo.size(); i++) {
@@ -259,7 +265,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     outputRamp = Tonic::RampedValue().value(0.5).length(0.1).target(rampTarget);
     instrumentOut = instrumentOut * outputRamp;
     
-    
+  
     //   cout << cubes.getNumVertices() << endl;
     
     
@@ -274,7 +280,7 @@ void Instrument::update() {
         }
     }
     
-    pulsePlane.update(*stepperPos,*bpmTick,scanDirection,  connectedDirection, activeDirection, pause);
+    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause);
     
     updateCubeMesh();
     
@@ -424,8 +430,7 @@ void Instrument::nextDirection() {
     bool test = false;
     int counter = 0;
     
-    
-    
+
     
     if (!pause) {
         
@@ -443,7 +448,7 @@ void Instrument::nextDirection() {
             }
             
         }
-        
+        pulseDivision = nextPulseDivision;
     } else {
         scanDirection = -1;
     }
@@ -1191,11 +1196,11 @@ void Instrument::planeMovement(float pct_){
 int Instrument::getRandomNote(){
     int note;
     if ( ofRandom(100) > 80) {
-        note = scaleNoteSteps[ 0 ] + (keyNote+*pitchCorrect);
+        note = scaleNoteSteps[ 0 ] + (keyNote);
     } else {
         int ranPos = ofRandom(scaleNoteSteps.size());
         //cout << ranPos << endl;
-        note = scaleNoteSteps[ ranPos ] + (keyNote+*pitchCorrect);
+        note = scaleNoteSteps[ ranPos ] + (keyNote);
     }
     return note;
 }
