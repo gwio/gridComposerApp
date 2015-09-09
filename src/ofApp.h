@@ -131,6 +131,7 @@ class ofApp : public ofxiOSApp{
         
         float mainVol;
         Generator mainOut;
+        Generator sineA, sineB;
         
         //scales
         GlobalScales scaleCollection;
@@ -237,7 +238,7 @@ class ofApp : public ofxiOSApp{
         bool insideSynth;
         
         //designgrid
-        ofVec2f designGrid[3][3];
+        ofVec3f designGrid[3][3];
         
         
         ofShader shader;

@@ -14,8 +14,8 @@ public:
     int count;
     float attack;
     
-    SampleTable tableSineSimple, tableNoiseSimple, sineSynth, simpleSquare, whistler,sineSynth2, snare;
+    SampleTable tableSineSimple, tableSaw, tableNoiseSimple, sineSynth, simpleSquare, whistler,sineSynth2, snare, bell1, bell2, dukken;
 
     
-    void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&, ControlGenerator&);
+    void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&, ControlGenerator&, Generator*,  Generator*);
 };

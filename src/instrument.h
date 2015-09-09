@@ -64,7 +64,7 @@ public:
     Instrument();
     Instrument(string,int,float,float);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode );
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode, Tonic::Generator*,Tonic::Generator*);
     void updateTonicOut();
     void update();
     void draw();
@@ -181,6 +181,7 @@ public:
     //interface planes
     InterfacePlane pulsePlane;
     //tonic
+    Tonic::Generator *sineA, *sineB;
     Tonic::ofxTonicSynth *mainTonicPtr;
     Tonic::Generator instrumentOut;
     Tonic::RampedValue outputRamp;

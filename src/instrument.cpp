@@ -69,7 +69,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
 
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_) {
   
     colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
@@ -255,11 +255,13 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     cubes.clearNormals();
     
     for( int i=0; i < cubes.getVertices().size(); i++ ) cubes.addNormal(ofPoint(0,0,0));
-    setNormals(cubes);
+    //setNormals(cubes);
     
     
     //setup main tonic out
-    
+    sineA = sineA_;
+    sineB = sineB_;
+
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
     outputRamp = Tonic::RampedValue().value(0.5).length(0.1).target(rampTarget);
@@ -284,7 +286,7 @@ void Instrument::update() {
     
     updateCubeMesh();
     
-    setNormals(cubes);
+   // setNormals(cubes);
     
 }
 
@@ -515,6 +517,7 @@ void Instrument::noteTriggerWest(){
             
             if (it->second.highX+1 == *stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+                it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = float( it->second.y_in_x_elements[*stepperPos]) / float(gridTiles) ;
                 it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
@@ -565,6 +568,7 @@ void Instrument::noteTriggerNorth() {
             
             if (it->second.lowY == gridTiles-*stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+                it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = float( it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles) ;
                 it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
@@ -614,6 +618,7 @@ void Instrument::noteTriggerEast() {
             
             if (it->second.lowX == gridTiles-*stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+                it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles) ;
                 it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
@@ -659,6 +664,7 @@ void Instrument::noteTriggerSouth() {
         if (*stepperPos >= it->second.lowY && *stepperPos <= it->second.highY+1) {
             if (it->second.highY+1 == *stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+                it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles) ;
                 it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
@@ -976,7 +982,7 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
     
     cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
-    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger);
+    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger, sineA, sineB);
     synthAttack = presetManager.attack;
     
     
@@ -996,7 +1002,7 @@ void Instrument::changePreset(bool test_) {
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger);
+            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, sineA,sineB);
             it->second.groupColor = ofColor::fromHsb(colorHue,
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
@@ -1049,7 +1055,7 @@ void Instrument::updateTonicOut(){
     
     
     
-    instrumentOut = (temp * outputRamp);
+    instrumentOut = ( temp * outputRamp);
     synthHasChanged = true;
 }
 

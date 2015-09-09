@@ -1,20 +1,24 @@
 
 #include "SynthPresetManager.h"
 
+//SINE A & B global Generator from ofApp
 
 SynthPresetManager::SynthPresetManager() {
     //update manual
-    count = 8;
+    count = 9;
     
     //sampleTable
     
-    int tableSize =4097;
+    int tableSize =2049;
     
     tableSineSimple = SampleTable(tableSize,1);
     TonicFloat* tableSineData = tableSineSimple.dataPointer();
 
     tableNoiseSimple = SampleTable(tableSize,1);
     TonicFloat* tableNoiseData = tableNoiseSimple.dataPointer();
+    
+    tableSaw = SampleTable(tableSize,1);
+    TonicFloat* tableSawData = tableSaw.dataPointer();
 
     sineSynth = SampleTable(tableSize,1);
     TonicFloat* sineSynthData = sineSynth.dataPointer();
@@ -31,8 +35,19 @@ SynthPresetManager::SynthPresetManager() {
     snare = SampleTable(tableSize,1);
     TonicFloat* snareData = snare.dataPointer();
     
+    bell1 = SampleTable(tableSize,1);
+    TonicFloat* bell1Data = bell1.dataPointer();
+    
+    bell2 = SampleTable(tableSize,1);
+    TonicFloat* bell2Data = bell2.dataPointer();
+    
+    dukken = SampleTable(tableSize,1);
+    TonicFloat* dukkenData = dukken.dataPointer();
+    
     TonicFloat norm = 1.0f / tableSize;
     
+    float tempVolPlus = 0;
+    float tempVolMinus = 0;
     for (unsigned long i= 0; i < tableSize; i++) {
         TonicFloat phase = TWO_PI*i*norm;
 
@@ -40,105 +55,141 @@ SynthPresetManager::SynthPresetManager() {
         *tableSineData++ = sinf(phase);
         *tableNoiseData++ = ((TonicFloat)rand()/RAND_MAX) * 2.0f - 1.0f;
 
-        //1.sine
+        //1.sine________________________________________
         TonicFloat temp = 0;
         int sums = 50;
-        for (int j = 1; j < sums; j++) {
+        for (int j = 0; j < sums; j++) {
             temp += sinf(phase*(float(j/2)))* powf((sums-float(j))/sums,4);
         }
-        *sineSynthData++ = temp*0.25;
-        
-        //2. squares
-        temp=0;
-        sums = 12;
-        for (int j = 0; j < sums; j++) {
-            if (i*(norm*j) > 0.5) {
-                temp += 1.0 * powf((sums-float(j))/sums,2);
-            } else {
-                temp += -1.0 * powf((sums-float(j))/sums,2);
-            }
-            
+        *sineSynthData++ = temp*0.19;
+       
+        if (temp > tempVolPlus) {
+            tempVolPlus = temp;
         }
-        *simpleSquareData++ = temp* 0.25;
-        cout << temp << endl;
-        //3. whistler
         
-        //4. box
-        *snareData++ = ((*tableNoiseSimple.dataPointer()+i*0.8)+(*tableSineSimple.dataPointer()+i*0.2))*ofSignedNoise(i*0.0001);
+        if (temp < tempVolMinus) {
+            tempVolMinus= temp;
+        }
         
-        *whistlerData++ =  (0.5*sinf(phase)* ofSignedNoise(i*0.0001))+(0.5*sinf(phase*2)* ofSignedNoise(i*0.001));
+        //2. saw________________________________________
+
+        
+        temp = (i *norm)*2-1;
+        
+        *tableSawData++ = temp;
+        
+    
+       
+        
+        
+        //3. dukken________________________________________
+      temp =  (sinf(phase)* (phase*4)*0.5)+ofSignedNoise(i*0.001)+((*(sineSynth.dataPointer()+i))* (phase*4)*0.5*-1);
+        temp -= 1.2;
+        
+        
+
+        *dukkenData++ = temp*0.11;
+        
+       
+        //4. whistler________________________________________
+
+         sums = 66;
+        temp = 0;
+        
+        for (int j = 1; j < sums; j++) {
+            float amp = 1/(j);
+            temp += (sinf(phase*j)*amp)+(sinf(phase*j*1.2)*amp*0.8)+ (sinf(phase*j*2.5)*amp*0.5)+ (sinf(phase*j*5.5)*amp*0.2)+ (sinf(phase*j*5.8)*amp*0.2);
+        }
+
+        temp +=0.12;
+        
+        *whistlerData++ = temp*0.49;
+        
+       
+        //6. snare
+        *snareData++ = (*(tableNoiseSimple.dataPointer()+i)*0.52)+((sinf(phase*1.86))+(sinf(phase*2.72))+(sinf(phase*3.64))+(sinf(phase*4.5))+(sinf(phase*5.46))*0.5)*0.22;
+        
+
+       
         *sineSynthData2++ = 0.4*sinf(phase) + 0.2*sinf(phase*2.1);
-                                                                        
+        
+        //8. bell
+    
+        temp =         ((sinf(phase)*0.1)+ (sinf(phase*0.5)*0.002) +(sinf(phase)*0.02) + (sinf(phase*0.7)*0.001))*2;
+        *bell1Data ++ = temp*5;
+        
+        
+        
+        
+        temp =  ((sinf(phase*2.49)*0.02) +(sinf(phase*11)*0.04) + (sinf(phase*2.571)*0.02)) + ((sinf(phase*2.002)*0.008) +(sinf(phase*3)*0.02) + (sinf(phase*9.6)*0.004))*2;
+        *bell2Data ++ = temp*7;
 
-
+        
+        
     }
     
+    cout << tempVolPlus << " " << tempVolMinus << endl;
+
 
 }
 
 
-void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_) {
+void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_, Generator *sineA_,  Generator *sineB_) {
     
     //1. sine synth__50 sine adder phase_* 0.5____________________________________________
     if (preset_ == 0) {
         
         attack = 0.007;
-        ADSR adsr = ADSR(attack, 0.3, 0.5, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.21, 0.5, 0.09).doesSustain(true).legato(true).trigger(trigger_);
         
-        TableLookupOsc sine = TableLookupOsc().setLookupTable(sineSynth).freq(freq_);
+        TableLookupOsc sine = TableLookupOsc().setLookupTable(sineSynth).freq(freq_  );
 
         
-        output_ =  sine*adsr*vol_;
+        output_ =  sine * adsr * (0.9+ ((*sineA_+1)/20) ) ;
     }
     //2. simple squarewave_______________________________________________
     else if(preset_ ==1 ){
         
         attack = 0.019;
-        ADSR adsr = ADSR(attack, 0.02, 0.82, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        ADSR adsr = ADSR(attack, 0.04, 0.62, 0.15).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr2 = ADSR(0.33, 0.04, 0.32, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+
         
+        TableLookupOsc myTable = TableLookupOsc().setLookupTable(tableSaw).freq(freq_);
         
-        TableLookupOsc myTable = TableLookupOsc().setLookupTable(simpleSquare).freq(freq_);
+        TableLookupOsc myTable2 = TableLookupOsc().setLookupTable(tableSaw).freq(freq_);
+
         
-        output_  =  (((myTable*2)>>BPF12().Q(22*(1.15-vol_)).cutoff(freq_))+(myTable*0.3))*adsr*vol_;
+      //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
+        
+        output_  =  ((myTable+myTable2*adsr**sineA_) + (myTable * adsr2**sineB_));
+
         
     }
-    //dukken______________________________________________
+    //3. dukken______________________________________________
     else if (preset_ == 2) {
-        attack = 0.010;
-        ADSR adsr = ADSR(attack, 0.12, 0.35, 0.05).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.020;
+        ADSR adsr = ADSR(attack, 0.12, 0.65, 0.05).doesSustain(true).legato(true).trigger(trigger_);
         
-        Generator outputGen = SineWave()
-        .freq( freq_
-              + (
-                 SineWave().freq( freq_*1.2 *vol_) *
-                 freq_/2 *
-                 ( (1.0f + SineWave().freq((LFNoise().setFreq(0.5f) + 1.f) * 2.f + 0.2f)  )
-                  )
-                 )
-              * ((SineWave().freq(0.15f) + 1.f) * 0.75f / vol_ + 0.25));
-        
-        //compressor
-        Tonic::Compressor compressor = Compressor()
-        .release(0.015)
-        .attack(0.001)
-        .threshold( dBToLin(-22) )
-        .ratio(8)
-        .lookahead(0.001)
-        .bypass(false);
+        TableLookupOsc dukkenTable = TableLookupOsc().setLookupTable(dukken).freq(freq_+((freq_*0.04)*(*sineA_)*vol_) );
+        TableLookupOsc noiseT = TableLookupOsc().setLookupTable(tableNoiseSimple).freq(freq_);
         
         
-        output_ = (outputGen*adsr*vol_)>>compressor ;
+        output_ = (dukkenTable*adsr* (0.9+ ((*sineA_+1)/20) )) + ((noiseT*adsr*0.8)>>BPF12().Q(8).cutoff(freq_));
+      
     }
     //whistler_______________________________________________
     
     else if (preset_ == 3) {
-        attack = 0.015;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.05).doesSustain(true).legato(true).trigger(trigger_);
+        attack = 0.001;
+        ADSR adsr = ADSR(attack, 0.15, 0.6, 0.025).doesSustain(false).legato(true).trigger(trigger_);
         
-        TableLookupOsc sine1 = TableLookupOsc().setLookupTable(tableSineSimple).freq(40);
-        TableLookupOsc whistler1 = TableLookupOsc().setLookupTable(whistler).freq(freq_+(sine1*100));
+        ADSR adsr2 = ADSR(attack*24, 0.1, 0.1, 0.7).doesSustain(false).legato(true).trigger(trigger_);
+
+        TableLookupOsc sineOSC = TableLookupOsc().freq(freq_).setLookupTable(sineSynth);
+        TableLookupOsc whistler1 = TableLookupOsc().setLookupTable(tableNoiseSimple).freq(freq_);
         
-        output_ = (whistler1*2)*adsr*vol_;
+        output_ = ((whistler1*adsr *0.1)+(sineOSC*adsr2 * (0.9+ ((*sineA_+1)/20) ) ))>>LPF6().Q(8).cutoff(freq_*10.5);
         
     }
     //box_______________________________________________
@@ -149,66 +200,32 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         attack = 0.00055;
         ADSR adsr = ADSR(attack, 0.105, 0.01, 0.03).doesSustain(false).legato(false).trigger(trigger_);
         
-        
         TableLookupOsc noiseTable = TableLookupOsc().setLookupTable(tableNoiseSimple).freq(12*(freq_*0.3));
         
-        
-        output_ = (noiseTable>>HPF6().Q(22).cutoff(freq_))*adsr*vol_;
+        output_ = (noiseTable>>HPF6().Q(22).cutoff(freq_))*adsr;
         
     }
     //dbender_______________________________________________
     
     else if (preset_ == 5) {
         
-        attack = 0.005;
-        ADSR adsr = ADSR(attack, 0.1, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
+        attack = 0.05;
+        ADSR adsr = ADSR(attack, 0.1, 0.8, 0.35).doesSustain(false).legato(true).trigger(trigger_);
         
+        TableLookupOsc sine1 = TableLookupOsc().setLookupTable(tableSineSimple).freq(freq_+(vol_*freq_*0.2));
         
-        Generator randomBass = (RectWave().freq( freq_ * SineWave().freq(3)) * 0.8) >> LPF24().cutoff( 2000 * (1 + ((SineWave().freq(0.1) + 1) * 0.5))).Q(1.5)  ;
-        output_ = (randomBass)*adsr *vol_;
+        output_ = (sine1)*(0.9+ ((*sineA_+1)/20));
     }
-    //snare_______________________________________________
+    //6. snare_______________________________________________
     
     else if (preset_ == 6) {
-        attack = 0.00015;
+        attack = 0.0025;
         
-        
-//        TableLookupOsc sine1 = TableLookupOsc().setLookupTable(tableSine).freq(freq_*1.65);
+        ADSR adsr = ADSR(attack, 0.105, 0.01, 0.03).doesSustain(false).legato(true).trigger(trigger_);
 
-  //      TableLookupOsc noise = TableLookupOsc().setLookupTable(tableNoise).freq(2) ;
-
-        //Generator tone = sine1;
-       // Generator noise4 = Noise() >> BPF12().Q(1).cutoff( (1.2-vol_)*freq_*0.75);
-        ADSR adsr = ADSR(attack, 0.075, 0.3, 0.15).doesSustain(false).legato(true).trigger(trigger_);
+        TableLookupOsc snareOsc = TableLookupOsc().setLookupTable(snare).freq((freq_*0.8)*vol_);
         
-        
-        SampleTable myTable = SampleTable(513,1);
-        
-        TonicFloat norm = 1.0f / 513;
-        TonicFloat* data = myTable.dataPointer();
-        
-        for (unsigned long i= 0; i < 513; i++) {
-            TonicFloat phase = TWO_PI*i*norm;
-            *data ++ = (0.2*sinf(phase))+((TonicFloat)rand()/RAND_MAX) * 2.0f - 1.0f;
-
-        }
-        
-        TableLookupOsc snare = TableLookupOsc().setLookupTable(myTable).freq(freq_);
-        TableLookupOsc snare2 = TableLookupOsc().setLookupTable(myTable).freq(4+(freq_*0.1));
-
-       // Generator tone = SineWave().freq(freq_*1.65)*0.1*(1.2-vol_)*sine1;
-        
-        //compressor
-        Tonic::Compressor compressor = Compressor()
-        .release(0.015)
-        .attack(0.0005)
-        .threshold( dBToLin(-5) )
-        .ratio(6)
-        .lookahead(0.001)
-        .bypass(false);
-
-        
-        output_ = (  (snare2+snare*adsr)>>BPF12().Q(1).cutoff(freq_*1.2) ) *vol_ ;
+        output_ = snareOsc*adsr;
     }
     
     //tableLookupTest_______________________________________________
@@ -220,7 +237,26 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
 
         TableLookupOsc sineS = TableLookupOsc().setLookupTable(sineSynth2).freq(freq_+(vol_*100));
-        output_ = sineS*adsr*vol_;
+        output_ = sineS*adsr **sineA_ **sineA_ **sineA_;
+    }
+    
+    //bell test
+
+    else if (preset_ == 8) {
+        
+        attack = 0.009;
+        ADSR adsr1 = ADSR(0.0005, 0.0, 1.0, 1.0).doesSustain(false).legato(true).trigger(trigger_);
+        ADSR adsr2 = ADSR(0.04, 0.0, 1.0, 0.5).doesSustain(false).legato(true).trigger(trigger_);
+
+        
+        TableLookupOsc bellAosc = TableLookupOsc().setLookupTable(bell1).freq(freq_);
+        TableLookupOsc bellBosc = TableLookupOsc().setLookupTable(bell2).freq(freq_);
+
+        
+        //output_ = ((bellAosc*adsr1)+(bellBosc*adsr2));
+
+        output_ = ((bellAosc*adsr1)*(0.9+ ((*sineA_+1)/20)))+((bellBosc*adsr1)*(0.9+ ((*sineA_+1)/20)))>>LPF6().Q(8).cutoff(freq_*7.5);
+
     }
 
     

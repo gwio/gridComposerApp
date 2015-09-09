@@ -6,6 +6,10 @@
 #define ANI_SPEED 0.03;
 #define VERSION "0.92.0";
 
+
+#define SINEA 25.8;
+#define SINEB 2;
+
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL, STATE_BPM};
 
 
@@ -30,6 +34,7 @@ void ofApp::setup(){
     ofEnableDepthTest();
     ofEnableAlphaBlending();
     
+   // ofSetDataPathRoot("../Resources/data/");
     
 #if TARGET_OS_IPHONE
     robotoLight.loadFont("fonts/Roboto-Light.ttf", 120);
@@ -107,6 +112,13 @@ void ofApp::setup(){
     ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
     ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(4).input(pulse);
     
+    TonicFloat sa = SINEA;
+    TonicFloat sb = SINEB;
+    
+    sineA = SineWave().freq(sa);
+    sineB = SineWave().freq(sb);
+
+    
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
     ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1 );
     
@@ -130,18 +142,18 @@ void ofApp::setup(){
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0] );
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &sineA, &sineB );
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1]);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &sineA, &sineB);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60);
     
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2] );
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &sineA, &sineB);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+12);
     
@@ -251,32 +263,34 @@ void ofApp::setupAudio(){
     }
     mainOut = temp ;
     
-    /*
-     Tonic::StereoDelay delay = Tonic::StereoDelay(0.10f,0.2f)
-     .delayTimeLeft( 0.10 )
-     .delayTimeRight(0.20)
-     .feedback(0.18)
-     .dryLevel(0.95)
-     .wetLevel(0.1);
-     */
     
+     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
+     .delayTimeLeft( 0.7 )
+     .delayTimeRight(0.18)
+     .feedback(0.18)
+     .dryLevel(0.8)
+     .wetLevel(0.2);
+     
+    
+    /*
     Tonic::StereoDelay delay = Tonic::StereoDelay(0.09f,0.13f)
     .delayTimeLeft( 0.09)
     .delayTimeRight(0.13)
-    .feedback(0.08)
+    .feedback(0.15)
     .dryLevel(0.9)
-    .wetLevel( 0.1);
+    .wetLevel( 0.12);
+    */
     
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
     .attack(0.0001)
-    .threshold( dBToLin(-40) )
+    .threshold( dBToLin(-30) )
     .ratio(6)
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp)>>compressor>>delay) ;
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) ) ;
 }
 
 //--------------------------------------------------------------
@@ -345,7 +359,7 @@ void ofApp::update(){
     
     
     
-    light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+   // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -416,7 +430,7 @@ void ofApp::updateInterfaceMesh() {
     
     
     for (int i = 45; i < 45+4; i++) {
-        mainInterfaceData[i].updateMainMesh(mainInterface, testCam.worldToScreen(synths[activeSynth].myNode.getPosition()) ,tweenFloat);
+        mainInterfaceData[i].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
     }
     
     
@@ -437,9 +451,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-    ofEnableLighting();
-    light.enable();
-    material.begin();
+   // ofEnableLighting();
+  //  light.enable();
+  //  material.begin();
     
     if (!debugCam) {
         testCam.begin();
@@ -464,8 +478,8 @@ void ofApp::draw(){
         cam.end();
     }
     
-    material.end();
-    ofDisableLighting();
+  //  material.end();
+ //   ofDisableLighting();
     
     if (drawInfo) {
         drawDebug();
@@ -2332,6 +2346,8 @@ void ofApp::makePresetString() {
     presetNames.push_back("bender");
     presetNames.push_back("templateA");
     presetNames.push_back("Table");
+    presetNames.push_back("Bell");
+
     
     
     
@@ -2339,8 +2355,8 @@ void ofApp::makePresetString() {
 
 void ofApp::makeDesignGrid() {
     
-    ofVec2f third = ofVec2f(ofGetWindowWidth()/3,ofGetWindowHeight()/3);
-    ofVec2f center = third/2;
+    ofVec3f third = ofVec2f(ofGetWindowWidth()/3,ofGetWindowHeight()/3);
+    ofVec3f center = third/2;
     
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
