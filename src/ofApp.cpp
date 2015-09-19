@@ -4,7 +4,7 @@
 #define TILEBORDER 0.075
 #define BPM 220*4
 #define ANI_SPEED 0.03;
-#define VERSION "0.92.0";
+#define VERSION "0.93.0";
 
 
 #define SINEA 25.8;
@@ -34,7 +34,7 @@ void ofApp::setup(){
     ofEnableDepthTest();
     ofEnableAlphaBlending();
     
-   // ofSetDataPathRoot("../Resources/data/");
+    // ofSetDataPathRoot("../Resources/data/");
     
 #if TARGET_OS_IPHONE
     robotoLight.loadFont("fonts/Roboto-Light.ttf", 120);
@@ -117,7 +117,7 @@ void ofApp::setup(){
     
     sineA = SineWave().freq(sa);
     sineB = SineWave().freq(sb);
-
+    
     
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
     ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1 );
@@ -264,22 +264,22 @@ void ofApp::setupAudio(){
     mainOut = temp ;
     
     
-     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
-     .delayTimeLeft( 0.7 )
-     .delayTimeRight(0.18)
-     .feedback(0.18)
-     .dryLevel(0.8)
-     .wetLevel(0.2);
-     
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
+    .delayTimeLeft( 0.7 )
+    .delayTimeRight(0.18)
+    .feedback(0.18)
+    .dryLevel(0.8)
+    .wetLevel(0.2);
+    
     
     /*
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.09f,0.13f)
-    .delayTimeLeft( 0.09)
-    .delayTimeRight(0.13)
-    .feedback(0.15)
-    .dryLevel(0.9)
-    .wetLevel( 0.12);
-    */
+     Tonic::StereoDelay delay = Tonic::StereoDelay(0.09f,0.13f)
+     .delayTimeLeft( 0.09)
+     .delayTimeRight(0.13)
+     .feedback(0.15)
+     .dryLevel(0.9)
+     .wetLevel( 0.12);
+     */
     
     //compressor
     Tonic::Compressor compressor = Compressor()
@@ -290,7 +290,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) ) ;
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp)  );
 }
 
 //--------------------------------------------------------------
@@ -359,7 +359,7 @@ void ofApp::update(){
     
     
     
-   // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+    // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -451,9 +451,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-   // ofEnableLighting();
-  //  light.enable();
-  //  material.begin();
+    // ofEnableLighting();
+    //  light.enable();
+    //  material.begin();
     
     if (!debugCam) {
         testCam.begin();
@@ -478,8 +478,8 @@ void ofApp::draw(){
         cam.end();
     }
     
-  //  material.end();
- //   ofDisableLighting();
+    //  material.end();
+    //   ofDisableLighting();
     
     if (drawInfo) {
         drawDebug();
@@ -731,7 +731,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 mainInterfaceData[56].elementName = "1/"+ofToString(5-synths[synthButton[1]].nextPulseDivision);
                 mainInterfaceData[56].setStringWidth(mainInterfaceData[55].fsPtr->getBBox(mainInterfaceData[56].elementName, mainInterfaceData[56].fontSize, 0, 0).getWidth());
                 
-
+                
             }
             
             if (mainInterfaceData[57].isInside(ofVec2f(x,y))) {
@@ -2339,17 +2339,9 @@ void ofApp::bothEditInterfaceOff() {
 
 void ofApp::makePresetString() {
     presetNames.push_back("sine");
-    presetNames.push_back("simple");
-    presetNames.push_back("dukken");
-    presetNames.push_back("whistler");
-    presetNames.push_back("box");
-    presetNames.push_back("bender");
-    presetNames.push_back("templateA");
-    presetNames.push_back("Table");
-    presetNames.push_back("Bell");
-
-    
-    
+    presetNames.push_back("saw");
+    presetNames.push_back("snare");
+    presetNames.push_back("bell");
     
 }
 
