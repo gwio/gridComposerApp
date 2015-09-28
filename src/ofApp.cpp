@@ -263,34 +263,34 @@ void ofApp::setupAudio(){
     }
     mainOut = temp ;
     
-    
+    /*
     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
     .delayTimeLeft( 0.7 )
     .delayTimeRight(0.18)
     .feedback(0.18)
     .dryLevel(0.8)
     .wetLevel(0.2);
+    */
     
     
-    /*
-     Tonic::StereoDelay delay = Tonic::StereoDelay(0.09f,0.13f)
-     .delayTimeLeft( 0.09)
-     .delayTimeRight(0.13)
-     .feedback(0.15)
-     .dryLevel(0.9)
-     .wetLevel( 0.12);
-     */
+     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.22f)
+     .delayTimeLeft( 0.07)
+     .delayTimeRight(0.22)
+     .feedback(0.1)
+     .dryLevel(0.95)
+     .wetLevel(0.12);
+    
     
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
     .attack(0.0001)
-    .threshold( dBToLin(-30) )
+    .threshold( dBToLin(-6) )
     .ratio(6)
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp)  );
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp)>>LPF12().cutoff(8000).Q(4) >> delay );
 }
 
 //--------------------------------------------------------------

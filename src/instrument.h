@@ -184,7 +184,7 @@ public:
     Tonic::Generator *sineA, *sineB;
     Tonic::ofxTonicSynth *mainTonicPtr;
     Tonic::Generator instrumentOut;
-    Tonic::RampedValue outputRamp;
+    Tonic::RampedValue outputRamp, lowFreqVolFac;
     
     bool synthHasChanged;
     bool userScale;
