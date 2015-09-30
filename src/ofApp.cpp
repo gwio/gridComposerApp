@@ -264,21 +264,21 @@ void ofApp::setupAudio(){
     mainOut = temp ;
     
     /*
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
-    .delayTimeLeft( 0.7 )
-    .delayTimeRight(0.18)
-    .feedback(0.18)
-    .dryLevel(0.8)
-    .wetLevel(0.2);
-    */
+     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
+     .delayTimeLeft( 0.7 )
+     .delayTimeRight(0.18)
+     .feedback(0.18)
+     .dryLevel(0.8)
+     .wetLevel(0.2);
+     */
     
     
-     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.22f)
-     .delayTimeLeft( 0.07)
-     .delayTimeRight(0.22)
-     .feedback(0.1)
-     .dryLevel(0.95)
-     .wetLevel(0.12);
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.22f)
+    .delayTimeLeft( 0.07)
+    .delayTimeRight(0.22)
+    .feedback(0.1)
+    .dryLevel(0.95)
+    .wetLevel(0.12);
     
     
     //compressor
@@ -1394,7 +1394,7 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     tempNode.setFov(camFov);
     tempNode.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
     tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
-    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), ofGetWindowWidth(), ofGetWindowHeight()));
+    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), ofGetWidth(), ofGetHeight()));
     ofRay ray;
     ray.s = wMouse;
     ray.t = wMouse-tempNode.getPosition();
@@ -2338,16 +2338,16 @@ void ofApp::bothEditInterfaceOff() {
 }
 
 void ofApp::makePresetString() {
-    presetNames.push_back("sine");
-    presetNames.push_back("saw");
-    presetNames.push_back("snare");
-    presetNames.push_back("bell");
+    presetNames.push_back("AAA");
+    presetNames.push_back("BBB");
+    presetNames.push_back("CCC");
+    presetNames.push_back("DDD");
     
 }
 
 void ofApp::makeDesignGrid() {
     
-    ofVec3f third = ofVec2f(ofGetWindowWidth()/3,ofGetWindowHeight()/3);
+    ofVec3f third = ofVec2f(ofGetWidth()/3,ofGetHeight()/3);
     ofVec3f center = third/2;
     
     for (int i = 0; i < 3; i++) {
@@ -3120,7 +3120,19 @@ void ofApp::saveToXml(){
     
     settings.addTag("BPM");
     settings.pushTag("BPM");
+    settings.addTag("global");
+    settings.pushTag("global");
     settings.addValue("value", bpm);
+    settings.popTag();
+    settings.addTag("slots");
+    settings.pushTag("slots");
+    for (int i = 0; i < 3; i++) {
+        settings.addTag("slot");
+        settings.pushTag("slot",i);
+        settings.addValue("bpm", synths[synthButton[i]].pulseDivision);
+        settings.popTag();
+    }
+    settings.popTag();
     settings.popTag();
     
     //version
@@ -3229,6 +3241,9 @@ void ofApp::loadFromXml(){
             
             synths[synthButton[i]].keyNote = settings.getValue("keyNote", 0);
             
+            //set the layer lowFreqVolumeFactor to keynote
+            synths[synthButton[i]].mainTonicPtr->setParameter("lfvf"+synths[synthButton[i]].instrumentId, pow( 1-(1-ofMap(float(synths[synthButton[i]].keyNote), 12, 127, 1.0, 0.0)),4 ) );
+
             //scaleNoteSteps
             string tempActiveScale = settings.getValue("ActiveScaleBool", "100000000000");
             for (int j = 0; j < 12; j++) {
@@ -3340,9 +3355,18 @@ void ofApp::loadFromXml(){
         
         //bpm
         settings.pushTag("BPM");
+        settings.pushTag("global");
         bpm =ofClamp(settings.getValue("value", 200), 1, 2000);
         tonicSynth.setParameter("BPM", bpm*4);
         mainInterfaceData[38].elementName = "BPM "+ ofToString(bpm);
+        settings.popTag();
+        settings.pushTag("slots");
+        for (int i = 0; i < 3; i++) {
+            settings.pushTag("slot",i);
+            synths[synthButton[i]].nextPulseDivision = settings.getValue("bpm", 4);
+            settings.popTag();
+        }
+        settings.popTag();
         settings.popTag();
         
     }
