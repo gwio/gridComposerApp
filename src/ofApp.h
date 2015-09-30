@@ -95,7 +95,10 @@ class ofApp : public ofxiOSApp{
         void bpmInterfaceOn();
         void bpmInterfaceOff();
         
-        void bothEditInterfaceOff();
+        void harmonyInterfaceOn();
+        void harmonyInterfaceOff();
+        
+        //void bothEditInterfaceOff();
         
         void setNewGUI();
         
@@ -109,6 +112,7 @@ class ofApp : public ofxiOSApp{
         void buttonFourPress();
         void buttonEditDetail();
         void bpmButtonPress();
+        void harmonyButtonPress();
         
         void loadFromXml();
         void saveToXml();
@@ -175,6 +179,8 @@ class ofApp : public ofxiOSApp{
         ofPolyline camUsePath;
         ofPolyline OneVolumeLayerPathOn,TwoVolumeLayerPathOn,ThreeVolumeLayerPathOn;
         ofPolyline OneVolumeLayerPathOff,TwoVolumeLayerPathOff,ThreeVolumeLayerPathOff;
+        ofPolyline OneHarmonyPathOn, TwoHarmonyPathOn, ThreeHarmonyPathOn;
+        ofPolyline OneHarmonePathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
         ofPolyline camEditToDetail, camDetailToEdit;
         float aniPct;
         float aniCam;
@@ -247,7 +253,7 @@ class ofApp : public ofxiOSApp{
         int editDetailMoveDirection;
         
         //icons
-        ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon, leftIcon, rightIcon, bpmIcon ;
+        ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon, leftIcon, rightIcon, bpmIcon, harmonyIcon ;
         
         float scaleFac;
         
