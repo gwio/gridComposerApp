@@ -1145,7 +1145,7 @@ void Instrument::setMusicScale(GlobalScales& scale_,int num_){
 
 void Instrument::setKeyNote(int keyNote_) {
     
-    if ( keyNote+keyNote_ >= 12 && keyNote+keyNote_ <= 96) {
+    if ( keyNote+keyNote_ >= 12 && keyNote+keyNote_ <= 95) {
         int change = keyNote_;
         keyNote = ofClamp(keyNote+change,0, 120);
         cout << keyNote << endl;

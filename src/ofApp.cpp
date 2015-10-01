@@ -4,7 +4,7 @@
 #define TILEBORDER 0.075
 #define BPM 220*4
 #define ANI_SPEED 0.03;
-#define VERSION "0.93.0";
+#define VERSION "0.93.5";
 
 
 #define SINEA 25.8;
@@ -139,23 +139,29 @@ void ofApp::setup(){
         synthPos[i+1]=temp;
     }
     
+    globalKey = 0;
+    
+    synthButton[0] = 0;
+    synthButton[1] = 1;
+    synthButton[2] = 2;
+    
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
     synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &sineA, &sineB );
     synths[0].setMusicScale(scaleCollection, 0);
-    synths[0].setKeyNote(60-12);
+    synths[0].setKeyNote(60+globalKey-12);
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
     synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &sineA, &sineB);
     synths[1].setMusicScale(scaleCollection, 0);
-    synths[1].setKeyNote(60);
+    synths[1].setKeyNote(60+globalKey);
     
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
     synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &sineA, &sineB);
     synths[2].setMusicScale(scaleCollection, 0);
-    synths[2].setKeyNote(60+12);
+    synths[2].setKeyNote(60+globalKey+12);
     
     
     activeSynth = 1;
@@ -194,10 +200,6 @@ void ofApp::setup(){
     
     focusCam = false;
     
-    
-    synthButton[0] = 0;
-    synthButton[1] = 1;
-    synthButton[2] = 2;
     
     
     //  aniPct = 1.0;
@@ -452,6 +454,9 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[58].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
     mainInterfaceData[59].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[60].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
+    
+    mainInterfaceData[61].updateMainMeshSlider(mainInterface, designGrid[0][0],tweenFloat);
+
 }
 
 //--------------------------------------------------------------
@@ -1125,30 +1130,30 @@ void ofApp::replaceMousePressed(int x, int y) {
             if(  mainInterfaceData[58].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[58].minX) > ((mainInterfaceData[58].maxX-mainInterfaceData[58].minX)/2)) {
                     synths[synthButton[0]].setKeyNote(1);
-                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote);
+                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
                     mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
 
                 } else {
                     synths[synthButton[0]].setKeyNote(-1);
-                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote);
+                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
                     mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
                 }
-                setNewGUI();
+               // setNewGUI();
                 mainInterfaceData[58].blinkOn();
             }
             
             if(  mainInterfaceData[59].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[59].minX) > ((mainInterfaceData[59].maxX-mainInterfaceData[59].minX)/2)) {
                     synths[synthButton[1]].setKeyNote(1);
-                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote);
+                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote)+" "+ofToString(notes[synths[synthButton[1]].keyNote%12]);
                     mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
                     
                 } else {
                     synths[synthButton[1]].setKeyNote(-1);
-                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote);
+                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote)+" "+ofToString(notes[synths[synthButton[1]].keyNote%12]);
                     mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
                 }
-                setNewGUI();
+                //setNewGUI();
                 mainInterfaceData[59].blinkOn();
             }
             
@@ -1156,16 +1161,69 @@ void ofApp::replaceMousePressed(int x, int y) {
             if(  mainInterfaceData[60].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[60].minX) > ((mainInterfaceData[60].maxX-mainInterfaceData[60].minX)/2)) {
                     synths[synthButton[2]].setKeyNote(1);
-                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote);
+                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote)+" "+ofToString(notes[synths[synthButton[2]].keyNote%12]);
                     mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
                     
                 } else {
                     synths[synthButton[2]].setKeyNote(-1);
-                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote);
+                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote)+" "+ofToString(notes[synths[synthButton[2]].keyNote%12]);
                     mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
                 }
-                setNewGUI();
+                //setNewGUI();
                 mainInterfaceData[60].blinkOn();
+            }
+            
+            if (mainInterfaceData[61].isInside(ofVec2f(x,y))) {
+                if (  (x-mainInterfaceData[61].minX) > ((mainInterfaceData[61].maxX-mainInterfaceData[61].minX)/2)) {
+                    
+                    globalKey = ofWrap(globalKey+1,0,12);
+
+                    synths[synthButton[0]].setKeyNote( ((synths[synthButton[0]].keyNote)-( (synths[synthButton[0]].keyNote/12)*12 +(globalKey%12) ))*-1 );
+                    synths[synthButton[1]].setKeyNote( ((synths[synthButton[1]].keyNote)-( (synths[synthButton[1]].keyNote/12)*12 +(globalKey%12) ))*-1 );
+                    synths[synthButton[2]].setKeyNote( ((synths[synthButton[2]].keyNote)-( (synths[synthButton[2]].keyNote/12)*12 +(globalKey%12) ))*-1 );
+                    
+                    mainInterfaceData[61].elementName = ofToString(notes[globalKey%12]);
+                    mainInterfaceData[61].setStringWidth(mainInterfaceData[61].fsPtr->getBBox(mainInterfaceData[61].elementName, mainInterfaceData[61].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[61].blinkOn();
+                    
+                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
+                    mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[58].blinkOn();
+
+                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote)+" "+ofToString(notes[synths[synthButton[1]].keyNote%12]);
+                    mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[59].blinkOn();
+
+                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote)+" "+ofToString(notes[synths[synthButton[2]].keyNote%12]);
+                    mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[60].blinkOn();
+
+
+                    
+                } else {
+                    globalKey = ofWrap(globalKey-1,0,12);
+
+                    synths[synthButton[0]].setKeyNote( ((synths[synthButton[0]].keyNote)-( (synths[synthButton[0]].keyNote/12)*12 +(globalKey%12) ))*-1 );
+                    synths[synthButton[1]].setKeyNote( ((synths[synthButton[1]].keyNote)-( (synths[synthButton[1]].keyNote/12)*12 +(globalKey%12) ))*-1 );
+                    synths[synthButton[2]].setKeyNote( ((synths[synthButton[2]].keyNote)-( (synths[synthButton[2]].keyNote/12)*12 +(globalKey%12) ))*-1 );
+                    
+                    mainInterfaceData[61].elementName = ofToString(notes[globalKey%12]);
+                    mainInterfaceData[61].setStringWidth(mainInterfaceData[61].fsPtr->getBBox(mainInterfaceData[61].elementName, mainInterfaceData[61].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[61].blinkOn();
+
+                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
+                    mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[58].blinkOn();
+
+                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote)+" "+ofToString(notes[synths[synthButton[1]].keyNote%12]);
+                    mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[59].blinkOn();
+
+                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote)+" "+ofToString(notes[synths[synthButton[2]].keyNote%12]);
+                    mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[60].blinkOn();
+
+                }
             }
             
         }
@@ -1774,6 +1832,17 @@ void ofApp::setupStatesAndAnimation() {
 
 
 void ofApp::setupGlobalInterface() {
+    notes = ofSplitString("C C# D D# E F F# G G# A A# B"," ");
+    for (int i = 0 ; i < 12; i++) {
+        pianoKeys[i] = 0;
+    }
+    pianoKeys[1] = 1;
+    pianoKeys[3] = 1;
+    
+    pianoKeys[6] = 1;
+    pianoKeys[8] = 1;
+    pianoKeys[10] = 1;
+    
     
     int fontDefault = designGrid[0][0].y*0.38;
     int fontSmall = designGrid[0][0].y*0.165;
@@ -1848,17 +1917,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     
-    notes = ofSplitString("C C# D D# E F F# G G# A A# B"," ");
-    for (int i = 0 ; i < 12; i++) {
-        pianoKeys[i] = 0;
-    }
-    pianoKeys[1] = keyNoteButton.y;
-    pianoKeys[3] = keyNoteButton.y;
-    
-    pianoKeys[6] = keyNoteButton.y;
-    pianoKeys[8] = keyNoteButton.y;
-    pianoKeys[10] = keyNoteButton.y;
-    
+   
     
     
     //scale
@@ -2010,6 +2069,13 @@ void ofApp::setupGlobalInterface() {
     place = ofVec3f(0,0,0);
     temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
     mainInterfaceData.push_back(temp);
+    
+    //harmony menu, keynote
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
+    mainInterfaceData.push_back(temp);
+    
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -2428,6 +2494,9 @@ void ofApp::harmonyInterfaceOn() {
     mainInterfaceData[60].showString = true;
     mainInterfaceData[60].animation = true;
     mainInterfaceData[60].moveDir = 1;
+    mainInterfaceData[61].showString = true;
+    mainInterfaceData[61].animation = true;
+    mainInterfaceData[61].moveDir = 1;
     
     mainInterfaceData[43].showString = false;
     mainInterfaceData[43].animation = true;
@@ -2442,6 +2511,8 @@ void ofApp::harmonyInterfaceOff() {
     mainInterfaceData[59].moveDir = 0;
     mainInterfaceData[60].animation = true;
     mainInterfaceData[60].moveDir = 0;
+    mainInterfaceData[61].animation = true;
+    mainInterfaceData[61].moveDir = 0;
     
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 0;
@@ -3161,7 +3232,15 @@ void ofApp::setNewGUI() {
     mainInterfaceData[57].setStringWidth(mainInterfaceData[57].fsPtr->getBBox(mainInterfaceData[57].elementName, mainInterfaceData[57].fontSize, 0, 0).getWidth());
     
     
+    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
+    mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
     
+    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote)+" "+ofToString(notes[synths[synthButton[1]].keyNote%12]);
+    mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
+    
+    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote)+" "+ofToString(notes[synths[synthButton[2]].keyNote%12]);
+    mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
+   
 }
 
 ofColor ofApp::filterColor(ofColor c_){

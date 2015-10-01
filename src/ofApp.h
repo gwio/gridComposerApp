@@ -222,6 +222,7 @@ class ofApp : public ofxiOSApp{
         
         vector<string> notes;
         float pianoKeys[12];
+        int globalKey;
         
         //sound time
         int timeCounter;
