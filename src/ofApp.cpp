@@ -448,6 +448,10 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[56].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[57].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
     
+    
+    mainInterfaceData[58].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[59].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[60].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
 }
 
 //--------------------------------------------------------------
@@ -1117,6 +1121,53 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[43].blinkOn();
             }
             
+            
+            if(  mainInterfaceData[58].isInside(ofVec2f(x,y))) {
+                if (  (x-mainInterfaceData[58].minX) > ((mainInterfaceData[58].maxX-mainInterfaceData[58].minX)/2)) {
+                    synths[synthButton[0]].setKeyNote(1);
+                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote);
+                    mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
+
+                } else {
+                    synths[synthButton[0]].setKeyNote(-1);
+                    mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote);
+                    mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
+                }
+                setNewGUI();
+                mainInterfaceData[58].blinkOn();
+            }
+            
+            if(  mainInterfaceData[59].isInside(ofVec2f(x,y))) {
+                if (  (x-mainInterfaceData[59].minX) > ((mainInterfaceData[59].maxX-mainInterfaceData[59].minX)/2)) {
+                    synths[synthButton[1]].setKeyNote(1);
+                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote);
+                    mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
+                    
+                } else {
+                    synths[synthButton[1]].setKeyNote(-1);
+                    mainInterfaceData[59].elementName = ofToString(synths[synthButton[1]].keyNote);
+                    mainInterfaceData[59].setStringWidth(mainInterfaceData[59].fsPtr->getBBox(mainInterfaceData[59].elementName, mainInterfaceData[59].fontSize, 0, 0).getWidth());
+                }
+                setNewGUI();
+                mainInterfaceData[59].blinkOn();
+            }
+            
+            
+            if(  mainInterfaceData[60].isInside(ofVec2f(x,y))) {
+                if (  (x-mainInterfaceData[60].minX) > ((mainInterfaceData[60].maxX-mainInterfaceData[60].minX)/2)) {
+                    synths[synthButton[2]].setKeyNote(1);
+                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote);
+                    mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
+                    
+                } else {
+                    synths[synthButton[2]].setKeyNote(-1);
+                    mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote);
+                    mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
+                }
+                setNewGUI();
+                mainInterfaceData[60].blinkOn();
+            }
+            
         }
         
         else if (currentState == STATE_EDIT) {
@@ -1357,6 +1408,8 @@ void ofApp::drawDebug() {
     centerToThree.draw();
     centerToOne.draw();
     
+    TwoVolumeLayerPathOn.draw();
+    TwoHarmonyPathOn.draw();
     
     
     if (!debugCam) {
@@ -1697,8 +1750,25 @@ void ofApp::setupStatesAndAnimation() {
     //---___---
     
     //harmony mode
+    harmonyMatrix.rotate(75,-1,0,0);
     
+    TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
+    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
     
+    TwoHarmonyPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
+    TwoHarmonyPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
+    
+    OneHarmonyPathOn = TwoHarmonyPathOn;
+    OneHarmonePathOff = TwoHarmonyPathOff;
+    ThreeHarmonyPathOn = TwoHarmonyPathOn;
+    ThreeHarmonyPathOff = TwoHarmonyPathOff;
+
+    for (int i = 0; i < TwoHarmonyPathOn.size() ; i++) {
+        OneHarmonyPathOn.getVertices().at(i) = TwoHarmonyPathOn.getVertices().at(i)+synthPos[0].getPosition();
+        OneHarmonePathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[0].getPosition();
+        ThreeHarmonyPathOn.getVertices().at(i) = TwoHarmonyPathOn.getVertices().at(i)+synthPos[2].getPosition();
+        ThreeHarmonyPathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[2].getPosition();
+    }
     
 }
 
@@ -1922,6 +1992,23 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(56,string("BPM B"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(52,0,0),place,offPlace,fontDefault,false,&robotoCon);
     mainInterfaceData.push_back(temp);
     temp = GlobalGUI(57,string("BPM C"),ofVec3f(horizontalSlider.x*0.9, horizontalSlider.y,0),ofColor(53,0,0),place,offPlace,fontDefault,false,&robotoCon);
+    mainInterfaceData.push_back(temp);
+    
+    //harmony settings, a,b,c keynote
+    
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
+    mainInterfaceData.push_back(temp);
+    
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
+    mainInterfaceData.push_back(temp);
+    
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
@@ -2332,12 +2419,29 @@ void ofApp::bpmInterfaceOff(){
 
 void ofApp::harmonyInterfaceOn() {
     
+    mainInterfaceData[58].showString = true;
+    mainInterfaceData[58].animation = true;
+    mainInterfaceData[58].moveDir = 1;
+    mainInterfaceData[59].showString = true;
+    mainInterfaceData[59].animation = true;
+    mainInterfaceData[59].moveDir = 1;
+    mainInterfaceData[60].showString = true;
+    mainInterfaceData[60].animation = true;
+    mainInterfaceData[60].moveDir = 1;
+    
     mainInterfaceData[43].showString = false;
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 1;
 }
 
 void ofApp::harmonyInterfaceOff() {
+    
+    mainInterfaceData[58].animation = true;
+    mainInterfaceData[58].moveDir = 0;
+    mainInterfaceData[59].animation = true;
+    mainInterfaceData[59].moveDir = 0;
+    mainInterfaceData[60].animation = true;
+    mainInterfaceData[60].moveDir = 0;
     
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 0;
@@ -2864,17 +2968,17 @@ void ofApp::harmonyButtonPress() {
     
     if(currentState != STATE_HARMONY) {
         
-        synths[synthButton[0]].aniPath = OneVolumeLayerPathOn;
+        synths[synthButton[0]].aniPath = OneHarmonyPathOn;
         synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
-        synths[synthButton[0]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[0]].myTarget = harmonyMatrix.getOrientationQuat();
         synths[synthButton[0]].animate = true ;
-        synths[synthButton[1]].aniPath = TwoVolumeLayerPathOn;
+        synths[synthButton[1]].aniPath = TwoHarmonyPathOn;
         synths[synthButton[1]].myDefault = synthPos[1].getOrientationQuat();
-        synths[synthButton[1]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[1]].myTarget = harmonyMatrix.getOrientationQuat();
         synths[synthButton[1]].animate = true ;
-        synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOn;
+        synths[synthButton[2]].aniPath = ThreeHarmonyPathOn;
         synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
-        synths[synthButton[2]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[2]].myTarget = harmonyMatrix.getOrientationQuat();
         synths[synthButton[2]].animate = true ;
         
         
@@ -2888,17 +2992,17 @@ void ofApp::harmonyButtonPress() {
         
     } else if (currentState == STATE_HARMONY) {
         
-        synths[synthButton[0]].aniPath = OneVolumeLayerPathOff;
+        synths[synthButton[0]].aniPath = OneHarmonePathOff;
         synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
-        synths[synthButton[0]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[0]].myDefault = harmonyMatrix.getOrientationQuat();
         synths[synthButton[0]].animate = true ;
-        synths[synthButton[1]].aniPath = TwoVolumeLayerPathOff;
+        synths[synthButton[1]].aniPath = TwoHarmonyPathOff;
         synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
-        synths[synthButton[1]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[1]].myDefault = harmonyMatrix.getOrientationQuat();
         synths[synthButton[1]].animate = true ;
-        synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOff;
+        synths[synthButton[2]].aniPath = ThreeHarmonyPathOff;
         synths[synthButton[2]].myTarget = synthPos[0].getOrientationQuat();
-        synths[synthButton[2]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[2]].myDefault = harmonyMatrix.getOrientationQuat();
         synths[synthButton[2]].animate = true ;
         
         aniPct = 0.0;

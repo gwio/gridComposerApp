@@ -158,6 +158,7 @@ class ofApp : public ofxiOSApp{
         ofNode camNotActiveSynth;
         ofNode synthActivePos;
         ofNode volumeMatrix;
+        ofNode harmonyMatrix;
         ofNode camEditDetailPos;
         float camFov;
         float camActiveFov;
