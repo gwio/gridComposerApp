@@ -139,6 +139,7 @@ class ofApp : public ofxiOSApp{
         
         //scales
         GlobalScales scaleCollection;
+        int globalScaleVecPos;
         
         //font
         ofxFontStash robotoLight, robotoBold, robotoCon;

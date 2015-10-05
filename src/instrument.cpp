@@ -1076,6 +1076,7 @@ void Instrument::setRotate(ofQuaternion rot_){
     myNode.setOrientation(rot_);
 }
 
+//3d scale, not musical scale ;)
 void Instrument::setScale(float scale_){
     myNode.setScale(scale_);
 }
