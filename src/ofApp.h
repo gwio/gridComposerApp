@@ -102,6 +102,8 @@ class ofApp : public ofxiOSApp{
         
         void setNewGUI();
         
+        void setScaleNoteInfo(int);
+        
         void makeDesignGrid();
         
         void makePresetString();

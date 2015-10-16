@@ -13,7 +13,8 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     isTrans = trans_;
     
     if (!trans_) {
-    elementColorOn =  filterColor(ofColor::darkCyan) ;
+   // elementColorOn =  filterColor(ofColor::darkCyan) ;
+        elementColorOn = ofColor::fromHsb(ofRandom(255), 100, 100,155);
         //setColor(0);
         targetColor = elementColorOn;
        // targetColor = elementColorOn;
