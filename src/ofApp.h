@@ -102,7 +102,13 @@ class ofApp : public ofxiOSApp{
         
         void setNewGUI();
         
-        void setScaleNoteInfo(int);
+        //edit menu
+        void markScaleSteps(int);
+        void markSynthNotes(int);
+        
+        //harmony menu
+        void markScaleSteps();
+        void markSynthNotes();
         
         void makeDesignGrid();
         

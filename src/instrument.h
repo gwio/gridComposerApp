@@ -8,6 +8,7 @@
 #include "interfacePlane.h"
 #include "GlobalScales.h"
 #include "SynthPresetManager.h"
+#include "GlobalGUI.h"
 
 
 struct synthInfo {
@@ -76,6 +77,7 @@ public:
     void noteTriggerEast();
     void noteTriggerSouth();
     
+    void blinkNoteInfo(int);
     
     void nextDirection();
     
@@ -131,6 +133,7 @@ public:
     
     ofColor innerColorDefault, outerColorDefault, rasterColor;
     ofColor filterColor(ofColor);
+    vector<GlobalGUI> *guiPtr;
     
     //time
     int *stepperPos;
@@ -196,5 +199,6 @@ public:
     float bpmTick;
     float lastTick;
 
-    
+    int ownSlot;
+    int *uiState;
 };

@@ -49,6 +49,7 @@ public:
     void update();
     
     void setColor(float);
+    void setColor(ofColor);
     void activateOnColor(ofVboMesh&);
     void activateDarkerColor(ofVboMesh&);
 

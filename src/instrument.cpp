@@ -66,13 +66,12 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_) {
     bpmTick = 0.0;
     lastTick = 0.0;
     tickTimes.resize(5);
-
+    
 }
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_) {
-  
-    colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
+    colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
     myNode = node_;
     
@@ -81,7 +80,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         activeDirection[i]= true;
     }
     
-   // stepperPos = stepperPos_;
+    // stepperPos = stepperPos_;
     stepperPos = &timeCounter;
     mainTonicPtr = mainTonicPtr_;
     
@@ -261,13 +260,13 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     //setup main tonic out
     sineA = sineA_;
     sineB = sineB_;
-
+    
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
     outputRamp = Tonic::RampedValue().value(0.5).length(0.1).target(rampTarget);
     instrumentOut = instrumentOut * outputRamp;
     
-  
+    
     Tonic::ControlParameter lfvfTarget = mainTonicPtr_->addParameter("lfvf"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("lfvf"+instrumentId, 1.0);
     lowFreqVolFac = Tonic::RampedValue().value(1.0).length(0.002).target(lfvfTarget);
@@ -289,7 +288,7 @@ void Instrument::update() {
     
     updateCubeMesh();
     
-   // setNormals(cubes);
+    setNormals(cubes);
     
 }
 
@@ -297,7 +296,7 @@ void Instrument::draw() {
     if (trackSwitchOn) {
         
         cubes.draw();
-       pulsePlane.draw(pause);
+        pulsePlane.draw(pause);
     } else {
         
         raster.draw();
@@ -435,7 +434,7 @@ void Instrument::nextDirection() {
     bool test = false;
     int counter = 0;
     
-
+    
     
     if (!pause) {
         
@@ -479,6 +478,8 @@ void Instrument::nextDirection() {
     //  cout << scanDirection << endl;
 }
 
+//Index position is different for each direction!!!
+
 void Instrument::noteTriggerWest(){
     
     //scanline
@@ -486,8 +487,9 @@ void Instrument::noteTriggerWest(){
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(0).at(i).hasCube) {
                 cubeVector[layerInfo.at(0).at(i).cubeVecNum].setDefaultHeight(scanZ);
-                cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(0).at(i).cubeVecNum].scanColor,true);
+                cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(cubeVector[layerInfo.at(0).at(i).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(0).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
+                blinkNoteInfo(soundsMap[layerInfo.at(0).at(i).cubeGroupId].groupNote-keyNote);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -501,15 +503,13 @@ void Instrument::noteTriggerWest(){
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(*stepperPos).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].setDefaultHeight(scanZ);
-                cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].scanColor,true);
+                cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].setColor(cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(*stepperPos).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
-                
-                
+                blinkNoteInfo(soundsMap[layerInfo.at(*stepperPos).at(i).cubeGroupId].groupNote-keyNote);
             }
             if (layerInfo.at(*stepperPos-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
-                cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setColor(   cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].groupColor,false);
-                
+                cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setColor(cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].groupColor,false);
             }
         }
         
@@ -538,9 +538,9 @@ void Instrument::noteTriggerNorth() {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(i).at(gridTiles-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setDefaultHeight(scanZ);
-                cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(   cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].scanColor,true);
+                cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(i).at(gridTiles-1).cubeGroupId].groupSynth.setParameter("trigger",1);
-                
+                blinkNoteInfo(soundsMap[layerInfo.at(i).at(gridTiles-1).cubeGroupId].groupNote-keyNote);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -556,7 +556,7 @@ void Instrument::noteTriggerNorth() {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].setColor(cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeGroupId].groupSynth.setParameter("trigger",1);
-                
+                blinkNoteInfo(soundsMap[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeGroupId].groupNote-keyNote);
             }
             if (layerInfo.at(i).at(gridTiles-*stepperPos).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -591,6 +591,7 @@ void Instrument::noteTriggerEast() {
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setColor(cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(gridTiles-1).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
+                blinkNoteInfo(soundsMap[layerInfo.at(gridTiles-1).at(i).cubeGroupId].groupNote-keyNote);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -606,7 +607,7 @@ void Instrument::noteTriggerEast() {
                 cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].setColor(cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
-                
+                blinkNoteInfo(soundsMap[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeGroupId].groupNote-keyNote);
             }
             if (layerInfo.at(gridTiles-*stepperPos).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -638,6 +639,7 @@ void Instrument::noteTriggerSouth() {
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setColor(cubeVector[layerInfo.at(i).at(0).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(i).at(0).cubeGroupId].groupSynth.setParameter("trigger",1);
+                blinkNoteInfo(soundsMap[layerInfo.at(i).at(0).cubeGroupId].groupNote-keyNote);
             }
         }
     } else if (*stepperPos == gridTiles ) {
@@ -653,6 +655,7 @@ void Instrument::noteTriggerSouth() {
                 cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].setDefaultHeight(scanZ);
                 cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].setColor(cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].scanColor,true);
                 soundsMap[layerInfo.at(i).at(*stepperPos).cubeGroupId].groupSynth.setParameter("trigger",1);
+                blinkNoteInfo(soundsMap[layerInfo.at(i).at(*stepperPos).cubeGroupId].groupNote-keyNote);
             }
             if (layerInfo.at(i).at(*stepperPos-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
@@ -701,8 +704,8 @@ void Instrument::drawDebug() {
             }
         }
     }
-    
     ofPopStyle();
+    
 }
 
 void Instrument::tapEvent(int x_,int y_) {
@@ -986,8 +989,8 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
     cgPtr->groupNote = getRandomNote();
     cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
-
-
+    
+    
     
     cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
     presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger, lowFreqVolFac, sineA, sineB);
@@ -1113,7 +1116,7 @@ void Instrument::applyNewScale(){
             it->second.groupNote = getRandomNote();
             it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
             mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
-
+            
         }
     }
 }
@@ -1161,6 +1164,14 @@ void Instrument::setKeyNote(int keyNote_) {
         }
     }
     
+}
+
+void Instrument::blinkNoteInfo(int index_) {
+    if(inFocus) {
+        guiPtr->at(63+index_).blinkOn();
+    } else if(*uiState==5) {
+        guiPtr->at(75+(ownSlot*12)+index_).blinkOn();
+    }
 }
 
 void Instrument::applyPitchMod(float mod_) {

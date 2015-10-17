@@ -245,9 +245,20 @@ void GlobalGUI::setColor(float hue_) {
     elementColorOn = ofColor::fromHsb(hue_, 100, 160,255);
     
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
-    elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
+    elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-120, elementColorOn.getSaturation(), 255 );
     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
 
+}
+
+
+void GlobalGUI::setColor(ofColor color_) {
+    
+    elementColorOn = color_;
+    
+    elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
+    elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-120, elementColorOn.getSaturation(), 255 );
+    elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
+    
 }
 
 void GlobalGUI::activateOnColor(ofVboMesh& mesh_){
