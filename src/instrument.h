@@ -10,6 +10,12 @@
 #include "SynthPresetManager.h"
 #include "GlobalGUI.h"
 
+struct noteLog {
+    vector<bool> notes;
+    noteLog() : notes(12, false)
+    {}
+    
+};
 
 struct synthInfo {
     bool hasCube;
@@ -63,7 +69,7 @@ public:
     
     
     Instrument();
-    Instrument(string,int,float,float);
+    Instrument(string,int,float,float,int);
     
     void setup(int*, Tonic::ofxTonicSynth *,ofNode, Tonic::Generator*,Tonic::Generator*);
     void updateTonicOut();
@@ -201,4 +207,9 @@ public:
 
     int ownSlot;
     int *uiState;
+    
+    //save played notes
+    vector<noteLog> noteHistory;
+    noteLog tempLog;
+    int historyRows;
 };

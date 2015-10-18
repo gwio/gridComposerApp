@@ -1,14 +1,16 @@
 #include "ofApp.h"
 #define TILES 5
-#define TILESIZE 100/TILES
+#define TILESIZE (100/TILES)
 #define TILEBORDER 0.075
-#define BPM 220*4
-#define ANI_SPEED 0.025;
-#define VERSION "0.93.5";
+#define BPM (220*4)
+#define ANI_SPEED 0.025
+#define VERSION "0.93.5"
 
 
-#define SINEA 25.8;
-#define SINEB 2;
+#define SINEA 25.8
+#define SINEB 2
+
+#define HISTORY_ROWS 50
 
 enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL, STATE_BPM, STATE_HARMONY};
 
@@ -153,19 +155,19 @@ void ofApp::setup(){
     
     synths.resize(3);
     
-    synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER);
+    synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
     synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &sineA, &sineB);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60+globalKey-12);
     synths[0].ownSlot = 0;
     
-    synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER);
+    synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
     synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &sineA, &sineB);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60+globalKey);
     synths[1].ownSlot = 1;
     
-    synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER);
+    synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
     synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &sineA, &sineB);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+globalKey+12);
@@ -186,6 +188,10 @@ void ofApp::setup(){
     synths[0].uiState = &currentState;
     synths[1].uiState = &currentState;
     synths[2].uiState = &currentState;
+    
+    hvSlotA.setup(&mainInterfaceData[75],HISTORY_ROWS,75);
+    hvSlotB.setup(&mainInterfaceData[87],HISTORY_ROWS,87);
+    hvSlotC.setup(&mainInterfaceData[99],HISTORY_ROWS,99);
     
     
     //intersectplane
@@ -517,7 +523,6 @@ void ofApp::draw(){
         synths[i].draw();
         
         synths[i].myNode.restoreTransformGL();
-        
     }
     
     
@@ -537,14 +542,23 @@ void ofApp::draw(){
     glDisable(GL_DEPTH_TEST);
     
     
+    if (!interfaceMoving && currentState == STATE_HARMONY){
+        hvSlotA.draw();
+        hvSlotB.draw();
+        hvSlotC.draw();
+    }
+    
+    mainInterface.draw();
+
     glDisable(GL_MULTISAMPLE);
     
     
-    mainInterface.draw();
     
     drawStringAndIcons();
     
     muster.draw();
+    
+    
 }
 
 void ofApp::drawStringAndIcons(){
@@ -1595,6 +1609,19 @@ void ofApp::pulseEvent(int div){
                 mainInterfaceData[55+i].blinkOn();
             }
         }
+    }
+    
+    if(currentState == STATE_HARMONY){
+        if (synths[synthButton[0]].pulseDivision == div) {
+            hvSlotA.update(synths[synthButton[0]].noteHistory, mainInterfaceData);
+        }
+        if (synths[synthButton[1]].pulseDivision == div) {
+            hvSlotB.update(synths[synthButton[1]].noteHistory, mainInterfaceData);
+        }
+        if (synths[synthButton[2]].pulseDivision == div) {
+            hvSlotC.update(synths[synthButton[2]].noteHistory, mainInterfaceData);
+        }
+        
     }
     
     for (int i = 0; i < synths.size(); i++) {

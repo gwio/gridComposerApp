@@ -7,6 +7,7 @@
 #include "GlobalGUI.h"
 #include "MusterContainer.h"
 #include "GlobalScales.h"
+#include "HistoryView.h"
 #include "ofxFontStash.h"
 #include "ofxXmlSettings.h"
 
@@ -275,4 +276,6 @@ class ofApp : public ofxiOSApp{
         string appVersion;
         
         int pitchCorrect;
+        
+        HistoryView hvSlotA, hvSlotB, hvSlotC;
     };
