@@ -12,7 +12,8 @@
 
 struct noteLog {
     vector<bool> notes;
-    noteLog() : notes(12, false)
+    vector<float> volume;
+    noteLog() : notes(12, false) , volume(12,0.0)
     {}
     
 };
@@ -71,7 +72,7 @@ public:
     Instrument();
     Instrument(string,int,float,float,int);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode, Tonic::Generator*,Tonic::Generator*);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode, Tonic::Generator*,Tonic::Generator*,int*);
     void updateTonicOut();
     void update();
     void draw();
@@ -212,4 +213,5 @@ public:
     vector<noteLog> noteHistory;
     noteLog tempLog;
     int historyRows;
+    int *globalStatePtr;
 };

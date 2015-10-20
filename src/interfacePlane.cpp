@@ -18,11 +18,11 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     
     posNode.setPosition(0, 0, 0);
     
-    
+    gridSize = (tileSize*tiles)*0.5+10;
     
     lineMesh.clear();
     
-    float zH = 2.55;
+    float zH = 22.55;
     //pulse lines
     lineMesh.addVertex(ofVec3f(-50,-50,zH));
     lineMesh.addColor(ofColor(255,255,255,0));
@@ -61,46 +61,42 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_) {
     directionMesh.setMode(OF_PRIMITIVE_TRIANGLES);
     
     
-    for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-6,0,0) + ofVec3f(0,tileSize*j-5,0) );
-        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(-6,0,0) + ofVec3f(0,tileSize*j+5,0) );
-        directionMesh.addVertex(lineMeshVertices.at(0)+ ofVec3f(0,tileSize*j,0));
+        directionMesh.addVertex(ofVec3f(-gridSize,0,0) + ofVec3f(0,-5,0) );
+        directionMesh.addVertex(ofVec3f(-gridSize,0,0) + ofVec3f(0,5,0) );
+        directionMesh.addVertex(ofVec3f(-gridSize,0,0));
         
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
-    }
     
-    for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,6,0) + ofVec3f(tileSize*j-5,0,0) );
-        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(0,6,0) + ofVec3f(tileSize*j+5,0,0) );
-        directionMesh.addVertex(lineMeshVertices.at(1)+ ofVec3f(tileSize*j,0,0));
+    
+        directionMesh.addVertex(ofVec3f(0,gridSize,0)  + ofVec3f(-5,0,0) );
+        directionMesh.addVertex(ofVec3f(0,gridSize,0)  + ofVec3f(5,0,0) );
+        directionMesh.addVertex(ofVec3f(0,gridSize,0));
         
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
-    }
     
-    for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(6,0,0) + ofVec3f(0,-tileSize*j-5,0) );
-        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(6,0,0) + ofVec3f(0,-tileSize*j+5,0) );
-        directionMesh.addVertex(lineMeshVertices.at(2)+ ofVec3f(0,-tileSize*j,0));
+    
+        directionMesh.addVertex(ofVec3f(gridSize,0,0) + ofVec3f(0,-5,0) );
+        directionMesh.addVertex(ofVec3f(gridSize,0,0) + ofVec3f(0,5,0) );
+        directionMesh.addVertex(ofVec3f(gridSize,0,0));
         
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
-    }
     
     
-    for (int j = 1; j < tiles; j++) {
-        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-6,0) + ofVec3f(-tileSize*j-5,0,0) );
-        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(0,-6,0) + ofVec3f(-tileSize*j+5,0,0) );
-        directionMesh.addVertex(lineMeshVertices.at(3)+ ofVec3f(-tileSize*j,0,0));
+    
+        directionMesh.addVertex(ofVec3f(0,-gridSize,0) + ofVec3f(-5,0,0) );
+        directionMesh.addVertex(ofVec3f(0,-gridSize,0) + ofVec3f(5,0,0) );
+        directionMesh.addVertex(ofVec3f(0,-gridSize,0));
         
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
         directionMesh.addColor(connectedDir);
-    }
+    
     
 }
 
@@ -225,44 +221,45 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         
         
         
+        
         //set active[]
         if (!active_[0]) {
-            for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (0*3) ; i < ((0*3)+3); i++) {
                 directionMesh.setColor(i,filterColor(  directionMesh.getColor(i).lerp(notActiveDir, 0.02))) ;
             }
         } else {
-            for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (0*3) ; i < ((0*3)+3); i++) {
                 directionMesh.setColor(i, filterColor(directionMesh.getColor(i).lerp(connectedDir, 0.02)));
             }
         }
         
         if (!active_[1]) {
-            for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (1*3) ; i < ((1*3)+3); i++) {
                 directionMesh.setColor(i, filterColor( directionMesh.getColor(i).lerp(notActiveDir, 0.02)));
             }
         } else {
-            for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (1*3) ; i < ((1*3)+3); i++) {
                 directionMesh.setColor(i, filterColor(directionMesh.getColor(i).lerp(connectedDir, 0.02)));
             }
         }
         
         
         if (!active_[2]) {
-            for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (2*3) ; i < ((2*3)+3); i++) {
                 directionMesh.setColor(i, filterColor( directionMesh.getColor(i).lerp(notActiveDir, 0.02)));
             }
         } else {
-            for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (2*3) ; i < ((2*3)+3); i++) {
                 directionMesh.setColor(i,filterColor( directionMesh.getColor(i).lerp(connectedDir, 0.02)));
             }
         }
         
         if (!active_[3]) {
-            for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (3*3) ; i < ((3*3)+3); i++) {
                 directionMesh.setColor(i, filterColor( directionMesh.getColor(i).lerp(notActiveDir, 0.02)));
             }
         } else {
-            for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i++) {
+            for (int i = (3*3) ; i < ((3*3)+3);i++) {
                 directionMesh.setColor(i,filterColor( directionMesh.getColor(i).lerp(connectedDir, 0.02)));
             }
         }
@@ -270,49 +267,49 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         
         //set connected[]
         if (!connected_[0]) {
-            for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i+=3) {
+            for (int i = (0*3) ; i < ((0*3)+3);i+=3) {
                 //directionMesh.setVertex(i+2, lineMeshVertices.at(0)+ ofVec3f(-10,tileSize*((i/3)+1),+10));
-                directionMesh.setVertex(i+2, lineMeshVertices.at(0)+ ofVec3f(-12,tileSize*((i/3)+1),0));
+                directionMesh.setVertex(i+2, ofVec3f(-gridSize,0,0) + ofVec3f(-5,0,0));
             }
         } else {
-            for (int i = (0*((tiles-1)*3)) ; i < (0*((tiles-1)*3))+((tiles-1)*3); i+=3) {
-                directionMesh.setVertex(i+2,lineMeshVertices.at(0)+ ofVec3f(0,tileSize*((i/3)+1),0));
+            for (int i = (0*3) ; i < ((0*3)+3); i+=3) {
+                directionMesh.setVertex(i+2, ofVec3f(-gridSize,0,0) + ofVec3f(5,0,0));
             }
         }
         
         if (!connected_[1]) {
-            for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i+=3) {
+            for (int i = (1*3) ; i < ((1*3)+3); i+=3) {
                 //directionMesh.setVertex(i+2,lineMeshVertices.at(1)+ ofVec3f(tileSize* (((i/3)+1)-(tiles*1)+1),10,10));
-                directionMesh.setVertex(i+2,lineMeshVertices.at(1)+ ofVec3f(tileSize* (((i/3)+1)-(tiles*1)+1),12,0));
+                directionMesh.setVertex(i+2, ofVec3f(0,gridSize,0) + ofVec3f(0,5,0));
             }
         } else {
-            for (int i = (1*((tiles-1)*3)) ; i < (1*((tiles-1)*3))+((tiles-1)*3); i+=3) {
-                directionMesh.setVertex(i+2,lineMeshVertices.at(1)+ ofVec3f(tileSize* (((i/3)+1)-(tiles*1)+1),0,0));
+            for (int i = (1*3) ; i < ((1*3)+3); i+=3) {
+                directionMesh.setVertex(i+2, ofVec3f(0,gridSize,0) + ofVec3f(0,-5,0));
             }
         }
         
         
         if (!connected_[2]) {
-            for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i+=3) {
+            for (int i = (2*3) ; i < ((2*3)+3); i+=3) {
                 //            directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(10,-tileSize* (((i/3)+1)-(tiles*2)+2),10));
-                directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(12,-tileSize* (((i/3)+1)-(tiles*2)+2),0));
+                directionMesh.setVertex(i+2, ofVec3f(gridSize,0,0) + ofVec3f(5,0,0));
                 
             }
         } else {
-            for (int i = (2*((tiles-1)*3)) ; i < (2*((tiles-1)*3))+((tiles-1)*3); i+=3) {
-                directionMesh.setVertex(i+2,lineMeshVertices.at(2)+ ofVec3f(0,-tileSize* (((i/3)+1)-(tiles*2)+2),0));
+            for (int i = (2*3) ; i < ((2*3)+3); i+=3) {
+                directionMesh.setVertex(i+2, ofVec3f(gridSize,0,0) + ofVec3f(-5,0,0));
             }
         }
         
         if (!connected_[3]) {
-            for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i+=3) {
+            for (int i = (3*3) ; i < ((3*3)+3); i+=3) {
                 //            directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-10,10));
-                directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),-12,0));
+                directionMesh.setVertex(i+2, ofVec3f(0,-gridSize,0) + ofVec3f(0,-5,0));
                 
             }
         } else {
-            for (int i = (3*((tiles-1)*3)) ; i < (3*((tiles-1)*3))+((tiles-1)*3); i+=3) {
-                directionMesh.setVertex(i+2,lineMeshVertices.at(3)+ ofVec3f(-tileSize* (((i/3)+1)-(tiles*3)+3),0,0));
+            for (int i = (3*3) ; i < ((3*3)+3); i+=3) {
+                directionMesh.setVertex(i+2, ofVec3f(0,-gridSize,0) + ofVec3f(0,5,0));
             }
         }
         
@@ -361,7 +358,7 @@ void InterfacePlane::draw( bool& pause_){
                     pulseLine.draw();
                 } else if (scanDir == 3) {
                     ofTranslate(-tileSize,0);
-                    pulseLine.draw();
+                   pulseLine.draw();
                 }
             }
             
@@ -374,8 +371,7 @@ void InterfacePlane::draw( bool& pause_){
 
 void InterfacePlane::pulseDir(int dir_) {
     
-    
-    for (int i = (dir_*((tiles-1)*3)) ; i < (dir_*((tiles-1)*3))+((tiles-1)*3); i++) {
+    for (int i = (dir_*3) ; i < (dir_*3)+3; i++) {
         directionMesh.setColor(i,filterColor( pulseColor));
     }
 }

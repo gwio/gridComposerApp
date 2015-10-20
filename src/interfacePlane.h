@@ -7,8 +7,8 @@
 class InterfacePlane {
     
     
-public:
-    
+
+    public:
     InterfacePlane();
     
     InterfacePlane(int, float);
@@ -33,6 +33,7 @@ public:
     float len;
     
     float tileSize;
+    float gridSize;
     
     float pctBar;
     float linePct;

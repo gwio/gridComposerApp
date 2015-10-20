@@ -77,7 +77,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
 
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int *globalState_) {
 
     colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
@@ -280,7 +280,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     lowFreqVolFac = Tonic::RampedValue().value(1.0).length(0.002).target(lfvfTarget);
     //   cout << cubes.getNumVertices() << endl;
     
-    
+    globalStatePtr = globalState_;
 }
 
 
@@ -536,9 +536,9 @@ void Instrument::noteTriggerWest(){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
-                float rampTarget = float( it->second.y_in_x_elements[*stepperPos]) / float(gridTiles) ;
-                it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
-                
+                float rampTarget = 1-powf(1-(float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles)),2) ;
+                it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
+                tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
             }
         }
     }
@@ -589,8 +589,9 @@ void Instrument::noteTriggerNorth() {
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
-                float rampTarget = float( it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles) ;
-                it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
+                float rampTarget = 1-powf(1-(float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
+                it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
+                tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
             }
         }
     }
@@ -642,8 +643,9 @@ void Instrument::noteTriggerEast() {
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
-                float rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles) ;
-                it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
+                float rampTarget = 1-powf(1-(float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
+                it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
+                tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
             }
         }
     }
@@ -692,8 +694,9 @@ void Instrument::noteTriggerSouth() {
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
-                float rampTarget = float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles) ;
-                it->second.groupSynth.setParameter("rampVolumeTarget", rampTarget);
+                float rampTarget =1-powf(1-(float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles)),2);
+                it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
+                tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
             }
         }
     }

@@ -18,7 +18,7 @@ public:
     int rows;
     int interfaceIndex;
     ofVec2f pos;
-    float offset;
+    ofVec3f offset;
     
     ofVboMesh mesh;
     GlobalGUI *guiPtr;

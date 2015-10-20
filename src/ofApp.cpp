@@ -156,19 +156,19 @@ void ofApp::setup(){
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &sineA, &sineB);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &sineA, &sineB,&currentState);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60+globalKey-12);
     synths[0].ownSlot = 0;
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &sineA, &sineB);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &sineA, &sineB,&currentState);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60+globalKey);
     synths[1].ownSlot = 1;
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &sineA, &sineB);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &sineA, &sineB,&currentState);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+globalKey+12);
     synths[2].ownSlot = 2;
@@ -541,16 +541,16 @@ void ofApp::draw(){
     
     glDisable(GL_DEPTH_TEST);
     
-    
-    if (!interfaceMoving && currentState == STATE_HARMONY){
+    glDisable(GL_MULTISAMPLE);
+
+    mainInterface.draw();
+
+    if (currentState == STATE_HARMONY){
         hvSlotA.draw();
         hvSlotB.draw();
         hvSlotC.draw();
     }
     
-    mainInterface.draw();
-
-    glDisable(GL_MULTISAMPLE);
     
     
     
@@ -2115,18 +2115,18 @@ void ofApp::setupGlobalInterface() {
     //harmony settings, a,b,c keynote
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,0,0);
-    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
+    place = ofVec3f(0,designGrid[0][0].y+horizontalSlider.y/4,0);
+    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontSmall,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,0,0);
-    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
+    place = ofVec3f(0,designGrid[0][0].y+horizontalSlider.y/4,0);
+    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontSmall,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,0,0);
-    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&robotoBold);
+    place = ofVec3f(0,designGrid[0][0].y+horizontalSlider.y/4,0);
+    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontSmall,false,&robotoBold);
     mainInterfaceData.push_back(temp);
     
     //harmony menu, keynote
@@ -2154,28 +2154,26 @@ void ofApp::setupGlobalInterface() {
     
     //harmony menu scale note display
     
+    float offset = designGrid[0][0].x/6;
     
     for (int i= 0; i < 12; i++) {
-        float offset = ((horizontalSlider.x)/12);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-        place = ofVec3f( (-horizontalSlider.x/2) + (offset*i) + (offset/2),-designGrid[0][0].y,0);
-        temp = GlobalGUI(75+i,"o",ofVec3f(offset,horizontalSlider.y*0.8,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&robotoBold);
+        place = ofVec3f( (-horizontalSlider.x/2) + (offset*i) + (offset/2),0,0);
+        temp = GlobalGUI(75+i,"o",ofVec3f(offset,designGrid[0][0].y*1.33,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&robotoBold);
         mainInterfaceData.push_back(temp);
     }
     
     for (int i= 0; i < 12; i++) {
-        float offset = ((horizontalSlider.x)/12);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-        place = ofVec3f( (-horizontalSlider.x/2) + (offset*i) + (offset/2),-designGrid[0][0].y,0);
-        temp = GlobalGUI(87+i,"o",ofVec3f(offset,horizontalSlider.y*0.8,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&robotoBold);
+        place = ofVec3f( (-horizontalSlider.x/2) + (offset*i) + (offset/2),0,0);
+        temp = GlobalGUI(87+i,"o",ofVec3f(offset,designGrid[0][0].y*1.33,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&robotoBold);
         mainInterfaceData.push_back(temp);
     }
     
     for (int i= 0; i < 12; i++) {
-        float offset = ((horizontalSlider.x)/12);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-        place = ofVec3f( (-horizontalSlider.x/2) + (offset*i) + (offset/2),-designGrid[0][0].y,0);
-        temp = GlobalGUI(99+i,"o",ofVec3f(offset,horizontalSlider.y*0.8,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&robotoBold);
+        place = ofVec3f( (-horizontalSlider.x/2) + (offset*i) + (offset/2),0,0);
+        temp = GlobalGUI(99+i,"o",ofVec3f(offset,designGrid[0][0].y*1.33,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&robotoBold);
         mainInterfaceData.push_back(temp);
     }
     
