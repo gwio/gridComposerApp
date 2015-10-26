@@ -17,7 +17,15 @@ class InterfacePlane {
     void draw(bool&);
     
     void pulseDir(int);
+    
+    void setupMeshes();
+    
+    void animation(float, int*);
+    
+    void transformButton(bool[],bool[]);
 
+    bool animate;
+    
     ofVec3f pos;
     ofVec3f tempDir;
     ofNode posNode;
@@ -26,6 +34,7 @@ class InterfacePlane {
     int stepCounter;
     int barCounter;
     int scanDir;
+    
     
     float alphaPart;
     float lastTick;
@@ -45,10 +54,25 @@ class InterfacePlane {
     
     ofVboMesh lineMesh;
     ofVboMesh pulseLine;
+    ofVboMesh directionMeshCon;
+    ofVboMesh directionMeshAct;
+    ofVboMesh directionMeshOff;
+    
+    ofVboMesh directionMeshConBig;
+    ofVboMesh directionMeshActBig;
+    ofVboMesh directionMeshOffBig;
+    
     ofVboMesh directionMesh;
+
     vector<ofVec3f> lineMeshVertices;
     
     bool nextDirs[4];
+    
+    int buttonState[4];
+    
+    float aniPct[4];
+    bool buttonMoving[4];
+    ofVec3f moveTarget[4];
     
     ofColor connectedDir;
     ofColor notActiveDir;

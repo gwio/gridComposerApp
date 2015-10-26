@@ -1219,6 +1219,9 @@ void Instrument::planeMovement(float pct_){
         tempRot.slerp(pct_, myDefault,myTarget);
         setRotate( tempRot );
         
+        //time menu animation
+        pulsePlane.animation(pct_, globalStatePtr);
+
         
     } else if (animate) {
         if (aniPath.size() > 1) {
@@ -1230,11 +1233,13 @@ void Instrument::planeMovement(float pct_){
         tempRot.slerp(pct_, myDefault,myTarget);
         setRotate( tempRot );
         
+        //time menu animation
+            pulsePlane.animation(pct_, globalStatePtr);
+    
     }
     
     
-    if(scaling ) {
-        
+    if(scaling) {
         setScale( ofLerp(myScaleDefault, myScaleTarget, pct_));
         
         if (scaling && pct_== 1.0) {
