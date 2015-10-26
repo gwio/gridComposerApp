@@ -77,7 +77,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
 
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int *globalState_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int* globalState_) {
 
     colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     
@@ -239,7 +239,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     
-    pulsePlane = InterfacePlane(gridTiles, gridSize);
+    pulsePlane = InterfacePlane(gridTiles, gridSize, connectedDirection, activeDirection);
     
     ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
     
@@ -292,7 +292,7 @@ void Instrument::update() {
         }
     }
     
-    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause);
+    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause, *globalStatePtr);
     
     updateCubeMesh();
     

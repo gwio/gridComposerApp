@@ -11,18 +11,18 @@ class InterfacePlane {
     public:
     InterfacePlane();
     
-    InterfacePlane(int, float);
+    InterfacePlane(int, float,bool[],bool[]);
     
-    void update(int&, float&, int&, bool[],bool[], bool&);
+    void update(int&, float&, int&, bool[],bool[], bool&, int&);
     void draw(bool&);
     
     void pulseDir(int);
     
-    void setupMeshes();
+    void setupMeshes(bool[],bool[]);
     
     void animation(float, int*);
     
-    void transformButton(bool[],bool[]);
+    void transformButton(bool[],bool[], int&);
 
     bool animate;
     
