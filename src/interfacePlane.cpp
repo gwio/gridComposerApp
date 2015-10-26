@@ -298,22 +298,73 @@ void InterfacePlane::setupMeshes(){
 void InterfacePlane::animation(float pct_, int* state_){
     
     if (*state_ == 4 && ! animate) {
-        ofVec3f tempVec;
-        for (int i = 0; i < directionMesh.getNumVertices(); i++) {
-            tempVec = ( (directionMeshConBig.getVertex(i)*2) - directionMeshCon.getVertex(i) )*pct_;
-            directionMesh.setVertex(i, directionMeshCon.getVertex(i)+tempVec );
+        
+        for (int i = 0; i < 4; i++) {
+            
+            
+            if(buttonState[i] == STATE_CONNECTED){
+                for (int j = i*9; j < (i*9)+9; j++) {
+                    ofVec3f tempVec;
+                    tempVec = ( (directionMeshConBig.getVertex(j)) - directionMeshCon.getVertex(j) );
+                    directionMesh.setVertex(j, directionMeshCon.getVertex(j)+(tempVec*pct_) );
+                }
+            }
+            
+            else if(buttonState[i] == STATE_ACTIVE){
+                for (int j = i*9; j < (i*9)+9; j++) {
+                    ofVec3f tempVec;
+                    tempVec = ( (directionMeshActBig.getVertex(j)) - directionMeshAct.getVertex(j) );
+                    directionMesh.setVertex(j,directionMeshAct.getVertex(j)+ (tempVec*pct_) );
+                }
+            }
+            
+            else if(buttonState[i] == STATE_OFF){
+                for (int j = i*9; j < (i*9)+9; j++) {
+                    ofVec3f tempVec;
+                    tempVec = ( (directionMeshOffBig.getVertex(j)) - directionMeshOff.getVertex(j) );
+                    directionMesh.setVertex(j,directionMeshOff.getVertex(j)+ (tempVec*pct_) );
+                }
+            }
+
         }
+        
+        
+        
         if(pct_==1.0){
             animate = true;
         }
     }
     
     if (*state_ != 4 &&  animate) {
-        ofVec3f tempVec;
-        for (int i = 0; i < directionMesh.getNumVertices(); i++) {
-            tempVec = ( (directionMeshConBig.getVertex(i)*2) - directionMeshCon.getVertex(i) )* (1-pct_);
-            directionMesh.setVertex(i, directionMeshCon.getVertex(i)+tempVec );
+        for (int i = 0; i < 4; i++) {
+            
+            
+            if(buttonState[i] == STATE_CONNECTED){
+                for (int j = i*9; j < (i*9)+9; j++) {
+                    ofVec3f tempVec;
+                    tempVec = ( (directionMeshCon.getVertex(j)) - directionMeshConBig.getVertex(j) );
+                    directionMesh.setVertex(j, directionMeshConBig.getVertex(j)+(tempVec*pct_) );
+                }
+            }
+            
+            else if(buttonState[i] == STATE_ACTIVE){
+                for (int j = i*9; j < (i*9)+9; j++) {
+                    ofVec3f tempVec;
+                    tempVec = ( (directionMeshAct.getVertex(j)) - directionMeshActBig.getVertex(j) );
+                    directionMesh.setVertex(j,directionMeshActBig.getVertex(j)+ (tempVec*pct_) );
+                }
+            }
+            
+            else if(buttonState[i] == STATE_OFF){
+                for (int j = i*9; j < (i*9)+9; j++) {
+                    ofVec3f tempVec;
+                    tempVec = ( (directionMeshOff.getVertex(j)) - directionMeshOffBig.getVertex(j) );
+                    directionMesh.setVertex(j,directionMeshOffBig.getVertex(j)+ (tempVec*pct_) );
+                }
+            }
+            
         }
+    
         if(pct_==1.0){
             animate = false;
         }
