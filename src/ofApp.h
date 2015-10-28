@@ -169,6 +169,7 @@ class ofApp : public ofxiOSApp{
         ofNode synthActivePos;
         ofNode volumeMatrix;
         ofNode harmonyMatrix;
+        ofNode timeMatrix;
         ofNode camEditDetailPos;
         float camFov;
         float camActiveFov;
@@ -192,7 +193,11 @@ class ofApp : public ofxiOSApp{
         ofPolyline OneVolumeLayerPathOff,TwoVolumeLayerPathOff,ThreeVolumeLayerPathOff;
         ofPolyline OneHarmonyPathOn, TwoHarmonyPathOn, ThreeHarmonyPathOn;
         ofPolyline OneHarmonePathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
+        ofPolyline OneTimePathOn, TwoTimePathOn, ThreeTimePathOn;
+        ofPolyline OneTimePathOff, TwoTimePathOff, ThreeTimePathOff;
+        
         ofPolyline camEditToDetail, camDetailToEdit;
+        
         float aniPct;
         float aniCam;
         bool animCam;

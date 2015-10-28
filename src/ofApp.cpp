@@ -1865,6 +1865,31 @@ void ofApp::setupStatesAndAnimation() {
     //___---___
     //---___---
     
+    //time mode
+    timeMatrix.rotate(-16,-1,0,0);
+    
+    TwoTimePathOn.addVertex(ofVec3f(0,0,0));
+    TwoTimePathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.45));
+    
+    TwoTimePathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.45));
+    TwoTimePathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
+    
+    OneTimePathOn = TwoTimePathOn;
+    OneTimePathOff = TwoTimePathOff;
+    ThreeTimePathOn = TwoTimePathOn;
+    ThreeTimePathOff = TwoTimePathOff;
+    
+    for (int i = 0; i < TwoTimePathOn.size() ; i++) {
+        OneTimePathOn.getVertices().at(i) = TwoTimePathOn.getVertices().at(i)+synthPos[0].getPosition();
+        OneTimePathOff.getVertices().at(i) = TwoTimePathOff.getVertices().at(i)+synthPos[0].getPosition();
+        ThreeTimePathOn.getVertices().at(i) = TwoTimePathOn.getVertices().at(i)+synthPos[2].getPosition();
+        ThreeTimePathOff.getVertices().at(i) = TwoTimePathOff.getVertices().at(i)+synthPos[2].getPosition();
+    }
+    
+    
+    //___---___
+    //---___---
+    
     //harmony mode
     harmonyMatrix.rotate(75,-1,0,0);
     
@@ -1886,6 +1911,7 @@ void ofApp::setupStatesAndAnimation() {
         ThreeHarmonyPathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[2].getPosition();
     }
     
+
 }
 
 //--------------------------------------------------------------
@@ -3265,20 +3291,28 @@ void ofApp::bpmButtonPress() {
     
     if(currentState != STATE_BPM) {
         
-        synths[synthButton[0]].aniPath = OneVolumeLayerPathOn;
+        synths[synthButton[0]].aniPath = OneTimePathOn;
         synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
-        synths[synthButton[0]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[0]].myTarget = timeMatrix.getOrientationQuat();
         synths[synthButton[0]].animate = true ;
-        synths[synthButton[1]].aniPath = TwoVolumeLayerPathOn;
+        synths[synthButton[1]].aniPath = TwoTimePathOn;
         synths[synthButton[1]].myDefault = synthPos[1].getOrientationQuat();
-        synths[synthButton[1]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[1]].myTarget = timeMatrix.getOrientationQuat();
         synths[synthButton[1]].animate = true ;
-        synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOn;
+        synths[synthButton[2]].aniPath = ThreeTimePathOn;
         synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
-        synths[synthButton[2]].myTarget = volumeMatrix.getOrientationQuat();
+        synths[synthButton[2]].myTarget = timeMatrix.getOrientationQuat();
         synths[synthButton[2]].animate = true ;
         
-        
+        synths[synthButton[0]].scaling = true;
+        synths[synthButton[1]].scaling = true;
+        synths[synthButton[2]].scaling = true;
+        synths[synthButton[0]].myScaleDefault = 1.0;
+        synths[synthButton[1]].myScaleDefault = 1.0;
+        synths[synthButton[2]].myScaleDefault = 1.0;
+        synths[synthButton[0]].myScaleTarget = 0.5;
+        synths[synthButton[1]].myScaleTarget = 0.5;
+        synths[synthButton[2]].myScaleTarget = 0.5;
         
         aniPct = 0.0;
         
@@ -3288,18 +3322,29 @@ void ofApp::bpmButtonPress() {
         
     } else if (currentState == STATE_BPM) {
         
-        synths[synthButton[0]].aniPath = OneVolumeLayerPathOff;
+        synths[synthButton[0]].aniPath = OneTimePathOff;
         synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
-        synths[synthButton[0]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[0]].myDefault = timeMatrix.getOrientationQuat();
         synths[synthButton[0]].animate = true ;
-        synths[synthButton[1]].aniPath = TwoVolumeLayerPathOff;
+        synths[synthButton[1]].aniPath = TwoTimePathOff;
         synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
-        synths[synthButton[1]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[1]].myDefault = timeMatrix.getOrientationQuat();
         synths[synthButton[1]].animate = true ;
-        synths[synthButton[2]].aniPath = ThreeVolumeLayerPathOff;
+        synths[synthButton[2]].aniPath = ThreeTimePathOff;
         synths[synthButton[2]].myTarget = synthPos[0].getOrientationQuat();
-        synths[synthButton[2]].myDefault = volumeMatrix.getOrientationQuat();
+        synths[synthButton[2]].myDefault = timeMatrix.getOrientationQuat();
         synths[synthButton[2]].animate = true ;
+        
+        
+        synths[synthButton[0]].scaling = true;
+        synths[synthButton[1]].scaling = true;
+        synths[synthButton[2]].scaling = true;
+        synths[synthButton[0]].myScaleDefault = 0.5;
+        synths[synthButton[1]].myScaleDefault = 0.5;
+        synths[synthButton[2]].myScaleDefault = 0.5;
+        synths[synthButton[0]].myScaleTarget = 1.0;
+        synths[synthButton[1]].myScaleTarget = 1.0;
+        synths[synthButton[2]].myScaleTarget = 1.0;
         
         aniPct = 0.0;
         

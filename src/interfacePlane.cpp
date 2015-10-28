@@ -77,10 +77,11 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     float zH = 30;
     float arrow_width = 8.0;
     arrow_width/=2;
-    ofMatrix4x4 tempM;
+    ofMatrix4x4 tempM, tempMB;
     vector<ofVec3f> tempVertices;
     tempVertices.clear();
     tempVertices.resize(9);
+    float scaleFac = 10;
     //connected mesh default
     
     //----------------------direction mesh connected
@@ -105,44 +106,51 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempVertices.at(8) = ofVec3f(arrow_width,-arrow_width,0);
     
     tempM.setTranslation(ofVec3f(-gridSize,0,0));
+    tempMB.setTranslation(ofVec3f(-gridSize*1.5,0,0));
+
     
     for (int i=0; i < 9;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
-        directionMeshConBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshConBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshConBig.addColor(connectedDir);
     }
     
     // tempM.newTranslationMatrix(ofVec3f(0,0,0));
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
     
     
     for (int i=0; i < 9;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
-        directionMeshConBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshConBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshConBig.addColor(connectedDir);
     }
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
-        directionMeshConBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshConBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshConBig.addColor(connectedDir);
     }
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
-        directionMeshConBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshConBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshConBig.addColor(connectedDir);
     }
     
@@ -174,44 +182,51 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     //tempM.setTranslation(ofVec3f(-gridSize,0,0));
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
-        directionMeshActBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshActBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshActBig.addColor(connectedDir);
     }
     
     // tempM.newTranslationMatrix(ofVec3f(0,0,0));
     tempM.rotate(90, 0, 0, -1);
-    
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
-        directionMeshActBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshActBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshActBig.addColor(connectedDir);
     }
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
-        directionMeshActBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshActBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshActBig.addColor(connectedDir);
     }
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
-        directionMeshActBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshActBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshActBig.addColor(connectedDir);
     }
     
@@ -244,44 +259,51 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     //tempM.setTranslation(ofVec3f(-gridSize,0,0));
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
-        directionMeshOffBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshOffBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshOffBig.addColor(connectedDir);
     }
     
     // tempM.newTranslationMatrix(ofVec3f(0,0,0));
     tempM.rotate(90, 0, 0, -1);
-    
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
-        directionMeshOffBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshOffBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshOffBig.addColor(connectedDir);
     }
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
-        directionMeshOffBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshOffBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshOffBig.addColor(connectedDir);
     }
     
     tempM.rotate(90, 0, 0, -1);
+    tempMB.rotate(90, 0, 0, -1);
+
     
     for (int i=0; i < 9;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
-        directionMeshOffBig.addVertex( tempVertices.at(i)*5 *tempM);
+        directionMeshOffBig.addVertex( tempVertices.at(i)*scaleFac *tempMB);
         directionMeshOffBig.addColor(connectedDir);
     }
     
@@ -599,7 +621,7 @@ void InterfacePlane::draw( bool& pause_){
         posNode.restoreTransformGL();
         //  ofPopStyle();
         //  lineMesh.draw();
-        directionMesh.draw();
+        directionMesh.drawWireframe();
         
         
         if (scanDir >=0) {
