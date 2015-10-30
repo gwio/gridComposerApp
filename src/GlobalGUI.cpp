@@ -297,7 +297,7 @@ bool GlobalGUI::isInside(ofVec2f click_) {
     }
 }
 
-void GlobalGUI::switchColor(ofVboMesh& mesh_) {
+void GlobalGUI::switchColor() {
     
     if (onOff) {
        
@@ -314,7 +314,7 @@ void GlobalGUI::switchColor(ofVboMesh& mesh_) {
     
 }
 
-void GlobalGUI::setOn(ofVboMesh& mesh_) {
+void GlobalGUI::setOn() {
     targetColor = elementColorOn;
     myTween = 0.0;
     blink = true;
@@ -328,7 +328,7 @@ void GlobalGUI::setOn(ofVboMesh& mesh_) {
 }
 
 
-void GlobalGUI::setOff(ofVboMesh& mesh_) {
+void GlobalGUI::setOff() {
     
     
     targetColor = elementColorOff;

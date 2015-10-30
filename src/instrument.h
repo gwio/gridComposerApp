@@ -214,4 +214,6 @@ public:
     noteLog tempLog;
     int historyRows;
     int *globalStatePtr;
+    
+    bool globalHarmony;
 };

@@ -70,9 +70,9 @@ public:
     bool isInside(ofVec2f);
     bool onOff;
     
-    void switchColor(ofVboMesh&);
-    void setOn(ofVboMesh&);
-    void setOff(ofVboMesh&);
+    void switchColor();
+    void setOn();
+    void setOff();
     
     bool touchDown;
     ofVec2f touchStart;

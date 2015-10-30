@@ -74,7 +74,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
         noteHistory[i] = tempLog;
     }
    
-
+    globalHarmony = true;
 }
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int* globalState_) {
