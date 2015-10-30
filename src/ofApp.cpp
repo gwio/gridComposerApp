@@ -1315,8 +1315,10 @@ void ofApp::replaceMousePressed(int x, int y) {
             
             //toggle state_edit_detail
             if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+                if(!synths[activeSynth].globalHarmony) {
                 buttonEditDetail();
                 mainInterfaceData[44].blinkOn();
+                }
             }
             
             //toggle save grid
@@ -1331,6 +1333,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 synths[activeSynth].globalHarmony = !synths[activeSynth].globalHarmony;
                 mainInterfaceData[111].blinkOn();
                 mainInterfaceData[111].switchColor();
+                mainInterfaceData[44].switchColor();
+
             }
             
             
@@ -3485,10 +3489,12 @@ void ofApp::setNewGUI() {
     
     if(synths[activeSynth].globalHarmony){
         mainInterfaceData[111].setOn();
+        mainInterfaceData[44].setOn();
     } else {
         mainInterfaceData[111].setOff();
+        mainInterfaceData[44].setOff();
     }
-    
+
     //set scaleNote Info
     
     markScaleSteps(63);
