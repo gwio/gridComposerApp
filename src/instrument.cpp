@@ -1,11 +1,10 @@
 #include "instrument.h"
 
 //layer is 100x100
-#define CUBE_Z_HEIGHT 12.5
-#define EMPTY_Z 2.55
-#define SCAN_Z 28
+#define CUBE_Z_HEIGHT 12
+#define EMPTY_Z 2
+#define SCAN_Z 20
 
-#define COLOR_TARGET 55.0
 
 Instrument::Instrument(){
     
@@ -25,9 +24,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     borderSize = border_;
     
     
-    innerColorDefault = filterColor( ofColor(222,222,222,255));
-    outerColorDefault = filterColor( ofColor(22,22,22,255) );
-    rasterColor = filterColor( ofColor::white);
+    innerColorDefault = filterColor( ofColor::fromHsb(138,0,180));
+    outerColorDefault = filterColor( ofColor::fromHsb(138,10,20) );
+    rasterColor = filterColor( ofColor::black);
     
     soundsCounter = 1;
     synthHasChanged = false;
@@ -73,13 +72,14 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     for (int i =0; i < historyRows; i++) {
         noteHistory[i] = tempLog;
     }
-   
+    
     globalHarmony = true;
 }
 
 void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int* globalState_) {
-
-    colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
+    
+    // colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
+    colorHue = presetManager.getPresetColor(colorHue, preset);
     
     myNode = node_;
     
@@ -103,7 +103,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     for (int i = 0; i < gridTiles+1; i++) {
         for (int j = 0; j < gridTiles+1; j++) {
             ofVec3f tPoint = ofVec3f(i*gridSize,j*gridSize,0);
-            raster.addVertex(tPoint+ofVec3f(0,0,0));
+            raster.addVertex(tPoint+ofVec3f(0,0,2));
             raster.addColor(rasterColor);
             
             verticesOuter[indexCounter] = tPoint;
@@ -116,9 +116,6 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
         cubes.addVertex(verticesOuter[i]);
         //cubes.addColor(ofColor(0,0,44));
         cubes.addColor(outerColorDefault);
-        
-        
-        
     }
     
     
@@ -161,7 +158,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             cubeVector[i*(gridTiles)+j].setColor(innerColorDefault,true);
             
             
-            cubeVector[i*(gridTiles)+j].attack = &synthAttack;
+            cubeVector[i*(gridTiles)+j].pulseDivPtr = &pulseDivision;
         }
     }
     
@@ -309,6 +306,8 @@ void Instrument::draw() {
         
         raster.draw();
     }
+   // raster.draw();
+    
 }
 
 
@@ -753,7 +752,7 @@ void Instrument::updateCubeMesh(){
         cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
         cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
         
-        cubes.setColor(cubeVector[j].vIndex0,filterColor (cubeVector[j].displayColor));
+        cubes.setColor(cubeVector[j].vIndex0,filterColor( cubeVector[j].displayColor));
         cubes.setColor(cubeVector[j].vIndex1,filterColor( cubeVector[j].displayColor));
         cubes.setColor(cubeVector[j].vIndex2,filterColor( cubeVector[j].displayColor));
         cubes.setColor(cubeVector[j].vIndex3,filterColor( cubeVector[j].displayColor));
@@ -801,7 +800,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeGroup temp = cubeGroup(gridTiles);
         temp.ownId = soundsCounter;
         temp.size = 1;
-        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-12,12),0,255), 150+ofRandom(-50,50), 120+ofRandom(-40,40));;
+        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-16,16),0,255), 180+ofRandom(-50,10), 120+ofRandom(0,40));
         temp.groupColor = gColor;
         temp.lowX = x_;
         temp.highX = x_;
@@ -1032,12 +1031,13 @@ void Instrument::changePreset(bool test_) {
     } else {
         preset--;
     }
-    colorHue = ofWrap( ofMap(preset%presetManager.count, 0, presetManager.count, 0, 255),0,255);
+    //colorHue = ofWrap( ofMap(preset%presetManager.count, 0, presetManager.count, 0, 255),0,255);
+    colorHue =  ofWrap(presetManager.getPresetColor(colorHue, preset%presetManager.count),0,255 );
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, lowFreqVolFac, sineA,sineB);
-            it->second.groupColor = ofColor::fromHsb(colorHue,
+            it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-16,16),0,255),
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
                                                      );
@@ -1053,7 +1053,7 @@ void Instrument::changePreset(bool test_) {
             if (layerInfo.at(x).at(y).hasCube){
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(
                                                                               ofColor::fromHsb(
-                                                                                               colorHue,
+                                                                                               soundsMap[layerInfo.at(x).at(y).cubeGroupId].groupColor.getHue(),
                                                                                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getSaturation(),
                                                                                                cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor.getBrightness()
                                                                                                )
@@ -1062,7 +1062,7 @@ void Instrument::changePreset(bool test_) {
                 
                 //if in pause mode
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor = ofColor::fromHsb(
-                                                                                          colorHue,
+                                                                                          soundsMap[layerInfo.at(x).at(y).cubeGroupId].groupColor.getHue(),
                                                                                           cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor.getSaturation(),
                                                                                           cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor.getBrightness()
                                                                                           );
@@ -1221,7 +1221,7 @@ void Instrument::planeMovement(float pct_){
         
         //time menu animation
         pulsePlane.animation(pct_, globalStatePtr);
-
+        
         
     } else if (animate) {
         if (aniPath.size() > 1) {
@@ -1234,8 +1234,8 @@ void Instrument::planeMovement(float pct_){
         setRotate( tempRot );
         
         //time menu animation
-            pulsePlane.animation(pct_, globalStatePtr);
-    
+        pulsePlane.animation(pct_, globalStatePtr);
+        
     }
     
     
@@ -1343,5 +1343,5 @@ ofColor Instrument::filterColor(ofColor c_){
     temp.a = ofClamp(c_.a, 10, 255);
     
     
-    return temp;
+    return c_;
 }

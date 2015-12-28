@@ -49,13 +49,13 @@ void Cube::update(){
         if (diff > 0) {
             aniFac = ofClamp(1-pow(1-aniPct, 2),0.0,1.0);
             
-            aniPct+= ofClamp( ofMap(*attack, 0.001, 0.01, 0.085, 0.01), 1.0, 0.1);
-
+            aniPct+= (0.1* (5-*pulseDivPtr) );
+            
         }
         
         if (diff < 0) {
             aniFac = ofClamp(pow(aniPct,4),0.0,1.0);
-            aniPct +=0.06;
+            aniPct += (0.06* (5-*pulseDivPtr)) ;
         }
         
         // cout << aniFac << endl;
@@ -64,31 +64,31 @@ void Cube::update(){
         vec2Ptr->z = actualZ + (diff*aniFac);
         vec3Ptr->z = actualZ + (diff*aniFac);
         
-       // aniPct+=SPEED;
-       // aniPct+= ofClamp( ofMap(*attack, 0.001, 0.01, 0.95, 0.1), 1.0, 0.1);
+        // aniPct+=SPEED;
+        // aniPct+= ofClamp( ofMap(*attack, 0.001, 0.01, 0.95, 0.1), 1.0, 0.1);
     }
     
     
     if (slowChange) {
-    if (myTween < 1.0) {
-        myTween = (myTween*1.0008)+0.001;
-        if (displayColor != cubeColor) {
-            displayColor =displayColor.lerp(cubeColor, myTween) ;
+        if (myTween < 1.0) {
+            myTween = (myTween*1.0008)+ (0.002 * (5-*pulseDivPtr));
+            if (displayColor != cubeColor) {
+                displayColor =displayColor.lerp(cubeColor, myTween) ;
+            }
+            
         }
         
-    }
-    
-    if (myTween >= 1.0) {
-        
-        displayColor = cubeColor;
-        slowChange = false;
-        fastChange = false;
-    }
+        if (myTween >= 1.0) {
+            
+            displayColor = cubeColor;
+            slowChange = false;
+            fastChange = false;
+        }
     }
     
     if (fastChange) {
         if (myTween < 1.0) {
-            myTween = (myTween*1.55)+0.02;
+            myTween = (myTween*1.55)+(0.035 * (5-*pulseDivPtr));
             if (displayColor != cubeColor) {
                 displayColor =displayColor.lerp(cubeColor, myTween) ;
             }
@@ -109,23 +109,23 @@ void Cube::update(){
 void Cube::changeGroupColor(ofColor c_) {
     
     if (!noSaturation) {
-    groupColor = c_;
-    scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, c_.getBrightness()+75) ;
+        groupColor = c_;
+        scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, 255) ;
     }
     
-       
+    
     
 }
 
 void Cube::setColor(ofColor c_,bool fast){
     
     if (!noSaturation) {
-    cubeColor = c_;
-    //displayColor = c_;
-    
-    myTween = 0.0;
-    fastChange = fast;
-    slowChange = !fast;
+        cubeColor = c_;
+        //displayColor = c_;
+        
+        myTween = 0.0;
+        fastChange = fast;
+        slowChange = !fast;
     }
     
     
@@ -139,11 +139,11 @@ void Cube::setDefaultHeight(float height_) {
 
 void Cube::satOff(){
     tempColor = groupColor;
-    changeGroupColor(ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-200,0,255) , groupColor.getBrightness(), 255));
+    changeGroupColor(ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-255,0,255) , groupColor.getBrightness(), 255));
     setColor(groupColor,false );
     noSaturation = true;
-
-
+    
+    
 }
 
 void Cube::satOn() {

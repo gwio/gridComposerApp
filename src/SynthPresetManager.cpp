@@ -206,3 +206,18 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     
     
 }
+
+float SynthPresetManager::getPresetColor(float hue_, int preset_){
+    
+    if (preset_ == 0) {
+        hue_ = 8;
+    } else if (preset_ == 1) {
+        hue_ = 50;
+    } else if (preset_ == 2) {
+        hue_ = 138;
+    } else if (preset_ == 3) {
+        hue_ = 230;
+    }
+    return hue_;
+    
+}

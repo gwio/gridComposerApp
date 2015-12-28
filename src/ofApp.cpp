@@ -199,7 +199,7 @@ void ofApp::setup(){
     thisIntersect.setFrom(planeForIntersect);
     
     
-    ofBackground( filterColor(ofColor(22,22,22)) );
+    ofBackground( filterColor(ofColor::fromHsb(138,10,10) ) );
     
     light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
     light.setDiffuseColor( ofColor(100,100,100));
@@ -385,7 +385,7 @@ void ofApp::update(){
     
     
     
-    // light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+     light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -511,9 +511,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-    // ofEnableLighting();
-    //  light.enable();
-    //  material.begin();
+     //ofEnableLighting();
+      //light.enable();
+      //material.begin();
     
     if (!debugCam) {
         testCam.begin();
@@ -537,8 +537,8 @@ void ofApp::draw(){
         cam.end();
     }
     
-    //  material.end();
-    //   ofDisableLighting();
+     // material.end();
+       //ofDisableLighting();
     
     if (drawInfo) {
         drawDebug();
@@ -3577,7 +3577,7 @@ ofColor ofApp::filterColor(ofColor c_){
     temp.a = ofClamp(c_.a, 10, 255);
     
     
-    return temp;
+    return c_;
 }
 
 void ofApp::exit(){

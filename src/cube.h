@@ -57,8 +57,8 @@ public:
     void satOff();
     ofColor tempColor;
     
-    float *attack;
     
     void setDefaultHeight(float);
     
+    int* pulseDivPtr;
 };
