@@ -321,7 +321,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
         directionMesh.addVertex(ofVec3f(0,0,0));
         directionMesh.addColor(connectedDir);
     }
-    
+  
     
 }
 
@@ -472,9 +472,11 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             buttonMoving[i] = false;
         }
     }
-    cout << buttonState[0] << endl;
+    //cout << buttonState[0] << endl;
     
 }
+
+
 
 void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_) {
     
@@ -623,6 +625,7 @@ void InterfacePlane::draw( bool& pause_){
         //  lineMesh.draw();
         directionMesh.drawWireframe();
         
+     
         
         if (scanDir >=0) {
             ofPushMatrix();

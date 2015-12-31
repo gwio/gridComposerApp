@@ -273,6 +273,34 @@ void ofApp::setup(){
     muster = MusterContainer(mainInterfaceData[39].drawStringPos, ofVec2f( mainInterfaceData[39].elementSize), TILES);
     muster.setup();
     
+    //setup click zones for directions
+    
+    for (int i = 0; i < 4; i++) {
+        ofVboMesh &aMesh = synths[0].pulsePlane.directionMeshConBig;
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+0)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+1)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+2)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+4)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].close();
+        
+        ofVboMesh &bMesh = synths[1].pulsePlane.directionMeshConBig;
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+0)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+1)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+2)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+4)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].close();
+        
+        
+        ofVboMesh &cMesh = synths[2].pulsePlane.directionMeshConBig;
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+0)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+1)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+2)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+4)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].close();
+        
+    }
+    
+    
     //load saves
     loadFromXml();
     
@@ -385,7 +413,7 @@ void ofApp::update(){
     
     
     
-     light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+    light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -511,9 +539,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-     //ofEnableLighting();
-      //light.enable();
-      //material.begin();
+    //ofEnableLighting();
+    //light.enable();
+    //material.begin();
     
     if (!debugCam) {
         testCam.begin();
@@ -537,8 +565,8 @@ void ofApp::draw(){
         cam.end();
     }
     
-     // material.end();
-       //ofDisableLighting();
+    // material.end();
+    //ofDisableLighting();
     
     if (drawInfo) {
         drawDebug();
@@ -1165,7 +1193,57 @@ void ofApp::replaceMousePressed(int x, int y) {
                 bpmButtonPress();
                 mainInterfaceData[43].blinkOn();
             }
+            
+            
+            //pulse direction
+            if (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x){
+                for (int i = 0; i < 4; i++) {
+                    if(directionClickZonesA[i].inside(x,y)){
+                        if(synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i] ) {
+                            synths[synthButton[0]].connectedDirection[i] =  false;
+                        } else if (!synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i]) {
+                            synths[synthButton[0]].activeDirection[i] =  false;
+                        } else {
+                            synths[synthButton[0]].connectedDirection[i] =  true;
+                            synths[synthButton[0]].activeDirection[i] =  true;
+                        }
+                    }
+                }
+            }
+            
+            if (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) {
+                for (int i = 0; i < 4; i++) {
+                    if (directionClickZonesB[i].inside(x, y)){
+                        if(synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i] ) {
+                            synths[synthButton[1]].connectedDirection[i] =  false;
+                        } else if (!synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i]) {
+                            synths[synthButton[1]].activeDirection[i] =  false;
+                        } else {
+                            synths[synthButton[1]].connectedDirection[i] =  true;
+                            synths[synthButton[1]].activeDirection[i] =  true;
+                        }
+                    }
+                }
+            }
+            
+            if (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) {
+                for (int i = 0; i < 4; i++) {
+                    if (directionClickZonesC[i].inside(x, y)){
+                        if(synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i] ) {
+                            synths[synthButton[2]].connectedDirection[i] =  false;
+                        } else if (!synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i]) {
+                            synths[synthButton[2]].activeDirection[i] =  false;
+                        } else {
+                            synths[synthButton[2]].connectedDirection[i] =  true;
+                            synths[synthButton[2]].activeDirection[i] =  true;
+                        }
+                    }
+                }
+                
+                
+            }
         }
+        
         
         else if (currentState == STATE_HARMONY) {
             
@@ -1514,6 +1592,7 @@ void ofApp::drawDebug() {
     TwoHarmonyPathOn.draw();
     
     
+    
     if (!debugCam) {
         testCam.end();
     } else {
@@ -1539,6 +1618,12 @@ void ofApp::drawDebug() {
         for (int j = 0; j < 3; j++) {
             ofEllipse(designGrid[i][j], 10, 10);
         }
+    }
+    
+    for (int i = 0; i < 4; i++){
+        directionClickZonesA[i].draw();
+        directionClickZonesB[i].draw();
+        directionClickZonesC[i].draw();
     }
 }
 

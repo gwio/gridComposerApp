@@ -283,4 +283,5 @@ class ofApp : public ofxiOSApp{
         int pitchCorrect;
         
         HistoryView hvSlotA, hvSlotB, hvSlotC;
+        ofPolyline directionClickZonesA[4],directionClickZonesB[4],directionClickZonesC[4];
     };
