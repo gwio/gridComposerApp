@@ -19,10 +19,9 @@ enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL, STAT
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    //11025 samplerate changed in toniccore.h, only ios project
 #if TARGET_OS_IPHONE
-    setSampleRate(44100);
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);
+    setSampleRate(44100);
     ofSoundStreamSetup(2, 1, this, 44100, 256*2, 1);
     pitchCorrect = 0;
 #else
@@ -385,7 +384,7 @@ void ofApp::update(){
     
     
     
-     light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+    light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
@@ -511,9 +510,9 @@ void ofApp::draw(){
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-     //ofEnableLighting();
-      //light.enable();
-      //material.begin();
+    //ofEnableLighting();
+    //light.enable();
+    //material.begin();
     
     if (!debugCam) {
         testCam.begin();
@@ -537,8 +536,8 @@ void ofApp::draw(){
         cam.end();
     }
     
-     // material.end();
-       //ofDisableLighting();
+    // material.end();
+    //ofDisableLighting();
     
     if (drawInfo) {
         drawDebug();
