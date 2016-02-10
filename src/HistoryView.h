@@ -11,16 +11,20 @@ class HistoryView{
 public:
     HistoryView();
     
-    void setup(GlobalGUI*,int,int);
-    void update(vector<noteLog>&,vector<GlobalGUI>&);
+    void setupMesh(GlobalGUI*,int,int);
+    void setupSpacer(ofVec3f,float, ofVec3f);
+    void update(vector<noteLog>&,vector<GlobalGUI>&, ofVboMesh&);
     void draw();
     
     int rows;
     int interfaceIndex;
     ofVec2f pos;
-    ofVec3f offset;
+    ofVec3f elementSize;
     
-    ofVboMesh mesh;
+    float elementDist;
+    float elementWhiteSpace;
+    
+    ofVboMesh mesh, spacer;
     GlobalGUI *guiPtr;
 
 };
