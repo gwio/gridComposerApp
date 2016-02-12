@@ -192,7 +192,7 @@ class ofApp : public ofxiOSApp{
         ofPolyline OneVolumeLayerPathOn,TwoVolumeLayerPathOn,ThreeVolumeLayerPathOn;
         ofPolyline OneVolumeLayerPathOff,TwoVolumeLayerPathOff,ThreeVolumeLayerPathOff;
         ofPolyline OneHarmonyPathOn, TwoHarmonyPathOn, ThreeHarmonyPathOn;
-        ofPolyline OneHarmonePathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
+        ofPolyline OneHarmonyPathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
         ofPolyline OneTimePathOn, TwoTimePathOn, ThreeTimePathOn;
         ofPolyline OneTimePathOff, TwoTimePathOff, ThreeTimePathOff;
         

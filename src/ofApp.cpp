@@ -1931,30 +1931,32 @@ void ofApp::setupStatesAndAnimation() {
     testCam.setOrientation(camNotActiveSynth.getOrientationQuat());
     testCam.setFov(camFov);
     
+
+    
     //___---___
     //---___---
-    
+    //harmony mode
     //from default to volume
-    volumeMatrix.rotate(45, -1, 0, 0);
+    harmonyMatrix.rotate(45, -1, 0, 0);
     
-    TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
-    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
+    TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
+    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
     // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
-    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
-    TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
+    TwoHarmonyPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
+    TwoHarmonyPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
-    OneVolumeLayerPathOn = TwoVolumeLayerPathOn;
-    OneVolumeLayerPathOff = TwoVolumeLayerPathOff;
-    ThreeVolumeLayerPathOn = TwoVolumeLayerPathOn;
-    ThreeVolumeLayerPathOff = TwoVolumeLayerPathOff;
+    OneHarmonyPathOn = TwoHarmonyPathOn;
+    OneHarmonyPathOff = TwoHarmonyPathOff;
+    ThreeHarmonyPathOn = TwoHarmonyPathOn;
+    ThreeHarmonyPathOff = TwoHarmonyPathOff;
     
-    for (int i = 0; i < TwoVolumeLayerPathOn.size() ; i++) {
-        OneVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[0].getPosition();
-        OneVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[0].getPosition();
-        ThreeVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[2].getPosition();
-        ThreeVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[2].getPosition();
+    for (int i = 0; i < TwoHarmonyPathOn.size() ; i++) {
+        OneHarmonyPathOn.getVertices().at(i) = TwoHarmonyPathOn.getVertices().at(i)+synthPos[0].getPosition();
+        OneHarmonyPathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[0].getPosition();
+        ThreeHarmonyPathOn.getVertices().at(i) = TwoHarmonyPathOn.getVertices().at(i)+synthPos[2].getPosition();
+        ThreeHarmonyPathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[2].getPosition();
     }
     
     //___---___
@@ -1985,25 +1987,25 @@ void ofApp::setupStatesAndAnimation() {
     //___---___
     //---___---
     
-    //harmony mode
-    harmonyMatrix.rotate(75,-1,0,0);
+    //volume mode
+    volumeMatrix.rotate(75,-1,0,0);
     
-    TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
-    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
+    TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
+    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
     
-    TwoHarmonyPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
-    TwoHarmonyPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
+    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
+    TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     
-    OneHarmonyPathOn = TwoHarmonyPathOn;
-    OneHarmonePathOff = TwoHarmonyPathOff;
-    ThreeHarmonyPathOn = TwoHarmonyPathOn;
-    ThreeHarmonyPathOff = TwoHarmonyPathOff;
+    OneVolumeLayerPathOn = TwoVolumeLayerPathOn;
+    OneVolumeLayerPathOff = TwoVolumeLayerPathOff;
+    ThreeVolumeLayerPathOn = TwoVolumeLayerPathOn;
+    ThreeVolumeLayerPathOff = TwoVolumeLayerPathOff;
     
-    for (int i = 0; i < TwoHarmonyPathOn.size() ; i++) {
-        OneHarmonyPathOn.getVertices().at(i) = TwoHarmonyPathOn.getVertices().at(i)+synthPos[0].getPosition();
-        OneHarmonePathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[0].getPosition();
-        ThreeHarmonyPathOn.getVertices().at(i) = TwoHarmonyPathOn.getVertices().at(i)+synthPos[2].getPosition();
-        ThreeHarmonyPathOff.getVertices().at(i) = TwoHarmonyPathOff.getVertices().at(i)+synthPos[2].getPosition();
+    for (int i = 0; i < TwoVolumeLayerPathOn.size() ; i++) {
+        OneVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[0].getPosition();
+        OneVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[0].getPosition();
+        ThreeVolumeLayerPathOn.getVertices().at(i) = TwoVolumeLayerPathOn.getVertices().at(i)+synthPos[2].getPosition();
+        ThreeVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[2].getPosition();
     }
     
     
@@ -3365,7 +3367,7 @@ void ofApp::harmonyButtonPress() {
         
     } else if (currentState == STATE_HARMONY) {
         
-        synths[synthButton[0]].aniPath = OneHarmonePathOff;
+        synths[synthButton[0]].aniPath = OneHarmonyPathOff;
         synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
         synths[synthButton[0]].myDefault = harmonyMatrix.getOrientationQuat();
         synths[synthButton[0]].animate = true ;
