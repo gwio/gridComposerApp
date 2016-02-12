@@ -283,25 +283,25 @@ void ofApp::setup(){
     
     for (int i = 0; i < 4; i++) {
         ofVboMesh &aMesh = synths[0].pulsePlane.directionMeshConBig;
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+0)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+1)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+2)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+4)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+0)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+1)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+3)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+7)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
         directionClickZonesA[i].close();
         
         ofVboMesh &bMesh = synths[1].pulsePlane.directionMeshConBig;
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+0)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+1)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+2)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+4)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+0)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+1)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+3)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+7)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
         directionClickZonesB[i].close();
         
         
         ofVboMesh &cMesh = synths[2].pulsePlane.directionMeshConBig;
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+0)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+1)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+2)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+4)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+0)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+1)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+3)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+7)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].close();
         
     }
