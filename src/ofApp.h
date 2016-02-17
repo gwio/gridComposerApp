@@ -32,6 +32,7 @@ class ofApp : public ofxiOSApp{
         void draw();
         void exit();
         void drawStringAndIcons();
+        void drawInterface();
         
 #if TARGET_OS_IPHONE
         void touchDown(ofTouchEventArgs & touch);
@@ -151,7 +152,7 @@ class ofApp : public ofxiOSApp{
         int globalScaleVecPos;
         
         //font
-        ofxFontStash robotoLight, robotoBold, robotoCon;
+        ofxFontStash tekoRegular, rajLight;
         
         
         //save function
@@ -270,7 +271,7 @@ class ofApp : public ofxiOSApp{
         int editDetailMoveDirection;
         
         //icons
-        ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon, leftIcon, rightIcon, bpmIcon, harmonyIcon ;
+        ofTexture backIcon, detailIcon, saveIcon, randomIcon, left, right, leftDouble, rightDouble ;
         
         float scaleFac;
         

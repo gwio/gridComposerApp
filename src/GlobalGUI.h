@@ -27,7 +27,6 @@ public:
     ofVec3f offPlacement;
     string elementName;
     
-    string drawString;
     
     float sliderPct;
     
@@ -66,6 +65,8 @@ public:
     void blinkOn();
     
     void drawFontString();
+    void drawFontString(float,float);
+
     
     bool isInside(ofVec2f);
     bool onOff;

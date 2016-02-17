@@ -8,27 +8,25 @@ GlobalGUI::GlobalGUI(){
 //colors for this start with 50,0,0
 GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_, bool trans_, ofxFontStash* fsPtr_) {
     elementName = name_;
-    drawString = name_;
     
     isTrans = trans_;
     
     if (!trans_) {
-   // elementColorOn =  filterColor(ofColor::darkCyan) ;
-        elementColorOn = ofColor::fromHsb(ofRandom(255), 100, 100,155);
+        //elementColorOn =  filterColor(ofColor::darkCyan);
+        elementColorOn = ofColor::fromHsb(ofRandom(255), 0, 255, 200);
         //setColor(0);
         targetColor = elementColorOn;
-       // targetColor = elementColorOn;
+        //targetColor = elementColorOn;
         elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
         elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
 
     } else {
         elementColorOn = ofColor(0,0,0,0);
         targetColor = elementColorOff;
-        ofColor whiteColor = filterColor( ofColor(255,255,255,230));
+        ofColor whiteColor = filterColor( ofColor(255,255,255,255));
         displayColor = whiteColor;
         targetColor = whiteColor;
         elementColorTouch = ofColor::fromHsb(whiteColor.getHue(), whiteColor.getSaturation()-50, whiteColor.getBrightness()+90, 255);
-
     }
     
     counter=counter_*4;
@@ -242,7 +240,7 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float& twee
 
 void GlobalGUI::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 100, 160,255);
+    elementColorOn = ofColor::fromHsb(hue_, 100, 160,200);
     
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-120, elementColorOn.getSaturation(), 255 );
@@ -357,14 +355,33 @@ void GlobalGUI::blinkOn(){
 void GlobalGUI::drawFontString() {
     
     if (showString){
+        ofPushStyle();
+        ofSetColor(displayColor);
     fsPtr->draw(elementName,
              fontSize,
               drawStringPos.x-stringWidth,
               drawStringPos.y+stringHeight
               );
     }
+    ofPopStyle();
 
 }
+
+void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
+    
+    if (showString){
+        ofPushStyle();
+        ofSetColor(displayColor);
+        fsPtr->draw(elementName,
+                    fontSize,
+                    drawStringPos.x-stringWidth+offsetX_,
+                    drawStringPos.y+stringHeight+offsetY_
+                    );
+    }
+    ofPopStyle();
+    
+}
+
 
 ofColor GlobalGUI::filterColor(ofColor c_){
     ofColor temp;
