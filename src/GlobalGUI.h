@@ -49,8 +49,8 @@ public:
     
     void setColor(float);
     void setColor(ofColor);
-    void activateOnColor(ofVboMesh&);
-    void activateDarkerColor(ofVboMesh&);
+    void activateOnColor();
+    void activateDarkerColor();
 
     
     void updateMainMesh(ofVboMesh&, ofVec3f);

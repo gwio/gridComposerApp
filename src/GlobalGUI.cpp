@@ -259,7 +259,7 @@ void GlobalGUI::setColor(ofColor color_) {
     
 }
 
-void GlobalGUI::activateOnColor(ofVboMesh& mesh_){
+void GlobalGUI::activateOnColor(){
     targetColor = elementColorOn;
     myTween = 0.0;
     blink = true;
@@ -271,7 +271,7 @@ void GlobalGUI::activateOnColor(ofVboMesh& mesh_){
      */
 }
 
-void GlobalGUI::activateDarkerColor(ofVboMesh& mesh_){
+void GlobalGUI::activateDarkerColor(){
     targetColor = elementColorDarker;
     myTween = 0.0;
     blink = true;
