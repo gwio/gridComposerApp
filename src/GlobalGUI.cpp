@@ -21,12 +21,15 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
         elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
 
     } else {
-        elementColorOn = ofColor(0,0,0,0);
+        elementColorOn = ofColor(255,255,255,255);
         targetColor = elementColorOff;
         ofColor whiteColor = filterColor( ofColor(255,255,255,255));
         displayColor = whiteColor;
         targetColor = whiteColor;
         elementColorTouch = ofColor::fromHsb(whiteColor.getHue(), whiteColor.getSaturation()-50, whiteColor.getBrightness()+90, 255);
+        elementColorDarker = ofColor::fromHsb(whiteColor.getHue(), 0, 111, 255 );
+        elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 25 );
+
     }
     
     counter=counter_*4;
@@ -299,7 +302,7 @@ void GlobalGUI::switchColor() {
     
     if (onOff) {
        
-        targetColor = elementColorOff;
+        targetColor = elementColorDarker;
         myTween = 0.0;
         blink = true;
     } else {

@@ -43,9 +43,9 @@ void ofApp::setup(){
     // ofSetDataPathRoot("../Resources/data/");
     
 #if TARGET_OS_IPHONE
-    tekoRegular.loadFont("fonts/teko/Teko-Light.ttf", 120);
+    tekoRegular.loadFont("fonts/Teko/Teko-Light.ttf", 120);
 #else
-    tekoRegular.setup("fonts/teko/Teko-Light.ttf", //font file, ttf only
+    tekoRegular.setup("fonts/Teko/Teko-Light.ttf", //font file, ttf only
                       1.0,					//lineheight percent
                       1024,					//texture atlas dimension
                       false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
@@ -230,15 +230,6 @@ void ofApp::setup(){
     
     temp.loadImage("icons/back.png");
     backIcon.loadData(temp.getPixelsRef(),GL_RGBA);
-    
-    temp.loadImage("icons/detail.png");
-    detailIcon.loadData(temp.getPixelsRef(), GL_RGBA);
-    
-    temp.loadImage("icons/save.png");
-    saveIcon.loadData(temp.getPixelsRef(), GL_RGBA);
-    
-    temp.loadImage("icons/random.png");
-    randomIcon.loadData(temp.getPixelsRef(), GL_RGBA);
     
     temp.loadImage("icons/left.png");
     left.loadData(temp.getPixelsRef(), GL_RGBA);
@@ -446,9 +437,6 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[2][0], tweenFloat);
     
-    mainInterfaceData[40].updateMainMesh(mainInterface,designGrid[2][0], tweenFloat);
-    
-    
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].updateMainMesh(mainInterface,ofVec3f(0,designGrid[0][0].y*2,0),tweenFloat);
@@ -475,7 +463,7 @@ void ofApp::updateInterfaceMesh() {
     
     
     mainInterfaceData[43].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
-    mainInterfaceData[44].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
+    mainInterfaceData[44].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
     
     mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
     
@@ -606,6 +594,8 @@ void ofApp::drawInterface(){
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x,mainInterface.getVertex(mainInterfaceData.at(45).counter+3).y,
                         designGrid[0][0].x/100,designGrid[0][0].y*0.2);
     }
+    
+    
 }
 
 void ofApp::drawStringAndIcons(){
@@ -633,7 +623,6 @@ void ofApp::drawStringAndIcons(){
             if(i == 38) {
                 //bpm global slider
                 mainInterfaceData[i].drawFontString(0, -mainInterfaceData[i].elementSize.y);
-                
             }
             
             else if(i<51 || i>54){
@@ -652,18 +641,10 @@ void ofApp::drawStringAndIcons(){
     //draw icons
     ofSetColor(mainInterfaceData[43].displayColor);
     backIcon.draw(mainInterfaceData[43].drawStringPos.x-tempTrans, mainInterfaceData[43].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
-    ofSetColor(mainInterfaceData[44].displayColor);
-    detailIcon.draw(mainInterfaceData[44].drawStringPos.x-tempTrans, mainInterfaceData[44].drawStringPos.y-tempTrans, 144*scaleFac,144*scaleFac);
+    
     
     ofSetColor(mainInterfaceData[11].displayColor);
     backIcon.draw(mainInterfaceData[11].drawStringPos.x-tempTrans, mainInterfaceData[11].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
-    
-    ofSetColor(mainInterfaceData[12].displayColor);
-    saveIcon.draw(mainInterfaceData[12].drawStringPos.x-tempTrans, mainInterfaceData[12].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
-    
-    ofSetColor(mainInterfaceData[40].displayColor);
-    randomIcon.draw(mainInterfaceData[40].drawStringPos.x-tempTrans, mainInterfaceData[12].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
-    
     
     
     ofSetColor(mainInterfaceData[58].displayColor);
@@ -743,6 +724,16 @@ void ofApp::drawStringAndIcons(){
               mainInterface.getVertex(mainInterfaceData[62].counter+0).y,
               144*scaleFac,144*scaleFac);
     
+    
+    ofSetColor(mainInterfaceData[7].displayColor);
+    right.draw(mainInterface.getVertex(mainInterfaceData[7].counter+3).x-(144*scaleFac),
+               mainInterface.getVertex(mainInterfaceData[7].counter+3).y,
+               144*scaleFac,144*scaleFac);
+    
+    left.draw(mainInterface.getVertex(mainInterfaceData[7].counter+0).x,
+              mainInterface.getVertex(mainInterfaceData[7].counter+0).y,
+              144*scaleFac,144*scaleFac);
+
     
     
     ofPopStyle();
@@ -1433,6 +1424,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[43].blinkOn();
             }
             
+            /*
             //scale
             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[5].minX) > ((mainInterfaceData[5].maxX-mainInterfaceData[5].minX)/2)) {
@@ -1447,6 +1439,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 // detailEditInterfaceOn();
                 cout << synths[activeSynth].activeScale.name  << endl;
             }
+             */
+            
             //synth
             if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
@@ -1478,13 +1472,21 @@ void ofApp::replaceMousePressed(int x, int y) {
             if(  mainInterfaceData[111].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].globalHarmony = !synths[activeSynth].globalHarmony;
                 mainInterfaceData[111].blinkOn();
-                mainInterfaceData[111].switchColor();
-                mainInterfaceData[44].switchColor();
+                if (synths[activeSynth].globalHarmony){
+                    mainInterfaceData[111].elementName = "GLOBAL HARMONY";
+                    mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[44].activateDarkerColor();
+                } else {
+                    mainInterfaceData[111].elementName = "LOCAL HARMONY";
+                    mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
+                    mainInterfaceData[44].activateOnColor();
+                }
                 
             }
             
             
             //toggle get random grid
+            /*
             if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
                 //leer
                 for (int i = 0; i < TILES; i++) {
@@ -1497,7 +1499,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[40].blinkOn();
                 markSynthNotes(63);
             }
-            
+            */
             
             
         }
@@ -2066,7 +2068,7 @@ void ofApp::setupGlobalInterface() {
     pianoKeys[10] = 1;
     
     
-    int fontDefault = designGrid[0][0].y*0.38;
+    int fontDefault = designGrid[0][0].y*0.3;
     int fontSmall = designGrid[0][0].y*0.165;
     
     ofVec3f smallButton = ofVec3f(designGrid[0][0].y,designGrid[0][0].y,0);
@@ -2097,7 +2099,7 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(4,string(""),ofVec3f(scaleButton.x,scaleButton.y+keyNoteButton.y,0),ofColor(54,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //detail view, scaleinfo background
+    //empty
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
     place = ofVec3f((horizontalSlider.x*0.86)/2,-designGrid[0][0].y+((horizontalSlider.y/2)*0.8),0);
     temp = GlobalGUI(5,string("activeScale"),ofVec3f(horizontalSlider.x*0.86,horizontalSlider.y*0.8,0),ofColor(55,0,0),place,offPlace,fontDefault,false,&tekoRegular);
@@ -2134,9 +2136,9 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //save to presets button, STATE_EDIT
-    place = ofVec3f(-designGrid[0][0].y/2,-designGrid[0][0].y/2,0);
+    place = ofVec3f(0,-designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
-    temp = GlobalGUI(12,string(""),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(12,string("SAVE GRID"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //scale, STATE_EDIT_DETAIL
@@ -2173,7 +2175,7 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //make random grid icon, STATE_EDIT
+    //empty
     place = ofVec3f(designGrid[0][0].y/2,-designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
     temp = GlobalGUI(40,string(""), smallButton ,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoRegular);
@@ -2198,9 +2200,9 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //toggle edit detail, STATE_EDIT
-    place = ofVec3f(designGrid[0][0].y/2,-designGrid[0][0].y/2,0);
+    place = ofVec3f(0,-designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
-    temp = GlobalGUI(44, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,true,&tekoRegular);
+    temp = GlobalGUI(44, string("SET NOTES"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //bpm slider, STATE_BPM
@@ -2334,9 +2336,9 @@ void ofApp::setupGlobalInterface() {
     }
     
     //toggle global harmony on synth, STATE_EDIT
-    place = ofVec3f(-designGrid[0][0].y/2,-designGrid[0][0].y/2,0);
+    place = ofVec3f(0,-designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
-    temp = GlobalGUI(111, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontSmall,false,&tekoRegular);
+    temp = GlobalGUI(111, string("LOCAL HARMONY"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     
@@ -2371,7 +2373,7 @@ void ofApp::setupGlobalInterface() {
         for (int j = 0; j < 4; j++) {
             mainInterface.addVertex(ofVec3f(0,0,0));
             mainInterfaceFbo.addVertex(ofVec3f(0,0,0));
-            mainInterface.addColor(mainInterfaceData[i].elementColorOn);
+            mainInterface.addColor(ofColor(0,0,0,0));
             mainInterfaceFbo.addColor(ofColor(50+i,0,0));
         }
         
@@ -2410,11 +2412,13 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[39].moveDir = 1;
     mainInterfaceData[39].animation = true;
     
+    /*
     mainInterfaceData[40].showString = false;
     mainInterfaceData[40].moveDir = 1;
     mainInterfaceData[40].animation = true;
+    */
     
-    mainInterfaceData[12].showString = false;
+    mainInterfaceData[12].showString = true;
     mainInterfaceData[12].moveDir = 1;
     mainInterfaceData[12].animation = true;
     
@@ -2422,11 +2426,11 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[43].moveDir = 1;
     mainInterfaceData[43].animation = true;
     
-    mainInterfaceData[44].showString = false;
+    mainInterfaceData[44].showString = true;
     mainInterfaceData[44].moveDir = 1;
     mainInterfaceData[44].animation = true;
     
-    mainInterfaceData[111].showString = false;
+    mainInterfaceData[111].showString = true;
     mainInterfaceData[111].moveDir = 1;
     mainInterfaceData[111].animation = true;
     
@@ -2464,8 +2468,10 @@ void ofApp::editInterfaceOff(){
     mainInterfaceData[39].moveDir = 0;
     mainInterfaceData[39].animation = true;
     
+   /*
     mainInterfaceData[40].moveDir = 0;
     mainInterfaceData[40].animation = true;
+    */
     
     mainInterfaceData[12].moveDir = 0;
     mainInterfaceData[12].animation = true;
@@ -2596,11 +2602,11 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[43].moveDir = 1;
     mainInterfaceData[43].animation = true;
     
-    mainInterfaceData[44].showString = false;
+    mainInterfaceData[44].showString = true;
     mainInterfaceData[44].moveDir = 1;
     mainInterfaceData[44].animation = true;
     
-    mainInterfaceData[12].showString = false;
+    mainInterfaceData[12].showString = true;
     mainInterfaceData[12].moveDir = 1;
     mainInterfaceData[12].animation = true;
     
@@ -2608,7 +2614,7 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[40].moveDir = 1;
     mainInterfaceData[40].animation = true;
     
-    mainInterfaceData[111].showString = false;
+    mainInterfaceData[111].showString = true;
     mainInterfaceData[111].moveDir = 1;
     mainInterfaceData[111].animation = true;
     
@@ -3654,7 +3660,7 @@ void ofApp::setNewGUI() {
     
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[112+i].setColor(synths[synthButton[0]].colorHue);
-        if (i == 4-synths[synthButton[0]].pulseDivision){
+        if (i == 4-synths[synthButton[0]].nextPulseDivision){
             mainInterfaceData[112+i].activateOnColor();
         } else {
             mainInterfaceData[112+i].activateDarkerColor();
@@ -3663,19 +3669,21 @@ void ofApp::setNewGUI() {
     
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[116+i].setColor(synths[synthButton[1]].colorHue);
-        if (i == 4-synths[synthButton[1]].pulseDivision){
+        if (i == 4-synths[synthButton[1]].nextPulseDivision){
             mainInterfaceData[116+i].activateOnColor();
         } else {
             mainInterfaceData[116+i].activateDarkerColor();
-        }    }
+        }
+    }
     
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[120+i].setColor(synths[synthButton[2]].colorHue);
-        if (i == 4-synths[synthButton[2]].pulseDivision){
+        if (i == 4-synths[synthButton[2]].nextPulseDivision){
             mainInterfaceData[120+i].activateOnColor();
         } else {
             mainInterfaceData[120+i].activateDarkerColor();
-        }    }
+        }
+    }
     
     
     mainInterfaceData[61].elementName = ofToString(notes[globalKey%12]);
@@ -3684,12 +3692,16 @@ void ofApp::setNewGUI() {
     mainInterfaceData[62].elementName = scaleCollection.scaleVec.at(globalScaleVecPos).name;
     mainInterfaceData[62].setStringWidth(mainInterfaceData[62].fsPtr->getBBox(mainInterfaceData[62].elementName, mainInterfaceData[62].fontSize, 0, 0).getWidth());
     
+    
+    //state edit global harmony
     if(synths[activeSynth].globalHarmony){
-        mainInterfaceData[111].setOn();
-        mainInterfaceData[44].setOn();
+        mainInterfaceData[111].elementName = "GLOBAL HARMONY";
+        mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
+        mainInterfaceData[44].activateDarkerColor();
     } else {
-        mainInterfaceData[111].setOff();
-        mainInterfaceData[44].setOff();
+        mainInterfaceData[111].elementName = "LOCAL HARMONY";
+        mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
+        mainInterfaceData[44].activateOnColor();
     }
     
     //pause play

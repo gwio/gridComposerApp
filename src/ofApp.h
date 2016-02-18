@@ -271,7 +271,7 @@ class ofApp : public ofxiOSApp{
         int editDetailMoveDirection;
         
         //icons
-        ofTexture backIcon, detailIcon, saveIcon, randomIcon, left, right, leftDouble, rightDouble ;
+        ofTexture backIcon, left, right, leftDouble, rightDouble ;
         
         float scaleFac;
         
