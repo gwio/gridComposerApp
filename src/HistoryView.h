@@ -14,6 +14,8 @@ public:
     void setupMesh(GlobalGUI*,int,int);
     void setupSpacer(ofVec3f,float, ofVec3f);
     void update(vector<noteLog>&,vector<GlobalGUI>&, ofVboMesh&);
+    void updateStateEditDetail(vector<noteLog>&,vector<GlobalGUI>&, ofVboMesh&, int);
+
     void draw();
     
     int rows;

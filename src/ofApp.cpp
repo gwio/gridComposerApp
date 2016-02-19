@@ -386,7 +386,9 @@ void ofApp::update(){
             hvSlotA.update(synths[synthButton[0]].noteHistory, mainInterfaceData, mainInterface);
             hvSlotB.update(synths[synthButton[1]].noteHistory, mainInterfaceData, mainInterface);
             hvSlotC.update(synths[synthButton[2]].noteHistory, mainInterfaceData, mainInterface);
-        }
+        } else if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT) {
+                hvSlotB.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
+    }
     }
     
     
@@ -427,10 +429,11 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[52].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[53].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     
+    mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[1][0], tweenFloat);
     
+    mainInterfaceData[4].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y,0) ,tweenFloat);
+    mainInterfaceData[6].updateMainMesh(mainInterface, ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y,0),tweenFloat);
     
-    mainInterfaceData[4].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y*2,0),tweenFloat);
-    mainInterfaceData[6].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0),tweenFloat);
     mainInterfaceData[39].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
     mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
@@ -488,8 +491,8 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[62].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
     
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[63+i].updateMainMesh(mainInterface, ofVec3f(0, designGrid[0][1].y,0) ,tweenFloat);
-        mainInterfaceData[63+i].updateMainMeshB(mainInterface, ofVec3f(0, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
+        mainInterfaceData[63+i].updateMainMesh(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y,0) ,tweenFloat);
+        mainInterfaceData[63+i].updateMainMeshB(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
     }
     
     for (int i = 0; i < 12; i++) {
@@ -574,6 +577,8 @@ void ofApp::drawInterface(){
         hvSlotA.draw();
         hvSlotB.draw();
         hvSlotC.draw();
+    } else if (currentState == STATE_EDIT || currentState == STATE_EDIT_DETAIL) {
+        hvSlotB.draw();
     }
     
     
@@ -741,6 +746,13 @@ void ofApp::drawStringAndIcons(){
               144*scaleFac,144*scaleFac);
 
     
+    ofSetColor(mainInterfaceData[6].displayColor);
+    right.draw(mainInterfaceData[6].drawStringPos.x-(144*scaleFac/2), mainInterfaceData[6].drawStringPos.y-(144*scaleFac/2),
+               144*scaleFac,144*scaleFac);
+    
+    ofSetColor(mainInterfaceData[4].displayColor);
+    left.draw(mainInterfaceData[4].drawStringPos.x-(144*scaleFac/2), mainInterfaceData[4].drawStringPos.y-(144*scaleFac/2),
+              144*scaleFac,144*scaleFac);
     
     ofPopStyle();
     
@@ -890,7 +902,10 @@ void ofApp::replaceMouseDragged(int x, int y){
             if(mainInterfaceData[49].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[49].minX, mainInterfaceData[49].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[49].setSlider(mainInterface, value);
-                cout << "BASDJASD" << endl;
+                int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
+                synths[activeSynth].setKeyNote(keyMod-synths[activeSynth].keyNote);
+                setNewGUI();
+                cout << keyMod - synths[activeSynth].keyNote<< endl;
                 /*
                 if (!mainInterfaceData[49].touchDown){
                     mainInterfaceData[49].touchStart = ofVec2f(x,y);
@@ -920,6 +935,39 @@ void ofApp::replaceMouseDragged(int x, int y){
                     
                 }
                  */
+            }
+            
+                if(mainInterfaceData[40].isInside(ofVec2f(x,y))) {
+                    
+                     if (!mainInterfaceData[40].touchDown){
+                     mainInterfaceData[40].touchStart = ofVec2f(x,y);
+                     mainInterfaceData[40].touchDown = true;
+                     }
+                     
+                     if (mainInterfaceData[40].touchDown) {
+                     
+                     int keyMod = (mainInterfaceData[40].touchStart.x - x)/54;
+                     mainInterfaceData[40].tempInt = keyMod;
+                     
+                     if ( abs(keyMod) > 0){
+                     // if ( keyMod > 0 || synths[activeSynth].keyNote > 0) {
+                     mainInterfaceData[40].touchStart.x = x;
+                     synths[activeSynth].setKeyNote(ofClamp(keyMod,-1,1));
+                     setNewGUI();
+                     //cout <<  "midinote " << synths[activeSynth].keyNote << endl;
+                     // } else {
+                     
+                     // cout << "not under 0 " << endl;
+                     
+                     //}
+                     }
+                     
+                     // cout <<     mainInterfaceData[49].touchStart.x << endl;
+                     
+                     
+                     }
+                     
+
             }
         }
         
@@ -1166,12 +1214,12 @@ void ofApp::replaceMousePressed(int x, int y) {
             }
             
             if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
-                synths[activeSynth].setKeyNote(-12);
+                synths[activeSynth].setKeyNote(-1);
                 setNewGUI();
                 mainInterfaceData[4].blinkOn();
             }
             if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
-                synths[activeSynth].setKeyNote(12);
+                synths[activeSynth].setKeyNote(1);
                 setNewGUI();
                 mainInterfaceData[6].blinkOn();
             }
@@ -1187,6 +1235,16 @@ void ofApp::replaceMousePressed(int x, int y) {
                     markScaleSteps(63);
                     cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
+            }
+            
+            
+            if(mainInterfaceData[49].isInside(ofVec2f(x,y))) {
+                float value = ofClamp(ofMap(x, mainInterfaceData[49].minX, mainInterfaceData[49].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[49].setSlider(mainInterface, value);
+                int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
+                synths[activeSynth].setKeyNote(keyMod-synths[activeSynth].keyNote);
+                setNewGUI();
+                cout << keyMod - synths[activeSynth].keyNote<< endl;
             }
             
             //toogle grid preset container
@@ -1523,8 +1581,8 @@ void ofApp::mouseReleased(int x, int y, int button){
 void ofApp::replaceMouseReleased(int x,int y) {
     
     
-    if (mainInterfaceData[49].touchDown){
-        mainInterfaceData[49].touchDown = !mainInterfaceData[49].touchDown;
+    if (mainInterfaceData[40].touchDown){
+        mainInterfaceData[40].touchDown = !mainInterfaceData[40].touchDown;
     }
     
 }
@@ -1755,7 +1813,10 @@ void ofApp::pulseEvent(int div){
         if (synths[synthButton[2]].pulseDivision == div) {
             hvSlotC.update(synths[synthButton[2]].noteHistory, mainInterfaceData, mainInterface);
         }
-        
+    } else if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT) {
+        if (synths[activeSynth].pulseDivision == div) {
+            hvSlotB.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
+        }
     }
     
     for (int i = 0; i < synths.size(); i++) {
@@ -2089,22 +2150,22 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(3,string(""),ofVec3f(horizontalSlider.x*0.7, horizontalSlider.y*0.2,0),ofColor(53,0,0),place,offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //octave down icon, STATE_EDIT_DETAIL
-    place = ofVec3f(+smallButton.x/2,-(smallButton.y/2),0);
+    //keynote down icon, STATE_EDIT_DETAIL
+    place = ofVec3f(smallButton.x/2,0,0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*12,0);
-    temp = GlobalGUI(4,string(""),ofVec3f(smallButton.x,smallButton.y+smallButton.y,0),ofColor(54,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(4,string(""),ofVec3f(smallButton.x,smallButton.y,0),ofColor(54,0,0),place,offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //Keynote slider background ->#49 slider, STATE_EDIT_DETAIL
     place = ofVec3f(0,designGrid[0][0].y*0.75,0);
     offPlace = ofVec3f(0 ,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(5,string(""), ofVec3f(horizontalSlider.x*3,horizontalSlider.y*0.2,0),ofColor(55,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(5,string(""), ofVec3f(((horizontalSlider.x*3)/14)*12,horizontalSlider.y*0.2,0),ofColor(55,0,0),place,offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //octave up icon, STATE_EDIT_DETAIL
-    place = ofVec3f(-smallButton.x/2, -(smallButton.y/2),0);
+    //keynote up icon, STATE_EDIT_DETAIL
+    place = ofVec3f(-smallButton.x/2,0,0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*12,0);
-    temp = GlobalGUI(6,string(""),ofVec3f(smallButton.x,smallButton.y+smallButton.y,0),ofColor(56,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(6,string(""),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //synth preset, STATE_DETAIL
@@ -2139,7 +2200,7 @@ void ofApp::setupGlobalInterface() {
     
     //scale, STATE_EDIT_DETAIL
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    float offset = (designGrid[0][0].x*6)/12;
+    float offset = (designGrid[0][0].x*6)/14;
     ofVec3f scaleButton = ofVec3f(offset,designGrid[0][0].y,0);
     for (int i = 0; i < 12; i++) {
         place = ofVec3f( -(offset*6)+(offset*i)+(scaleButton.x/2),0,0);
@@ -2174,10 +2235,10 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //empty
-    place = ofVec3f(designGrid[0][0].y/2,-designGrid[0][0].y/2,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*4,0);
-    temp = GlobalGUI(40,string(""), smallButton ,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    //keynote drag slider STATE_EDIT_DETAIL
+    place = ofVec3f(0,designGrid[0][0].y+(keyButton.y/2),0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    temp = GlobalGUI(40,string(""), ofVec3f( keyButton.x*12,keyButton.y,0) ,ofColor(63,0,0),place,offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //toggle bpm icon, STATE_DEFFAULT
@@ -2231,7 +2292,7 @@ void ofApp::setupGlobalInterface() {
     //keynote slider, STATE_EDIT_DETAIL
     place = ofVec3f(0,designGrid[0][0].y*0.75,0);
     offPlace = ofVec3f(0 ,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(49, string(""), ofVec3f(horizontalSlider.x*3,horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(49, string(""), ofVec3f( ((horizontalSlider.x*3)/14)*12,horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //empty
@@ -2303,10 +2364,10 @@ void ofApp::setupGlobalInterface() {
     
     //active scale notes display, STATE_EDIT
     for (int i= 0; i < 12; i++) {
-        float offset = ((horizontalSlider.x*0.86)/12);
+        float offset =  (horizontalSlider.x*HARMONY_ROWS_SCALE)/12 ;
         offPlace = ofVec3f(-designGrid[0][0].x*6- ((offset*i) + (offset/2) ),0,0);
-        place = ofVec3f( (offset*i) + (offset/2),-designGrid[0][0].y+((horizontalSlider.y/2)*0.8),0);
-        temp = GlobalGUI(63+i,"o",ofVec3f(offset,horizontalSlider.y*0.8,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+        place = ofVec3f( (-offset*6) + (offset*i) + (offset/2) ,0,0);
+        temp = GlobalGUI(63+i,"o",ofVec3f(offset*0.5,offset,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
@@ -2508,11 +2569,19 @@ void ofApp::editInterfaceOff(){
 //--------------------------------------------------------------
 
 void ofApp::detailEditInterfaceOn() {
-    mainInterfaceData[6].showString = true;
+    
+    mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
+
+    
+    mainInterfaceData[40].showString = false;
+    mainInterfaceData[40].moveDir = 1;
+    mainInterfaceData[40].animation = true;
+    
+    mainInterfaceData[6].showString = false;
     mainInterfaceData[6].moveDir = 1;
     mainInterfaceData[6].animation = true;
     
-    mainInterfaceData[4].showString = true;
+    mainInterfaceData[4].showString = false;
     mainInterfaceData[4].moveDir = 1;
     mainInterfaceData[4].animation = true;
     
@@ -2539,9 +2608,6 @@ void ofApp::detailEditInterfaceOn() {
     
     mainInterfaceData[44].moveDir = 0;
     mainInterfaceData[44].animation = true;
-    
-    mainInterfaceData[40].moveDir = 0;
-    mainInterfaceData[40].animation = true;
     
     mainInterfaceData[12].moveDir = 0;
     mainInterfaceData[12].animation = true;
