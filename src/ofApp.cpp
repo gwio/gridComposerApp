@@ -1531,6 +1531,10 @@ void ofApp::replaceMousePressed(int x, int y) {
                     mainInterfaceData[111].elementName = "GLOBAL HARMONY";
                     mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
                     mainInterfaceData[44].activateDarkerColor();
+                    synths[activeSynth].currentScaleVecPos = globalScaleVecPos;
+                    synths[activeSynth].userScale = false;
+                    synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                    setNewGUI();
                 } else {
                     mainInterfaceData[111].elementName = "LOCAL HARMONY";
                     mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
