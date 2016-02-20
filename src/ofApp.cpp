@@ -2434,8 +2434,8 @@ void ofApp::setupGlobalInterface() {
     for (int i = 0; i < mainInterfaceData.size(); i++) {
         
         for (int j = 0; j < 4; j++) {
-            mainInterface.addVertex(ofVec3f(0,0,0));
-            mainInterfaceFbo.addVertex(ofVec3f(0,0,0));
+            mainInterface.addVertex(ofVec3f(-500,-500,0));
+           // mainInterfaceFbo.addVertex(ofVec3f(0,0,0));
             mainInterface.addColor(ofColor(0,0,0,0));
             mainInterfaceFbo.addColor(ofColor(50+i,0,0));
         }
