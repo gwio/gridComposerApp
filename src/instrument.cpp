@@ -159,6 +159,8 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             
             
             cubeVector[i*(gridTiles)+j].pulseDivPtr = &pulseDivision;
+            cubeVector[i*(gridTiles)+j].bpmTickPtr = &bpmTick;
+
         }
     }
     

@@ -20,6 +20,8 @@ public:
     
     float targetZ;
     float actualZ;
+    float pulseDivFac;
+    float zInc;
     
     float aniPct;
     float diff;
@@ -61,4 +63,5 @@ public:
     void setDefaultHeight(float);
     
     int* pulseDivPtr;
+    float* bpmTickPtr;
 };
