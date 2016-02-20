@@ -80,36 +80,40 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     ofMatrix4x4 tempM, tempMB;
     vector<ofVec3f> tempVertices;
     tempVertices.clear();
-    tempVertices.resize(9);
+    tempVertices.resize(10);
     float scaleFac = 10;
     //connected mesh default
     
     //----------------------direction mesh connected
     
     directionMeshCon.clear();
-    directionMeshCon.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMeshCon.setMode(OF_PRIMITIVE_LINES);
     
     directionMeshConBig.clear();
-    directionMeshConBig.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMeshConBig.setMode(OF_PRIMITIVE_LINES);
     
     
     tempVertices.at(0) = ofVec3f(-arrow_width,-arrow_width,0);
     tempVertices.at(1) = ofVec3f(-arrow_width,arrow_width,0);
-    tempVertices.at(2) = ofVec3f(arrow_width,arrow_width,0);
     
+    tempVertices.at(2) = ofVec3f(-arrow_width,arrow_width,0);
     tempVertices.at(3) = ofVec3f(arrow_width,arrow_width,0);
-    tempVertices.at(4) = ofVec3f(arrow_width,-arrow_width,0);
-    tempVertices.at(5) = ofVec3f(-arrow_width,-arrow_width,0);
     
-    tempVertices.at(6) = ofVec3f(arrow_width,arrow_width,0);
-    tempVertices.at(7) = ofVec3f(arrow_width*2,0,0);
+    tempVertices.at(4) = ofVec3f(arrow_width,arrow_width,0);
+    tempVertices.at(5) = ofVec3f(arrow_width*2,0,0);
+    
+    tempVertices.at(6) = ofVec3f(arrow_width*2,0,0);
+    tempVertices.at(7) = ofVec3f(arrow_width,-arrow_width,0);
+    
     tempVertices.at(8) = ofVec3f(arrow_width,-arrow_width,0);
+    tempVertices.at(9) = ofVec3f(-arrow_width,-arrow_width,0);
+    
     
     tempM.setTranslation(ofVec3f(-gridSize,0,0));
     tempMB.setTranslation(ofVec3f(-gridSize*1.5,0,0));
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
@@ -122,7 +126,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
     
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
@@ -134,7 +138,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
@@ -146,7 +150,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshCon.addVertex(tempVertices.at(i)*tempM);
         directionMeshCon.addColor(connectedDir);
         
@@ -163,29 +167,34 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     //connected mesh active
     directionMeshAct.clear();
-    directionMeshAct.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMeshAct.setMode(OF_PRIMITIVE_LINES);
     
     directionMeshActBig.clear();
-    directionMeshActBig.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMeshActBig.setMode(OF_PRIMITIVE_LINES);
     
     tempVertices.at(0) = ofVec3f(-arrow_width,-arrow_width,0);
     tempVertices.at(1) = ofVec3f(-arrow_width,arrow_width,0);
-    tempVertices.at(2) = ofVec3f(arrow_width,arrow_width,0);
     
+    tempVertices.at(2) = ofVec3f(-arrow_width,arrow_width,0);
     tempVertices.at(3) = ofVec3f(arrow_width,arrow_width,0);
-    tempVertices.at(4) = ofVec3f(arrow_width,-arrow_width,0);
-    tempVertices.at(5) = ofVec3f(-arrow_width,-arrow_width,0);
     
-    tempVertices.at(6) = ofVec3f(arrow_width,arrow_width,0);
-    tempVertices.at(7) = ofVec3f(arrow_width,0,0);
+    tempVertices.at(4) = ofVec3f(arrow_width,arrow_width,0);
+    tempVertices.at(5) = ofVec3f(arrow_width,0,0);
+    
+    tempVertices.at(6) = ofVec3f(arrow_width,0,0);
+    tempVertices.at(7) = ofVec3f(arrow_width,-arrow_width,0);
+    
     tempVertices.at(8) = ofVec3f(arrow_width,-arrow_width,0);
+    tempVertices.at(9) = ofVec3f(-arrow_width,-arrow_width,0);
+    
+
     
     //tempM.setTranslation(ofVec3f(-gridSize,0,0));
     tempM.rotate(90, 0, 0, -1);
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
@@ -198,7 +207,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
@@ -210,7 +219,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
@@ -222,7 +231,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshAct.addVertex(tempVertices.at(i)*tempM);
         directionMeshAct.addColor(connectedDir);
         
@@ -239,10 +248,10 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     //connected mesh active
     directionMeshOff.clear();
-    directionMeshOff.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMeshOff.setMode(OF_PRIMITIVE_LINES);
     
     directionMeshOffBig.clear();
-    directionMeshOffBig.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMeshOffBig.setMode(OF_PRIMITIVE_LINES);
     
     tempVertices.at(0) = ofVec3f(-arrow_width,-arrow_width,0);
     tempVertices.at(1) = ofVec3f(-arrow_width,arrow_width,0);
@@ -256,13 +265,30 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempVertices.at(7) = ofVec3f(0,0,0);
     tempVertices.at(8) = ofVec3f(0,-arrow_width,0);
     
+    tempVertices.at(0) = ofVec3f(-arrow_width,-arrow_width,0);
+    tempVertices.at(1) = ofVec3f(-arrow_width,arrow_width,0);
+    
+    tempVertices.at(2) = ofVec3f(-arrow_width,arrow_width,0);
+    tempVertices.at(3) = ofVec3f(0,arrow_width,0);
+    
+    tempVertices.at(4) = ofVec3f(0,arrow_width,0);
+    tempVertices.at(5) = ofVec3f(0,0,0);
+    
+    tempVertices.at(6) = ofVec3f(0,0,0);
+    tempVertices.at(7) = ofVec3f(0,-arrow_width,0);
+    
+    tempVertices.at(8) = ofVec3f(0,-arrow_width,0);
+    tempVertices.at(9) = ofVec3f(-arrow_width,-arrow_width,0);
+    
+
+    
     //tempM.setTranslation(ofVec3f(-gridSize,0,0));
     
     tempM.rotate(90, 0, 0, -1);
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
@@ -275,7 +301,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
@@ -287,7 +313,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
@@ -299,7 +325,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempMB.rotate(90, 0, 0, -1);
 
     
-    for (int i=0; i < 9;i++) {
+    for (int i=0; i < 10;i++) {
         directionMeshOff.addVertex(tempVertices.at(i)*tempM);
         directionMeshOff.addColor(connectedDir);
         
@@ -313,7 +339,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     }
     //------------------------------------------------------
     directionMesh.clear();
-    directionMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+    directionMesh.setMode(OF_PRIMITIVE_LINES);
     
     
     //setup start position
@@ -321,7 +347,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
         directionMesh.addVertex(ofVec3f(0,0,0));
         directionMesh.addColor(connectedDir);
     }
-    
+  
     
 }
 
@@ -333,7 +359,7 @@ void InterfacePlane::animation(float pct_, int* state_){
             
             
             if(buttonState[i] == STATE_CONNECTED){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     tempVec = ( (directionMeshConBig.getVertex(j)) - directionMeshCon.getVertex(j) );
                     directionMesh.setVertex(j, directionMeshCon.getVertex(j)+(tempVec*pct_) );
@@ -341,7 +367,7 @@ void InterfacePlane::animation(float pct_, int* state_){
             }
             
             else if(buttonState[i] == STATE_ACTIVE){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     tempVec = ( (directionMeshActBig.getVertex(j)) - directionMeshAct.getVertex(j) );
                     directionMesh.setVertex(j,directionMeshAct.getVertex(j)+ (tempVec*pct_) );
@@ -349,7 +375,7 @@ void InterfacePlane::animation(float pct_, int* state_){
             }
             
             else if(buttonState[i] == STATE_OFF){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     tempVec = ( (directionMeshOffBig.getVertex(j)) - directionMeshOff.getVertex(j) );
                     directionMesh.setVertex(j,directionMeshOff.getVertex(j)+ (tempVec*pct_) );
@@ -370,7 +396,7 @@ void InterfacePlane::animation(float pct_, int* state_){
             
             
             if(buttonState[i] == STATE_CONNECTED){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     tempVec = ( (directionMeshCon.getVertex(j)) - directionMeshConBig.getVertex(j) );
                     directionMesh.setVertex(j, directionMeshConBig.getVertex(j)+(tempVec*pct_) );
@@ -378,7 +404,7 @@ void InterfacePlane::animation(float pct_, int* state_){
             }
             
             else if(buttonState[i] == STATE_ACTIVE){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     tempVec = ( (directionMeshAct.getVertex(j)) - directionMeshActBig.getVertex(j) );
                     directionMesh.setVertex(j,directionMeshActBig.getVertex(j)+ (tempVec*pct_) );
@@ -386,7 +412,7 @@ void InterfacePlane::animation(float pct_, int* state_){
             }
             
             else if(buttonState[i] == STATE_OFF){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     tempVec = ( (directionMeshOff.getVertex(j)) - directionMeshOffBig.getVertex(j) );
                     directionMesh.setVertex(j,directionMeshOffBig.getVertex(j)+ (tempVec*pct_) );
@@ -426,7 +452,7 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
     for (int i = 0; i < 4; i++) {
         if (buttonMoving[i]) {
             if(buttonState[i] == STATE_CONNECTED){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     if (globalState_ != 4){
                         tempVec = ( (directionMeshCon.getVertex(j)) - directionMesh.getVertex(j) );
@@ -438,7 +464,7 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             }
             
             else if(buttonState[i] == STATE_ACTIVE){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     if (globalState_ != 4){
                         tempVec = ( (directionMeshAct.getVertex(j)) - directionMesh.getVertex(j) );
@@ -450,7 +476,7 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             }
             
             else if(buttonState[i] == STATE_OFF){
-                for (int j = i*9; j < (i*9)+9; j++) {
+                for (int j = i*10; j < (i*10)+10; j++) {
                     ofVec3f tempVec;
                     if (globalState_ != 4){
                         tempVec = ( (directionMeshOff.getVertex(j)) - directionMesh.getVertex(j) );
@@ -472,9 +498,11 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             buttonMoving[i] = false;
         }
     }
-   // cout << buttonState[0] << endl;
+    //cout << buttonState[0] << endl;
     
 }
+
+
 
 void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_) {
     
@@ -623,6 +651,7 @@ void InterfacePlane::draw( bool& pause_){
         //  lineMesh.draw();
         directionMesh.drawWireframe();
         
+     
         
         if (scanDir >=0) {
             ofPushMatrix();

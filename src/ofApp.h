@@ -32,6 +32,7 @@ class ofApp : public ofxiOSApp{
         void draw();
         void exit();
         void drawStringAndIcons();
+        void drawInterface();
         
 #if TARGET_OS_IPHONE
         void touchDown(ofTouchEventArgs & touch);
@@ -151,7 +152,7 @@ class ofApp : public ofxiOSApp{
         int globalScaleVecPos;
         
         //font
-        ofxFontStash robotoLight, robotoBold, robotoCon;
+        ofxFontStash tekoRegular, rajLight;
         
         
         //save function
@@ -192,7 +193,7 @@ class ofApp : public ofxiOSApp{
         ofPolyline OneVolumeLayerPathOn,TwoVolumeLayerPathOn,ThreeVolumeLayerPathOn;
         ofPolyline OneVolumeLayerPathOff,TwoVolumeLayerPathOff,ThreeVolumeLayerPathOff;
         ofPolyline OneHarmonyPathOn, TwoHarmonyPathOn, ThreeHarmonyPathOn;
-        ofPolyline OneHarmonePathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
+        ofPolyline OneHarmonyPathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
         ofPolyline OneTimePathOn, TwoTimePathOn, ThreeTimePathOn;
         ofPolyline OneTimePathOff, TwoTimePathOff, ThreeTimePathOff;
         
@@ -270,7 +271,7 @@ class ofApp : public ofxiOSApp{
         int editDetailMoveDirection;
         
         //icons
-        ofTexture backIcon, detailIcon, pauseIcon, playIcon, volumeIcon, saveIcon, randomIcon, leftIcon, rightIcon, bpmIcon, harmonyIcon ;
+        ofTexture backIcon, left, right, leftDouble, rightDouble ;
         
         float scaleFac;
         
@@ -283,4 +284,5 @@ class ofApp : public ofxiOSApp{
         int pitchCorrect;
         
         HistoryView hvSlotA, hvSlotB, hvSlotC;
+        ofPolyline directionClickZonesA[4],directionClickZonesB[4],directionClickZonesC[4];
     };

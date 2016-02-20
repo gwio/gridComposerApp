@@ -27,7 +27,6 @@ public:
     ofVec3f offPlacement;
     string elementName;
     
-    string drawString;
     
     float sliderPct;
     
@@ -50,8 +49,8 @@ public:
     
     void setColor(float);
     void setColor(ofColor);
-    void activateOnColor(ofVboMesh&);
-    void activateDarkerColor(ofVboMesh&);
+    void activateOnColor();
+    void activateDarkerColor();
 
     
     void updateMainMesh(ofVboMesh&, ofVec3f);
@@ -66,6 +65,8 @@ public:
     void blinkOn();
     
     void drawFontString();
+    void drawFontString(float,float);
+
     
     bool isInside(ofVec2f);
     bool onOff;

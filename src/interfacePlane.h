@@ -79,5 +79,6 @@ class InterfacePlane {
     ofColor pulseColor;
     
     ofColor filterColor(ofColor);
+    
 };
 
