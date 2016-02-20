@@ -472,7 +472,7 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             buttonMoving[i] = false;
         }
     }
-    cout << buttonState[0] << endl;
+   // cout << buttonState[0] << endl;
     
 }
 

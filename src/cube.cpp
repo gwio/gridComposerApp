@@ -31,7 +31,8 @@ Cube::Cube(ofVec3f* ptr0_,ofVec3f* ptr1_,ofVec3f* ptr2_, ofVec3f* ptr3_, int v0_
     vIndex2 = v2_;
     vIndex3 = v3_;
     noSaturation = false;
-    
+ 
+    targetZ = vec0Ptr->z;
 }
 
 
@@ -44,28 +45,29 @@ void Cube::setup(){
 }
 
 void Cube::update(){
-    if (defaultZ != vec0Ptr->z) {
+    if (targetZ != vec0Ptr->z) {
         
         if (diff > 0) {
             aniFac = ofClamp(1-pow(1-aniPct, 2),0.0,1.0);
-            
-            aniPct+= (0.1* (5-*pulseDivPtr) );
-            
+            aniPct+= (0.11*  (1+((5-*pulseDivPtr)/5)) );
         }
         
         if (diff < 0) {
             aniFac = ofClamp(pow(aniPct,4),0.0,1.0);
-            aniPct += (0.06* (5-*pulseDivPtr)) ;
+            aniPct += (0.11* (1+((5-*pulseDivPtr)/5)) ) ;
         }
         
-        // cout << aniFac << endl;
-        vec0Ptr->z = actualZ + (diff*aniFac);
-        vec1Ptr->z = actualZ + (diff*aniFac);
-        vec2Ptr->z = actualZ + (diff*aniFac);
-        vec3Ptr->z = actualZ + (diff*aniFac);
-        
-        // aniPct+=SPEED;
-        // aniPct+= ofClamp( ofMap(*attack, 0.001, 0.01, 0.95, 0.1), 1.0, 0.1);
+        if (aniFac >= 1.0){
+            vec0Ptr->z = targetZ;
+            vec1Ptr->z = targetZ;
+            vec2Ptr->z = targetZ;
+            vec3Ptr->z = targetZ;
+        } else {
+            vec0Ptr->z = actualZ + (diff*aniFac);
+            vec1Ptr->z = actualZ + (diff*aniFac);
+            vec2Ptr->z = actualZ + (diff*aniFac);
+            vec3Ptr->z = actualZ + (diff*aniFac);
+        }
     }
     
     
@@ -133,7 +135,7 @@ void Cube::setColor(ofColor c_,bool fast){
 void Cube::setDefaultHeight(float height_) {
     diff = height_-vec0Ptr->z;
     actualZ = vec0Ptr->z;
-    defaultZ = height_;
+    targetZ = height_;
     aniPct = 0.0;
 }
 

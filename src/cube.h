@@ -18,7 +18,7 @@ public:
     ofVec3f *vec0Ptr,*vec1Ptr,*vec2Ptr,*vec3Ptr;
     int vIndex0,vIndex1,vIndex2,vIndex3;
     
-    float defaultZ;
+    float targetZ;
     float actualZ;
     
     float aniPct;

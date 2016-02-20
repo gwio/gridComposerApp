@@ -3,7 +3,7 @@
 //layer is 100x100
 #define CUBE_Z_HEIGHT 12
 #define EMPTY_Z 2
-#define SCAN_Z 20
+#define SCAN_Z 22
 
 
 Instrument::Instrument(){
