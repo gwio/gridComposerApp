@@ -28,8 +28,8 @@ void HistoryView::setupSpacer(ofVec3f pos_, float scale_, ofVec3f size_) {
         spacer.addVertex(position+ofVec3f(0,6,0)+ofVec3f(elementDist*i,0,0));
         spacer.addVertex(position+ofVec3f(0,-6,0)+ofVec3f(elementDist*i,0,0));
         
-        spacer.addColor(ofColor(255,255,255));
-        spacer.addColor(ofColor(255,255,255));
+        spacer.addColor(ofColor::fromHsb(255,0,204,255));
+        spacer.addColor(ofColor::fromHsb(255,0,204,255));
     }
 }
 

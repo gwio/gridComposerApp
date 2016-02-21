@@ -1,9 +1,9 @@
 #include "ofApp.h"
 #define TILES 5
 #define TILESIZE (100/TILES)
-#define TILEBORDER 0.075
+#define TILEBORDER 0.065
 #define BPM (220*4)
-#define ANI_SPEED 0.025
+#define ANI_SPEED 0.010
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.780
@@ -80,8 +80,9 @@ void ofApp::setup(){
     
     synthPos.resize(3);
     
-    camActiveFov = 26;
-    camFov = 38;
+    camActiveFov = 33;
+    camFov = 24;
+    camEditDetailFov = 20;
     
     nearClip = 10;
     farClip = 10000;
@@ -126,6 +127,8 @@ void ofApp::setup(){
     ofEvent<float>* pulseEventDiv4= tonicSynth.createOFEvent(pulseDiv4);
     ofAddListener(*pulseEventDiv4, this, &ofApp::pulseEventDiv4 );
     
+    
+    camNotActivePos = ofVec3f(0, -TILES*TILESIZE*2, TILES*TILESIZE*10.5);
     
     for (int i = -1; i < 2; i++) {
         ofNode temp;
@@ -193,14 +196,14 @@ void ofApp::setup(){
     thisIntersect.setFrom(planeForIntersect);
     
     
-    ofBackground( filterColor(ofColor::fromHsb(138,10,10) ) );
+    ofBackground( ofColor(21,21,21) );
     
     light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
     light.setDiffuseColor( ofColor(100,100,100));
     material.setShininess(55);
-    material.setSpecularColor( filterColor(ofColor::white));
+   // material.setSpecularColor( filterColor(ofColor::white));
     //temp sketch
-    light.setAmbientColor( filterColor(ofColor::white) );
+   // light.setAmbientColor( filterColor(ofColor::white) );
     
     doubleClickTime = 300;
     curTap = 0;
@@ -590,20 +593,20 @@ void ofApp::drawInterface(){
     if ( (currentState == STATE_VOLUME) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         for (int i = 0; i < 4; i++){
             ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x,mainInterface.getVertex(mainInterfaceData.at(i).counter+3).y,
-                            designGrid[0][0].x/100,designGrid[0][0].y*0.2);
+                            designGrid[0][0].x/30,designGrid[0][0].y*0.2);
         }
     }
     
     //bpm slider white line
     if ( (currentState == STATE_BPM) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x,mainInterface.getVertex(mainInterfaceData.at(45).counter+3).y,
-                        designGrid[0][0].x/100,designGrid[0][0].y*0.2);
+                        designGrid[0][0].x/30,designGrid[0][0].y*0.2);
     }
     
     //STATE_EDT_DETAIL keynote slider white line
     if ( (currentState == STATE_EDIT_DETAIL) || (interfaceMoving && currentState == STATE_EDIT) ){
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x,mainInterface.getVertex(mainInterfaceData.at(49).counter+3).y,
-                        designGrid[0][0].x/100,designGrid[0][0].y*0.2);
+                        designGrid[0][0].x/30,designGrid[0][0].y*0.2);
     }
     
 }
@@ -612,7 +615,7 @@ void ofApp::drawStringAndIcons(){
     
     
     ofPushStyle();
-    ofSetColor(255, 255, 255,255);
+    ofSetColor(ofColor::fromHsb(255,0,204,255));
     
     //drawStrings
     for (int i = 0; i < mainInterfaceData.size();i ++){
@@ -632,7 +635,7 @@ void ofApp::drawStringAndIcons(){
             
             if(i == 38) {
                 //bpm global slider
-                mainInterfaceData[i].drawFontString(0, -mainInterfaceData[i].elementSize.y);
+                mainInterfaceData[i].drawFontString(0, -(designGrid[0][0].y/2)  );
             }
             
             else if(i<51 || i>54){
@@ -640,8 +643,7 @@ void ofApp::drawStringAndIcons(){
             }
             
             else {
-                //volume menu numbers
-                mainInterfaceData[i].drawFontString(0, -mainInterfaceData[i].elementSize.y);
+                mainInterfaceData[i].drawFontString(0,-(designGrid[0][0].y/2) );
             }
         }
     }
@@ -1225,7 +1227,7 @@ void ofApp::replaceMousePressed(int x, int y) {
             
             for (int i = 1; i < 12; i++) {
                 
-                if (   mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
+                if (mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
                     synths[activeSynth].changeMusicScale(i);
                     mainInterfaceData[13+i].switchColor();
                    
@@ -1763,7 +1765,7 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     tempNode.setNearClip(nearClip);
     tempNode.setFarClip(farClip);
     tempNode.setFov(camFov);
-    tempNode.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
+    tempNode.setPosition(camNotActivePos);
     tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
     ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), ofGetWidth(), ofGetHeight()));
     ofRay ray;
@@ -1914,11 +1916,12 @@ void ofApp::updateCamera(float pct_){
     } else if (animCam) {
         
         float index = camUsePath.getIndexAtPercent(pct_);
+        if(index < camUsePath.size()-1){
         ofVec3f tempPos =  (camUsePath.getVertices().at((int)index+1)-camUsePath.getVertices().at((int)index))* (index-floor(index));
         testCam.setPosition( camUsePath.getVertices().at((int)index)+ tempPos);
-        
         testCam.setFov(ofLerp(camDefaultFov, camTargetFov, pct_));
-        
+        }
+            
         ofQuaternion tempRot;
         tempRot.slerp(pct_, camQuatDefault,camQuatTarget);
         testCam.setOrientation(tempRot);
@@ -1961,15 +1964,15 @@ void ofApp::setupStatesAndAnimation() {
     testCam.setNearClip(nearClip);
     testCam.setFarClip(farClip);
     
-    float bezierHandleFac = 2.5;
+    float bezierHandleFac = 3.0;
     
     //___---___
     //---___---
     
     //synthlayer and camera for active edit position
-    synthActivePos.setPosition(0, -TILES*TILESIZE*4, TILESIZE*TILES*3.3);
-    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.5,TILES*TILESIZE*2.1));
-    camNotActiveSynth.setPosition(0, -TILES*TILESIZE*2, TILES*TILESIZE*7);
+    synthActivePos.setPosition(0, -TILES*TILESIZE*1.9, TILESIZE*TILES*2.25);
+    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.125,TILES*TILESIZE*1.0));
+    camNotActiveSynth.setPosition(camNotActivePos);
     camEditDetailPos.setPosition(camActiveSynth.getPosition()+ofVec3f(0,0,(TILESIZE*TILES)/2.55));
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
@@ -1988,15 +1991,15 @@ void ofApp::setupStatesAndAnimation() {
     
     //-----------__________----------________
     twoToActive.addVertex(synthPos[1].getPosition());
-    twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*1.2), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
+    twoToActive.bezierTo(synthPos[1].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac), synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     twoToActive = twoToActive.getResampledByCount(80);
     
     oneToActive.addVertex(synthPos[0].getPosition());
-    oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac*1.2),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
+    oneToActive.bezierTo(synthPos[0].getPosition()+ofVec3f(0,0,TILES*TILESIZE*bezierHandleFac),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     oneToActive = oneToActive.getResampledByCount(80);
     
     threeToActive.addVertex(synthPos[2].getPosition());
-    threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*1.2),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
+    threeToActive.bezierTo(synthPos[2].getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac),synthActivePos.getPosition()+ofVec3f(0,TILES*TILESIZE*bezierHandleFac,0), synthActivePos.getPosition());
     threeToActive = threeToActive.getResampledByCount(80);
     
     //------------__________-------------__________
@@ -2014,11 +2017,11 @@ void ofApp::setupStatesAndAnimation() {
     
     //_____----------_________________-------------
     camPath.addVertex(camNotActiveSynth.getPosition());
-    camPath.bezierTo(camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camActiveSynth.getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac) , camActiveSynth.getPosition());
+    camPath.bezierTo(camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac*2,0), camActiveSynth.getPosition()+ofVec3f(0,0,TILESIZE*TILES*bezierHandleFac*2) , camActiveSynth.getPosition());
     camPath = camPath.getResampledByCount(80);
     
     camPathBack.addVertex(camActiveSynth.getPosition());
-    camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,TILESIZE*TILES*bezierHandleFac,0), camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac,0), camNotActiveSynth.getPosition());
+    camPathBack.bezierTo(camActiveSynth.getPosition()+ofVec3f(0,TILESIZE*TILES*bezierHandleFac*0.5,0), camNotActiveSynth.getPosition()+ofVec3f(0,-TILES*TILESIZE*bezierHandleFac*2.5,0), camNotActiveSynth.getPosition());
     camPathBack = camPathBack.getResampledByCount(80);
     
     camEditToDetail.addVertex(camActiveSynth.getPosition());
@@ -2043,10 +2046,10 @@ void ofApp::setupStatesAndAnimation() {
     harmonyMatrix.rotate(45, -1, 0, 0);
     
     TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
-    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
+    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.3,-(TILESIZE*TILES)*0.0));
     // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
-    TwoHarmonyPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)/2));
+    TwoHarmonyPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.3,-(TILESIZE*TILES)*0.0));
     TwoHarmonyPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
@@ -2066,12 +2069,12 @@ void ofApp::setupStatesAndAnimation() {
     //---___---
     
     //time mode
-    timeMatrix.rotate(-16,-1,0,0);
+    timeMatrix.rotate(-10,-1,0,0);
     
     TwoTimePathOn.addVertex(ofVec3f(0,0,0));
-    TwoTimePathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.45));
+    TwoTimePathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.0));
     
-    TwoTimePathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.45));
+    TwoTimePathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.0));
     TwoTimePathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     
     OneTimePathOn = TwoTimePathOn;
@@ -2091,12 +2094,12 @@ void ofApp::setupStatesAndAnimation() {
     //---___---
     
     //volume mode
-    volumeMatrix.rotate(75,-1,0,0);
+    volumeMatrix.rotate(70,-1,0,0);
     
     TwoVolumeLayerPathOn.addVertex(ofVec3f(0,0,0));
-    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
+    TwoVolumeLayerPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.175));
     
-    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*1,-(TILESIZE*TILES)*0.45));
+    TwoVolumeLayerPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.175));
     TwoVolumeLayerPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     
     OneVolumeLayerPathOn = TwoVolumeLayerPathOn;
@@ -2137,7 +2140,7 @@ void ofApp::setupGlobalInterface() {
     ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
     
-    
+    //bpm slider global #54 background ,STATE_VOLUME
     ofVec3f place = ofVec3f(0,0,0);
     ofVec3f offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
     GlobalGUI temp = GlobalGUI(0,string(""),ofVec3f(horizontalSlider.x*0.7, horizontalSlider.y*0.2,0), ofColor(50,0,0),place,offPlace,fontDefault,false,&tekoRegular);
@@ -2241,7 +2244,7 @@ void ofApp::setupGlobalInterface() {
     //keynote drag slider STATE_EDIT_DETAIL
     place = ofVec3f(0,designGrid[0][0].y+(keyButton.y/2),0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(40,string(""), ofVec3f( keyButton.x*12,keyButton.y,0) ,ofColor(63,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(40,string(""), ofVec3f( keyButton.x*12,keyButton.y,0) ,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //toggle bpm icon, STATE_DEFFAULT
@@ -2327,7 +2330,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //BPM A B C Buttons Background, STATE_BPM
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(0,-designGrid[0][0].y,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     temp = GlobalGUI(55,string("BPM A"),ofVec3f(horizontalSlider.x, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
@@ -2339,17 +2342,17 @@ void ofApp::setupGlobalInterface() {
     //harmony settings, a,b,c, keynote STATE_HARMONY
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     place = ofVec3f(0,designGrid[0][0].y+horizontalSlider.y/4,0);
-    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     place = ofVec3f(0,designGrid[0][0].y+horizontalSlider.y/4,0);
-    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     place = ofVec3f(0,designGrid[0][0].y+horizontalSlider.y/4,0);
-    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(horizontalSlider.x,horizontalSlider.y/2,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //harmony menu,  global keynote, STATE_HARMONY
@@ -2409,21 +2412,21 @@ void ofApp::setupGlobalInterface() {
     offset = horizontalSlider.x/4;
     //bpm factor selector buttons
     for (int i = 0; i<4; i++) {
-        place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),0,0);
+        place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),-designGrid[0][0].y,0);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
         temp = GlobalGUI(112+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
     for (int i = 0; i<4; i++) {
-        place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),0,0);
+        place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),-designGrid[0][0].y,0);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
         temp = GlobalGUI(116+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
     for (int i = 0; i<4; i++) {
-        place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),0,0);
+        place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),-designGrid[0][0].y,0);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
         temp = GlobalGUI(120+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
@@ -2694,7 +2697,7 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[12].animation = true;
     
     mainInterfaceData[40].showString = false;
-    mainInterfaceData[40].moveDir = 1;
+    mainInterfaceData[40].moveDir = 0;
     mainInterfaceData[40].animation = true;
     
     mainInterfaceData[111].showString = true;
@@ -3084,10 +3087,10 @@ void ofApp::buttonOnePress(){
         
         synths[synthButton[0]].scaling = true;
         synths[synthButton[1]].scaling = true;
-        synths[synthButton[0]].myScaleDefault = 0.5;
+        synths[synthButton[0]].myScaleDefault = 0.45;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[0]].myScaleTarget = 1.0;
-        synths[synthButton[1]].myScaleTarget = 0.5;
+        synths[synthButton[1]].myScaleTarget = 0.45;
         
         
         synthButton[0] = synthButton[1];
@@ -3139,8 +3142,8 @@ void ofApp::buttonOnePress(){
         synths[synthButton[2]].scaling = true;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleDefault = 1.0;
-        synths[synthButton[1]].myScaleTarget = 0.5;
-        synths[synthButton[2]].myScaleTarget = 0.5;
+        synths[synthButton[1]].myScaleTarget = 0.45;
+        synths[synthButton[2]].myScaleTarget = 0.45;
         
         
         
@@ -3193,8 +3196,8 @@ void ofApp::buttonTwoPress(){
         
         synths[synthButton[0]].scaling = true;
         synths[synthButton[2]].scaling = true;
-        synths[synthButton[0]].myScaleDefault = 0.5;
-        synths[synthButton[2]].myScaleDefault = 0.5;
+        synths[synthButton[0]].myScaleDefault = 0.45;
+        synths[synthButton[2]].myScaleDefault = 0.45;
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
         
@@ -3236,8 +3239,8 @@ void ofApp::buttonTwoPress(){
         synths[synthButton[2]].scaling = true;
         synths[synthButton[0]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleDefault = 1.0;
-        synths[synthButton[0]].myScaleTarget = 0.5;
-        synths[synthButton[2]].myScaleTarget = 0.5;
+        synths[synthButton[0]].myScaleTarget = 0.45;
+        synths[synthButton[2]].myScaleTarget = 0.45;
         
         
         
@@ -3291,10 +3294,10 @@ void ofApp::buttonThreePress(){
         
         synths[synthButton[2]].scaling = true;
         synths[synthButton[1]].scaling = true;
-        synths[synthButton[2]].myScaleDefault = 0.5;
+        synths[synthButton[2]].myScaleDefault = 0.45;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
-        synths[synthButton[1]].myScaleTarget = 0.5;
+        synths[synthButton[1]].myScaleTarget = 0.45;
         
         
         synthButton[2] = synthButton[1];
@@ -3341,8 +3344,8 @@ void ofApp::buttonThreePress(){
         synths[synthButton[1]].scaling = true;
         synths[synthButton[0]].myScaleDefault = 1.0;
         synths[synthButton[1]].myScaleDefault = 1.0;
-        synths[synthButton[0]].myScaleTarget = 0.5;
-        synths[synthButton[1]].myScaleTarget = 0.5;
+        synths[synthButton[0]].myScaleTarget = 0.45;
+        synths[synthButton[1]].myScaleTarget = 0.45;
         
         
         synthButton[2] = synthButton[1];
@@ -3442,7 +3445,7 @@ void ofApp::buttonEditDetail() {
         camQuatDefault = camActiveSynth.getOrientationQuat();
         camQuatTarget = camActiveSynth.getOrientationQuat();
         camUsePath = camEditToDetail;
-        camTargetFov = 20;
+        camTargetFov = camEditDetailFov;
         camDefaultFov = camActiveFov;
         animCam = true;
         
@@ -3491,7 +3494,7 @@ void ofApp::buttonEditDetail() {
         camQuatTarget = camActiveSynth.getOrientationQuat();
         camUsePath = camDetailToEdit;
         camTargetFov = camActiveFov;
-        camDefaultFov = 20;
+        camDefaultFov = camEditDetailFov;
         animCam = true;
         
         
@@ -3821,18 +3824,19 @@ void ofApp::setNewGUI() {
 //--------------------------------------------------------------
 void ofApp::markScaleSteps(int index_) {
     
+    /*
     for (int i = 0; i < 12; i++){
         if (synths[activeSynth].activeScale.steps[i] ) {
             mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
             mainInterfaceData[index_+i].setOn();
-            mainInterfaceData[index_+i].activateDarkerColor();
+            //mainInterfaceData[index_+i].activateDarkerColor();
         }else{
             mainInterfaceData[index_+i].setOff();
             //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
             //mainInterfaceData[index_+i].activateOnColor(mainInterface);
         }
     }
-    
+    */
     markSynthNotes(index_);
 }
 
@@ -3842,8 +3846,12 @@ void ofApp::markSynthNotes(int index_){
     for (int i = 0; i < 12; i++){
         if (synths[activeSynth].activeScale.steps[i] ) {
             mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-            mainInterfaceData[index_+i].setOn();
+            //mainInterfaceData[index_+i].setOn();
             mainInterfaceData[index_+i].activateDarkerColor();
+        }else{
+            mainInterfaceData[index_+i].setOff();
+            //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
+            //mainInterfaceData[index_+i].activateOnColor(mainInterface);
         }
     }
     
@@ -3859,12 +3867,13 @@ void ofApp::markSynthNotes(int index_){
 //--------------------------------------------------------------
 void ofApp::markScaleSteps() {
     
+    /*
     for (int j = 0; j < 3; j++) {
         for (int i = 0; i < 12; i++){
             if (synths[synthButton[j]].activeScale.steps[i] ) {
                 mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setColor(synths[synthButton[j]].colorHue);
                 mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOn();
-                mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].activateDarkerColor();
+               // mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].activateDarkerColor();
             }else{
                 mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOff();
                 //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
@@ -3872,7 +3881,7 @@ void ofApp::markScaleSteps() {
             }
         }
     }
-    
+    */
     markSynthNotes();
 }
 
@@ -3882,9 +3891,13 @@ void ofApp::markSynthNotes(){
     for (int j = 0; j < 3; j++) {
         for (int i = 0; i < 12; i++){
             if (synths[synthButton[j]].activeScale.steps[i] ) {
-                mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setColor(synths[synthButton[j]].colorHue);
-                mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOn();
+                //mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setColor(synths[synthButton[j]].colorHue);
+                //mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOn();
                 mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].activateDarkerColor();
+            } else{
+                mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOff();
+                //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
+                //mainInterfaceData[index_+i].activateOnColor(mainInterface);
             }
         }
         
@@ -3898,16 +3911,7 @@ void ofApp::markSynthNotes(){
     }
 }
 
-ofColor ofApp::filterColor(ofColor c_){
-    ofColor temp;
-    temp.r = ofClamp(c_.r+20, 20, 230);
-    temp.g = ofClamp(c_.g+5, 20, 230);
-    temp.b = ofClamp(c_.b-20, 20, 230);
-    temp.a = ofClamp(c_.a, 10, 255);
-    
-    
-    return c_;
-}
+
 
 void ofApp::exit(){
     startUp = true;

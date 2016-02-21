@@ -163,6 +163,8 @@ class ofApp : public ofxiOSApp{
         ofEasyCam cam;
         ofCamera testCam;
         
+        ofVec3f camNotActivePos;
+        
         // ofCamera testCam;
         ofNode globalTranslate;
         ofNode camActiveSynth;
@@ -176,6 +178,7 @@ class ofApp : public ofxiOSApp{
         float camActiveFov;
         float camTargetFov;
         float camDefaultFov;
+        float camEditDetailFov;
         
         float easeInOut(float,float);
         
@@ -219,7 +222,6 @@ class ofApp : public ofxiOSApp{
         ofPlanePrimitive planeForIntersect;
         
         
-        ofColor filterColor(ofColor);
         
         
         //light

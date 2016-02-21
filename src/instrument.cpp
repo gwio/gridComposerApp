@@ -3,7 +3,7 @@
 //layer is 100x100
 #define CUBE_Z_HEIGHT 12
 #define EMPTY_Z 2
-#define SCAN_Z 22
+#define SCAN_Z 24
 
 
 Instrument::Instrument(){
@@ -24,8 +24,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     borderSize = border_;
     
     
-    innerColorDefault = filterColor( ofColor::fromHsb(138,0,180));
-    outerColorDefault = filterColor( ofColor::fromHsb(138,10,20) );
+    innerColorDefault = filterColor( ofColor::fromHsb(138,0,210));
+    outerColorDefault = ofColor(21,21,21);
     rasterColor = filterColor( ofColor::black);
     
     soundsCounter = 1;
@@ -802,7 +802,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeGroup temp = cubeGroup(gridTiles);
         temp.ownId = soundsCounter;
         temp.size = 1;
-        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-16,16),0,255), 180+ofRandom(-50,10), 120+ofRandom(0,40));
+        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-18,18),0,255), 180+ofRandom(-50,28), 100+ofRandom(0,100));
         temp.groupColor = gColor;
         temp.lowX = x_;
         temp.highX = x_;
@@ -1039,7 +1039,7 @@ void Instrument::changePreset(bool test_) {
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, lowFreqVolFac, sineA,sineB);
-            it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-16,16),0,255),
+            it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-18,18),0,255),
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
                                                      );
@@ -1224,12 +1224,14 @@ void Instrument::planeMovement(float pct_){
         //time menu animation
         pulsePlane.animation(pct_, globalStatePtr);
         
-        
     } else if (animate) {
         if (aniPath.size() > 1) {
             float index = aniPath.getIndexAtPercent(pct_);
+            //hmm ??
+            if (index < aniPath.size()-1) {
             ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
             setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+            }
         }
         ofQuaternion tempRot;
         tempRot.slerp(pct_, myDefault,myTarget);

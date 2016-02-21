@@ -41,7 +41,6 @@ public:
     float minX,minY,maxX,maxY;
     
     ofColor elementColorOn, elementColorOff, elementColorDarker, elementColorTouch, displayColor, targetColor;
-    ofColor filterColor(ofColor);
     
     ofVec3f vertices[4];
     int index[6];
