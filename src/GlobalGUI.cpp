@@ -8,6 +8,7 @@ GlobalGUI::GlobalGUI(){
 //colors for this start with 50,0,0
 GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_, bool trans_, ofxFontStash* fsPtr_) {
     elementName = name_;
+    auxString ="";
     
     isTrans = trans_;
     
@@ -348,6 +349,10 @@ void GlobalGUI::setStringWidth(float sW_) {
     stringWidth = sW_/2;
 }
 
+void GlobalGUI::setAuxStringWidth(float sW_) {
+    auxStringWidth = sW_/2;
+}
+
 void GlobalGUI::blinkOn(){
     displayColor = elementColorTouch;
     myTween = 0.0;
@@ -408,5 +413,18 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
     
 }
 
+
+void GlobalGUI::drawAuxString(float offsetX_, float offsetY_) {
+    
+        ofPushStyle();
+        ofSetColor(displayColor);
+        fsPtr->draw(auxString,
+                    fontSize,
+                    drawStringPos.x-auxStringWidth+offsetX_,
+                    drawStringPos.y+stringHeight+offsetY_
+                    );
+       ofPopStyle();
+    
+}
 
 

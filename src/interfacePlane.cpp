@@ -74,7 +74,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
 
 void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
-    float zH = 30;
+    float zH = 0;
+    float zHharmony = 30;
     float arrow_width = 8.0;
     arrow_width/=2;
     ofMatrix4x4 tempM, tempMB;
@@ -160,7 +161,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     for (int i = 0; i < directionMeshCon.getNumVertices(); i++) {
         directionMeshCon.setVertex(i, directionMeshCon.getVertex(i)+ofVec3f(0,0,zH));
-        directionMeshConBig.setVertex(i, directionMeshConBig.getVertex(i)+ofVec3f(0,0,zH));
+        directionMeshConBig.setVertex(i, directionMeshConBig.getVertex(i)+ofVec3f(0,0,zHharmony));
     }
     
     //----------------------direction mesh active
@@ -242,7 +243,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     for (int i = 0; i < directionMeshAct.getNumVertices(); i++) {
         directionMeshAct.setVertex(i, directionMeshAct.getVertex(i)+ofVec3f(0,0,zH));
-        directionMeshActBig.setVertex(i, directionMeshActBig.getVertex(i)+ofVec3f(0,0,zH));
+        directionMeshActBig.setVertex(i, directionMeshActBig.getVertex(i)+ofVec3f(0,0,zHharmony));
     }
     //----------------------direction mesh off
     
@@ -335,7 +336,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     for (int i = 0; i < directionMeshOff.getNumVertices(); i++) {
         directionMeshOff.setVertex(i, directionMeshOff.getVertex(i)+ofVec3f(0,0,zH));
-        directionMeshOffBig.setVertex(i, directionMeshOffBig.getVertex(i)+ofVec3f(0,0,zH));
+        directionMeshOffBig.setVertex(i, directionMeshOffBig.getVertex(i)+ofVec3f(0,0,zHharmony));
     }
     //------------------------------------------------------
     directionMesh.clear();

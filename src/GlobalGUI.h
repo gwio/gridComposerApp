@@ -26,14 +26,16 @@ public:
     ofVec3f placement;
     ofVec3f offPlacement;
     string elementName;
-    
+    string auxString;
     
     float sliderPct;
     
     ofVec3f drawStringPos;
     
     void setStringWidth(float);
-    float stringWidth, stringHeight;
+    void setAuxStringWidth(float);
+
+    float stringWidth, auxStringWidth, stringHeight;
     
     int moveDir;
     
@@ -65,6 +67,7 @@ public:
     
     void drawFontString();
     void drawFontString(float,float);
+    void drawAuxString(float,float);
 
     
     bool isInside(ofVec2f);
