@@ -23,6 +23,8 @@ class InterfacePlane {
     void animation(float, int*);
     
     void transformButton(bool[],bool[], int&);
+    
+    void blinkP();
 
     bool animate;
     
@@ -73,12 +75,15 @@ class InterfacePlane {
     float aniPct[4];
     bool buttonMoving[4];
     ofVec3f moveTarget[4];
+    bool blink[4];
+    float blinkPct[4];
     
-    ofColor connectedDir;
-    ofColor notActiveDir;
+    ofColor connected;
+    ofColor active;
+    ofColor offColor;
     ofColor pulseColor;
     
-    ofColor filterColor(ofColor);
-    
+    ofColor tempC;
+    ofVec3f tempVec;
 };
 
