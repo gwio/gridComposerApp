@@ -349,7 +349,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     //setup start position
     for (int i = 0 ; i < directionMeshCon.getNumVertices(); i++) {
-        directionMesh.addVertex(ofVec3f(0,0,0));
+        directionMesh.addVertex(directionMeshCon.getVertex(i));
         directionMesh.addColor(connected);
     }
   
