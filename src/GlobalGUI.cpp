@@ -20,7 +20,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
         //targetColor = elementColorOn;
         elementColorDarker = ofColor::fromHsb(255, 0, 51, 255);
         elementColorOff = ofColor::fromHsb(0,0,0,0);
-
+        
     } else {
         elementColorOn = ofColor::fromHsb(255,0,204,255);
         targetColor = elementColorOn;
@@ -96,27 +96,27 @@ void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
     if(animation && tween_ >= 1.0){
         animation = false;
     }
-
+    
     
     if (blink) {
         myTween = (myTween*1.12)+0.01;
-
-    if (displayColor != targetColor) {
+        
+        if (displayColor != targetColor) {
             displayColor = displayColor.lerp(targetColor, myTween);
-        if (!isTrans){
-            mesh_.setColor(0+counter,displayColor);
-            mesh_.setColor(1+counter,displayColor);
-            mesh_.setColor(2+counter,displayColor);
-            mesh_.setColor(3+counter,displayColor);
+            if (!isTrans){
+                mesh_.setColor(0+counter,displayColor);
+                mesh_.setColor(1+counter,displayColor);
+                mesh_.setColor(2+counter,displayColor);
+                mesh_.setColor(3+counter,displayColor);
+            }
         }
-    }
         if (myTween >= 1.0) {
             displayColor = targetColor;
             if(!isTrans) {
-            mesh_.setColor(0+counter,displayColor);
-            mesh_.setColor(1+counter,displayColor);
-            mesh_.setColor(2+counter,displayColor);
-            mesh_.setColor(3+counter,displayColor);
+                mesh_.setColor(0+counter,displayColor);
+                mesh_.setColor(1+counter,displayColor);
+                mesh_.setColor(2+counter,displayColor);
+                mesh_.setColor(3+counter,displayColor);
             }
             blink = false;
             myTween = 1.0;
@@ -153,19 +153,19 @@ void GlobalGUI::updateMainMeshB(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
         if (displayColor != targetColor) {
             displayColor = displayColor.lerp(targetColor, myTween);
             if (!isTrans){
-            mesh_.setColor(0+counter,displayColor);
-            mesh_.setColor(1+counter,displayColor);
-            mesh_.setColor(2+counter,displayColor);
-            mesh_.setColor(3+counter,displayColor);
+                mesh_.setColor(0+counter,displayColor);
+                mesh_.setColor(1+counter,displayColor);
+                mesh_.setColor(2+counter,displayColor);
+                mesh_.setColor(3+counter,displayColor);
             }
         }
         if (myTween >= 1.0) {
             displayColor = targetColor;
             if (!isTrans){
-            mesh_.setColor(0+counter,displayColor);
-            mesh_.setColor(1+counter,displayColor);
-            mesh_.setColor(2+counter,displayColor);
-            mesh_.setColor(3+counter,displayColor);
+                mesh_.setColor(0+counter,displayColor);
+                mesh_.setColor(1+counter,displayColor);
+                mesh_.setColor(2+counter,displayColor);
+                mesh_.setColor(3+counter,displayColor);
             }
             blink = false;
             myTween = 1.0;
@@ -210,7 +210,7 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float& twee
     if(animation && tween_ >= 1.0){
         animation = false;
     }
-   
+    
     
     
     if (blink) {
@@ -244,10 +244,10 @@ void GlobalGUI::setColor(float hue_) {
     
     elementColorOn = ofColor::fromHsb(hue_, 120, 140,255);
     
-   // elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation(), elementColorOn.getBrightness(), 0 );
+    // elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation(), elementColorOn.getBrightness(), 0 );
     //elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(),elementColorOn.getSaturation(),51, 255 );
     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, 255, 255);
-
+    
 }
 
 
@@ -255,10 +255,10 @@ void GlobalGUI::setColor(ofColor color_) {
     
     elementColorOn = color_;
     
-   // elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation(), elementColorOn.getBrightness(), 0 );
+    // elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation(), elementColorOn.getBrightness(), 0 );
     //elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(),elementColorOn.getSaturation(),51, 255 );
     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, 255, 255);
-
+    
     
 }
 
@@ -267,10 +267,10 @@ void GlobalGUI::activateOnColor(){
     myTween = 0.0;
     blink = true;
     /*
-    mesh_.setColor(0+counter, displayColor);
-    mesh_.setColor(1+counter, displayColor);
-    mesh_.setColor(2+counter, displayColor);
-    mesh_.setColor(3+counter, displayColor);
+     mesh_.setColor(0+counter, displayColor);
+     mesh_.setColor(1+counter, displayColor);
+     mesh_.setColor(2+counter, displayColor);
+     mesh_.setColor(3+counter, displayColor);
      */
 }
 
@@ -279,11 +279,11 @@ void GlobalGUI::activateDarkerColor(){
     myTween = 0.0;
     blink = true;
     /*
-    mesh_.setColor(0+counter, displayColor);
-    mesh_.setColor(1+counter, displayColor);
-    mesh_.setColor(2+counter, displayColor);
-    mesh_.setColor(3+counter, displayColor);
-    */
+     mesh_.setColor(0+counter, displayColor);
+     mesh_.setColor(1+counter, displayColor);
+     mesh_.setColor(2+counter, displayColor);
+     mesh_.setColor(3+counter, displayColor);
+     */
 }
 
 
@@ -301,17 +301,17 @@ bool GlobalGUI::isInside(ofVec2f click_) {
 void GlobalGUI::switchColor() {
     
     if (onOff) {
-       
+        
         targetColor = elementColorOff;
         myTween = 0.0;
         blink = true;
     } else {
-       
+        
         targetColor = elementColorOn;
         myTween = 0.0;
         blink = true;
     }
- onOff = !onOff;
+    onOff = !onOff;
     
 }
 
@@ -319,12 +319,12 @@ void GlobalGUI::setOn() {
     targetColor = elementColorOn;
     myTween = 0.0;
     blink = true;
-/*
-    mesh_.setColor(0+counter, elementColorOn);
-    mesh_.setColor(1+counter,elementColorOn);
-    mesh_.setColor(2+counter, elementColorOn);
-    mesh_.setColor(3+counter, elementColorOn);
- */
+    /*
+     mesh_.setColor(0+counter, elementColorOn);
+     mesh_.setColor(1+counter,elementColorOn);
+     mesh_.setColor(2+counter, elementColorOn);
+     mesh_.setColor(3+counter, elementColorOn);
+     */
     onOff = true;
 }
 
@@ -335,12 +335,12 @@ void GlobalGUI::setOff() {
     targetColor = elementColorOff;
     myTween = 0.0;
     blink = true;
-/*
-    mesh_.setColor(0+counter, elementColorOff);
-    mesh_.setColor(1+counter,elementColorOff);
-    mesh_.setColor(2+counter, elementColorOff);
-    mesh_.setColor(3+counter, elementColorOff);
- */
+    /*
+     mesh_.setColor(0+counter, elementColorOff);
+     mesh_.setColor(1+counter,elementColorOff);
+     mesh_.setColor(2+counter, elementColorOff);
+     mesh_.setColor(3+counter, elementColorOff);
+     */
     onOff = false;
 }
 
@@ -372,7 +372,7 @@ void GlobalGUI::drawFontString() {
     } else if (showString) {
         ofPushStyle();
         if(onOff) {
-        ofSetColor(ofColor::fromHsb(255,0,204,255));
+            ofSetColor(ofColor::fromHsb(255,0,204,255));
         } else {
             ofSetColor(elementColorDarker);
         }
@@ -383,7 +383,7 @@ void GlobalGUI::drawFontString() {
                     );
     }
     ofPopStyle();
-
+    
 }
 
 void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
@@ -399,11 +399,11 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
     } else if (showString) {
         ofPushStyle();
         if(onOff) {
-        ofSetColor(ofColor::fromHsb(255,0,204,255));
-    } else {
-        ofSetColor(elementColorDarker);
-    }
-    fsPtr->draw(elementName,
+            ofSetColor(ofColor::fromHsb(255,0,204,255));
+        } else {
+            ofSetColor(elementColorDarker);
+        }
+        fsPtr->draw(elementName,
                     fontSize,
                     drawStringPos.x-stringWidth+offsetX_,
                     drawStringPos.y+stringHeight+offsetY_
@@ -416,14 +416,14 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
 
 void GlobalGUI::drawAuxString(float offsetX_, float offsetY_) {
     
-        ofPushStyle();
-        ofSetColor(displayColor);
-        fsPtr->draw(auxString,
-                    fontSize,
-                    drawStringPos.x-auxStringWidth+offsetX_,
-                    drawStringPos.y+stringHeight+offsetY_
-                    );
-       ofPopStyle();
+    ofPushStyle();
+    ofSetColor(displayColor);
+    fsPtr->draw(auxString,
+                fontSize,
+                drawStringPos.x-auxStringWidth+offsetX_,
+                drawStringPos.y+stringHeight+offsetY_
+                );
+    ofPopStyle();
     
 }
 

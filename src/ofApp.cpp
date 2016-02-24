@@ -278,6 +278,14 @@ void ofApp::setup(){
         
     }
     
+    //setup stateBpm Fx Mesh
+    bpmFx.setMode(OF_PRIMITIVE_LINES);
+    bpmFx.clear();
+    
+    for (int i = 0; i < 8; i++) {
+        bpmFx.addVertex(ofVec3f(-500,-500,0));
+        bpmFx.addColor(ofColor(0,0,0,0));
+    }
     
     //load saves
     loadFromXml();
@@ -287,6 +295,7 @@ void ofApp::setup(){
     
 }
 
+//--------------------------------------------------------------
 void ofApp::setupAudio(){
     
     Generator temp;
@@ -325,6 +334,58 @@ void ofApp::setupAudio(){
     tonicSynth.setOutputGen( ((mainOut)*volumeRamp)>>LPF12().cutoff(8000).Q(4) >> delay );
 }
 
+//--------------------------------------------------------------
+
+void ofApp::updateBpmMenuMesh(){
+
+    ofVec3f linePct;
+    ofVec3f offset = ofVec3f(0,20,0);
+    bpmFx.setVertex(0,mainInterface.getVertices().at(mainInterfaceData[45].counter+1)+offset);
+    bpmFx.setVertex(1,mainInterface.getVertices().at(mainInterfaceData[45].counter+1)+offset);
+    
+    bpmFx.setColor(0, ofColor(255,255,255,255));
+    bpmFx.setColor(1, ofColor(255,255,255,255));
+    
+    linePct.x = mainInterfaceData[55].elementSize.x * synths[synthButton[0]].pulsePlane.linePct;
+    
+    bpmFx.setVertex(2,mainInterface.getVertices().at(mainInterfaceData[55].counter+1)+offset);
+    bpmFx.setVertex(3,mainInterface.getVertices().at(mainInterfaceData[55].counter+1)+offset+linePct);
+    
+    
+    if (*synths[synthButton[0]].stepperPos != 5){
+    bpmFx.setColor(2,ofColor::fromHsb(synths[synthButton[0]].colorHue, 200, 200, 255 ));
+    bpmFx.setColor(3, ofColor::fromHsb(synths[synthButton[0]].colorHue, 200, 200, 255 ));
+    } else {
+        bpmFx.setColor(2,bpmFx.getColor(2).lerp(ofColor(0,0,0,0), 0.1));
+        bpmFx.setColor(3,bpmFx.getColor(3).lerp(ofColor(0,0,0,0), 0.1));
+    }
+
+    linePct.x = mainInterfaceData[56].elementSize.x * synths[synthButton[1]].pulsePlane.linePct;
+    bpmFx.setVertex(4,mainInterface.getVertices().at(mainInterfaceData[56].counter+1)+offset);
+    bpmFx.setVertex(5,mainInterface.getVertices().at(mainInterfaceData[56].counter+1)+offset+linePct);
+    
+    if (*synths[synthButton[1]].stepperPos != 5){
+        bpmFx.setColor(4,ofColor::fromHsb(synths[synthButton[1]].colorHue, 200, 200, 255 ));
+        bpmFx.setColor(5, ofColor::fromHsb(synths[synthButton[1]].colorHue, 200, 200, 255 ));
+    } else {
+        bpmFx.setColor(4,bpmFx.getColor(4).lerp(ofColor(0,0,0,0), 0.1));
+        bpmFx.setColor(5,bpmFx.getColor(5).lerp(ofColor(0,0,0,0), 0.1));
+    }
+    
+    linePct.x = mainInterfaceData[57].elementSize.x * synths[synthButton[2]].pulsePlane.linePct;
+    bpmFx.setVertex(6,mainInterface.getVertices().at(mainInterfaceData[57].counter+1)+offset);
+    bpmFx.setVertex(7,mainInterface.getVertices().at(mainInterfaceData[57].counter+1)+offset+linePct);
+    
+    if (*synths[synthButton[2]].stepperPos != 5){
+        bpmFx.setColor(6,ofColor::fromHsb(synths[synthButton[2]].colorHue, 200, 200, 255 ));
+        bpmFx.setColor(7, ofColor::fromHsb(synths[synthButton[2]].colorHue, 200, 200, 255 ));
+    } else {
+        bpmFx.setColor(6,bpmFx.getColor(6).lerp(ofColor(0,0,0,0), 0.1));
+        bpmFx.setColor(7,bpmFx.getColor(7).lerp(ofColor(0,0,0,0), 0.1));
+    }
+
+
+}
 //--------------------------------------------------------------
 void ofApp::update(){
     //fade in Volume at start
@@ -395,7 +456,9 @@ void ofApp::update(){
     
     
     // intersectPlane(ofGetMouseX(),ofGetMouseY());
-    
+    if (currentState == STATE_BPM) {
+        updateBpmMenuMesh();
+    }
     
     
     light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
@@ -519,12 +582,14 @@ void ofApp::updateInterfaceMesh() {
         mainInterfaceData[120+i].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     }
     
+    
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    
+   // glLineWidth(	2);
     
     //glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
@@ -607,6 +672,14 @@ void ofApp::drawInterface(){
     if ( (currentState == STATE_EDIT_DETAIL) || (interfaceMoving && currentState == STATE_EDIT) ){
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x,mainInterface.getVertex(mainInterfaceData.at(49).counter+3).y,
                         designGrid[0][0].x/30,designGrid[0][0].y*0.2);
+    }
+    
+    
+    //bpm fx
+    if (currentState == STATE_BPM) {
+        //glLineWidth(	2);
+
+        bpmFx.draw();
     }
     
 }
@@ -1241,8 +1314,12 @@ void ofApp::replaceMousePressed(int x, int y) {
                 
                 if (mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
                     synths[activeSynth].changeMusicScale(i);
+                    if(!mainInterfaceData[13+i].onOff) {
+                    mainInterfaceData[13+i].blinkOn();
                     mainInterfaceData[13+i].switchColor();
-                   
+                    } else {
+                        mainInterfaceData[13+i].switchColor();
+                    }
                     synths[activeSynth].userScale = true;
                     
                     markScaleSteps(63);
@@ -1290,7 +1367,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                         mainInterfaceData[112+i].setOn();
                         mainInterfaceData[112+i].blinkOn();
                     } else {
-                        mainInterfaceData[112+i].activateDarkerColor();
+                        mainInterfaceData[112+i].setOff();
                         
                     }
                 }
@@ -1303,7 +1380,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                         mainInterfaceData[116+i].setOn();
                         mainInterfaceData[116+i].blinkOn();
                     } else {
-                        mainInterfaceData[116+i].activateDarkerColor();
+                        mainInterfaceData[116+i].setOff();
                         
                     }
                 }
@@ -1316,7 +1393,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                         mainInterfaceData[120+i].setOn();
                         mainInterfaceData[120+i].blinkOn();
                     } else {
-                        mainInterfaceData[120+i].activateDarkerColor();
+                        mainInterfaceData[120+i].setOff();
                         
                     }
                 }
@@ -1560,6 +1637,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     mainInterfaceData[111].elementName = "LOCAL HARMONY";
                     mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
                     mainInterfaceData[44].activateOnColor();
+                    setNewGUI();
                 }
                 
             }
@@ -2092,9 +2170,9 @@ void ofApp::setupStatesAndAnimation() {
     timeMatrix.rotate(-10,-1,0,0);
     
     TwoTimePathOn.addVertex(ofVec3f(0,0,0));
-    TwoTimePathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.0));
+    TwoTimePathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)*0.0));
     
-    TwoTimePathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.5,-(TILESIZE*TILES)*0.0));
+    TwoTimePathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)*0.0));
     TwoTimePathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
     
     OneTimePathOn = TwoTimePathOn;
@@ -2252,7 +2330,7 @@ void ofApp::setupGlobalInterface() {
     //bpm slider background, STATE_BPM
     place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
-    temp = GlobalGUI(38,"", ofVec3f(horizontalSlider.x*0.7, horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(38,"", ofVec3f(horizontalSlider.x*2, horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //STATE_EDIT, muster container
@@ -2294,7 +2372,7 @@ void ofApp::setupGlobalInterface() {
     //bpm slider, STATE_BPM
     place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
-    temp = GlobalGUI(45, string(""), ofVec3f(horizontalSlider.x*0.7, horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
+    temp = GlobalGUI(45, string(""), ofVec3f(horizontalSlider.x*2, horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //empty
@@ -2352,11 +2430,11 @@ void ofApp::setupGlobalInterface() {
     //BPM A B C Buttons Background, STATE_BPM
     place = ofVec3f(0,-designGrid[0][0].y,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(55,string("BPM A"),ofVec3f(horizontalSlider.x, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(55,string("BPM A"),ofVec3f(horizontalSlider.x/5*4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(56,string("BPM B"),ofVec3f(horizontalSlider.x, horizontalSlider.y,0),ofColor(52,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(56,string("BPM B"),ofVec3f(horizontalSlider.x/5*4, horizontalSlider.y,0),ofColor(52,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(57,string("BPM C"),ofVec3f(horizontalSlider.x, horizontalSlider.y,0),ofColor(53,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(57,string("BPM C"),ofVec3f(horizontalSlider.x/5*4, horizontalSlider.y,0),ofColor(53,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //harmony settings, a,b,c, keynote STATE_HARMONY
@@ -2429,26 +2507,26 @@ void ofApp::setupGlobalInterface() {
     
     
     
-    offset = horizontalSlider.x/4;
+    offset = horizontalSlider.x/5;
     //bpm factor selector buttons
     for (int i = 0; i<4; i++) {
         place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),-designGrid[0][0].y,0);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-        temp = GlobalGUI(112+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+        temp = GlobalGUI(112+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/5, horizontalSlider.y/2,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
     for (int i = 0; i<4; i++) {
         place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),-designGrid[0][0].y,0);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-        temp = GlobalGUI(116+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+        temp = GlobalGUI(116+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/5, horizontalSlider.y/2,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
     for (int i = 0; i<4; i++) {
         place = ofVec3f( (-offset*2)+(offset*i)+(offset/2),-designGrid[0][0].y,0);
         offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-        temp = GlobalGUI(120+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/4, horizontalSlider.y,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
+        temp = GlobalGUI(120+i,string("x"+ofToString(i+1)),ofVec3f(horizontalSlider.x/5, horizontalSlider.y/2,0),ofColor(51,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
@@ -2473,9 +2551,14 @@ void ofApp::setupGlobalInterface() {
     }
     
     //offset for scale key string
-    mainInterfaceData[50].stringHeight-=scaleButton.y/3;
+   // mainInterfaceData[50].stringHeight-=scaleButton.y/3;
     
+    mainInterfaceData[61].auxString = "KEYNOTE";
+    mainInterfaceData[61].setAuxStringWidth(mainInterfaceData[61].fsPtr->getBBox(mainInterfaceData[61].auxString, mainInterfaceData[61].fontSize, 0, 0).getWidth());
     
+    mainInterfaceData[62].auxString = "SCALE";
+    mainInterfaceData[62].setAuxStringWidth(mainInterfaceData[62].fsPtr->getBBox(mainInterfaceData[62].auxString, mainInterfaceData[62].fontSize, 0, 0).getWidth());
+
     pauseInterfaceOn();
     aniPct = 0.0;
 }
@@ -3775,27 +3858,27 @@ void ofApp::setNewGUI() {
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[112+i].setColor(synths[synthButton[0]].colorHue);
         if (i == 4-synths[synthButton[0]].nextPulseDivision){
-            mainInterfaceData[112+i].activateOnColor();
+            mainInterfaceData[112+i].setOn();
         } else {
-            mainInterfaceData[112+i].activateDarkerColor();
+            mainInterfaceData[112+i].setOff();
         }
     }
     
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[116+i].setColor(synths[synthButton[1]].colorHue);
         if (i == 4-synths[synthButton[1]].nextPulseDivision){
-            mainInterfaceData[116+i].activateOnColor();
+            mainInterfaceData[116+i].setOn();
         } else {
-            mainInterfaceData[116+i].activateDarkerColor();
+            mainInterfaceData[116+i].setOff();
         }
     }
     
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[120+i].setColor(synths[synthButton[2]].colorHue);
         if (i == 4-synths[synthButton[2]].nextPulseDivision){
-            mainInterfaceData[120+i].activateOnColor();
+            mainInterfaceData[120+i].setOn();
         } else {
-            mainInterfaceData[120+i].activateDarkerColor();
+            mainInterfaceData[120+i].setOff();
         }
     }
     
@@ -4303,7 +4386,7 @@ void ofApp::loadFromXml(){
             }
             settings.popTag();
             
-            
+                       
             settings.popTag();
         }
         settings.popTag();

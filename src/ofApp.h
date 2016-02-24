@@ -287,4 +287,7 @@ class ofApp : public ofxiOSApp{
         
         HistoryView hvSlotA, hvSlotB, hvSlotC;
         ofPolyline directionClickZonesA[4],directionClickZonesB[4],directionClickZonesC[4];
+        
+        ofVboMesh bpmFx;
+        void updateBpmMenuMesh();
     };
