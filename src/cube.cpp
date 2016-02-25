@@ -32,7 +32,7 @@ Cube::Cube(ofVec3f* ptr0_,ofVec3f* ptr1_,ofVec3f* ptr2_, ofVec3f* ptr3_, int v0_
     vIndex3 = v3_;
     noSaturation = false;
     targetZ =  vec0Ptr->z;
- 
+    
 }
 
 
@@ -49,7 +49,7 @@ void Cube::update(){
         
         pulseDivFac =  5-*pulseDivPtr;
         zInc =  (SPEED*aniFac)* ofClamp(ofMap(*bpmTickPtr, 150,1100,2.0,1.0),1.0,2.0)*pulseDivFac;
-
+        
         
         if (diff > 0) {
             aniFac = ofClamp(1-pow(1-aniPct, 2),0.0,1.0);
@@ -60,10 +60,10 @@ void Cube::update(){
                 vec2Ptr->z = targetZ;
                 vec3Ptr->z = targetZ;
             } else {
-            vec0Ptr->z += zInc;
-            vec1Ptr->z += zInc;
-            vec2Ptr->z += zInc;
-            vec3Ptr->z += zInc;
+                vec0Ptr->z += zInc;
+                vec1Ptr->z += zInc;
+                vec2Ptr->z += zInc;
+                vec3Ptr->z += zInc;
             }
         }
         
@@ -76,10 +76,10 @@ void Cube::update(){
                 vec2Ptr->z = targetZ;
                 vec3Ptr->z = targetZ;
             } else {
-            vec0Ptr->z -= zInc;
-            vec1Ptr->z -= zInc;
-            vec2Ptr->z -= zInc;
-            vec3Ptr->z -= zInc;
+                vec0Ptr->z -= zInc;
+                vec1Ptr->z -= zInc;
+                vec2Ptr->z -= zInc;
+                vec3Ptr->z -= zInc;
             }
         }
         

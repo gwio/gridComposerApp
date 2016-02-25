@@ -20,7 +20,7 @@ class InterfacePlane {
     
     void setupMeshes(bool[],bool[]);
     
-    void animation(float, int*);
+    void animationTransition(float);
     
     void transformButton(bool[],bool[], int&);
     
@@ -77,6 +77,9 @@ class InterfacePlane {
     ofVec3f moveTarget[4];
     bool blink[4];
     float blinkPct[4];
+    int meshState[4];
+    bool meshBig;
+    ofMesh targetMesh;
     
     ofColor connected;
     ofColor active;

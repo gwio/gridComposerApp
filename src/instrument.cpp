@@ -160,7 +160,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
             
             cubeVector[i*(gridTiles)+j].pulseDivPtr = &pulseDivision;
             cubeVector[i*(gridTiles)+j].bpmTickPtr = &bpmTick;
-
+            
         }
     }
     
@@ -308,7 +308,7 @@ void Instrument::draw() {
         
         raster.draw();
     }
-   // raster.draw();
+    // raster.draw();
     
 }
 
@@ -1222,15 +1222,15 @@ void Instrument::planeMovement(float pct_){
         setRotate( tempRot );
         
         //time menu animation
-        pulsePlane.animation(pct_, globalStatePtr);
+        pulsePlane.animationTransition(pct_);
         
     } else if (animate) {
         if (aniPath.size() > 1) {
             float index = aniPath.getIndexAtPercent(pct_);
             //hmm ??
             if (index < aniPath.size()-1) {
-            ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
-            setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
+                ofVec3f tempPos =  (aniPath.getVertices().at((int)index+1)-aniPath.getVertices().at((int)index))* (index-floor(index));
+                setTranslate( aniPath.getVertices().at((int)index)+ tempPos);
             }
         }
         ofQuaternion tempRot;
@@ -1238,7 +1238,7 @@ void Instrument::planeMovement(float pct_){
         setRotate( tempRot );
         
         //time menu animation
-        pulsePlane.animation(pct_, globalStatePtr);
+        pulsePlane.animationTransition(pct_);
         
     }
     

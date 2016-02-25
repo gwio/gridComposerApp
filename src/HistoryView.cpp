@@ -49,7 +49,7 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
                 tempC.a = alpha;
                 
                 float volumeB = noteLog_.at(i).volume.at(j);
-
+                
                 //read the position form the main interface vertices
                 mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp);
                 mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp+ofVec3f(0,2,0));
