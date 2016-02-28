@@ -1177,14 +1177,14 @@ void Instrument::setKeyNote(int keyNote_) {
     if ( keyNote+keyNote_ >= 12 && keyNote+keyNote_ <= 96) {
         int change = keyNote_;
         keyNote = ofClamp(keyNote+change,0, 120);
-        cout << keyNote << endl;
+        //cout << keyNote << endl;
         for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
             if(it->second.size > 0){
                 it->second.groupNote+=change;
                 it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
                 mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
                 
-                cout << pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) << endl;
+                //cout << pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) << endl;
             }
         }
     }

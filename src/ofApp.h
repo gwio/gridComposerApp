@@ -20,6 +20,12 @@ using namespace Tonic;
 
 
 
+struct xmlSave{
+    ofxXmlSettings settings;
+    string year, month, day;
+    int number;
+};
+
 #if TARGET_OS_IPHONE
 class ofApp : public ofxiOSApp{
 #else
@@ -124,12 +130,13 @@ class ofApp : public ofxiOSApp{
         void bpmButtonPress();
         void harmonyButtonPress();
         
-        void loadFromXml();
-        void saveToXml();
+        void loadFromXml(string);
+        void saveToXml(string);
+        void savePreset();
         
         //xml
         ofxXmlSettings settings;
-        
+        map<string, map<int,xmlSave>> xmlSavesDay;
         //tonic
         void setupAudio();
         void pulseEvent(int);
@@ -290,4 +297,9 @@ class ofApp : public ofxiOSApp{
         
         ofVboMesh bpmFx;
         void updateBpmMenuMesh();
+        
+        //save load
+        ofDirectory saveDir;
+        string saveLastYear, saveLastMonth, saveLastDay;
+        int saveLastNumber;
     };

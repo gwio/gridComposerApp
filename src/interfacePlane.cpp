@@ -606,7 +606,7 @@ void InterfacePlane::blinkP(){
             }
         }
         
-        cout << blinkPct[i]  << endl;
+        //cout << blinkPct[i]  << endl;
         if (blink[i] && blinkPct[i] >= 1.0){
             blink[i] = false;
             blinkPct[i] = 1.0;

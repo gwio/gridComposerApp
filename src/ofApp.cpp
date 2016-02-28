@@ -16,7 +16,7 @@
 
 
 
-enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL, STATE_BPM, STATE_HARMONY};
+enum currentState {STATE_DEFAULT,STATE_EDIT,STATE_VOLUME,STATE_EDIT_DETAIL, STATE_BPM, STATE_HARMONY, STATE_SAVE};
 
 
 
@@ -70,6 +70,54 @@ void ofApp::setup(){
     rajLight.setKerning(rajLight.getKerning());
 #endif
     
+#if TARGET_OS_IPHONE
+   //ios doc dir
+#else
+    saveDir.open("saves/");
+    if (!saveDir.exists()) {
+        saveDir.create();
+    }
+    saveDir.allowExt("xml");
+    saveDir.listDir();
+    
+    cout << saveDir.getFiles().size() << endl;
+    
+    xmlSave tempXml;
+    for (int i = 0; i < saveDir.getFiles().size(); i++) {
+        tempXml.settings.loadFile("saves/"+saveDir.getFiles().at(i).getFileName());
+        tempXml.settings.pushTag("date");
+        
+        tempXml.year = tempXml.settings.getValue("year", "");
+        tempXml.month = tempXml.settings.getValue("month", "");
+        tempXml.day = tempXml.settings.getValue("day", "");
+        tempXml.number = tempXml.settings.getValue("number", 1);
+        
+        tempXml.settings.popTag();
+        string xmlKeyDay = tempXml.year+tempXml.month+tempXml.day;
+        
+        xmlSavesDay[xmlKeyDay][tempXml.number] = tempXml;
+    }
+       //check if map is not empty
+    
+    if (!xmlSavesDay.empty()){
+        
+        saveLastYear = xmlSavesDay.rbegin()->second.rbegin()->second.year;
+        
+        saveLastMonth = xmlSavesDay.rbegin()->second.rbegin()->second.month;
+        
+        saveLastDay = xmlSavesDay.rbegin()->second.rbegin()->second.day;
+        
+        saveLastNumber = xmlSavesDay.rbegin()->second.rbegin()->second.number;
+        
+    } else {
+        saveLastDay = "";
+        saveLastMonth = "";
+        saveLastDay = "";
+        saveLastNumber = 0;
+    }
+    cout << saveLastNumber << endl;
+    
+#endif
     
     scaleCollection.loadScales();
     globalScaleVecPos = 0;
@@ -228,22 +276,22 @@ void ofApp::setup(){
     insideSynth = false;
     
     //load icons
-    ofImage temp;
+    ofImage tempImg;
     
-    temp.loadImage("icons/back.png");
-    backIcon.loadData(temp.getPixelsRef(),GL_RGBA);
+    tempImg.loadImage("icons/back.png");
+    backIcon.loadData(tempImg.getPixelsRef(),GL_RGBA);
     
-    temp.loadImage("icons/left.png");
-    left.loadData(temp.getPixelsRef(), GL_RGBA);
+    tempImg.loadImage("icons/left.png");
+    left.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
-    temp.loadImage("icons/right.png");
-    right.loadData(temp.getPixelsRef(), GL_RGBA);
+    tempImg.loadImage("icons/right.png");
+    right.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
-    temp.loadImage("icons/leftDouble.png");
-    leftDouble.loadData(temp.getPixelsRef(), GL_RGBA);
+    tempImg.loadImage("icons/leftDouble.png");
+    leftDouble.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
-    temp.loadImage("icons/rightDouble.png");
-    rightDouble.loadData(temp.getPixelsRef(), GL_RGBA);
+    tempImg.loadImage("icons/rightDouble.png");
+    rightDouble.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
     scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
     scaleFac *= 0.55;
@@ -288,7 +336,7 @@ void ofApp::setup(){
     }
     
     //load saves
-    loadFromXml();
+    loadFromXml("settings.xml");
     
     setNewGUI();
     setupAudio();
@@ -882,16 +930,8 @@ void ofApp::keyPressed(int key){
         
     }
     
-    
-    if (key == '1') {
-        synths[activeSynth].nextPulseDivision = 4;
-    }
-    
-    if (key == '2') {
-        synths[activeSynth].nextPulseDivision = 2;
-    }
-    if (key == '4') {
-        synths[activeSynth].nextPulseDivision = 1;
+    if(key == 'p') {
+        savePreset();
     }
     
 }
@@ -991,7 +1031,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
                 synths[activeSynth].setKeyNote(keyMod-synths[activeSynth].keyNote);
                 setNewGUI();
-                cout << keyMod - synths[activeSynth].keyNote<< endl;
+                //cout << keyMod - synths[activeSynth].keyNote<< endl;
                 /*
                  if (!mainInterfaceData[49].touchDown){
                  mainInterfaceData[49].touchStart = ofVec2f(x,y);
@@ -1323,7 +1363,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[activeSynth].userScale = true;
                     
                     markScaleSteps(63);
-                    cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
+                   // cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
             
@@ -1334,7 +1374,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
                 synths[activeSynth].setKeyNote(keyMod-synths[activeSynth].keyNote);
                 setNewGUI();
-                cout << keyMod - synths[activeSynth].keyNote<< endl;
+               // cout << keyMod - synths[activeSynth].keyNote<< endl;
             }
             
             //toogle grid preset container
@@ -1631,7 +1671,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[activeSynth].userScale = false;
                     synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                     synths[activeSynth].setKeyNote( (globalKey%12) - (synths[activeSynth].keyNote%12));
-                    cout << notes[ synths[activeSynth].keyNote%12 ] << endl;
+                   // cout << notes[ synths[activeSynth].keyNote%12 ] << endl;
                     setNewGUI();
                 } else {
                     mainInterfaceData[111].elementName = "LOCAL HARMONY";
@@ -4055,13 +4095,52 @@ void ofApp::markSynthNotes(){
 
 void ofApp::exit(){
     startUp = true;
-    saveToXml();
+    saveToXml("settings.xml");
+}
+
+void ofApp::savePreset(){
+    string cYear = ofGetTimestampString("%y");
+    string cMonth = ofGetTimestampString("%m");
+    string cDay = ofGetTimestampString("%d");
+    
+    if( (cYear == saveLastYear) && (cMonth == saveLastMonth) && (cDay == saveLastDay)){
+        saveLastNumber ++;
+        saveToXml("saves/"+cYear+cMonth+cDay+"#"+ofToString(saveLastNumber)+".xml");
+    } else {
+        saveLastYear = cYear;
+        saveLastMonth = cMonth;
+        saveLastDay = cDay;
+        saveLastNumber = 1;
+        saveToXml("saves/"+cYear+cMonth+cDay+"#"+ofToString(saveLastNumber)+".xml");
+    }
+    
+    xmlSave tempXml;
+    tempXml.settings = settings;
+    tempXml.settings.pushTag("date");
+    
+    tempXml.year = tempXml.settings.getValue("year", "");
+    tempXml.month = tempXml.settings.getValue("month", "");
+    tempXml.day = tempXml.settings.getValue("day", "");
+    tempXml.number = tempXml.settings.getValue("number", 1);
+    
+    tempXml.settings.popTag();
+    string xmlKey = tempXml.year+tempXml.month+tempXml.day;
+    xmlSavesDay[xmlKey][tempXml.number] = tempXml;
+    
 }
 
 
-void ofApp::saveToXml(){
+void ofApp::saveToXml(string path_){
     
     settings.clear();
+    //date
+    settings.addTag("date");
+    settings.pushTag("date");
+    settings.addValue("year",saveLastYear);
+    settings.addValue("month",saveLastMonth);
+    settings.addValue("day",saveLastDay);
+    settings.addValue("number", saveLastNumber);
+    settings.popTag();
     
     //--------------------------------
     //save grid presets
@@ -4243,21 +4322,21 @@ void ofApp::saveToXml(){
     settings.popTag();
     
 #if TARGET_OS_IPHONE
-    settings.saveFile(ofxiOSGetDocumentsDirectory()+"settings.xml");
+    settings.saveFile(ofxiOSGetDocumentsDirectory()+path_);
 #else
-    settings.saveFile("settings.xml");
+    settings.saveFile(path_);
 #endif
     
 }
 
-void ofApp::loadFromXml(){
+void ofApp::loadFromXml(string path_){
     startUp = true;
     
     //load grid presets from xml
 #if TARGET_OS_IPHONE
-    if (settings.loadFile(ofxiOSGetDocumentsDirectory()+"settings.xml")) {
+    if (settings.loadFile(ofxiOSGetDocumentsDirectory()+path_)) {
 #else
-        if (settings.loadFile("settings.xml")) {
+        if (settings.loadFile(path_)) {
 #endif
             settings.pushTag("Version");
             //dont load old xmlsettings
