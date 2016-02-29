@@ -70,54 +70,7 @@ void ofApp::setup(){
     rajLight.setKerning(rajLight.getKerning());
 #endif
     
-#if TARGET_OS_IPHONE
-   //ios doc dir
-#else
-    saveDir.open("saves/");
-    if (!saveDir.exists()) {
-        saveDir.create();
-    }
-    saveDir.allowExt("xml");
-    saveDir.listDir();
-    
-    cout << saveDir.getFiles().size() << endl;
-    
-    xmlSave tempXml;
-    for (int i = 0; i < saveDir.getFiles().size(); i++) {
-        tempXml.settings.loadFile("saves/"+saveDir.getFiles().at(i).getFileName());
-        tempXml.settings.pushTag("date");
-        
-        tempXml.year = tempXml.settings.getValue("year", "");
-        tempXml.month = tempXml.settings.getValue("month", "");
-        tempXml.day = tempXml.settings.getValue("day", "");
-        tempXml.number = tempXml.settings.getValue("number", 1);
-        
-        tempXml.settings.popTag();
-        string xmlKeyDay = tempXml.year+tempXml.month+tempXml.day;
-        
-        xmlSavesDay[xmlKeyDay][tempXml.number] = tempXml;
-    }
-       //check if map is not empty
-    
-    if (!xmlSavesDay.empty()){
-        
-        saveLastYear = xmlSavesDay.rbegin()->second.rbegin()->second.year;
-        
-        saveLastMonth = xmlSavesDay.rbegin()->second.rbegin()->second.month;
-        
-        saveLastDay = xmlSavesDay.rbegin()->second.rbegin()->second.day;
-        
-        saveLastNumber = xmlSavesDay.rbegin()->second.rbegin()->second.number;
-        
-    } else {
-        saveLastDay = "";
-        saveLastMonth = "";
-        saveLastDay = "";
-        saveLastNumber = 0;
-    }
-    cout << saveLastNumber << endl;
-    
-#endif
+    saveManager.loadSaveFolder();
     
     scaleCollection.loadScales();
     globalScaleVecPos = 0;
@@ -326,6 +279,7 @@ void ofApp::setup(){
         
     }
     
+    
     //setup stateBpm Fx Mesh
     bpmFx.setMode(OF_PRIMITIVE_LINES);
     bpmFx.clear();
@@ -508,6 +462,9 @@ void ofApp::update(){
         updateBpmMenuMesh();
     }
     
+    if (currentState == STATE_SAVE){
+        saveManager.update();
+    }
     
     light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
@@ -630,7 +587,9 @@ void ofApp::updateInterfaceMesh() {
         mainInterfaceData[120+i].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     }
     
-    
+    mainInterfaceData[46].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+    mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
+
     
 }
 
@@ -728,6 +687,11 @@ void ofApp::drawInterface(){
         //glLineWidth(	2);
         
         bpmFx.draw();
+    }
+    
+    //saveload test
+    if (currentState == STATE_SAVE) {
+        saveManager.draw();
     }
     
 }
@@ -1257,6 +1221,10 @@ void ofApp::replaceMousePressed(int x, int y) {
                 harmonyButtonPress();
             }
             
+            if (mainInterfaceData[46].isInside(ofVec2f(x,y))) {
+                mainInterfaceData[46].blinkOn();
+                loadSaveButtonPress();
+            }
             
         }
         
@@ -1701,6 +1669,12 @@ void ofApp::replaceMousePressed(int x, int y) {
             
             
         }
+        else if (currentState == STATE_SAVE){
+            if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
+                loadSaveButtonPress();
+                mainInterfaceData[47].blinkOn();
+            }
+        }
     }
 }
 
@@ -1838,7 +1812,7 @@ void ofApp::drawDebug() {
     TwoVolumeLayerPathOn.draw();
     TwoHarmonyPathOn.draw();
     
-    
+    TwoLoadPathOn.draw();
     
     if (!debugCam) {
         testCam.end();
@@ -2252,7 +2226,27 @@ void ofApp::setupStatesAndAnimation() {
         ThreeVolumeLayerPathOff.getVertices().at(i) = TwoVolumeLayerPathOff.getVertices().at(i)+synthPos[2].getPosition();
     }
     
+    //___---___
+    //---___---
     
+    //load save menu
+    TwoLoadPathOn.addVertex(ofVec3f(0,0,0));
+    TwoLoadPathOn.bezierTo(ofVec3f(0,0,0), ofVec3f((TILES*TILESIZE*6),0,0), ofVec3f((TILES*TILESIZE*6),0,0));
+    
+    TwoLoadPathOff.addVertex( ofVec3f((TILES*TILESIZE*6),0,0));
+    TwoLoadPathOff.bezierTo( ofVec3f((TILES*TILESIZE*6),0,0), ofVec3f(0,0,0), ofVec3f(0,0,0));
+    
+    OneLoadPathOn = TwoLoadPathOn;
+    OneLoadPathOff = TwoLoadPathOff;
+    ThreeLoadPathOn = TwoLoadPathOn;
+    ThreeLoadPathOff =TwoLoadPathOff;
+    
+    for (int i = 0; i < TwoLoadPathOn.size() ; i++) {
+        OneLoadPathOn.getVertices().at(i) = TwoLoadPathOn.getVertices().at(i)+synthPos[0].getPosition();
+        OneLoadPathOff.getVertices().at(i) = TwoLoadPathOff.getVertices().at(i)+synthPos[0].getPosition();
+        ThreeLoadPathOn.getVertices().at(i) = TwoLoadPathOn.getVertices().at(i)+synthPos[2].getPosition();
+        ThreeLoadPathOff.getVertices().at(i) = TwoLoadPathOff.getVertices().at(i)+synthPos[2].getPosition();
+    }
 }
 
 //--------------------------------------------------------------
@@ -2415,16 +2409,16 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(45, string(""), ofVec3f(horizontalSlider.x*2, horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //empty
-    place = ofVec3f(0,-designGrid[0][0].y*1.45,0);
+    // load save button STATE_DEFAULT
+    place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0, -designGrid[0][0].y*6,0);
-    temp = GlobalGUI(46, string("north"), ofVec3f(designGrid[0][0].y*2.1,60,0), ofColor(23,23,23), place, offPlace,fontSmall,true,&tekoRegular);
+    temp = GlobalGUI(46, string("LOAD"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //empty
-    place = ofVec3f(designGrid[0][0].y*1.45,0,0);
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(47, string("east"), ofVec3f(60,designGrid[0][0].y*2.1,0), ofColor(23,23,23), place, offPlace,fontSmall,true,&tekoRegular);
+    // back to default, STATE_SAVE
+    place = ofVec3f(0,0,0);
+    offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
+    temp = GlobalGUI(47, string("back"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //empty
@@ -2978,6 +2972,10 @@ void ofApp::pauseInterfaceOn() {
     mainInterfaceData[42].moveDir = 1;
     mainInterfaceData[42].animation = true;
     
+    
+    mainInterfaceData[46].showString = true;
+    mainInterfaceData[46].moveDir = 1;
+    mainInterfaceData[46].animation = true;
 }
 
 
@@ -3003,6 +3001,9 @@ void ofApp::pauseInterfaceOff() {
     
     mainInterfaceData[42].moveDir = 0;
     mainInterfaceData[42].animation = true;
+    
+    mainInterfaceData[46].moveDir = 0;
+    mainInterfaceData[46].animation = true;
     
 }
 
@@ -3129,6 +3130,18 @@ void ofApp::harmonyInterfaceOff() {
     }
 }
 
+//--------------------------------------------------------------
+void ofApp::loadSaveInterfaceOn(){
+    mainInterfaceData[47].showString = true;
+    mainInterfaceData[47].animation = true;
+    mainInterfaceData[47].moveDir = 1;
+}
+//--------------------------------------------------------------
+
+void ofApp::loadSaveInterfaceOff(){
+    mainInterfaceData[47].animation = true;
+    mainInterfaceData[47].moveDir = 0;
+}
 
 /*
  void ofApp::bothEditInterfaceOff() {
@@ -3829,6 +3842,50 @@ void ofApp::bpmButtonPress() {
     }
 }
 
+//--------------------------------------------------------------
+
+void ofApp::loadSaveButtonPress(){
+    
+    if(currentState == STATE_DEFAULT) {
+        synths[synthButton[0]].aniPath = OneLoadPathOn;
+        synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
+        synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
+        synths[synthButton[0]].animate = true ;
+        synths[synthButton[1]].aniPath = TwoLoadPathOn;
+        synths[synthButton[1]].myDefault = synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].animate = true ;
+        synths[synthButton[2]].aniPath = ThreeLoadPathOn;
+        synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
+        synths[synthButton[2]].myTarget = synthPos[2].getOrientationQuat();
+        synths[synthButton[2]].animate = true ;
+        
+        pauseInterfaceOff();
+        loadSaveInterfaceOn();
+        aniPct = 0.0;
+        currentState = STATE_SAVE;
+        
+    } else if (currentState == STATE_SAVE) {
+        synths[synthButton[0]].aniPath = OneLoadPathOff;
+        synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
+        synths[synthButton[0]].myTarget = synthPos[0].getOrientationQuat();
+        synths[synthButton[0]].animate = true ;
+        synths[synthButton[1]].aniPath = TwoLoadPathOff;
+        synths[synthButton[1]].myDefault = synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].myTarget = synthPos[1].getOrientationQuat();
+        synths[synthButton[1]].animate = true ;
+        synths[synthButton[2]].aniPath = ThreeLoadPathOff;
+        synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
+        synths[synthButton[2]].myTarget = synthPos[2].getOrientationQuat();
+        synths[synthButton[2]].animate = true ;
+        
+        
+        pauseInterfaceOn();
+        loadSaveInterfaceOff();
+        aniPct = 0.0;
+        currentState = STATE_DEFAULT;
+    }
+}
 
 //--------------------------------------------------------------
 void ofApp::setNewGUI() {
@@ -4099,47 +4156,23 @@ void ofApp::exit(){
 }
 
 void ofApp::savePreset(){
-    string cYear = ofGetTimestampString("%y");
-    string cMonth = ofGetTimestampString("%m");
-    string cDay = ofGetTimestampString("%d");
+    saveManager.checkDate();
+    saveToXml("saves/"+saveManager.saveLastYear+saveManager.saveLastMonth+saveManager.saveLastDay+"#"+ofToString(saveManager.saveLastNumber)+".xml");
     
-    if( (cYear == saveLastYear) && (cMonth == saveLastMonth) && (cDay == saveLastDay)){
-        saveLastNumber ++;
-        saveToXml("saves/"+cYear+cMonth+cDay+"#"+ofToString(saveLastNumber)+".xml");
-    } else {
-        saveLastYear = cYear;
-        saveLastMonth = cMonth;
-        saveLastDay = cDay;
-        saveLastNumber = 1;
-        saveToXml("saves/"+cYear+cMonth+cDay+"#"+ofToString(saveLastNumber)+".xml");
-    }
-    
-    xmlSave tempXml;
-    tempXml.settings = settings;
-    tempXml.settings.pushTag("date");
-    
-    tempXml.year = tempXml.settings.getValue("year", "");
-    tempXml.month = tempXml.settings.getValue("month", "");
-    tempXml.day = tempXml.settings.getValue("day", "");
-    tempXml.number = tempXml.settings.getValue("number", 1);
-    
-    tempXml.settings.popTag();
-    string xmlKey = tempXml.year+tempXml.month+tempXml.day;
-    xmlSavesDay[xmlKey][tempXml.number] = tempXml;
-    
+   
+    saveManager.addNewSave(settings);
 }
 
 
 void ofApp::saveToXml(string path_){
-    
     settings.clear();
     //date
     settings.addTag("date");
     settings.pushTag("date");
-    settings.addValue("year",saveLastYear);
-    settings.addValue("month",saveLastMonth);
-    settings.addValue("day",saveLastDay);
-    settings.addValue("number", saveLastNumber);
+    settings.addValue("year",saveManager.saveLastYear);
+    settings.addValue("month",saveManager.saveLastMonth);
+    settings.addValue("day",saveManager.saveLastDay);
+    settings.addValue("number", saveManager.saveLastNumber);
     settings.popTag();
     
     //--------------------------------

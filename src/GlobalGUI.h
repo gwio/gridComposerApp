@@ -2,7 +2,7 @@
 
 #pragma once
 #include "ofMain.h"
-#include "ofxFontstash.h"
+#include "ofxFontStash.h"
 
 
 class GlobalGUI{

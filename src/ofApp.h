@@ -7,9 +7,10 @@
 #include "GlobalGUI.h"
 #include "MusterContainer.h"
 #include "GlobalScales.h"
+#include "SaveLoad.h"
 #include "HistoryView.h"
-#include "ofxFontStash.h"
-#include "ofxXmlSettings.h"
+//#include "ofxFontStash.h"
+//#include "ofxXmlSettings.h"
 
 #if TARGET_OS_IPHONE
 #include "ofxiOS.h"
@@ -20,11 +21,6 @@ using namespace Tonic;
 
 
 
-struct xmlSave{
-    ofxXmlSettings settings;
-    string year, month, day;
-    int number;
-};
 
 #if TARGET_OS_IPHONE
 class ofApp : public ofxiOSApp{
@@ -106,6 +102,9 @@ class ofApp : public ofxiOSApp{
         void harmonyInterfaceOn();
         void harmonyInterfaceOff();
         
+        void loadSaveInterfaceOn();
+        void loadSaveInterfaceOff();
+        
         //void bothEditInterfaceOff();
         
         void setNewGUI();
@@ -129,6 +128,7 @@ class ofApp : public ofxiOSApp{
         void buttonEditDetail();
         void bpmButtonPress();
         void harmonyButtonPress();
+        void loadSaveButtonPress();
         
         void loadFromXml(string);
         void saveToXml(string);
@@ -136,7 +136,7 @@ class ofApp : public ofxiOSApp{
         
         //xml
         ofxXmlSettings settings;
-        map<string, map<int,xmlSave>> xmlSavesDay;
+        
         //tonic
         void setupAudio();
         void pulseEvent(int);
@@ -206,6 +206,8 @@ class ofApp : public ofxiOSApp{
         ofPolyline OneHarmonyPathOff, TwoHarmonyPathOff, ThreeHarmonyPathOff;
         ofPolyline OneTimePathOn, TwoTimePathOn, ThreeTimePathOn;
         ofPolyline OneTimePathOff, TwoTimePathOff, ThreeTimePathOff;
+        ofPolyline OneLoadPathOn, TwoLoadPathOn, ThreeLoadPathOn;
+        ofPolyline OneLoadPathOff, TwoLoadPathOff, ThreeLoadPathOff;
         
         ofPolyline camEditToDetail, camDetailToEdit;
         
@@ -298,8 +300,8 @@ class ofApp : public ofxiOSApp{
         ofVboMesh bpmFx;
         void updateBpmMenuMesh();
         
-        //save load
-        ofDirectory saveDir;
-        string saveLastYear, saveLastMonth, saveLastDay;
-        int saveLastNumber;
+        
+        SaveLoad saveManager;
+        ofxXmlSettings setings;
+
     };
