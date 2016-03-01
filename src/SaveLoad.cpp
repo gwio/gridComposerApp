@@ -1,4 +1,3 @@
-
 #include "SaveLoad.h"
 
 SaveLoad::SaveLoad(){
@@ -9,10 +8,15 @@ SaveLoad::SaveLoad(){
     velo = 0;
 }
 
-void SaveLoad::loadSaveFolder(){
+void SaveLoad::loadSaveFolder(string iosFolder_){
     
 #if TARGET_OS_IPHONE
-    //ios doc dir
+    saveDir.open(iosFolder_+"saves/");
+    if (!saveDir.exists()) {
+        saveDir.create();
+    }
+    saveDir.allowExt("xml");
+    saveDir.listDir();
 #else
     saveDir.open("saves/");
     if (!saveDir.exists()) {
@@ -137,9 +141,15 @@ void SaveLoad::update(){
     
     //cout << acc << endl;
 
-    velo+=ofClamp( pow((acc*0.25),1),-35,35);
-    acc = 0.0;
+    velo+=ofClamp( pow((acc*0.5),1),-55,55);
+   // acc = 0.0;
+    if(!touchDown){
     scrollLocation = ofClamp(scrollLocation+velo,-offsetDown.y+(designGrid.y*5),0);
+    }else {
+    scrollLocation = ofClamp(scrollLocation+acc,-offsetDown.y+(designGrid.y*5),0);
+    }
+    acc = 0.0;
+
     velo *= 0.751;
     
     

@@ -5,6 +5,7 @@
 
 
 
+
 struct saveSlot{
     ofVec3f pos;
     ofVec3f size;
@@ -29,7 +30,7 @@ class SaveLoad{
 public:
     
     SaveLoad();
-    void loadSaveFolder();
+    void loadSaveFolder(string);
     void checkDate();
     void setup(ofVec3f, ofxFontStash *, ofVec3f*);
     void update();

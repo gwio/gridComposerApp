@@ -281,7 +281,11 @@ void ofApp::setup(){
     
     //use interface element string pos 48 for animation
     saveManager.setup(designGrid[0][0], &tekoRegular, &mainInterfaceData[48].drawStringPos);
-    saveManager.loadSaveFolder();
+#if TARGET_OS_IPHONE
+    saveManager.loadSaveFolder(ofxiOSGetDocumentsDirectory());
+#else
+    saveManager.loadSaveFolder(";-)");
+#endif
     
     //setup stateBpm Fx Mesh
     bpmFx.setMode(OF_PRIMITIVE_LINES);
@@ -1708,7 +1712,7 @@ void ofApp::lostFocus(){
     volumeRestartTarget = mainVol;
     volumeRestart = 0.0;
     tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
-    saveToXml();
+    saveToXml("settings.xml");
     //volumeRampValueChanged(mainVol);
     
     //    mainVol = 0.0;
