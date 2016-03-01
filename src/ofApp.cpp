@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.065
 #define BPM (220*4)
-#define ANI_SPEED 0.030
+#define ANI_SPEED 0.010
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.780
@@ -278,8 +278,9 @@ void ofApp::setup(){
         directionClickZonesC[i].close();
         
     }
-
-    saveManager.setup(designGrid[0][0], &tekoRegular);
+    
+    //use interface element string pos 48 for animation
+    saveManager.setup(designGrid[0][0], &tekoRegular, &mainInterfaceData[48].drawStringPos);
     saveManager.loadSaveFolder();
     
     //setup stateBpm Fx Mesh
@@ -591,6 +592,7 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[46].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
     mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
+    mainInterfaceData[48].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
 
     
 }
@@ -687,12 +689,13 @@ void ofApp::drawInterface(){
     //bpm fx
     if (currentState == STATE_BPM) {
         //glLineWidth(	2);
-        
         bpmFx.draw();
     }
     
-    //saveload test
-    if (currentState == STATE_SAVE) {
+  
+    
+    //save menu
+    if ( (currentState == STATE_SAVE) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         saveManager.draw();
     }
     
@@ -950,7 +953,7 @@ void ofApp::replaceMouseDragged(int x, int y){
             
         }
         
-        if (currentState == STATE_VOLUME) {
+       else if (currentState == STATE_VOLUME) {
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
@@ -986,9 +989,21 @@ void ofApp::replaceMouseDragged(int x, int y){
             
         }
         
+       else if (currentState == STATE_SAVE) {
+           if (!saveManager.touchDown){
+               saveManager.touchDown = true;
+               saveManager.touchPos = y;
+               saveManager.oldTouchPos = y;
+           } else if(saveManager.touchDown){
+               //scrollOffset.x == temp for y
+               //saveManager.scrollOffset.y = ofClamp(y-saveManager.touchStart.y+saveManager.scrollOffset.x, -saveManager.offsetDown.y+designGrid[0][0].y*5,0);
+               saveManager.oldTouchPos = saveManager.touchPos;
+               saveManager.touchPos = y;
+               saveManager.acc = saveManager.touchPos-saveManager.oldTouchPos;
+           }
+       }
         
-        
-        if (currentState == STATE_EDIT_DETAIL) {
+       else if (currentState == STATE_EDIT_DETAIL) {
             
             
             if(mainInterfaceData[49].isInside(ofVec2f(x,y))) {
@@ -997,36 +1012,6 @@ void ofApp::replaceMouseDragged(int x, int y){
                 int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
                 synths[activeSynth].setKeyNote(keyMod-synths[activeSynth].keyNote);
                 setNewGUI();
-                //cout << keyMod - synths[activeSynth].keyNote<< endl;
-                /*
-                 if (!mainInterfaceData[49].touchDown){
-                 mainInterfaceData[49].touchStart = ofVec2f(x,y);
-                 mainInterfaceData[49].touchDown = true;
-                 }
-                 
-                 if (mainInterfaceData[49].touchDown) {
-                 
-                 int keyMod = (mainInterfaceData[49].touchStart.x - x)/54;
-                 mainInterfaceData[49].tempInt = keyMod;
-                 
-                 if ( abs(keyMod) > 0){
-                 // if ( keyMod > 0 || synths[activeSynth].keyNote > 0) {
-                 mainInterfaceData[49].touchStart.x = x;
-                 synths[activeSynth].setKeyNote(ofClamp(keyMod,-1,1));
-                 setNewGUI();
-                 //cout <<  "midinote " << synths[activeSynth].keyNote << endl;
-                 // } else {
-                 
-                 // cout << "not under 0 " << endl;
-                 
-                 //}
-                 }
-                 
-                 // cout <<     mainInterfaceData[49].touchStart.x << endl;
-                 
-                 
-                 }
-                 */
             }
             
             if(mainInterfaceData[40].isInside(ofVec2f(x,y))) {
@@ -1046,17 +1031,10 @@ void ofApp::replaceMouseDragged(int x, int y){
                         mainInterfaceData[40].touchStart.x = x;
                         synths[activeSynth].setKeyNote(ofClamp(keyMod,-1,1));
                         setNewGUI();
-                        //cout <<  "midinote " << synths[activeSynth].keyNote << endl;
-                        // } else {
-                        
-                        // cout << "not under 0 " << endl;
-                        
-                        //}
+                        mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
+
                     }
-                    
-                    // cout <<     mainInterfaceData[49].touchStart.x << endl;
-                    
-                    
+
                 }
                 
                 
@@ -1313,11 +1291,13 @@ void ofApp::replaceMousePressed(int x, int y) {
                 synths[activeSynth].setKeyNote(-1);
                 setNewGUI();
                 mainInterfaceData[4].blinkOn();
+                mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
             }
             if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(1);
                 setNewGUI();
                 mainInterfaceData[6].blinkOn();
+                mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
             }
             
             for (int i = 1; i < 12; i++) {
@@ -1699,9 +1679,14 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 void ofApp::replaceMouseReleased(int x,int y) {
     
-    
+    if (currentState == STATE_EDIT_DETAIL) {
     if (mainInterfaceData[40].touchDown){
-        mainInterfaceData[40].touchDown = !mainInterfaceData[40].touchDown;
+        mainInterfaceData[40].touchDown = false;
+    }
+    } else if (currentState == STATE_SAVE){
+        if(saveManager.touchDown) {
+            saveManager.touchDown = false;
+        }
     }
     
 }
@@ -2423,10 +2408,10 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(47, string("back"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //empty
-    place = ofVec3f(0,designGrid[0][0].y*1.45,0);
-    offPlace = ofVec3f(0 ,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(48, string("south"), ofVec3f(designGrid[0][0].y*2.1,60,0), ofColor(23,23,23), place, offPlace,fontSmall,true,&tekoRegular);
+    // animation data for load save grid, STATE_SAVE
+    place = ofVec3f(-designGrid[0][0].x,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].x*6 ,0,0);
+    temp = GlobalGUI(48, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //keynote slider, STATE_EDIT_DETAIL
@@ -3137,12 +3122,19 @@ void ofApp::loadSaveInterfaceOn(){
     mainInterfaceData[47].showString = true;
     mainInterfaceData[47].animation = true;
     mainInterfaceData[47].moveDir = 1;
+    
+    mainInterfaceData[48].showString = false;
+    mainInterfaceData[48].animation = true;
+    mainInterfaceData[48].moveDir = 1;
 }
 //--------------------------------------------------------------
 
 void ofApp::loadSaveInterfaceOff(){
     mainInterfaceData[47].animation = true;
     mainInterfaceData[47].moveDir = 0;
+    
+    mainInterfaceData[48].animation = true;
+    mainInterfaceData[48].moveDir = 0;
 }
 
 /*

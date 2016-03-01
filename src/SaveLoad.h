@@ -31,7 +31,7 @@ public:
     SaveLoad();
     void loadSaveFolder();
     void checkDate();
-    void setup(ofVec3f, ofxFontStash *);
+    void setup(ofVec3f, ofxFontStash *, ofVec3f*);
     void update();
     void draw();
     void addNewSave(ofxXmlSettings&);
@@ -39,7 +39,10 @@ public:
     
     ofxFontStash *fsPtr;
     ofVec3f slotSize;
-
+    ofVec3f *aniVecPtr;
+    ofVec3f offsetDown;
+    float touchPos, oldTouchPos, acc ,scrollLocation, velo;
+    
     map<string, map<int,xmlSave>>::reverse_iterator outerIt;
     map<int,xmlSave>::iterator innerIt;
     
@@ -48,5 +51,8 @@ public:
     string saveLastYear, saveLastMonth, saveLastDay;
     int saveLastNumber;
     ofVec3f designGrid;
+    
+    bool touchDown;
+    ofVec2f touchStart;
     
 };

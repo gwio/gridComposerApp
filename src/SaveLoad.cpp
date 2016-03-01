@@ -2,7 +2,11 @@
 #include "SaveLoad.h"
 
 SaveLoad::SaveLoad(){
-    
+    touchPos = 0.0;
+    oldTouchPos = 0.0;
+    acc = 0.0;
+    scrollLocation = 0;
+    velo = 0;
 }
 
 void SaveLoad::loadSaveFolder(){
@@ -103,7 +107,7 @@ void SaveLoad::updatePosition(){
     
     int counterOut = 0;
     int counterIn = 0;
-    ofVec3f offsetDown = ofVec3f(0,0,0);
+    offsetDown = ofVec3f(0,0,0);
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         
         counterIn = 0;
@@ -121,30 +125,43 @@ void SaveLoad::updatePosition(){
         counterOut++;
     }
 }
-void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_){
+void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
    
     designGrid = dGrid_;
     fsPtr = fsPtr_;
     slotSize = ofVec3f(designGrid.x*4/3, designGrid.y,0);
+    aniVecPtr = aniPtr_;
 }
 
 void SaveLoad::update(){
+    
+    //cout << acc << endl;
+
+    velo+=ofClamp( pow((acc*0.25),1),-35,35);
+    acc = 0.0;
+    scrollLocation = ofClamp(scrollLocation+velo,-offsetDown.y+(designGrid.y*5),0);
+    velo *= 0.751;
+    
     
 }
 
 void SaveLoad::draw(){
     ofPushStyle();
+    ofPushMatrix();
     ofSetColor(255, 255, 255);
+    ofTranslate(aniVecPtr->x,scrollLocation,0);
+
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         fsPtr->draw(outerIt->first, 40, 0,outerIt->second.rbegin()->second.slotInfo.pos.y);
 
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             ofNoFill();
-
             ofDrawRectangle(innerIt->second.slotInfo.testRect);
+            ofDrawEllipse(innerIt->second.slotInfo.pos,10,10);
             ofFill();
             fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.pos.x,innerIt->second.slotInfo.pos.y+42);
         }
     }
     ofPopStyle();
+    ofPopMatrix();
 }
