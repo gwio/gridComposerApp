@@ -70,12 +70,12 @@ void ofApp::setup(){
     rajLight.setKerning(rajLight.getKerning());
 #endif
     
-    saveManager.loadSaveFolder();
     
     scaleCollection.loadScales();
     globalScaleVecPos = 0;
     
     makeDesignGrid();
+    
     currentState = STATE_DEFAULT;
     appVersion = VERSION;
     
@@ -278,7 +278,9 @@ void ofApp::setup(){
         directionClickZonesC[i].close();
         
     }
-    
+
+    saveManager.setup(designGrid[0][0], &tekoRegular);
+    saveManager.loadSaveFolder();
     
     //setup stateBpm Fx Mesh
     bpmFx.setMode(OF_PRIMITIVE_LINES);

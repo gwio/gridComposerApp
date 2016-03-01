@@ -66,7 +66,12 @@ void SaveLoad::checkDate(){
     
     if( (cYear == saveLastYear) && (cMonth == saveLastMonth) && (cDay == saveLastDay)){
         saveLastNumber ++;
-    } else {
+    } else if(xmlSavesMap.find(cYear+cMonth+cDay) != xmlSavesMap.end() ) {
+        saveLastYear = xmlSavesMap[cYear+cMonth+cDay].rbegin()->second.year;
+        saveLastMonth = xmlSavesMap[cYear+cMonth+cDay].rbegin()->second.month;
+        saveLastDay = xmlSavesMap[cYear+cMonth+cDay].rbegin()->second.day;
+        saveLastNumber = xmlSavesMap[cYear+cMonth+cDay].rbegin()->second.number + 1;
+    }else {
         saveLastYear = cYear;
         saveLastMonth = cMonth;
         saveLastDay = cDay;
@@ -98,24 +103,29 @@ void SaveLoad::updatePosition(){
     
     int counterOut = 0;
     int counterIn = 0;
-    
+    ofVec3f offsetDown = ofVec3f(0,0,0);
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         
         counterIn = 0;
-        for (innerIt = outerIt->second.rbegin(); innerIt != outerIt->second.rend(); ++innerIt) {
+         offsetDown.y += (((outerIt->second.size()/3))* slotSize.y) + (designGrid.y/3);
+        cout << counterOut << offsetDown.y << endl;
+        for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             saveSlot &slot = innerIt->second.slotInfo;
             slot.name = outerIt->first+" #"+ofToString(innerIt->first);
             slot.size = slotSize;
-            slot.pos = ofVec3f(counterIn*20,counterOut*100,0);
+            slot.pos = ofVec3f((counterIn%3)*slotSize.x,-(counterIn/3)*slotSize.y,0)+offsetDown;
+            slot.testRect.set(slot.pos, slotSize.x, slotSize.y);
+            slot.name ="SKETCH #"+ofToString(innerIt->second.number);
             counterIn++;
         }
         counterOut++;
     }
 }
-void SaveLoad::setup(map<string, map<int,xmlSave>>* slPtr_,map<string, map<int,xmlSave>>::reverse_iterator* out_,map<int,xmlSave>::reverse_iterator* in_, ofxFontStash* fsPtr_){
+void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_){
    
-    slotSize = ofVec3f(10,10,0);
-   
+    designGrid = dGrid_;
+    fsPtr = fsPtr_;
+    slotSize = ofVec3f(designGrid.x*4/3, designGrid.y,0);
 }
 
 void SaveLoad::update(){
@@ -123,11 +133,18 @@ void SaveLoad::update(){
 }
 
 void SaveLoad::draw(){
-    
+    ofPushStyle();
+    ofSetColor(255, 255, 255);
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
-        
-        for (innerIt = outerIt->second.rbegin(); innerIt != outerIt->second.rend(); ++innerIt) {
-            ofDrawEllipse(innerIt->second.slotInfo.pos.x, innerIt->second.slotInfo.pos.y, 10, 10);
-                    }
+        fsPtr->draw(outerIt->first, 40, 0,outerIt->second.rbegin()->second.slotInfo.pos.y);
+
+        for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
+            ofNoFill();
+
+            ofDrawRectangle(innerIt->second.slotInfo.testRect);
+            ofFill();
+            fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.pos.x,innerIt->second.slotInfo.pos.y+42);
+        }
     }
+    ofPopStyle();
 }

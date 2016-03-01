@@ -31,7 +31,7 @@ public:
     SaveLoad();
     void loadSaveFolder();
     void checkDate();
-    void setup(map<string, map<int,xmlSave>>*, map<string, map<int,xmlSave>>::reverse_iterator*,map<int,xmlSave>::reverse_iterator*,ofxFontStash *);
+    void setup(ofVec3f, ofxFontStash *);
     void update();
     void draw();
     void addNewSave(ofxXmlSettings&);
@@ -41,11 +41,12 @@ public:
     ofVec3f slotSize;
 
     map<string, map<int,xmlSave>>::reverse_iterator outerIt;
-    map<int,xmlSave>::reverse_iterator innerIt;
+    map<int,xmlSave>::iterator innerIt;
     
     ofDirectory saveDir;
     map<string, map<int,xmlSave>> xmlSavesMap;
     string saveLastYear, saveLastMonth, saveLastDay;
     int saveLastNumber;
+    ofVec3f designGrid;
     
 };
