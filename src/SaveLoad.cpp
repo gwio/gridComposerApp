@@ -15,8 +15,12 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     if (!saveDir.exists()) {
         saveDir.create();
     }
+
     saveDir.allowExt("xml");
     saveDir.listDir();
+    
+    cout <<"dir:" <<saveDir.exists() << endl;
+    cout << "dir files size " << saveDir.size() << endl;
 #else
     saveDir.open("saves/");
     if (!saveDir.exists()) {
@@ -24,12 +28,17 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     }
     saveDir.allowExt("xml");
     saveDir.listDir();
+    cout << "dir files size " << saveDir.size() << endl;
 #endif
-    cout << saveDir.getFiles().size() << endl;
     
+    xmlSavesMap.clear();
     xmlSave tempXml;
     for (int i = 0; i < saveDir.getFiles().size(); i++) {
+#if TARGET_OS_IPHONE
+        tempXml.settings.loadFile(iosFolder_+"saves/"+saveDir.getFiles().at(i).getFileName());
+#else
         tempXml.settings.loadFile("saves/"+saveDir.getFiles().at(i).getFileName());
+#endif
         tempXml.settings.pushTag("date");
         
         tempXml.year = tempXml.settings.getValue("year", "");
@@ -61,7 +70,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         saveLastNumber = 0;
     }
     cout << saveLastNumber << endl;
-    
+    cout << " xmlmap size" << xmlSavesMap.size() << endl;
     updatePosition();
 }
 
@@ -128,6 +137,10 @@ void SaveLoad::updatePosition(){
         }
         counterOut++;
     }
+    
+    saveDir.listDir();
+    cout << "new sizue" << saveDir.size() << endl;
+
 }
 void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
    
@@ -140,7 +153,7 @@ void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
 void SaveLoad::update(){
     
     //cout << acc << endl;
-
+//bug with small amaount of save.... ofClamp +-?!
     velo+=ofClamp( pow((acc*0.5),1),-55,55);
    // acc = 0.0;
     if(!touchDown){
@@ -152,8 +165,9 @@ void SaveLoad::update(){
 
     velo *= 0.751;
     
+    cout<< "scroll" << scrollLocation << endl;
     
-}
+   }
 
 void SaveLoad::draw(){
     ofPushStyle();

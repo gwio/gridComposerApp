@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.065
 #define BPM (220*4)
-#define ANI_SPEED 0.010
+#define ANI_SPEED 0.030
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.780
@@ -4155,8 +4155,9 @@ void ofApp::exit(){
 
 void ofApp::savePreset(){
     saveManager.checkDate();
-    saveToXml("saves/"+saveManager.saveLastYear+saveManager.saveLastMonth+saveManager.saveLastDay+"#"+ofToString(saveManager.saveLastNumber)+".xml");
     
+
+    saveToXml("saves/"+saveManager.saveLastYear+saveManager.saveLastMonth+saveManager.saveLastDay+"#"+ofToString(saveManager.saveLastNumber)+".xml");
    
     saveManager.addNewSave(settings);
 }
