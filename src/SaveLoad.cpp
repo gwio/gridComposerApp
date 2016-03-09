@@ -15,7 +15,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     if (!saveDir.exists()) {
         saveDir.create();
     }
-
+    
     saveDir.allowExt("xml");
     saveDir.listDir();
     
@@ -124,7 +124,7 @@ void SaveLoad::updatePosition(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         
         counterIn = 0;
-         offsetDown.y += (((outerIt->second.size()/3))* slotSize.y) + (designGrid.y/3);
+        offsetDown.y += floor((((outerIt->second.size()/3)))* slotSize.y) + (designGrid.y/3);
         cout << counterOut << offsetDown.y << endl;
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             saveSlot &slot = innerIt->second.slotInfo;
@@ -140,10 +140,10 @@ void SaveLoad::updatePosition(){
     
     saveDir.listDir();
     cout << "new sizue" << saveDir.size() << endl;
-
+    
 }
 void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
-   
+    
     designGrid = dGrid_;
     fsPtr = fsPtr_;
     slotSize = ofVec3f(designGrid.x*4/3, designGrid.y,0);
@@ -152,32 +152,34 @@ void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
 
 void SaveLoad::update(){
     
-    //cout << acc << endl;
-//bug with small amaount of save.... ofClamp +-?!
     velo+=ofClamp( pow((acc*0.5),1),-55,55);
-   // acc = 0.0;
-    if(!touchDown){
-    scrollLocation = ofClamp(scrollLocation+velo,-offsetDown.y+(designGrid.y*5),0);
-    }else {
-    scrollLocation = ofClamp(scrollLocation+acc,-offsetDown.y+(designGrid.y*5),0);
+    
+    if (-offsetDown.y+(designGrid.y*5) < 0 ){
+        if(!touchDown){
+            scrollLocation = ofClamp(scrollLocation+velo, -offsetDown.y+(designGrid.y*5) ,0);
+        }else {
+            scrollLocation = ofClamp(scrollLocation+acc,-offsetDown.y+(designGrid.y*5),0);
+        }
     }
     acc = 0.0;
-
+    
+    if ( abs(velo) > 0.0001){
     velo *= 0.751;
+    } else {
+        velo = 0.0;
+    }
     
-    cout<< "scroll" << scrollLocation << endl;
-    
-   }
+}
 
 void SaveLoad::draw(){
     ofPushStyle();
     ofPushMatrix();
     ofSetColor(255, 255, 255);
     ofTranslate(aniVecPtr->x,scrollLocation,0);
-
+    
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         fsPtr->draw(outerIt->first, 40, 0,outerIt->second.rbegin()->second.slotInfo.pos.y);
-
+        
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             ofNoFill();
             ofDrawRectangle(innerIt->second.slotInfo.testRect);
