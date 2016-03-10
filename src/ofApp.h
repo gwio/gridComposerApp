@@ -106,6 +106,8 @@ class ofApp : public ofxiOSApp{
         void loadSaveInterfaceOn();
         void loadSaveInterfaceOff();
         
+        void openSlotInterface();
+        void closeSlotInterface();
         //void bothEditInterfaceOff();
         
         void setNewGUI();

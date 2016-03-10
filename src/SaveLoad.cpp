@@ -6,6 +6,8 @@ SaveLoad::SaveLoad(){
     acc = 0.0;
     scrollLocation = 0;
     velo = 0;
+    animate = false;
+    moveDir = 0;
 }
 
 void SaveLoad::loadSaveFolder(string iosFolder_){
@@ -164,7 +166,7 @@ void SaveLoad::update(){
     acc = 0.0;
     
     if ( abs(velo) > 0.0001){
-    velo *= 0.751;
+        velo *= 0.751;
     } else {
         velo = 0.0;
     }
@@ -181,13 +183,13 @@ void SaveLoad::draw(){
         fsPtr->draw(outerIt->first, 40, 0,outerIt->second.rbegin()->second.slotInfo.pos.y);
         
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
-            ofNoFill();
-            ofDrawRectangle(innerIt->second.slotInfo.testRect);
-            ofDrawEllipse(innerIt->second.slotInfo.pos,10,10);
-            ofFill();
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
             if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*6) {
-            fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.pos.x,innerIt->second.slotInfo.pos.y+42);
+                ofNoFill();
+                ofDrawRectangle(innerIt->second.slotInfo.testRect);
+                ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
+                ofFill();
+                fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+42);
             }
         }
     }
@@ -201,13 +203,57 @@ void SaveLoad::isInside(ofVec3f pos_) {
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             if(innerIt->second.slotInfo.testRect.inside(pos_+ofVec3f(0,-scrollLocation,0))){
                 cout << innerIt->second.slotInfo.name << endl;
-
+                innerIt->second.slotInfo.active = true;
+                animate = true;
                 breaking = true;
                 break;
             }
         }
         if(breaking){
             break;
+        }
+    }
+    if(breaking){
+        bool breaking = false;
+        for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
+            for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
+                saveSlot& slot = innerIt->second.slotInfo;
+                if (!slot.active){
+                    slot.offPos = getOffPos(pos_, slot.pos);
+                } else {
+                    slot.offPos = ofVec3f(designGrid.x*2,designGrid.y*2,0) - (slot.pos+ofVec3f(0,scrollLocation,0));
+                }
+            }
+        }
+    }
+}
+
+ofVec3f SaveLoad::getOffPos(ofVec3f& clicktarget_, ofVec3f& pos_) {
+    ofVec3f temp;
+    /*
+     if(clicktarget_.x > pos_.x){
+     temp.x = -(designGrid.x*10);
+     } else {
+     temp.x = +(designGrid.x*10);
+     }
+     */
+    
+    if(clicktarget_.y-scrollLocation > pos_.y){
+        temp.y = -(designGrid.y*10);
+    } else {
+        temp.y = +(designGrid.y*10);
+    }
+    
+    return temp;
+}
+
+void SaveLoad::animateGrid(float& tween_){
+    if(animate){
+        for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
+            for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
+                saveSlot& slot = innerIt->second.slotInfo;
+                slot.testRect.setPosition(slot.pos+(slot.offPos*abs(moveDir-tween_)) );
+            }
         }
     }
 }

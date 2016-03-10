@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.065
 #define BPM (220*4)
-#define ANI_SPEED 0.030
+#define ANI_SPEED 0.010
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.780
@@ -597,8 +597,8 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[46].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
     mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
     mainInterfaceData[48].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
-
     
+    saveManager.animateGrid(tweenFloat);
 }
 
 //--------------------------------------------------------------
@@ -696,7 +696,7 @@ void ofApp::drawInterface(){
         bpmFx.draw();
     }
     
-  
+    
     
     //save menu
     if ( (currentState == STATE_SAVE) || (interfaceMoving && currentState == STATE_DEFAULT) ){
@@ -957,7 +957,7 @@ void ofApp::replaceMouseDragged(int x, int y){
             
         }
         
-       else if (currentState == STATE_VOLUME) {
+        else if (currentState == STATE_VOLUME) {
             
             if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
@@ -993,21 +993,23 @@ void ofApp::replaceMouseDragged(int x, int y){
             
         }
         
-       else if (currentState == STATE_SAVE) {
-           if (!saveManager.touchDown){
-               saveManager.touchDown = true;
-               saveManager.touchPos = y;
-               saveManager.oldTouchPos = y;
-           } else if(saveManager.touchDown){
-               //scrollOffset.x == temp for y
-               //saveManager.scrollOffset.y = ofClamp(y-saveManager.touchStart.y+saveManager.scrollOffset.x, -saveManager.offsetDown.y+designGrid[0][0].y*5,0);
-               saveManager.oldTouchPos = saveManager.touchPos;
-               saveManager.touchPos = y;
-               saveManager.acc = saveManager.touchPos-saveManager.oldTouchPos;
-           }
-       }
+        else if (currentState == STATE_SAVE) {
+            if(!saveManager.animate){
+            if (!saveManager.touchDown){
+                saveManager.touchDown = true;
+                saveManager.touchPos = y;
+                saveManager.oldTouchPos = y;
+            } else if(saveManager.touchDown){
+                //scrollOffset.x == temp for y
+                //saveManager.scrollOffset.y = ofClamp(y-saveManager.touchStart.y+saveManager.scrollOffset.x, -saveManager.offsetDown.y+designGrid[0][0].y*5,0);
+                saveManager.oldTouchPos = saveManager.touchPos;
+                saveManager.touchPos = y;
+                saveManager.acc = saveManager.touchPos-saveManager.oldTouchPos;
+            }
+            }
+        }
         
-       else if (currentState == STATE_EDIT_DETAIL) {
+        else if (currentState == STATE_EDIT_DETAIL) {
             
             
             if(mainInterfaceData[49].isInside(ofVec2f(x,y))) {
@@ -1036,9 +1038,9 @@ void ofApp::replaceMouseDragged(int x, int y){
                         synths[activeSynth].setKeyNote(ofClamp(keyMod,-1,1));
                         setNewGUI();
                         mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
-
+                        
                     }
-
+                    
                 }
                 
                 
@@ -1070,8 +1072,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 void ofApp::replaceMousePressed(int x, int y) {
     
-    lastClick.x = x;
-    lastClick.y = y;
+    
     
     if (!interfaceMoving) {
         if (currentState == STATE_EDIT) {
@@ -1320,7 +1321,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[activeSynth].userScale = true;
                     
                     markScaleSteps(63);
-                   // cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
+                    // cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
             
@@ -1331,7 +1332,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
                 synths[activeSynth].setKeyNote(keyMod-synths[activeSynth].keyNote);
                 setNewGUI();
-               // cout << keyMod - synths[activeSynth].keyNote<< endl;
+                // cout << keyMod - synths[activeSynth].keyNote<< endl;
             }
             
             //toogle grid preset container
@@ -1628,7 +1629,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[activeSynth].userScale = false;
                     synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                     synths[activeSynth].setKeyNote( (globalKey%12) - (synths[activeSynth].keyNote%12));
-                   // cout << notes[ synths[activeSynth].keyNote%12 ] << endl;
+                    // cout << notes[ synths[activeSynth].keyNote%12 ] << endl;
                     setNewGUI();
                 } else {
                     mainInterfaceData[111].elementName = "LOCAL HARMONY";
@@ -1659,6 +1660,10 @@ void ofApp::replaceMousePressed(int x, int y) {
             
         }
         else if (currentState == STATE_SAVE){
+            
+            lastClick.x = x;
+            lastClick.y = y;
+            
             if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
                 loadSaveButtonPress();
                 mainInterfaceData[47].blinkOn();
@@ -1696,7 +1701,12 @@ void ofApp::replaceMouseReleased(int x,int y) {
         }
         
         if (lastClick.x == x && lastClick.y == y){
-            saveManager.isInside(ofVec3f(x,y,0));
+            if(!saveManager.animate){
+                saveManager.isInside(ofVec3f(x,y,0));
+                if(saveManager.animate){
+                    openSlotInterface();
+                }
+            }
         }
     }
     
@@ -3199,6 +3209,17 @@ void ofApp::loadSaveInterfaceOff(){
  
  */
 
+//--------------------------------------------------------------
+
+void ofApp::openSlotInterface(){
+    aniPct = 0.0;
+    interfaceMoving = true;
+}
+
+//--------------------------------------------------------------
+void ofApp::closeSlotInterface(){
+    
+}
 
 //--------------------------------------------------------------
 void ofApp::makePresetString() {
@@ -4163,9 +4184,9 @@ void ofApp::exit(){
 void ofApp::savePreset(){
     saveManager.checkDate();
     
-
+    
     saveToXml("saves/"+saveManager.saveLastYear+saveManager.saveLastMonth+saveManager.saveLastDay+"#"+ofToString(saveManager.saveLastNumber)+".xml");
-   
+    
     saveManager.addNewSave(settings);
 }
 

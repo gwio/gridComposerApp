@@ -7,10 +7,16 @@
 
 
 struct saveSlot{
-    ofVec3f pos;
+    ofVec3f pos, offPos;
     ofVec3f size;
     ofRectangle testRect;
     string name;
+    bool active;
+    saveSlot(){
+        active = false;
+        offPos = ofVec3f(0,0,0);
+        name = "";
+    }
 };
 
 
@@ -39,6 +45,7 @@ public:
     void updatePosition();
     
     void isInside(ofVec3f);
+    void animateGrid(float&);
     
     ofxFontStash *fsPtr;
     ofVec3f slotSize;
@@ -56,6 +63,8 @@ public:
     ofVec3f designGrid;
     
     bool touchDown;
+    bool animate;
     ofVec2f touchStart;
-    
+    ofVec3f getOffPos(ofVec3f&, ofVec3f&);
+    int moveDir;
 };
