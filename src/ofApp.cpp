@@ -1070,6 +1070,9 @@ void ofApp::mousePressed(int x, int y, int button){
 
 void ofApp::replaceMousePressed(int x, int y) {
     
+    lastClick.x = x;
+    lastClick.y = y;
+    
     if (!interfaceMoving) {
         if (currentState == STATE_EDIT) {
             intersectPlane(x, y);
@@ -1684,12 +1687,16 @@ void ofApp::mouseReleased(int x, int y, int button){
 void ofApp::replaceMouseReleased(int x,int y) {
     
     if (currentState == STATE_EDIT_DETAIL) {
-    if (mainInterfaceData[40].touchDown){
-        mainInterfaceData[40].touchDown = false;
-    }
+        if (mainInterfaceData[40].touchDown){
+            mainInterfaceData[40].touchDown = false;
+        }
     } else if (currentState == STATE_SAVE){
         if(saveManager.touchDown) {
             saveManager.touchDown = false;
+        }
+        
+        if (lastClick.x == x && lastClick.y == y){
+            saveManager.isInside(ofVec3f(x,y,0));
         }
     }
     

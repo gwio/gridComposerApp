@@ -304,5 +304,7 @@ class ofApp : public ofxiOSApp{
         
         SaveLoad saveManager;
         ofxXmlSettings setings;
+        
+        ofVec3f lastClick;
 
     };

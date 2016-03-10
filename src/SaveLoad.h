@@ -38,6 +38,8 @@ public:
     void addNewSave(ofxXmlSettings&);
     void updatePosition();
     
+    void isInside(ofVec3f);
+    
     ofxFontStash *fsPtr;
     ofVec3f slotSize;
     ofVec3f *aniVecPtr;

@@ -156,7 +156,7 @@ void SaveLoad::update(){
     
     if (-offsetDown.y+(designGrid.y*5) < 0 ){
         if(!touchDown){
-            scrollLocation = ofClamp(scrollLocation+velo, -offsetDown.y+(designGrid.y*5) ,0);
+            scrollLocation = ofClamp(scrollLocation+velo,-offsetDown.y+(designGrid.y*5) ,0);
         }else {
             scrollLocation = ofClamp(scrollLocation+acc,-offsetDown.y+(designGrid.y*5),0);
         }
@@ -185,9 +185,29 @@ void SaveLoad::draw(){
             ofDrawRectangle(innerIt->second.slotInfo.testRect);
             ofDrawEllipse(innerIt->second.slotInfo.pos,10,10);
             ofFill();
+            float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
+            if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*6) {
             fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.pos.x,innerIt->second.slotInfo.pos.y+42);
+            }
         }
     }
     ofPopStyle();
     ofPopMatrix();
+}
+
+void SaveLoad::isInside(ofVec3f pos_) {
+    bool breaking = false;
+    for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
+        for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
+            if(innerIt->second.slotInfo.testRect.inside(pos_+ofVec3f(0,-scrollLocation,0))){
+                cout << innerIt->second.slotInfo.name << endl;
+
+                breaking = true;
+                break;
+            }
+        }
+        if(breaking){
+            break;
+        }
+    }
 }
