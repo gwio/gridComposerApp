@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.065
 #define BPM (220*4)
-#define ANI_SPEED 0.010
+#define ANI_SPEED 0.030
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.780
@@ -601,6 +601,8 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[50].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
     
     mainInterfaceData[124].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+    
+    mainInterfaceData[125].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
 
     
     saveManager.animateGrid(tweenFloat);
@@ -1670,8 +1672,17 @@ void ofApp::replaceMousePressed(int x, int y) {
             lastClick.y = y;
             
             if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
+                if(!saveManager.slotDetail){
                 loadSaveButtonPress();
                 mainInterfaceData[47].blinkOn();
+                }
+            }
+            
+            if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
+                if(!saveManager.slotDetail){
+                    savePreset();
+                    mainInterfaceData[125].blinkOn();
+                }
             }
             
             if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
@@ -2599,6 +2610,11 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(124,"DELETE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
+    //save button, STATE_SAVE
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(125,"SAVE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    mainInterfaceData.push_back(temp);
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -3178,7 +3194,9 @@ void ofApp::loadSaveInterfaceOn(){
     mainInterfaceData[48].animation = true;
     mainInterfaceData[48].moveDir = 1;
     
-    
+    mainInterfaceData[125].showString = true;
+    mainInterfaceData[125].animation = true;
+    mainInterfaceData[125].moveDir = 1;
 }
 //--------------------------------------------------------------
 
@@ -3189,6 +3207,8 @@ void ofApp::loadSaveInterfaceOff(){
     mainInterfaceData[48].animation = true;
     mainInterfaceData[48].moveDir = 0;
     
+    mainInterfaceData[125].animation = true;
+    mainInterfaceData[125].moveDir = 0;
 }
 
 /*
@@ -3255,6 +3275,9 @@ void ofApp::openSlotInterface(){
     mainInterfaceData[47].animation = true;
     mainInterfaceData[47].moveDir = 0;
     
+    mainInterfaceData[125].animation = true;
+    mainInterfaceData[125].moveDir = 0;
+    
     mainInterfaceData[50].animation = true;
     mainInterfaceData[50].moveDir = 1;
     mainInterfaceData[50].showString = true;
@@ -3282,6 +3305,11 @@ void ofApp::closeSlotInterface(){
     
     mainInterfaceData[124].animation = true;
     mainInterfaceData[124].moveDir = 0;
+    
+    mainInterfaceData[125].animation = true;
+    mainInterfaceData[125].moveDir = 1;
+    mainInterfaceData[125].showString = true;
+ 
 }
 
 //--------------------------------------------------------------

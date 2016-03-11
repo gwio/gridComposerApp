@@ -117,6 +117,7 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     xmlSavesMap[xmlKey][tempXml.number] = tempXml;
     
     updatePosition();
+    velo += (scrollLocation*-1*0.3);
 }
 
 void SaveLoad::updatePosition(){
@@ -171,7 +172,6 @@ void SaveLoad::update(){
     } else {
         velo = 0.0;
     }
-    
 }
 
 void SaveLoad::draw(){
@@ -239,6 +239,9 @@ void SaveLoad::deleteSave(){
     temp.open(saveDir.getAbsolutePath()+"/"+delInnerIt->second.year+delInnerIt->second.month+delInnerIt->second.day+"#"+ofToString(delInnerIt->second.number)+".xml");
     temp.remove();
     delOuterIt->second.erase(delInnerIt);
+    if(delOuterIt->second.size() == 0){
+        xmlSavesMap.erase(delOuterIt->first);
+    }
     updatePosition();
 }
 
