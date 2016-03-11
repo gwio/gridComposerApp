@@ -47,6 +47,8 @@ public:
     void isInside(ofVec3f);
     void animateGrid(float&);
     
+    void deleteSave();
+    
     ofxFontStash *fsPtr;
     ofVec3f slotSize;
     ofVec3f *aniVecPtr;
@@ -55,6 +57,9 @@ public:
     
     map<string, map<int,xmlSave>>::reverse_iterator outerIt;
     map<int,xmlSave>::iterator innerIt;
+    
+    map<string, map<int,xmlSave>>::reverse_iterator delOuterIt;
+    map<int,xmlSave>::iterator delInnerIt;
     
     ofDirectory saveDir;
     map<string, map<int,xmlSave>> xmlSavesMap;
@@ -67,4 +72,5 @@ public:
     ofVec2f touchStart;
     ofVec3f getOffPos(ofVec3f&, ofVec3f&);
     int moveDir;
+    bool slotDetail;
 };

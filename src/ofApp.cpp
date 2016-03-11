@@ -598,6 +598,11 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
     mainInterfaceData[48].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
     
+    mainInterfaceData[50].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
+    
+    mainInterfaceData[124].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+
+    
     saveManager.animateGrid(tweenFloat);
 }
 
@@ -1668,6 +1673,21 @@ void ofApp::replaceMousePressed(int x, int y) {
                 loadSaveButtonPress();
                 mainInterfaceData[47].blinkOn();
             }
+            
+            if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
+                if(saveManager.slotDetail){
+                closeSlotInterface();
+                mainInterfaceData[50].blinkOn();
+                }
+            }
+            
+            if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
+                if(saveManager.slotDetail){
+                saveManager.deleteSave();
+                mainInterfaceData[124].blinkOn();
+                closeSlotInterface();
+                }
+            }
         }
     }
 }
@@ -1691,6 +1711,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 void ofApp::replaceMouseReleased(int x,int y) {
     
+    if(!interfaceMoving){
     if (currentState == STATE_EDIT_DETAIL) {
         if (mainInterfaceData[40].touchDown){
             mainInterfaceData[40].touchDown = false;
@@ -1708,6 +1729,7 @@ void ofApp::replaceMouseReleased(int x,int y) {
                 }
             }
         }
+    }
     }
     
 }
@@ -2441,12 +2463,11 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(49, string(""), ofVec3f( ((horizontalSlider.x*3)/14)*12,horizontalSlider.y*0.2,0), ofColor(23,23,23), place, offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //empty
-    place = ofVec3f( (smallButton.x*(0+1))+(smallButton.x/2),-(smallButton.y/2)-(smallButton.y/2),0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
-    temp = GlobalGUI(50, string("KEY"), scaleButton,ofColor(0,0,0),place,offPlace,fontSmall*1.2,false,&tekoRegular);
+    //return to load grid, STATE_SAVE
+    place = ofVec3f( 0,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    temp = GlobalGUI(50, string("Back"), smallButton,ofColor(0,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
-    mainInterfaceData[50].elementColorOn = ofColor(255,255,255,100);
     
     
     //volume slider, background, A B C and global, STATE_VOLUME
@@ -2572,6 +2593,13 @@ void ofApp::setupGlobalInterface() {
         mainInterfaceData.push_back(temp);
     }
     
+    //delete save STATE_SAVE
+    offPlace = ofVec3f(0,+designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(124,"DELETE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    mainInterfaceData.push_back(temp);
+    
+    
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
@@ -2600,6 +2628,8 @@ void ofApp::setupGlobalInterface() {
     
     mainInterfaceData[62].auxString = "SCALE";
     mainInterfaceData[62].setAuxStringWidth(mainInterfaceData[62].fsPtr->getBBox(mainInterfaceData[62].auxString, mainInterfaceData[62].fontSize, 0, 0).getWidth());
+    
+   
     
     pauseInterfaceOn();
     
@@ -3147,6 +3177,8 @@ void ofApp::loadSaveInterfaceOn(){
     mainInterfaceData[48].showString = false;
     mainInterfaceData[48].animation = true;
     mainInterfaceData[48].moveDir = 1;
+    
+    
 }
 //--------------------------------------------------------------
 
@@ -3156,6 +3188,7 @@ void ofApp::loadSaveInterfaceOff(){
     
     mainInterfaceData[48].animation = true;
     mainInterfaceData[48].moveDir = 0;
+    
 }
 
 /*
@@ -3214,11 +3247,41 @@ void ofApp::loadSaveInterfaceOff(){
 void ofApp::openSlotInterface(){
     aniPct = 0.0;
     interfaceMoving = true;
+    
+    saveManager.animate = true;
+    saveManager.moveDir = 0;
+    saveManager.slotDetail = true;
+    
+    mainInterfaceData[47].animation = true;
+    mainInterfaceData[47].moveDir = 0;
+    
+    mainInterfaceData[50].animation = true;
+    mainInterfaceData[50].moveDir = 1;
+    mainInterfaceData[50].showString = true;
+    
+    mainInterfaceData[124].showString = true;
+    mainInterfaceData[124].animation = true;
+    mainInterfaceData[124].moveDir = 1;
 }
 
 //--------------------------------------------------------------
 void ofApp::closeSlotInterface(){
+    aniPct = 0.0;
+    interfaceMoving = true;
     
+    saveManager.animate = true;
+    saveManager.moveDir = 1;
+    saveManager.slotDetail = false;
+    
+    mainInterfaceData[47].animation = true;
+    mainInterfaceData[47].moveDir = 1;
+    mainInterfaceData[47].showString = true;
+
+    mainInterfaceData[50].animation = true;
+    mainInterfaceData[50].moveDir = 0;
+    
+    mainInterfaceData[124].animation = true;
+    mainInterfaceData[124].moveDir = 0;
 }
 
 //--------------------------------------------------------------

@@ -7,6 +7,7 @@ SaveLoad::SaveLoad(){
     scrollLocation = 0;
     velo = 0;
     animate = false;
+    slotDetail = false;
     moveDir = 0;
 }
 
@@ -122,17 +123,17 @@ void SaveLoad::updatePosition(){
     
     int counterOut = 0;
     int counterIn = 0;
-    offsetDown = ofVec3f(0,0,0);
+    offsetDown = ofVec3f(0,-slotSize.y,0);
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         
         counterIn = 0;
-        offsetDown.y += floor((((outerIt->second.size()/3)))* slotSize.y) + (designGrid.y/3);
-        cout << counterOut << offsetDown.y << endl;
+        offsetDown.y += ((((outerIt->second.size()-1)/3))* slotSize.y) + slotSize.y*2;
+
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             saveSlot &slot = innerIt->second.slotInfo;
             slot.name = outerIt->first+" #"+ofToString(innerIt->first);
             slot.size = slotSize;
-            slot.pos = ofVec3f((counterIn%3)*slotSize.x,-(counterIn/3)*slotSize.y,0)+offsetDown;
+            slot.pos = ofVec3f((counterIn%3)*slotSize.x,-floor((counterIn/3))*slotSize.y,0)+offsetDown;
             slot.testRect.set(slot.pos, slotSize.x, slotSize.y);
             slot.name ="SKETCH #"+ofToString(innerIt->second.number);
             counterIn++;
@@ -180,7 +181,7 @@ void SaveLoad::draw(){
     ofTranslate(aniVecPtr->x,scrollLocation,0);
     
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
-        fsPtr->draw(outerIt->first, 40, 0,outerIt->second.rbegin()->second.slotInfo.pos.y);
+        fsPtr->draw(outerIt->first, 40, 0,outerIt->second.rbegin()->second.slotInfo.testRect.position.y-slotSize.y+40);
         
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
@@ -206,6 +207,10 @@ void SaveLoad::isInside(ofVec3f pos_) {
                 innerIt->second.slotInfo.active = true;
                 animate = true;
                 breaking = true;
+                
+                delOuterIt = outerIt;
+                delInnerIt = innerIt;
+                
                 break;
             }
         }
@@ -228,6 +233,15 @@ void SaveLoad::isInside(ofVec3f pos_) {
     }
 }
 
+void SaveLoad::deleteSave(){
+    ofFile temp;
+    cout << saveDir.getAbsolutePath()+"/"+delInnerIt->second.year+delInnerIt->second.month+delInnerIt->second.day+"#"+ofToString(delInnerIt->second.number)+".xml" << endl;
+    temp.open(saveDir.getAbsolutePath()+"/"+delInnerIt->second.year+delInnerIt->second.month+delInnerIt->second.day+"#"+ofToString(delInnerIt->second.number)+".xml");
+    temp.remove();
+    delOuterIt->second.erase(delInnerIt);
+    updatePosition();
+}
+
 ofVec3f SaveLoad::getOffPos(ofVec3f& clicktarget_, ofVec3f& pos_) {
     ofVec3f temp;
     /*
@@ -248,6 +262,20 @@ ofVec3f SaveLoad::getOffPos(ofVec3f& clicktarget_, ofVec3f& pos_) {
 }
 
 void SaveLoad::animateGrid(float& tween_){
+    
+    if(animate && tween_>= 1.0){
+        animate = false;
+        
+        for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
+            for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
+                saveSlot& slot = innerIt->second.slotInfo;
+                slot.testRect.setPosition(slot.pos+(slot.offPos*abs(moveDir-1.0)) );
+                slot.active = false;
+            }
+        }
+        
+    }
+    
     if(animate){
         for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
             for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
@@ -255,5 +283,9 @@ void SaveLoad::animateGrid(float& tween_){
                 slot.testRect.setPosition(slot.pos+(slot.offPos*abs(moveDir-tween_)) );
             }
         }
+        
     }
 }
+
+
+
