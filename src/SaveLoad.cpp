@@ -9,6 +9,7 @@ SaveLoad::SaveLoad(){
     animate = false;
     slotDetail = false;
     moveDir = 0;
+    loadString = "";
 }
 
 void SaveLoad::loadSaveFolder(string iosFolder_){
@@ -211,6 +212,7 @@ void SaveLoad::isInside(ofVec3f pos_) {
                 delOuterIt = outerIt;
                 delInnerIt = innerIt;
                 
+                loadString = saveDir.getAbsolutePath()+"/"+delInnerIt->second.year+delInnerIt->second.month+delInnerIt->second.day+"#"+ofToString(delInnerIt->second.number)+".xml";
                 break;
             }
         }

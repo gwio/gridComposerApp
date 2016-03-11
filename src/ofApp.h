@@ -136,6 +136,7 @@ class ofApp : public ofxiOSApp{
         void loadFromXml(string);
         void saveToXml(string);
         void savePreset();
+        void loadPreset();
         
         //xml
         ofxXmlSettings settings;

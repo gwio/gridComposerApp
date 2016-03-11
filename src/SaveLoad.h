@@ -73,4 +73,5 @@ public:
     ofVec3f getOffPos(ofVec3f&, ofVec3f&);
     int moveDir;
     bool slotDetail;
+    string loadString;
 };

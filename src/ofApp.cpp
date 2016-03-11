@@ -604,6 +604,8 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[125].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
 
+    mainInterfaceData[126].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
+
     
     saveManager.animateGrid(tweenFloat);
 }
@@ -1671,32 +1673,38 @@ void ofApp::replaceMousePressed(int x, int y) {
             lastClick.x = x;
             lastClick.y = y;
             
-            if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
-                if(!saveManager.slotDetail){
-                loadSaveButtonPress();
-                mainInterfaceData[47].blinkOn();
+            if(!saveManager.slotDetail){
+                if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
+                    loadSaveButtonPress();
+                    mainInterfaceData[47].blinkOn();
+                    
                 }
-            }
-            
-            if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
-                if(!saveManager.slotDetail){
+                
+                if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
                     savePreset();
                     mainInterfaceData[125].blinkOn();
                 }
             }
             
-            if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
-                if(saveManager.slotDetail){
-                closeSlotInterface();
-                mainInterfaceData[50].blinkOn();
+            if(saveManager.slotDetail) {
+                if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
+                    closeSlotInterface();
+                    mainInterfaceData[50].blinkOn();
+                    
                 }
-            }
-            
-            if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
-                if(saveManager.slotDetail){
-                saveManager.deleteSave();
-                mainInterfaceData[124].blinkOn();
-                closeSlotInterface();
+                
+                if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
+                    //closeSlotInterface();
+                    loadSaveButtonPress();
+                    loadPreset();
+                    mainInterfaceData[126].blinkOn();
+                }
+                
+                if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
+                    saveManager.deleteSave();
+                    mainInterfaceData[124].blinkOn();
+                    closeSlotInterface();
+                    
                 }
             }
         }
@@ -2616,6 +2624,12 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(125,"SAVE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
+    //load save, STATE_SAVE
+    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(126,"LOAD",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    mainInterfaceData.push_back(temp);
+    
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
@@ -3285,6 +3299,10 @@ void ofApp::openSlotInterface(){
     mainInterfaceData[124].showString = true;
     mainInterfaceData[124].animation = true;
     mainInterfaceData[124].moveDir = 1;
+    
+    mainInterfaceData[126].showString = true;
+    mainInterfaceData[126].animation = true;
+    mainInterfaceData[126].moveDir = 1;
 }
 
 //--------------------------------------------------------------
@@ -3309,6 +3327,9 @@ void ofApp::closeSlotInterface(){
     mainInterfaceData[125].animation = true;
     mainInterfaceData[125].moveDir = 1;
     mainInterfaceData[125].showString = true;
+    
+    mainInterfaceData[126].animation = true;
+    mainInterfaceData[126].moveDir = 0;
  
 }
 
@@ -4279,6 +4300,11 @@ void ofApp::savePreset(){
     saveToXml("saves/"+saveManager.saveLastYear+saveManager.saveLastMonth+saveManager.saveLastDay+"#"+ofToString(saveManager.saveLastNumber)+".xml");
     
     saveManager.addNewSave(settings);
+}
+
+void ofApp::loadPreset(){
+    
+    loadFromXml(saveManager.loadString);
 }
 
 
