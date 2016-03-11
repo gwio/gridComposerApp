@@ -1694,7 +1694,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
                 
                 if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
-                    //closeSlotInterface();
+                    closeSlotInterface();
                     loadSaveButtonPress();
                     loadPreset();
                     mainInterfaceData[126].blinkOn();
@@ -4508,6 +4508,8 @@ void ofApp::saveToXml(string path_){
 
 void ofApp::loadFromXml(string path_){
     startUp = true;
+    volumeRestartTarget = mainVol;
+    volumeRestart = 0.0;
     
     //load grid presets from xml
 #if TARGET_OS_IPHONE
@@ -4679,6 +4681,17 @@ void ofApp::loadFromXml(string path_){
             settings.pushTag("grid",i);
             string temp = settings.getValue("info", "0");
             if (temp.size() == TILES*TILES){
+                
+                //clear the grid
+                for (int x = 0; x < TILES; x++) {
+                    for (int y = 0; y <TILES; y++) {
+                        if (synths[synthButton[i]].layerInfo.at(x).at(y).hasCube) {
+                            synths[synthButton[i]].tapEvent(x, y);
+                        }
+                    }
+                }
+                
+                //load grid
                 for (int x = 0; x < TILES; x++) {
                     for (int y = 0; y <TILES; y++) {
                         if (temp.at(x+(TILES*y)) == '1') {
