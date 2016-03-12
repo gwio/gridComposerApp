@@ -126,42 +126,53 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
 }
 
 ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_){
-    ofTexture tex;
-    tex.allocate(designGrid.x, designGrid.y, GL_RGBA);
-    
+   // ofTexture tex;
+   // tex.allocate(designGrid.x, designGrid.y, GL_RGBA);
+    ofPixels pix;
+
     ofFbo fbo;
     fbo.allocate(designGrid.x, designGrid.y,GL_RGBA);
     
-    float rSize = 4;
+    float rSize = 8;
     float offset = designGrid.x/3;
     
     fbo.begin();
     ofClear(0, 0, 0,0);
     
-    xml_.pushTag("currentGrids");
     for (int i = 0; i < 3; i++) {
         
+        xml_.pushTag("currentGrids");
         xml_.pushTag("grid",i);
         string temp = xml_.getValue("info", "0");
-
+        xml_.popTag();
+        xml_.popTag();
+        xml_.pushTag("SynthSettings");
+        xml_.pushTag("synth",i);
+        ofColor tc = ofColor::fromHsb(xml_.getValue("cHue", 0), 120, 140, 255);
+        
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
                 if (temp.at(x+(5*y)) == '1') {
+                    ofSetColor(tc);
                     ofVec2f point = ofVec2f(x*rSize+(offset*i),y*rSize);
                     ofDrawRectangle(point, rSize, rSize);
                 }
             }
         }
         xml_.popTag();
+        xml_.popTag();
+
     }
-    xml_.popTag();
     
     fbo.end();
     
-    tex = fbo.getTexture();
-    ofPixels pix;
-    tex.readToPixels(pix);
+    pix.allocate(designGrid.x,designGrid.y,OF_PIXELS_RGBA);
+   // tex.allocate(pix);
+    fbo.readToPixels(pix);
+    
+    
     ofImage tempImg;
+   // tempImg.allocate(designGrid.x, designGrid.y, OF_IMAGE_COLOR_ALPHA);
     tempImg.setFromPixels(pix);
     
     tempImg.save(saveDir.getAbsolutePath()+"/"+fileName_+".png");
