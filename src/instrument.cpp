@@ -402,7 +402,7 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
 
 void Instrument::noteTrigger() {
     
-    if(!pause){
+    if(!pause && *globalStatePtr != 6){
     tempLog = noteLog();
     
     // cout << scanDirection << endl;
@@ -1330,6 +1330,11 @@ void Instrument::setSaturationOff(){
         }
     }
     
+    setAllNotesOff();
+
+}
+
+void Instrument::setAllNotesOff(){
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);

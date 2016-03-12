@@ -2004,6 +2004,7 @@ void ofApp::pulseEvent(int div){
             }
             
             synths[i].noteTrigger();
+            
             if (synths[i].pulsePlane.stepCounter == ((TILES+1)*4)-1 ){
                 synths[i].pulsePlane.stepCounter = 0;
             } else {
@@ -4011,6 +4012,12 @@ void ofApp::loadSaveButtonPress(){
         aniPct = 0.0;
         currentState = STATE_SAVE;
         
+        for (int i = 0; i < 3; i++){
+            synths[i].setAllNotesOff();
+        }
+        
+        
+        
     } else if (currentState == STATE_SAVE) {
         synths[synthButton[0]].aniPath = OneLoadPathOff;
         synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
@@ -4030,6 +4037,14 @@ void ofApp::loadSaveButtonPress(){
         loadSaveInterfaceOff();
         aniPct = 0.0;
         currentState = STATE_DEFAULT;
+        
+        
+        startUp = true;
+        volumeRestartTarget = mainVol;
+        volumeRestart = 0.0;
+        volumeRamp.value(0.0);
+        volumeRamp.value(0.0);
+
     }
 }
 
@@ -4518,7 +4533,8 @@ void ofApp::loadFromXml(string path_){
     startUp = true;
     volumeRestartTarget = mainVol;
     volumeRestart = 0.0;
-    
+    volumeRamp.value(0.0);
+
     //load grid presets from xml
     
     if (settings.loadFile(path_)) {

@@ -110,6 +110,7 @@ public:
     void setSaturationOff();
     void setSaturationOn();
     
+    void setAllNotesOff();
     
     void getLayerInfo(vector< vector <bool> >&);
     
