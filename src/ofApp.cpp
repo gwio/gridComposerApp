@@ -4595,7 +4595,7 @@ void ofApp::loadFromXml(string path_){
     settings.pushTag("slots");
     for (int i = 0; i < 3; i++) {
         settings.pushTag("slot",i);
-        synths[synthButton[i]].sVolume = settings.getValue("volume", 1.0);
+        synths[synthButton[i]].sVolume = settings.getValue("volume", 0.85);
         synths[synthButton[i]].changeSynthVolume(synths[synthButton[i]].sVolume);
         settings.popTag();
     }
@@ -4621,11 +4621,11 @@ void ofApp::loadFromXml(string path_){
         
         synths[synthButton[i]].preset = settings.getValue("patchPreset", 0);
         
-        synths[synthButton[i]].trackSwitchOn = settings.getValue("StartStatus", 0);
+        synths[synthButton[i]].trackSwitchOn = settings.getValue("StartStatus", 1);
         
         synths[synthButton[i]].pause = settings.getValue("pauseStatus", 0);
         
-        synths[synthButton[i]].keyNote = settings.getValue("keyNote", 0);
+        synths[synthButton[i]].keyNote = settings.getValue("keyNote", 60);
         
         synths[synthButton[i]].globalHarmony = settings.getValue("globalHarmony", 1);
         

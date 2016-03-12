@@ -51,7 +51,7 @@ public:
     
     bool fastChange, slowChange;
     
-    void setColor(ofColor,bool);
+    void setColor(bool,bool);
     
     void changeGroupColor(ofColor);
     

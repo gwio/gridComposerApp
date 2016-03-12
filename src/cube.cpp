@@ -1,7 +1,7 @@
 
 #include "cube.h"
 
-#define SPEED 0.45
+#define SPEED 0.55
 
 
 Cube::Cube(){
@@ -135,12 +135,16 @@ void Cube::changeGroupColor(ofColor c_) {
     
 }
 
-void Cube::setColor(ofColor c_,bool fast){
+void Cube::setColor(bool scan,bool fast){
     
     if(noSaturation){
         cubeColor = pauseColor;
     } else {
+        if(!scan){
         cubeColor = groupColor;
+        } else {
+        cubeColor = scanColor;
+        }
     }
         //displayColor = c_;
         
