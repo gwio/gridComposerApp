@@ -73,13 +73,13 @@ void MusterContainer::draw(){
         if (displayColor != elementColorTouch) {
             displayColor = displayColor.lerp(elementColorTouch, 0.04);
         }
-        ofSetColor(filterColor(  displayColor));
+        ofSetColor(displayColor);
         
     } else {
         if (displayColor!= targetColor) {
             displayColor = displayColor.lerp(targetColor, 0.04);
         }
-        ofSetColor(filterColor(displayColor));
+        ofSetColor(displayColor);
 
     }
     for (int i = 0; i < displayGrid.size(); i++) {
@@ -102,14 +102,6 @@ void MusterContainer::setColor(float hue_) {
     displayColor = elementColorDarker;
 }
 
-ofColor MusterContainer::filterColor(ofColor c_){
-    ofColor temp;
-    temp.r = ofClamp(c_.r+15, 30, 220);
-    temp.g = ofClamp(c_.g-5, 30, 220);
-    temp.b = ofClamp(c_.b-10, 30, 220);
-    temp.a = ofClamp(c_.a-10, 10, 230);
-    return temp;
-}
 
 
 

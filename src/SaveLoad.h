@@ -11,6 +11,7 @@ struct saveSlot{
     ofVec3f size;
     ofRectangle testRect;
     string name;
+    ofImage thumb;
     bool active;
     saveSlot(){
         active = false;
@@ -43,6 +44,7 @@ public:
     void draw();
     void addNewSave(ofxXmlSettings&);
     void updatePosition();
+    ofImage makePng(ofxXmlSettings&,string);
     
     void isInside(ofVec3f);
     void animateGrid(float&);

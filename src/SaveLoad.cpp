@@ -38,11 +38,9 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     xmlSavesMap.clear();
     xmlSave tempXml;
     for (int i = 0; i < saveDir.getFiles().size(); i++) {
-#if TARGET_OS_IPHONE
-        tempXml.settings.loadFile(iosFolder_+"saves/"+saveDir.getFiles().at(i).getFileName());
-#else
-        tempXml.settings.loadFile("saves/"+saveDir.getFiles().at(i).getFileName());
-#endif
+
+        
+        tempXml.settings.loadFile(saveDir.getAbsolutePath()+"/"+saveDir.getFiles().at(i).getFileName());
         tempXml.settings.pushTag("date");
         
         tempXml.year = tempXml.settings.getValue("year", "");
@@ -52,6 +50,9 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         
         tempXml.settings.popTag();
         string xmlKeyDay = tempXml.year+tempXml.month+tempXml.day;
+        
+       // tempXml.slotInfo.thumb.allocate(designGrid.x,designGrid.y,OF_IMAGE_COLOR_ALPHA);
+     cout <<   tempXml.slotInfo.thumb.load(saveDir.getAbsolutePath()+"/"+xmlKeyDay+"#"+ofToString(tempXml.number)+".png") << endl;
         
         xmlSavesMap[xmlKeyDay][tempXml.number] = tempXml;
     }
@@ -115,10 +116,56 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     
     tempXml.settings.popTag();
     string xmlKey = tempXml.year+tempXml.month+tempXml.day;
+    
+    tempXml.slotInfo.thumb = makePng(tempXml.settings, xmlKey+"#"+ofToString(tempXml.number));
+
     xmlSavesMap[xmlKey][tempXml.number] = tempXml;
     
     updatePosition();
     velo += (scrollLocation*-1*0.3);
+}
+
+ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_){
+    ofTexture tex;
+    tex.allocate(designGrid.x, designGrid.y, GL_RGBA);
+    
+    ofFbo fbo;
+    fbo.allocate(designGrid.x, designGrid.y,GL_RGBA);
+    
+    float rSize = 4;
+    float offset = designGrid.x/3;
+    
+    fbo.begin();
+    ofClear(0, 0, 0,0);
+    
+    xml_.pushTag("currentGrids");
+    for (int i = 0; i < 3; i++) {
+        
+        xml_.pushTag("grid",i);
+        string temp = xml_.getValue("info", "0");
+
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                if (temp.at(x+(5*y)) == '1') {
+                    ofVec2f point = ofVec2f(x*rSize+(offset*i),y*rSize);
+                    ofDrawRectangle(point, rSize, rSize);
+                }
+            }
+        }
+        xml_.popTag();
+    }
+    xml_.popTag();
+    
+    fbo.end();
+    
+    tex = fbo.getTexture();
+    ofPixels pix;
+    tex.readToPixels(pix);
+    ofImage tempImg;
+    tempImg.setFromPixels(pix);
+    
+    tempImg.save(saveDir.getAbsolutePath()+"/"+fileName_+".png");
+    return tempImg;
 }
 
 void SaveLoad::updatePosition(){
@@ -188,6 +235,7 @@ void SaveLoad::draw(){
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
             if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*6) {
                 ofNoFill();
+                innerIt->second.slotInfo.thumb.draw(innerIt->second.slotInfo.testRect.position);
                 ofDrawRectangle(innerIt->second.slotInfo.testRect);
                 ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 ofFill();
