@@ -4712,6 +4712,18 @@ void ofApp::loadFromXml(string path_){
     
     //---------------------------
     
+    //set pause status
+    
+    for (int i = 0; i < 3; i++) {
+        if(synths[synthButton[i]].pause) {
+            synths[synthButton[i]].setSaturationOff();
+        } else {
+            synths[synthButton[i]].setSaturationOn();
+        }
+    }
+    
+    //---------------------------
+    
     //load notes
     
     settings.pushTag("currentGrids");

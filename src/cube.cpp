@@ -125,10 +125,11 @@ void Cube::update(){
 
 void Cube::changeGroupColor(ofColor c_) {
     
-    if (!noSaturation) {
+  //  if (!noSaturation) {
         groupColor = c_;
-        scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, 255) ;
-    }
+        scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, 255);
+        pauseColor = ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-255,0,255) , groupColor.getBrightness(), 255);
+  //  }
     
     
     
@@ -136,15 +137,17 @@ void Cube::changeGroupColor(ofColor c_) {
 
 void Cube::setColor(ofColor c_,bool fast){
     
-    if (!noSaturation) {
-        cubeColor = c_;
+    if(noSaturation){
+        cubeColor = pauseColor;
+    } else {
+        cubeColor = groupColor;
+    }
         //displayColor = c_;
         
         myTween = 0.0;
         fastChange = fast;
         slowChange = !fast;
-    }
-    
+ 
     
 }
 void Cube::setDefaultHeight(float height_) {
@@ -155,16 +158,15 @@ void Cube::setDefaultHeight(float height_) {
 }
 
 void Cube::satOff(){
-    tempColor = groupColor;
-    changeGroupColor(ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-255,0,255) , groupColor.getBrightness(), 255));
-    setColor(groupColor,false );
+   // tempColor = groupColor;
+   // changeGroupColor(ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-255,0,255) , groupColor.getBrightness(), 255));
+    //setColor(pauseColor,false );
     noSaturation = true;
-    
-    
 }
 
 void Cube::satOn() {
+  //  noSaturation = false;
+   // changeGroupColor(tempColor);
+   // setColor(groupColor, true);
     noSaturation = false;
-    changeGroupColor(tempColor);
-    setColor(groupColor, true);
 }

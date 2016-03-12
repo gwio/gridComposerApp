@@ -348,10 +348,14 @@ void Instrument::removeCube(int x_, int y_){
     
     // cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].cubeColor = ofColor::white;
     
+    /*
     if (pause) {
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].satOn();
     }
+    */
+    cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(innerColorDefault);
     cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(innerColorDefault,true);
+
     
     //   cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].displayColor = ofColor::black;
     
@@ -398,6 +402,7 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
 
 void Instrument::noteTrigger() {
     
+    if(!pause){
     tempLog = noteLog();
     
     // cout << scanDirection << endl;
@@ -440,7 +445,7 @@ void Instrument::noteTrigger() {
     
     noteHistory.push_back(tempLog);
     noteHistory.erase(noteHistory.begin());
-    
+    }
 }
 
 void Instrument::nextDirection() {
@@ -825,9 +830,11 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(gColor);
         cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(gColor,true);
         //if pauseMode
+        /*
         if (pause) {
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].satOff();
         }
+         */
         
         
         soundsCounter++;
@@ -850,10 +857,11 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(tempPtr->groupColor,true);
             //if pauseMode
+            /*
             if (pause) {
                 cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].satOff();
             }
-            
+            */
             
             updateGroupInfo(soundMapIndex, x_, y_);
         } else {
@@ -862,9 +870,11 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].changeGroupColor(tempPtr->groupColor);
             cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].setColor(tempPtr->groupColor,true);
             //if pauseMode
+            /*
             if (pause) {
                 cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].satOff();
-            }
+            } 
+             */
             
         }
         
@@ -883,10 +893,11 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].changeGroupColor(tempPtr->groupColor);
                                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(tempPtr->groupColor,false);
                                 //if pauseMode
+                                /*
                                 if (pause) {
                                     cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor = tempPtr->groupColor;
                                 }
-                                
+                                */
                                 
                                 tempPtr->size++;
                                 //check for max,min, x,y
@@ -939,9 +950,11 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
     }
     
     for (int i = 0; i < tempPosis.size(); i++) {
+        /*
         if (pause) {
             cubeVector[layerInfo.at(tempPosis[i].x).at(tempPosis[i].y).cubeVecNum].satOn();
         }
+         */
         addCube(tempPosis[i].x, tempPosis[i].y);
     }
     
@@ -1063,11 +1076,13 @@ void Instrument::changePreset(bool test_) {
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor( cubeVector[layerInfo.at(x).at(y).cubeVecNum].groupColor,true);
                 
                 //if in pause mode
+                /*
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor = ofColor::fromHsb(
                                                                                           soundsMap[layerInfo.at(x).at(y).cubeGroupId].groupColor.getHue(),
                                                                                           cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor.getSaturation(),
                                                                                           cubeVector[layerInfo.at(x).at(y).cubeVecNum].tempColor.getBrightness()
                                                                                           );
+                 */
                 
                 //cubeVector[layerInfo.at(x).at(y).cubeVecNum].displayColor = cubeVector[layerInfo.at(x).at(y).cubeVecNum].scanColor;
             }
@@ -1307,9 +1322,18 @@ void Instrument::setNormals(ofVboMesh& mesh_) {
 void Instrument::setSaturationOff(){
     for (int x = 0; x < gridTiles; x++) {
         for (int y = 0; y <gridTiles; y++) {
+            cubeVector[layerInfo.at(x).at(y).cubeVecNum].satOff();
             if ( layerInfo.at(x).at(y).hasCube) {
-                cubeVector[layerInfo.at(x).at(y).cubeVecNum].satOff();
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(ofColor(0,0,0),false);
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
             }
+        }
+    }
+    
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+            it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+            it->second.groupSynth.setParameter("trigger",0);
         }
     }
 }
@@ -1318,8 +1342,9 @@ void Instrument::setSaturationOn(){
     
     for (int x = 0; x < gridTiles; x++) {
         for (int y = 0; y <gridTiles; y++) {
+            cubeVector[layerInfo.at(x).at(y).cubeVecNum].satOn();
             if ( layerInfo.at(x).at(y).hasCube) {
-                cubeVector[layerInfo.at(x).at(y).cubeVecNum].satOn();
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(ofColor(0,0,0),false);
             }
         }
     }

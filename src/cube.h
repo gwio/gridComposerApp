@@ -57,7 +57,7 @@ public:
     
     void satOn();
     void satOff();
-    ofColor tempColor;
+    ofColor pauseColor;
     
     
     void setDefaultHeight(float);
