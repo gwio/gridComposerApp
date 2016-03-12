@@ -958,14 +958,12 @@ void ofApp::replaceMouseDragged(int x, int y){
         if (currentState == STATE_BPM) {
             
             if(mainInterfaceData[45].isInside(ofVec2f(x,y))) {
-                
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX);
                 tonicSynth.setParameter("BPM",bpm*4);
                 mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
-                
             }
             
         }
@@ -979,14 +977,14 @@ void ofApp::replaceMouseDragged(int x, int y){
                 mainInterfaceData[51].elementName = ofToString(value);
                 mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
-            if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
                 mainInterfaceData[52].elementName = ofToString(value);
                 mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
-            if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
@@ -994,7 +992,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             
-            if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
@@ -1033,7 +1031,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 setNewGUI();
             }
             
-            if(mainInterfaceData[40].isInside(ofVec2f(x,y))) {
+            else if(mainInterfaceData[40].isInside(ofVec2f(x,y))) {
                 
                 if (!mainInterfaceData[40].touchDown){
                     mainInterfaceData[40].touchStart = ofVec2f(x,y);
@@ -1051,11 +1049,9 @@ void ofApp::replaceMouseDragged(int x, int y){
                         synths[activeSynth].setKeyNote(ofClamp(keyMod,-1,1));
                         setNewGUI();
                         mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
-                        
                     }
                     
                 }
-                
                 
             }
         }
@@ -1115,13 +1111,13 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if( (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) &&
-               (y > designGrid[1][1].y-designGrid[0][0].y && y < designGrid[1][1].y+designGrid[0][0].y) ){
+            else if( (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) &&
+                    (y > designGrid[1][1].y-designGrid[0][0].y && y < designGrid[1][1].y+designGrid[0][0].y) ){
                 buttonTwoPress();
             }
             
-            if( (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) &&
-               (y > designGrid[2][1].y-designGrid[0][0].y && y < designGrid[2][1].y+designGrid[0][0].y) ){
+            else if( (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) &&
+                    (y > designGrid[2][1].y-designGrid[0][0].y && y < designGrid[2][1].y+designGrid[0][0].y) ){
                 if(!synths[synthButton[2]].trackSwitchOn) {
                     synths[synthButton[2]].trackSwitchOn = true;
                 } else {
@@ -1143,8 +1139,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if( (x > designGrid[2][2].x-designGrid[0][0].x && x < designGrid[2][2].x+designGrid[0][0].x) &&
-               (y > designGrid[2][2].y-designGrid[0][0].y +100 && y < designGrid[2][2].y+designGrid[0][0].y) ){
+            else if( (x > designGrid[2][2].x-designGrid[0][0].x && x < designGrid[2][2].x+designGrid[0][0].x) &&
+                    (y > designGrid[2][2].y-designGrid[0][0].y +100 && y < designGrid[2][2].y+designGrid[0][0].y) ){
                 if(synths[synthButton[2]].trackSwitchOn) {
                     buttonThreePress();
                 } else {
@@ -1178,7 +1174,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 
                 
             }
-            if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[9].blinkOn();
                 
                 if (!synths[synthButton[1]].pause) {
@@ -1193,7 +1189,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 synths[synthButton[1]].pause = !synths[synthButton[1]].pause;
                 
             }
-            if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[10].blinkOn();
                 
                 if (!synths[synthButton[2]].pause) {
@@ -1208,21 +1204,21 @@ void ofApp::replaceMousePressed(int x, int y) {
                 synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
             }
             
-            if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
                 buttonFourPress();
                 mainInterfaceData[37].blinkOn();
             }
             
-            if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[41].blinkOn();
                 bpmButtonPress();
             }
-            if (mainInterfaceData[42].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[42].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[42].blinkOn();
                 harmonyButtonPress();
             }
             
-            if (mainInterfaceData[46].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[46].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[46].blinkOn();
                 loadSaveButtonPress();
             }
@@ -1238,14 +1234,14 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[51].elementName = ofToString(value);
                 mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
-            if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
                 mainInterfaceData[52].elementName = ofToString(value);
                 mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
-            if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
@@ -1253,7 +1249,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             
-            if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
@@ -1261,7 +1257,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
-            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonFourPress();
                 mainInterfaceData[43].blinkOn();
             }
@@ -1290,10 +1286,8 @@ void ofApp::replaceMousePressed(int x, int y) {
             }
             
             
-            
-            
             //synth
-            if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
                     synths[activeSynth].changePreset(true);
                 } else {
@@ -1303,18 +1297,18 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[7].blinkOn();
             }
             
-            if(  mainInterfaceData[11].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[11].isInside(ofVec2f(x,y))) {
                 buttonEditDetail();
                 mainInterfaceData[11].blinkOn();
             }
             
-            if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[4].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(-1);
                 setNewGUI();
                 mainInterfaceData[4].blinkOn();
                 mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
             }
-            if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[6].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].setKeyNote(1);
                 setNewGUI();
                 mainInterfaceData[6].blinkOn();
@@ -1361,7 +1355,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[43].blinkOn();
             }
             
-            if(mainInterfaceData[45].isInside(ofVec2f(x,y))) {
+            else if(mainInterfaceData[45].isInside(ofVec2f(x,y))) {
                 
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
@@ -1371,7 +1365,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
             }
             //bpm synth bpm metro factor
-            if(mainInterfaceData[55].isInside(ofVec2f(x,y))) {
+            else if(mainInterfaceData[55].isInside(ofVec2f(x,y))) {
                 for (int i = 0; i < 4; i++) {
                     if(mainInterfaceData[112+i].isInside(ofVec2f(x,y))) {
                         synths[synthButton[0]].nextPulseDivision = 4-i;
@@ -1384,7 +1378,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if(mainInterfaceData[56].isInside(ofVec2f(x,y))) {
+            else if(mainInterfaceData[56].isInside(ofVec2f(x,y))) {
                 for (int i = 0; i < 4; i++) {
                     if(mainInterfaceData[116+i].isInside(ofVec2f(x,y))) {
                         synths[synthButton[1]].nextPulseDivision = 4-i;
@@ -1397,7 +1391,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if(mainInterfaceData[57].isInside(ofVec2f(x,y))) {
+            else if(mainInterfaceData[57].isInside(ofVec2f(x,y))) {
                 for (int i = 0; i < 4; i++) {
                     if(mainInterfaceData[120+i].isInside(ofVec2f(x,y))) {
                         synths[synthButton[2]].nextPulseDivision = 4-i;
@@ -1411,7 +1405,7 @@ void ofApp::replaceMousePressed(int x, int y) {
             }
             
             //pulse direction
-            if (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x){
+            else if (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x){
                 for (int i = 0; i < 4; i++) {
                     if(directionClickZonesA[i].inside(x,y)){
                         if(synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i] ) {
@@ -1426,7 +1420,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) {
+            else if (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) {
                 for (int i = 0; i < 4; i++) {
                     if (directionClickZonesB[i].inside(x, y)){
                         if(synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i] ) {
@@ -1441,7 +1435,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) {
+            else if (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) {
                 for (int i = 0; i < 4; i++) {
                     if (directionClickZonesC[i].inside(x, y)){
                         if(synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i] ) {
@@ -1581,7 +1575,7 @@ void ofApp::replaceMousePressed(int x, int y) {
             }
             
             //back to State_default
-            if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
                 buttonTwoPress();
                 mainInterfaceData[43].blinkOn();
             }
@@ -1604,7 +1598,7 @@ void ofApp::replaceMousePressed(int x, int y) {
              */
             
             //synth
-            if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
                     synths[activeSynth].changePreset(true);
                 } else {
@@ -1616,7 +1610,7 @@ void ofApp::replaceMousePressed(int x, int y) {
             }
             
             //toggle state_edit_detail
-            if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
                 if(!synths[activeSynth].globalHarmony) {
                     buttonEditDetail();
                     mainInterfaceData[44].blinkOn();
@@ -1624,14 +1618,14 @@ void ofApp::replaceMousePressed(int x, int y) {
             }
             
             //toggle save grid
-            if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
                 //leer
                 muster.saveReady = true;
                 mainInterfaceData[12].blinkOn();
             }
             
             //toggle synth-> globalHarmony
-            if(  mainInterfaceData[111].isInside(ofVec2f(x,y))) {
+            else if(  mainInterfaceData[111].isInside(ofVec2f(x,y))) {
                 synths[activeSynth].globalHarmony = !synths[activeSynth].globalHarmony;
                 mainInterfaceData[111].blinkOn();
                 if (synths[activeSynth].globalHarmony){
@@ -1684,7 +1678,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     
                 }
                 
-                if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
+                else if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
                     savePreset();
                     mainInterfaceData[125].blinkOn();
                 }
@@ -1697,14 +1691,14 @@ void ofApp::replaceMousePressed(int x, int y) {
                     
                 }
                 
-                if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
-                    closeSlotInterface();
+                else if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
                     loadSaveButtonPress();
+                    closeSlotInterface();
                     loadPreset();
                     mainInterfaceData[126].blinkOn();
                 }
                 
-                if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
+                else  if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
                     saveManager.deleteSave();
                     mainInterfaceData[124].blinkOn();
                     closeSlotInterface();
@@ -3224,14 +3218,19 @@ void ofApp::loadSaveInterfaceOn(){
 //--------------------------------------------------------------
 
 void ofApp::loadSaveInterfaceOff(){
-    mainInterfaceData[47].animation = true;
-    mainInterfaceData[47].moveDir = 0;
+    
+    if( mainInterfaceData[47].moveDir != 0){
+        mainInterfaceData[47].animation = true;
+        mainInterfaceData[47].moveDir = 0;
+    }
     
     mainInterfaceData[48].animation = true;
     mainInterfaceData[48].moveDir = 0;
     
-    mainInterfaceData[125].animation = true;
-    mainInterfaceData[125].moveDir = 0;
+    if( mainInterfaceData[125].moveDir != 0){
+        mainInterfaceData[125].animation = true;
+        mainInterfaceData[125].moveDir = 0;
+    }
 }
 
 /*
@@ -3323,9 +3322,6 @@ void ofApp::closeSlotInterface(){
     saveManager.moveDir = 1;
     saveManager.slotDetail = false;
     
-    mainInterfaceData[47].animation = true;
-    mainInterfaceData[47].moveDir = 1;
-    mainInterfaceData[47].showString = true;
     
     mainInterfaceData[50].animation = true;
     mainInterfaceData[50].moveDir = 0;
@@ -3333,12 +3329,19 @@ void ofApp::closeSlotInterface(){
     mainInterfaceData[124].animation = true;
     mainInterfaceData[124].moveDir = 0;
     
-    mainInterfaceData[125].animation = true;
-    mainInterfaceData[125].moveDir = 1;
-    mainInterfaceData[125].showString = true;
     
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 0;
+    
+    if (currentState != STATE_DEFAULT) {
+        mainInterfaceData[47].animation = true;
+        mainInterfaceData[47].moveDir = 1;
+        mainInterfaceData[47].showString = true;
+        
+        mainInterfaceData[125].animation = true;
+        mainInterfaceData[125].moveDir = 1;
+        mainInterfaceData[125].showString = true;
+    }
     
 }
 
@@ -4044,7 +4047,7 @@ void ofApp::loadSaveButtonPress(){
         volumeRestart = 0.0;
         volumeRamp.value(0.0);
         volumeRamp.value(0.0);
-
+        
     }
 }
 
@@ -4534,7 +4537,7 @@ void ofApp::loadFromXml(string path_){
     volumeRestartTarget = mainVol;
     volumeRestart = 0.0;
     volumeRamp.value(0.0);
-
+    
     //load grid presets from xml
     
     if (settings.loadFile(path_)) {
