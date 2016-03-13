@@ -1,10 +1,10 @@
 
 #include "MusterContainer.h"
 
-#define DISPLAY_NUMX 4
+#define DISPLAY_NUMX 3
 #define DISPLAY_NUMY 3
-#define FLIP_SIZE_FAC 0.65
-#define FLIP_MAX 4*3
+#define FLIP_SIZE_FAC 0.82
+#define FLIP_MAX 3*3
 
 MusterContainer::MusterContainer() {
     
@@ -28,7 +28,7 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
             displayGrid.at(index).x = (x*designGrid.x)+( (designGrid.x-flipSize)/2);
           //  displayGrid.at(index).y = (y*designGrid.x)+( (designGrid.x-flipSize)/2);
 
-            displayGrid.at(index).y = (y*(designGrid.y*1.17));
+            displayGrid.at(index).y = (y*(designGrid.y*1.1));
         }
     }
     
@@ -91,15 +91,15 @@ void MusterContainer::draw(){
 
 void MusterContainer::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 100, 160,255);
+    elementColorOn = ofColor::fromHsb(hue_, 120, 140,255);
     
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
     elementColorDarkerTrans = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 100 );
-    elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, elementColorOn.getBrightness()+90, 255);
+     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, 255, 255);
     
-    targetColor = elementColorDarker;
-    displayColor = elementColorDarker;
+    targetColor = elementColorOn;
+    displayColor = elementColorOn;
 }
 
 

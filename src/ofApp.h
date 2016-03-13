@@ -298,7 +298,7 @@ class ofApp : public ofxiOSApp{
         
         int pitchCorrect;
         
-        HistoryView hvSlotA, hvSlotB, hvSlotC;
+        HistoryView hvSlotA, hvSlotB, hvSlotC, hvSlotD;
         ofPolyline directionClickZonesA[4],directionClickZonesB[4],directionClickZonesC[4];
         
         ofVboMesh bpmFx;

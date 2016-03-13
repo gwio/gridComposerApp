@@ -6,7 +6,7 @@
 #define ANI_SPEED 0.030
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
-#define HARMONY_ROWS_SCALE 0.780
+#define HARMONY_ROWS_SCALE 0.8
 #define VERSION "0.93.5"
 
 
@@ -190,7 +190,8 @@ void ofApp::setup(){
     hvSlotB.setupSpacer(designGrid[1][1],HARMONY_ROWS_SCALE, designGrid[0][0]);
     hvSlotC.setupMesh(&mainInterfaceData[99],HISTORY_ROWS,99);
     hvSlotC.setupSpacer(designGrid[2][1],HARMONY_ROWS_SCALE, designGrid[0][0]);
-    
+    //state_edit_detail
+    hvSlotD = hvSlotB;
     
     //intersectplane
     planeForIntersect.set(TILES*TILESIZE,TILES*TILESIZE);
@@ -462,8 +463,10 @@ void ofApp::update(){
             hvSlotA.update(synths[synthButton[0]].noteHistory, mainInterfaceData, mainInterface);
             hvSlotB.update(synths[synthButton[1]].noteHistory, mainInterfaceData, mainInterface);
             hvSlotC.update(synths[synthButton[2]].noteHistory, mainInterfaceData, mainInterface);
-        } else if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT) {
-            hvSlotB.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
+        }
+        
+        if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT || currentState == STATE_DEFAULT) {
+            hvSlotD.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
         }
     }
     
@@ -515,8 +518,8 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[4].updateMainMesh(mainInterface, ofVec3f(0,designGrid[0][0].y,0) ,tweenFloat);
     mainInterfaceData[6].updateMainMesh(mainInterface, ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y,0),tweenFloat);
     
-    mainInterfaceData[39].updateMainMesh(mainInterface,ofVec3f(designGrid[0][0].x*6,designGrid[0][0].y*2,0), tweenFloat);
-    mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x*6, designGrid[0][0].y*2+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+    mainInterfaceData[39].updateMainMesh(mainInterface,designGrid[2][1], tweenFloat);
+    mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[2][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
     
     mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[2][0], tweenFloat);
@@ -672,8 +675,10 @@ void ofApp::drawInterface(){
         hvSlotA.draw();
         hvSlotB.draw();
         hvSlotC.draw();
-    } else if (currentState == STATE_EDIT || currentState == STATE_EDIT_DETAIL) {
-        hvSlotB.draw();
+    }
+    
+    if (currentState == STATE_EDIT || currentState == STATE_EDIT_DETAIL || (interfaceMoving && currentState == STATE_DEFAULT)) {
+        hvSlotD.draw();
     }
     
     
@@ -2007,7 +2012,7 @@ void ofApp::pulseEvent(int div){
         }
     } else if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT) {
         if (synths[activeSynth].pulseDivision == div) {
-            hvSlotB.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
+            hvSlotD.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
         }
     }
     
@@ -2450,8 +2455,8 @@ void ofApp::setupGlobalInterface() {
     
     //STATE_EDIT, muster container
     offPlace = ofVec3f(+designGrid[0][0].x*6,0,0);
-    place = ofVec3f(-(horizontalSlider.x*0.86)/2,(designGrid[0][0].y*2)/2,0);
-    temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.86,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(39,string("Container"),ofVec3f( horizontalSlider.x*0.8,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //keynote drag slider STATE_EDIT_DETAIL

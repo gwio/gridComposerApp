@@ -69,11 +69,21 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
         }
     }
     
+    /*
     //move spacer with interface animation
-    if (spacer.getVertex(0).y != guiPtr->drawStringPos.y) {
+    if (spacer.getVertex(0).y != guiPtr->drawStringPos.y+6) {
         for (int i = 0; i < spacer.getNumVertices(); i+=2) {
             spacer.setVertex(i, ofVec3f(spacer.getVertex(i).x,guiPtr->drawStringPos.y+6,0) );
             spacer.setVertex(i+1, ofVec3f(spacer.getVertex(i).x,guiPtr->drawStringPos.y-6,0) );
+        }
+    }
+     */
+    
+    //move spacer with interface animation
+    if ( (spacer.getVertex(0).y != guiPtr->drawStringPos.y+6)  || (spacer.getVertex(0).x != guiPtr->drawStringPos.x-(elementWhiteSpace*2)) ) {
+        for (int i = 0; i < spacer.getNumVertices(); i+=2) {
+            spacer.setVertex(i, ofVec3f(guiPtr->drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+6,0) );
+            spacer.setVertex(i+1, ofVec3f(guiPtr->drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y-6,0) );
         }
     }
 }
@@ -115,12 +125,14 @@ void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<Global
     }
     
     //move spacer with interface animation
-    if (spacer.getVertex(0).y != guiPtr->drawStringPos.y) {
+    if ( (spacer.getVertex(0).y != guiIndex_.at(newIndex_).drawStringPos.y+6)  || (spacer.getVertex(0).x != guiIndex_.at(newIndex_).drawStringPos.x-(elementWhiteSpace*2)) ) {
         for (int i = 0; i < spacer.getNumVertices(); i+=2) {
-            spacer.setVertex(i, ofVec3f(spacer.getVertex(i).x,guiPtr->drawStringPos.y+6,0) );
-            spacer.setVertex(i+1, ofVec3f(spacer.getVertex(i).x,guiPtr->drawStringPos.y-6,0) );
+            spacer.setVertex(i, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+6,0) );
+            spacer.setVertex(i+1, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y-6,0) );
         }
     }
+    
+   
 }
 
 
