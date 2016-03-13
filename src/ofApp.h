@@ -309,5 +309,7 @@ class ofApp : public ofxiOSApp{
         ofxXmlSettings setings;
         
         ofVec3f lastClick;
+        
+        void drawSliderPos();
 
     };
