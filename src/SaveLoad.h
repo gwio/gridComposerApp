@@ -44,7 +44,7 @@ public:
     void draw();
     void addNewSave(ofxXmlSettings&);
     void updatePosition();
-    ofImage makePng(ofxXmlSettings&,string);
+    ofImage makePng(ofxXmlSettings&,string,ofVec3f);
     
     void isInside(ofVec3f);
     void animateGrid(float&);

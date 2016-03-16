@@ -8,7 +8,7 @@ public:
     MusterFlip();
   
     
-    void setup(int,int);
+    void setup(float,int);
     void loadData(bool**,int,int);
     void update();
     void draw(ofVec3f);

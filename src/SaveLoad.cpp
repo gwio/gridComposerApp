@@ -82,7 +82,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
 
 void SaveLoad::checkDate(){
     
-    string cYear = ofGetTimestampString("%y");
+    string cYear = ofGetTimestampString("%Y");
     string cMonth = ofGetTimestampString("%m");
     string cDay = ofGetTimestampString("%d");
     
@@ -117,7 +117,7 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     tempXml.settings.popTag();
     string xmlKey = tempXml.year+tempXml.month+tempXml.day;
     
-    tempXml.slotInfo.thumb = makePng(tempXml.settings, xmlKey+"#"+ofToString(tempXml.number));
+    tempXml.slotInfo.thumb = makePng(tempXml.settings, xmlKey+"#"+ofToString(tempXml.number),slotSize);
 
     xmlSavesMap[xmlKey][tempXml.number] = tempXml;
     
@@ -125,16 +125,16 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     velo += (scrollLocation*-1*0.3);
 }
 
-ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_){
+ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSize_){
    // ofTexture tex;
    // tex.allocate(designGrid.x, designGrid.y, GL_RGBA);
     ofPixels pix;
 
     ofFbo fbo;
-    fbo.allocate(designGrid.x, designGrid.y,GL_RGBA);
+    fbo.allocate(slotSize_.x, slotSize_.y,GL_RGBA);
     
-    float rSize = 8;
-    float offset = designGrid.x/3;
+    int rSize = slotSize_.y/3/5;
+    int offset = (rSize*5)+((slotSize_.x-(rSize*15))/2);
     
     fbo.begin();
     ofClear(0, 0, 0,0);
@@ -150,15 +150,23 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_){
         xml_.pushTag("synth",i);
         ofColor tc = ofColor::fromHsb(xml_.getValue("cHue", 0), 120, 140, 255);
         
+        ofFill();
+        ofSetColor(ofColor::fromHsb(255,0,204,255));
+         ofDrawRectangle(offset*i,(slotSize_.y/3), rSize*5,rSize*5);
+        
+         ofSetColor(tc);
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
                 if (temp.at(x+(5*y)) == '1') {
-                    ofSetColor(tc);
-                    ofVec2f point = ofVec2f(x*rSize+(offset*i),y*rSize);
+                    
+                    ofVec2f point = ofVec2f(x*rSize+(offset*i),(y*rSize)+ (slotSize_.y/3) );
                     ofDrawRectangle(point, rSize, rSize);
+                    
+                   
                 }
             }
         }
+        
         xml_.popTag();
         xml_.popTag();
 
@@ -166,7 +174,7 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_){
     
     fbo.end();
     
-    pix.allocate(designGrid.x,designGrid.y,OF_PIXELS_RGBA);
+    pix.allocate(slotSize_.x,slotSize_.y,OF_PIXELS_RGBA);
    // tex.allocate(pix);
     fbo.readToPixels(pix);
     
@@ -187,15 +195,22 @@ void SaveLoad::updatePosition(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         
         counterIn = 0;
-        offsetDown.y += ((((outerIt->second.size()-1)/3))* slotSize.y) + slotSize.y*2;
+        offsetDown.y += ((((outerIt->second.size()-1)/4))* (slotSize.y+slotSize.y/3) + (slotSize.y*2));
 
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             saveSlot &slot = innerIt->second.slotInfo;
-            slot.name = outerIt->first+" #"+ofToString(innerIt->first);
+            //slot.name = outerIt->first+" #"+ofToString(innerIt->first);
+            //slot.name = "# "+ofToString(innerIt->first);
+
             slot.size = slotSize;
-            slot.pos = ofVec3f((counterIn%3)*slotSize.x,-floor((counterIn/3))*slotSize.y,0)+offsetDown;
+            
+            slot.pos = ofVec3f((counterIn%4)*slotSize.x,-floor((counterIn/4))* (slotSize.y+slotSize.y/3),0);
+            slot.pos+=offsetDown;
+            slot.pos+=ofVec3f(designGrid.x * 0.111*2,0,0);
+            slot.pos+=ofVec3f(counterIn%4* designGrid.x*0.111*2,  0,0);
+            
             slot.testRect.set(slot.pos, slotSize.x, slotSize.y);
-            slot.name ="SKETCH #"+ofToString(innerIt->second.number);
+            slot.name ="# "+ofToString(innerIt->second.number);
             counterIn++;
         }
         counterOut++;
@@ -209,7 +224,7 @@ void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
     
     designGrid = dGrid_;
     fsPtr = fsPtr_;
-    slotSize = ofVec3f(designGrid.x*4/3, designGrid.y,0);
+    slotSize = ofVec3f(designGrid.x*0.777, designGrid.y*0.777,0);
     aniVecPtr = aniPtr_;
 }
 
@@ -248,9 +263,9 @@ void SaveLoad::draw(){
                 ofNoFill();
                 innerIt->second.slotInfo.thumb.draw(innerIt->second.slotInfo.testRect.position);
                 ofDrawRectangle(innerIt->second.slotInfo.testRect);
-                ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
+                //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 ofFill();
-                fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+42);
+                fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+22);
             }
         }
     }

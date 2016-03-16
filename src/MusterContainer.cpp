@@ -3,7 +3,7 @@
 
 #define DISPLAY_NUMX 3
 #define DISPLAY_NUMY 3
-#define FLIP_SIZE_FAC 0.82
+#define FLIP_SIZE_FAC 0.888
 #define FLIP_MAX 3*3
 
 MusterContainer::MusterContainer() {
@@ -13,11 +13,13 @@ MusterContainer::MusterContainer() {
 MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_) {
     
     gridTiles = tiles_;
-    designGrid.x = (designGrid_.x)/(DISPLAY_NUMX);
-    designGrid.y = (designGrid_.y)/(DISPLAY_NUMY);
+    designGrid.x = (designGrid_.x)/(float)DISPLAY_NUMX;
+    designGrid.y = (designGrid_.y)/(float)DISPLAY_NUMY;
     //designGrid*=0.8;
     
     flipSize = designGrid.y*FLIP_SIZE_FAC;
+    float offsetX = ((designGrid_.x)-(flipSize*3))/2;
+    float offsetY = ((designGrid_.y)-(flipSize*3))/2;
     
     displayGrid.clear();
     displayGrid.resize(DISPLAY_NUMX*DISPLAY_NUMY);
@@ -25,10 +27,10 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     for (int x = 0; x < DISPLAY_NUMX; x++) {
         for (int y = 0; y < DISPLAY_NUMY; y++) {
             int index = x+(y*DISPLAY_NUMX);
-            displayGrid.at(index).x = (x*designGrid.x)+( (designGrid.x-flipSize)/2);
+            displayGrid.at(index).x = (x*flipSize)+(offsetX*x);
           //  displayGrid.at(index).y = (y*designGrid.x)+( (designGrid.x-flipSize)/2);
 
-            displayGrid.at(index).y = (y*(designGrid.y*1.1));
+            displayGrid.at(index).y = (y*flipSize)+(offsetY*y);
         }
     }
     

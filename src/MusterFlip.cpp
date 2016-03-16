@@ -7,8 +7,8 @@ MusterFlip::MusterFlip() {
     
 }
 
-void MusterFlip::setup(int size_,int tiles_){
-    size = size_;
+void MusterFlip::setup(float size_,int tiles_){
+    size = (int)size_;
     gridTiles = tiles_;
     ofFbo tempFbo;
     

@@ -26,7 +26,7 @@ public:
     ofVec3f centerPos;
     ofVec2f designGrid;
     
-    int flipSize;
+    float flipSize;
     int gridTiles;
     
     vector<ofVec3f>  displayGrid;
