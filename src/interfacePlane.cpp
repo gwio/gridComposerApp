@@ -755,8 +755,9 @@ void InterfacePlane::draw( bool& pause_){
         // ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
         ofSetColor( ofColor( 255, 255, 255,180) );
         
+        glLineWidth(2);
+
         ofLine(-8, 0, 8, 0);
-        
         
         posNode.restoreTransformGL();
         //  ofPopStyle();

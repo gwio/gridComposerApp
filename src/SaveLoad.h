@@ -5,6 +5,16 @@
 
 
 
+struct dateInfo{
+    string name;
+    ofVec3f offPos, defaultPos, displayPos;
+    bool active;
+    dateInfo(){
+        active = false;
+        name="";
+    }
+};
+//--------
 
 struct saveSlot{
     ofVec3f pos, offPos;
@@ -23,7 +33,7 @@ struct saveSlot{
 
 struct xmlSave{
     ofxXmlSettings settings;
-    string year, month, day;
+    string year, month, day, hour;
     int number;
     saveSlot slotInfo;
 };
@@ -76,4 +86,6 @@ public:
     int moveDir;
     bool slotDetail;
     string loadString;
+    
+    vector<dateInfo> datePosVec;
 };

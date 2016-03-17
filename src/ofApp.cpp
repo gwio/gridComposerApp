@@ -690,7 +690,7 @@ void ofApp::drawInterface(){
     
     //bpm fx
     if (currentState == STATE_BPM) {
-        //glLineWidth(	2);
+        glLineWidth(	2);
         bpmFx.draw();
     }
     
@@ -2486,7 +2486,7 @@ void ofApp::setupGlobalInterface() {
     // back to default, STATE_SAVE
     place = ofVec3f(0,0,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(47, string("back"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(47, string("BACK"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     // animation data for load save grid, STATE_SAVE
@@ -4353,6 +4353,7 @@ void ofApp::saveToXml(string path_){
     settings.addValue("month",saveManager.saveLastMonth);
     settings.addValue("day",saveManager.saveLastDay);
     settings.addValue("number", saveManager.saveLastNumber);
+    settings.addValue("hour", ofGetTimestampString("%H")+":"+ofGetTimestampString("%M"));
     settings.popTag();
     
     //--------------------------------
