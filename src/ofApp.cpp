@@ -2504,7 +2504,7 @@ void ofApp::setupGlobalInterface() {
     //return to load grid, STATE_SAVE
     place = ofVec3f( 0,0,0);
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(50, string("Back"), smallButton,ofColor(0,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(50, string("BACK"), smallButton,ofColor(0,0,0),place,offPlace,fontDefault,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     

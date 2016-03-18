@@ -54,8 +54,8 @@ void MusterContainer::setup() {
         {1,1,1,1,1}
     };
     
-    bool *tempB[5];
-    for (int i = 0; i < 5; i++) {
+    bool *tempB[gridTiles];
+    for (int i = 0; i < gridTiles; i++) {
         tempB[i] = tempA[i];
     }
     
