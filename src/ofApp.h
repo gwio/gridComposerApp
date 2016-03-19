@@ -163,7 +163,7 @@ class ofApp : public ofxiOSApp{
         int globalScaleVecPos;
         
         //font
-        ofxFontStash tekoRegular, rajLight;
+        ofxFontStash tekoLight, tekoRegular, tekoMedium, tekoSemibold, tekoBold;
         
         
         //save function
@@ -311,5 +311,10 @@ class ofApp : public ofxiOSApp{
         ofVec3f lastClick;
         
         void drawSliderPos();
+        
+        float fontSizeDefault, fontSizeSmall ,fontSizeBigger;
+        int iconSize;
+        
+        void setupFonts();
 
     };

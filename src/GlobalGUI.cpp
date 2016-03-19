@@ -346,11 +346,11 @@ void GlobalGUI::setOff() {
 
 
 void GlobalGUI::setStringWidth(float sW_) {
-    stringWidth = sW_/2;
+    stringWidth = (sW_/2)-fsPtr->getSpaceSize()/2;
 }
 
 void GlobalGUI::setAuxStringWidth(float sW_) {
-    auxStringWidth = sW_/2;
+    auxStringWidth = (sW_/2)-fsPtr->getSpaceSize()/2;
 }
 
 void GlobalGUI::blinkOn(){
@@ -414,17 +414,5 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
 }
 
 
-void GlobalGUI::drawAuxString(float offsetX_, float offsetY_) {
-    
-    ofPushStyle();
-    ofSetColor(displayColor);
-    fsPtr->draw(auxString,
-                fontSize,
-                drawStringPos.x-auxStringWidth+offsetX_,
-                drawStringPos.y+stringHeight+offsetY_
-                );
-    ofPopStyle();
-    
-}
 
 

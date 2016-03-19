@@ -49,7 +49,7 @@ public:
     SaveLoad();
     void loadSaveFolder(string);
     void checkDate();
-    void setup(ofVec3f, ofxFontStash *, ofVec3f*);
+    void setup(ofVec3f, ofxFontStash *, ofxFontStash *, ofVec3f*);
     void update();
     void draw();
     void addNewSave(ofxXmlSettings&);
@@ -61,7 +61,7 @@ public:
     
     void deleteSave();
     
-    ofxFontStash *fsPtr;
+    ofxFontStash *fsPtrLight, *fsPtrSemi;
     ofVec3f slotSize;
     ofVec3f *aniVecPtr;
     ofVec3f offsetDown;

@@ -228,10 +228,11 @@ void SaveLoad::updatePosition(){
     cout << "new sizue" << saveDir.size() << endl;
     
 }
-void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtr_, ofVec3f *aniPtr_){
+void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtrLight_, ofxFontStash* fsPtrSemi_ ,ofVec3f *aniPtr_){
     
     designGrid = dGrid_;
-    fsPtr = fsPtr_;
+    fsPtrLight = fsPtrLight_;
+    fsPtrSemi = fsPtrSemi_;
     slotSize = ofVec3f(designGrid.x*0.777, designGrid.y*0.777,0);
     aniVecPtr = aniPtr_;
 }
@@ -265,7 +266,7 @@ void SaveLoad::draw(){
     int counter =0;
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
-        fsPtr->draw(temp.year+" "+temp.month+" "+temp.day, 60, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        fsPtrLight->draw(temp.year+" "+temp.month+" "+temp.day, 60, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
         
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
@@ -277,10 +278,10 @@ void SaveLoad::draw(){
                 //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 ofFill();
                 ofSetColor(ofColor::fromHsb(255,0,204,255));
-                fsPtr->draw(innerIt->second.slotInfo.name, 40, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+22);
-                float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtr->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
+                fsPtrSemi->draw(innerIt->second.slotInfo.name, slotSize.x/6.5, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+22);
+                float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrSemi->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
-                fsPtr->draw(innerIt->second.hour, 40,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
+                fsPtrSemi->draw(innerIt->second.hour, slotSize.x/6.5,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
 
             }
         }
