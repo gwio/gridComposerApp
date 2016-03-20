@@ -254,8 +254,14 @@ void ofApp::setup(){
         
     }
     
-    //use interface element string pos 48 for animation
-    saveManager.setup(designGrid[0][0], &tekoLight, &tekoSemibold, &mainInterfaceData[48].drawStringPos);
+    //setup save manager, font files , size
+    saveManager.setup(fontSizeSmall, fontSizeDefault, fontSizeBigger,
+                      designGrid[0][0],
+                      &tekoLight,&tekoRegular,
+                      &tekoMedium,
+                      &tekoSemibold,
+                      &tekoBold,
+                      &mainInterfaceData[48].drawStringPos);
 #if TARGET_OS_IPHONE
     saveManager.loadSaveFolder(ofxiOSGetDocumentsDirectory());
 #else

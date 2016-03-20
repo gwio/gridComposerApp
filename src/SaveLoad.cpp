@@ -228,13 +228,26 @@ void SaveLoad::updatePosition(){
     cout << "new sizue" << saveDir.size() << endl;
     
 }
-void SaveLoad::setup(ofVec3f dGrid_, ofxFontStash* fsPtrLight_, ofxFontStash* fsPtrSemi_ ,ofVec3f *aniPtr_){
+void SaveLoad::setup(float fs_, float fd_, float fb_,ofVec3f dGrid_,
+                     ofxFontStash* fsPtrLight_,
+                     ofxFontStash* fsPtrReg_,
+                     ofxFontStash* fsPtrMedium_,
+                     ofxFontStash* fsPtrSemi_,
+                     ofxFontStash* fsPtrBold_,
+                     ofVec3f *aniPtr_){
     
     designGrid = dGrid_;
     fsPtrLight = fsPtrLight_;
+    fsPtrRegular = fsPtrReg_;
+    fsPtrMedium = fsPtrMedium_;
     fsPtrSemi = fsPtrSemi_;
+    fsPtrBold = fsPtrBold_;
     slotSize = ofVec3f(designGrid.x*0.777, designGrid.y*0.777,0);
     aniVecPtr = aniPtr_;
+    
+    fontSmall = fs_;
+    fontDefault = fd_;
+    fontBig = fb_;
 }
 
 void SaveLoad::update(){
@@ -266,7 +279,7 @@ void SaveLoad::draw(){
     int counter =0;
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
-        fsPtrLight->draw(temp.year+" "+temp.month+" "+temp.day, 60, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        fsPtrLight->draw(temp.year+" "+temp.month+" "+temp.day, fontBig, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
         
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
@@ -278,10 +291,10 @@ void SaveLoad::draw(){
                 //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 ofFill();
                 ofSetColor(ofColor::fromHsb(255,0,204,255));
-                fsPtrSemi->draw(innerIt->second.slotInfo.name, slotSize.x/6.5, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+22);
-                float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrSemi->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
+                fsPtrLight->draw(innerIt->second.slotInfo.name, fontBig, innerIt->second.slotInfo.testRect.position.x,innerIt->second.slotInfo.testRect.position.y+22);
+                float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
-                fsPtrSemi->draw(innerIt->second.hour, slotSize.x/6.5,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
+                fsPtrLight->draw(innerIt->second.hour, fontBig,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
 
             }
         }

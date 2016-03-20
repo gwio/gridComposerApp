@@ -49,7 +49,7 @@ public:
     SaveLoad();
     void loadSaveFolder(string);
     void checkDate();
-    void setup(ofVec3f, ofxFontStash *, ofxFontStash *, ofVec3f*);
+    void setup(float,float,float,ofVec3f, ofxFontStash *, ofxFontStash *, ofxFontStash *, ofxFontStash *, ofxFontStash *, ofVec3f*);
     void update();
     void draw();
     void addNewSave(ofxXmlSettings&);
@@ -61,7 +61,7 @@ public:
     
     void deleteSave();
     
-    ofxFontStash *fsPtrLight, *fsPtrSemi;
+    ofxFontStash *fsPtrLight, *fsPtrRegular, *fsPtrMedium, *fsPtrSemi , *fsPtrBold;
     ofVec3f slotSize;
     ofVec3f *aniVecPtr;
     ofVec3f offsetDown;
@@ -88,4 +88,5 @@ public:
     string loadString;
     
     vector<dateInfo> datePosVec;
+    float fontSmall, fontDefault, fontBig;
 };
