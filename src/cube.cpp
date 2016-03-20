@@ -1,7 +1,7 @@
 
 #include "cube.h"
 
-#define SPEED 0.55
+#define SPEED 2.5
 
 
 Cube::Cube(){
@@ -48,12 +48,12 @@ void Cube::update(){
     if (targetZ != vec0Ptr->z) {
         
         pulseDivFac =  5-*pulseDivPtr;
-        zInc =  (SPEED*aniFac)* ofClamp(ofMap(*bpmTickPtr, 150,1100,2.0,1.0),1.0,2.0)*pulseDivFac;
-        
+     //   zInc =  (SPEED*aniFac)* *pulseDivFac;
+        zInc = aniFac*SPEED*pulseDivFac;
         
         if (diff > 0) {
             aniFac = ofClamp(1-pow(1-aniPct, 2),0.0,1.0);
-            aniPct+= (0.15);
+            aniPct+= (0.01 * ofClamp(ofMap(*bpmTickPtr, 150,1100,2.0,1.0),1.0,3.0)*pulseDivFac);
             if(vec0Ptr->z + zInc >= targetZ){
                 vec0Ptr->z = targetZ;
                 vec1Ptr->z = targetZ;
@@ -68,8 +68,8 @@ void Cube::update(){
         }
         
         if (diff < 0) {
-            aniFac = ofClamp(pow(aniPct,4),0.0,1.0);
-            aniPct += (0.066);
+            aniFac = ofClamp(pow(aniPct,2),0.0,1.0);
+            aniPct += (0.005 * ofClamp(ofMap(*bpmTickPtr, 150,1100,2.0,1.0),1.0,2.0)*pulseDivFac);
             if(vec0Ptr->z - zInc <= targetZ){
                 vec0Ptr->z = targetZ;
                 vec1Ptr->z = targetZ;
