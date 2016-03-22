@@ -22,12 +22,16 @@ struct saveSlot{
     ofRectangle testRect;
     string name;
     ofImage thumb;
-    bool active;
+    bool active, cycleColorNext;
     int highlight;
+    float myTween;
+    ofColor displayC, targetC;
     saveSlot(){
         active = false;
+        cycleColorNext = false;
         offPos = ofVec3f(0,0,0);
         name = "";
+        myTween = 0.0;
         highlight = 0;
     }
 };
@@ -59,7 +63,7 @@ public:
     
     void isInside(ofVec3f);
     void animateGrid(float&);
-    void updateHighlight();
+    void updateHighlightVertices();
     void deleteSave();
     void cycleHighlightColor();
     
@@ -99,6 +103,5 @@ public:
     
     ofxXmlSettings xmlTemp;
     
-    float easeInOut(float, float);
     
 };

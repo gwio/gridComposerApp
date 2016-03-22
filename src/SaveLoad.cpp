@@ -58,6 +58,16 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         tempXml.hour = loader.getValue("hour","");
         tempXml.slotInfo.highlight = loader.getValue("highlight", 0);
         
+        if(tempXml.slotInfo.highlight == 0){
+            tempXml.slotInfo.displayC = colorDef;
+        } else if (tempXml.slotInfo.highlight == 1){
+            tempXml.slotInfo.displayC = colorA;
+        } else if (tempXml.slotInfo.highlight == 2){
+            tempXml.slotInfo.displayC = colorB;
+        } else {
+            tempXml.slotInfo.displayC = colorC;
+        }
+        
         loader.popTag();
         string xmlKeyDay = tempXml.year+tempXml.month+tempXml.day;
         
@@ -256,7 +266,7 @@ void SaveLoad::setup(float fs_, float fd_, float fb_,ofVec3f dGrid_,
     fsPtrBold = fsPtrBold_;
     slotSize = ofVec3f( (designGrid.x*4)/3.5, (designGrid.x*4)/3.5/3, 0);
     rSize = slotSize.x/18;
-    highlightLine = rSize;
+    highlightLine = rSize/2;
     
     aniVecPtr = aniPtr_;
     
@@ -267,11 +277,11 @@ void SaveLoad::setup(float fs_, float fd_, float fb_,ofVec3f dGrid_,
 
 void SaveLoad::update(){
     
-    velo+=ofClamp( pow((acc*0.5),1),-55,55);
+    velo+=ofClamp(pow((acc*0.5),1),-55,55);
     
     if (-offsetDown.y+(designGrid.y*7) < 0 ){
         if(!touchDown){
-            scrollLocation = ofClamp(scrollLocation+velo,-offsetDown.y+(designGrid.y*7) ,0);
+            scrollLocation = ofClamp(scrollLocation+velo,-offsetDown.y+(designGrid.y*7),0);
         }else {
             scrollLocation = ofClamp(scrollLocation+acc,-offsetDown.y+(designGrid.y*7),0);
         }
@@ -280,11 +290,13 @@ void SaveLoad::update(){
     
     if ( abs(velo) > 0.0001){
         velo *= 0.751;
-        updateHighlight();
     } else {
         velo = 0.0;
-        updateHighlight();
     }
+
+    
+    updateHighlightVertices();
+
     
 }
 
@@ -304,7 +316,7 @@ void SaveLoad::draw(){
                 ofNoFill();
                 ofSetColor(ofColor(255,255,255,255));
                 innerIt->second.slotInfo.thumb.draw(innerIt->second.slotInfo.testRect.position);
-                ofDrawRectangle(innerIt->second.slotInfo.testRect);
+                //ofDrawRectangle(innerIt->second.slotInfo.testRect);
                 //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 ofFill();
                 ofSetColor(ofColor::fromHsb(255,0,204,255));
@@ -446,7 +458,7 @@ void SaveLoad::animateGrid(float& tween_){
     }
 }
 
-void SaveLoad::updateHighlight(){
+void SaveLoad::updateHighlightVertices(){
     highlight.clear();
     ofVec3f temp;
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
@@ -464,23 +476,26 @@ void SaveLoad::updateHighlight(){
                 highlight.addVertex(temp+ofVec3f(0,0,0));
                 highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
                 
-                if(slot.highlight == 0){
-                    for (int i = 0; i < 6; i++) {
-                        highlight.addColor(colorDef);
+                
+                for (int i = 0; i < 6; i++) {
+                    highlight.addColor(slot.displayC);
+                }
+                
+                if (slot.cycleColorNext) {
+                    slot.myTween = (slot.myTween*1.12)+0.01;
+                    
+                    if (slot.displayC != slot.targetC) {
+                        slot.displayC = slot.displayC.lerp(slot.targetC, slot.myTween);
                     }
-                } else if (slot.highlight == 1){
-                    for (int i = 0; i < 6; i++) {
-                        highlight.addColor(colorA);
-                    }
-                } else if (slot.highlight == 2){
-                    for (int i = 0; i < 6; i++) {
-                        highlight.addColor(colorB);
-                    }
-                } else {
-                    for (int i = 0; i < 6; i++) {
-                        highlight.addColor(colorC);
+                    
+                    if (slot.myTween >= 1.0) {
+                        slot.displayC = slot.targetC;
+                        slot.myTween = 0.0;
+                        slot.cycleColorNext = false;
                     }
                 }
+                
+               
                 
                 
             }
@@ -490,38 +505,33 @@ void SaveLoad::updateHighlight(){
 
 void SaveLoad::cycleHighlightColor(){
     
-    selectInnerIt->second.slotInfo.highlight = (selectInnerIt->second.slotInfo.highlight+1)%4;
-    updateHighlight();
-    
+    saveSlot &slot = selectInnerIt->second.slotInfo;
+
+    slot.highlight = (slot.highlight+1)%4;
     
   xmlTemp.pushTag("date");
-   xmlTemp.setValue("highlight", selectInnerIt->second.slotInfo.highlight);
+   xmlTemp.setValue("highlight", slot.highlight);
    xmlTemp.popTag();
    
     
    xmlTemp.save(loadString);
     
+    if(slot.highlight == 0){
+        slot.targetC = colorDef;
+    } else if (slot.highlight == 1){
+        slot.targetC = colorA;
+    } else if (slot.highlight == 2){
+        slot.targetC = colorB;
+    } else {
+        slot.targetC = colorC;
+    }
+    slot.displayC = ofColor::fromHsb(slot.displayC.getHue(), slot.displayC.getSaturation()-50, 255,255);
+    
+    slot.cycleColorNext = true;
+    
 }
 
-float SaveLoad::easeInOut(float input_, float a_) {
-    
-    
-    float epsilon = 0.00001;
-    float min_param_a = 0.0 + epsilon;
-    float max_param_a = 1.0 - epsilon;
-    a_ = min(max_param_a, max(min_param_a, a_));
-    a_ = 1.0-a_; // for sensible results
-    
-    
-    float y = 0;
-    if (input_<=0.5){
-        y = (pow(2.0*input_, 1.0/a_))/2.0;
-    } else {
-        y = 1.0 - (pow(2.0*(1.0-input_), 1.0/a_))/2.0;
-    }
-    return y;
-    
-}
+
 
 
 
