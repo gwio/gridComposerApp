@@ -37,6 +37,8 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     flips.clear();
     flips.resize(FLIP_MAX);
     
+    flipsBackground.clear();
+    flipsBackground.resize(FLIP_MAX);
   
     
     saveReady = false;
@@ -63,13 +65,21 @@ void MusterContainer::setup() {
         
         flips.at(i).setup(designGrid.y*FLIP_SIZE_FAC, gridTiles);
         flips.at(i).loadData(tempB, gridTiles,gridTiles);
+        
+        flipsBackground.at(i).setup(designGrid.y*FLIP_SIZE_FAC, gridTiles);
+        flipsBackground.at(i).makeBackTex();
+
     }
     
     
 }
 void MusterContainer::draw(){
-    
-    ofPushStyle();
+    //ofPushStyle();
+    ofSetColor(255, 255, 255,255);
+    for (int i = 0; i < displayGrid.size(); i++) {
+        flipsBackground.at(i).draw(displayGrid.at(i)+centerPos);
+    }
+
     if (saveReady) {
         elementColorTouch.setBrightness( ((sin(ofGetElapsedTimef()*8)+1)/2)*200 );
         if (displayColor != elementColorTouch) {
@@ -87,7 +97,7 @@ void MusterContainer::draw(){
     for (int i = 0; i < displayGrid.size(); i++) {
         flips.at(i).draw(displayGrid.at(i)+centerPos);
     }
-    ofPopStyle();
+    //ofPopStyle();
     
 }
 

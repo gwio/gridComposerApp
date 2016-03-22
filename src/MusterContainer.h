@@ -23,6 +23,7 @@ public:
     void saveToFlip(int);
     
     vector<MusterFlip> flips;
+    vector<MusterFlip> flipsBackground;
     ofVec3f centerPos;
     ofVec2f designGrid;
     

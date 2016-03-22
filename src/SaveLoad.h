@@ -23,16 +23,17 @@ struct saveSlot{
     string name;
     ofImage thumb;
     bool active;
+    int highlight;
     saveSlot(){
         active = false;
         offPos = ofVec3f(0,0,0);
         name = "";
+        highlight = 0;
     }
 };
 
 
 struct xmlSave{
-    ofxXmlSettings settings;
     string year, month, day, hour;
     int number;
     saveSlot slotInfo;
@@ -58,8 +59,9 @@ public:
     
     void isInside(ofVec3f);
     void animateGrid(float&);
-    
+    void updateHighlight();
     void deleteSave();
+    void cycleHighlightColor();
     
     ofxFontStash *fsPtrLight, *fsPtrRegular, *fsPtrMedium, *fsPtrSemi , *fsPtrBold;
     ofVec3f slotSize;
@@ -70,8 +72,8 @@ public:
     map<string, map<int,xmlSave>>::reverse_iterator outerIt;
     map<int,xmlSave>::iterator innerIt;
     
-    map<string, map<int,xmlSave>>::reverse_iterator delOuterIt;
-    map<int,xmlSave>::iterator delInnerIt;
+    map<string, map<int,xmlSave>>::reverse_iterator selectOuterIt;
+    map<int,xmlSave>::iterator selectInnerIt;
     
     ofDirectory saveDir;
     map<string, map<int,xmlSave>> xmlSavesMap;
@@ -89,4 +91,14 @@ public:
     
     vector<dateInfo> datePosVec;
     float fontSmall, fontDefault, fontBig;
+    
+    ofVboMesh highlight;
+    float highlightLine, rSize;
+    
+    ofColor colorDef, colorA, colorB, colorC;
+    
+    ofxXmlSettings xmlTemp;
+    
+    float easeInOut(float, float);
+    
 };

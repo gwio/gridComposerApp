@@ -292,13 +292,13 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 
 void ofApp::setupFonts(){
-    fontSizeDefault = designGrid[0][0].x/5.25;
+    fontSizeDefault = designGrid[0][0].y/3.5;
     fontSizeSmall = fontSizeDefault*0.7;
     fontSizeBigger = fontSizeDefault*1.333;
     
     tekoLight.setup("fonts/Teko/Teko-Light.ttf", //font file, ttf only
                     1.0,					//lineheight percent
-                    1024,					//texture atlas dimension
+                    512,					//texture atlas dimension
                     false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
                     8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                     1.0f					//dpi scaleup, render textures @2x the reso
@@ -310,7 +310,7 @@ void ofApp::setupFonts(){
     
     tekoRegular.setup("fonts/Teko/Teko-Regular.ttf", //font file, ttf only
                     1.0,					//lineheight percent
-                    1024,					//texture atlas dimension
+                    512,					//texture atlas dimension
                     false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
                     8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                     1.0f					//dpi scaleup, render textures @2x the reso
@@ -322,7 +322,7 @@ void ofApp::setupFonts(){
     
     tekoMedium.setup("fonts/Teko/Teko-Medium.ttf", //font file, ttf only
                       1.0,					//lineheight percent
-                      1024,					//texture atlas dimension
+                      512,					//texture atlas dimension
                       false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
                       8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                       1.0f					//dpi scaleup, render textures @2x the reso
@@ -334,7 +334,7 @@ void ofApp::setupFonts(){
     
     tekoSemibold.setup("fonts/Teko/Teko-SemiBold.ttf", //font file, ttf only
                      1.0,					//lineheight percent
-                     1024,					//texture atlas dimension
+                     512,					//texture atlas dimension
                      false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
                      8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                      1.0f					//dpi scaleup, render textures @2x the reso
@@ -346,7 +346,7 @@ void ofApp::setupFonts(){
     
     tekoBold.setup("fonts/Teko/Teko-Bold.ttf", //font file, ttf only
                        1.0,					//lineheight percent
-                       1024,					//texture atlas dimension
+                       512,					//texture atlas dimension
                        false,					//create mipmaps of the font, useful to scale down the font at smaller sizes
                        8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
                        1.0f					//dpi scaleup, render textures @2x the reso
@@ -671,6 +671,8 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[129].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
 
     
+    mainInterfaceData[130].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
+
     saveManager.animateGrid(tweenFloat);
 }
 
@@ -1769,6 +1771,9 @@ void ofApp::replaceMousePressed(int x, int y) {
                     mainInterfaceData[124].blinkOn();
                     closeSlotInterface();
                     
+                } else  if (mainInterfaceData[130].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[130].blinkOn();
+                    saveManager.cycleHighlightColor();
                 }
             }
         }
@@ -2728,6 +2733,12 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(129,string("GLOBAL SCALE"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
+    //save button, STATE_SAVE
+    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
+    place = ofVec3f(0,0,0);
+    temp = GlobalGUI(130,"MARK",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+    
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
@@ -3427,6 +3438,10 @@ void ofApp::openSlotInterface(){
     mainInterfaceData[126].showString = true;
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 1;
+    
+    mainInterfaceData[130].showString = true;
+    mainInterfaceData[130].animation = true;
+    mainInterfaceData[130].moveDir = 1;
 }
 
 //--------------------------------------------------------------
@@ -3448,6 +3463,9 @@ void ofApp::closeSlotInterface(){
     
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 0;
+    
+    mainInterfaceData[130].animation = true;
+    mainInterfaceData[130].moveDir = 0;
     
     if (currentState != STATE_DEFAULT) {
         mainInterfaceData[47].animation = true;
@@ -4488,6 +4506,7 @@ void ofApp::saveToXml(string path_){
     settings.addValue("day",saveManager.saveLastDay);
     settings.addValue("number", saveManager.saveLastNumber);
     settings.addValue("hour", ofGetTimestampString("%H")+":"+ofGetTimestampString("%M"));
+    settings.addValue("highlight", 0);
     settings.popTag();
     
     //--------------------------------

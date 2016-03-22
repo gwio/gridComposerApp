@@ -14,6 +14,7 @@ public:
     void draw(ofVec3f);
     
     void makeTex();
+    void makeBackTex();
     
     ofTexture texture;
     ofVec3f pos;

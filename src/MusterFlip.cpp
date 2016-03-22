@@ -38,6 +38,27 @@ void MusterFlip::draw(ofVec3f pos_){
     
 }
 
+void MusterFlip::makeBackTex(){
+    ofPushStyle();
+    ofFbo fbo_;
+    
+    fbo_.allocate( (size/gridTiles)*gridTiles, (size/gridTiles)*gridTiles, GL_RGBA);
+    
+    fbo_.begin();
+    
+    // ofEnableDepthTest();
+    ofClear(ofColor::fromHsb(255,0,204,255));
+    
+    fbo_.end();
+    texture.clear();
+    texture = fbo_.getTextureReference();
+    
+    ofPopStyle();
+    
+
+
+}
+
 void MusterFlip::makeTex(){
 
     
@@ -49,7 +70,7 @@ void MusterFlip::makeTex(){
     fbo_.begin();
    
     // ofEnableDepthTest();
-    ofClear(255, 255, 255,80);
+    ofClear(ofColor::fromHsb(0,0,0,0));
     float rSize = size/gridTiles;
     //ofSetColor(ofColor::darkCyan);
 
