@@ -210,13 +210,13 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
 float SynthPresetManager::getPresetColor(float hue_, int preset_){
     
     if (preset_ == 0) {
-        hue_ = 7;
+        hue_ = 9;
     } else if (preset_ == 1) {
         hue_ = 111;
     } else if (preset_ == 2) {
-        hue_ = 141;
+        hue_ = 137;
     } else if (preset_ == 3) {
-        hue_ = 230;
+        hue_ = 232;
     }
     return hue_;
     

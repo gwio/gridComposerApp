@@ -25,9 +25,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     borderSize = border_;
     
     
-    innerColorDefault = filterColor( ofColor::fromHsb(138,0,210));
+    innerColorDefault =  ofColor::fromHsb(138,0,195);
     outerColorDefault = ofColor(21,21,21);
-    rasterColor = filterColor( ofColor::black);
+    rasterColor = ofColor::black;
     
     soundsCounter = 1;
     synthHasChanged = false;
@@ -761,10 +761,10 @@ void Instrument::updateCubeMesh(){
         cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
         cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
         
-        cubes.setColor(cubeVector[j].vIndex0,filterColor( cubeVector[j].displayColor));
-        cubes.setColor(cubeVector[j].vIndex1,filterColor( cubeVector[j].displayColor));
-        cubes.setColor(cubeVector[j].vIndex2,filterColor( cubeVector[j].displayColor));
-        cubes.setColor(cubeVector[j].vIndex3,filterColor( cubeVector[j].displayColor));
+        cubes.setColor(cubeVector[j].vIndex0, cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex1, cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex2, cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex3, cubeVector[j].displayColor);
     }
     
 }
@@ -1371,13 +1371,4 @@ void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
     }
 }
 
-ofColor Instrument::filterColor(ofColor c_){
-    ofColor temp;
-    temp.r = ofClamp(c_.r+20, 20, 230);
-    temp.g = ofClamp(c_.g+5, 20, 230);
-    temp.b = ofClamp(c_.b-20, 20, 230);
-    temp.a = ofClamp(c_.a, 10, 255);
-    
-    
-    return c_;
-}
+

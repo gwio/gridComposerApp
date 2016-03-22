@@ -14,7 +14,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     
     if (!trans_) {
         //elementColorOn =  filterColor(ofColor::darkCyan);
-        elementColorOn = ofColor::fromHsb(255,0,204,255);
+        elementColorOn = ofColor::fromHsb(255,0,195,255);
         //setColor(0);
         targetColor = elementColorOn;
         //targetColor = elementColorOn;
@@ -22,7 +22,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
         elementColorOff = ofColor::fromHsb(0,0,0,0);
         
     } else {
-        elementColorOn = ofColor::fromHsb(255,0,204,255);
+        elementColorOn = ofColor::fromHsb(255,0,195,255);
         targetColor = elementColorOn;
         //ofColor whiteColor = filterColor( ofColor(255,255,255,255));
         displayColor = elementColorOn;
@@ -372,7 +372,7 @@ void GlobalGUI::drawFontString() {
     } else if (showString) {
         ofPushStyle();
         if(onOff) {
-            ofSetColor(ofColor::fromHsb(255,0,204,255));
+            ofSetColor(ofColor::fromHsb(255,0,195,255));
         } else {
             ofSetColor(elementColorDarker);
         }
@@ -399,7 +399,7 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
     } else if (showString) {
         ofPushStyle();
         if(onOff) {
-            ofSetColor(ofColor::fromHsb(255,0,204,255));
+            ofSetColor(ofColor::fromHsb(255,0,195,255));
         } else {
             ofSetColor(elementColorDarker);
         }

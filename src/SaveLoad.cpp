@@ -13,7 +13,7 @@ SaveLoad::SaveLoad(){
     highlight.clear();
     highlight.setMode(OF_PRIMITIVE_TRIANGLES);
     
-    colorDef = ofColor::fromHsb(255,0,204,255);
+    colorDef = ofColor::fromHsb(255,0,195,255);
     colorA = ofColor::rosyBrown;
     colorB = ofColor::royalBlue;
     colorC = ofColor::orange;

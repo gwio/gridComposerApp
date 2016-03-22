@@ -140,7 +140,6 @@ public:
     float borderSize;
     
     ofColor innerColorDefault, outerColorDefault, rasterColor;
-    ofColor filterColor(ofColor);
     vector<GlobalGUI> *guiPtr;
     
     //time
