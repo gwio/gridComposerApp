@@ -242,7 +242,7 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float& twee
 
 void GlobalGUI::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 120, 140,255);
+    elementColorOn = ofColor::fromHsb(hue_, 235, 180,255);
     
     // elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation(), elementColorOn.getBrightness(), 0 );
     //elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(),elementColorOn.getSaturation(),51, 255 );

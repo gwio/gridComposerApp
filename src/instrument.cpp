@@ -4,6 +4,7 @@
 #define CUBE_Z_HEIGHT 12
 #define EMPTY_Z 2
 #define SCAN_Z 24
+#define HUE_VARIATION 12
 
 
 Instrument::Instrument(){
@@ -808,7 +809,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeGroup temp = cubeGroup(gridTiles);
         temp.ownId = soundsCounter;
         temp.size = 1;
-        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-18,18),0,255), 180+ofRandom(-50,28), 100+ofRandom(0,100));
+        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-HUE_VARIATION,HUE_VARIATION),0,255), 180+ofRandom(-50,28), 100+ofRandom(0,100));
         temp.groupColor = gColor;
         temp.lowX = x_;
         temp.highX = x_;
@@ -1053,7 +1054,7 @@ void Instrument::changePreset(bool test_) {
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, lowFreqVolFac, sineA,sineB);
-            it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-18,18),0,255),
+            it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-HUE_VARIATION,HUE_VARIATION),0,255),
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
                                                      );

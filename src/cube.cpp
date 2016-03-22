@@ -127,7 +127,7 @@ void Cube::changeGroupColor(ofColor c_) {
     
   //  if (!noSaturation) {
         groupColor = c_;
-        scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-50, 255);
+        scanColor = ofColor::fromHsb(c_.getHue(), c_.getSaturation()-90, 255);
         pauseColor = ofColor::fromHsb(groupColor.getHue(), ofClamp( groupColor.getSaturation()-255,0,255) , groupColor.getBrightness(), 255);
   //  }
     

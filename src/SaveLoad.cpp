@@ -170,7 +170,7 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
         xml_.popTag();
         xml_.pushTag("SynthSettings");
         xml_.pushTag("synth",i);
-        ofColor tc = ofColor::fromHsb(xml_.getValue("cHue", 0), 120, 140, 255);
+        ofColor tc = ofColor::fromHsb(xml_.getValue("cHue", 0), 235, 180, 255);
         
         ofSetColor(colorDef);
         // glLineWidth(2);

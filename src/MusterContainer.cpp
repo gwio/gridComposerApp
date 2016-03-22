@@ -103,7 +103,7 @@ void MusterContainer::draw(){
 
 void MusterContainer::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 120, 140,255);
+    elementColorOn = ofColor::fromHsb(hue_, 235, 180,255);
     
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
