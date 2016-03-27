@@ -90,16 +90,16 @@ void ofApp::setup(){
     
     
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
-    ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1 );
+    ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1, OF_EVENT_ORDER_AFTER_APP );
     
     ofEvent<float>* pulseEventDiv2 = tonicSynth.createOFEvent(pulseDiv2);
-    ofAddListener(*pulseEventDiv2, this, &ofApp::pulseEventDiv2 );
+    ofAddListener(*pulseEventDiv2, this, &ofApp::pulseEventDiv2, OF_EVENT_ORDER_AFTER_APP );
     
     ofEvent<float>* pulseEventDiv3 = tonicSynth.createOFEvent(pulseDiv3);
-    ofAddListener(*pulseEventDiv3, this, &ofApp::pulseEventDiv3 );
+    ofAddListener(*pulseEventDiv3, this, &ofApp::pulseEventDiv3, OF_EVENT_ORDER_AFTER_APP );
     
     ofEvent<float>* pulseEventDiv4= tonicSynth.createOFEvent(pulseDiv4);
-    ofAddListener(*pulseEventDiv4, this, &ofApp::pulseEventDiv4 );
+    ofAddListener(*pulseEventDiv4, this, &ofApp::pulseEventDiv4, OF_EVENT_ORDER_AFTER_APP );
     
     
     camNotActivePos = ofVec3f(0, -TILES*TILESIZE*2, TILES*TILESIZE*10.5);
