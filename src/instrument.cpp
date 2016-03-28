@@ -1185,7 +1185,7 @@ void Instrument::applyNewScale(){
             
             it->second.groupNote = getRandomNote();
             it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
-            mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
+           // mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
             
         }
     }
