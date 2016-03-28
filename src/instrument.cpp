@@ -24,9 +24,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     borderSize = border_;
     
     
-    innerColorDefault = filterColor( ofColor::fromHsb(138,0,210));
+    innerColorDefault = ofColor::fromHsb(138,0,210);
     outerColorDefault = ofColor(21,21,21);
-    rasterColor = filterColor( ofColor::black);
+    rasterColor = ofColor::black;
     
     soundsCounter = 1;
     synthHasChanged = false;
@@ -76,7 +76,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     globalHarmony = true;
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int* globalState_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_,int* globalState_) {
     
     // colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     colorHue = presetManager.getPresetColor(colorHue, preset);
@@ -266,8 +266,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     //setup main tonic out
-    sineA = sineA_;
-    sineB = sineB_;
+  
     
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
@@ -764,10 +763,10 @@ void Instrument::updateCubeMesh(){
         cubes.setVertex(cubeVector[j].vIndex2, *cubeVector[j].vec2Ptr);
         cubes.setVertex(cubeVector[j].vIndex3, *cubeVector[j].vec3Ptr);
         
-        cubes.setColor(cubeVector[j].vIndex0,filterColor( cubeVector[j].displayColor));
-        cubes.setColor(cubeVector[j].vIndex1,filterColor( cubeVector[j].displayColor));
-        cubes.setColor(cubeVector[j].vIndex2,filterColor( cubeVector[j].displayColor));
-        cubes.setColor(cubeVector[j].vIndex3,filterColor( cubeVector[j].displayColor));
+        cubes.setColor(cubeVector[j].vIndex0,cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex1,cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex2,cubeVector[j].displayColor);
+        cubes.setColor(cubeVector[j].vIndex3,cubeVector[j].displayColor);
     }
     
 }
@@ -1058,7 +1057,7 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     
     cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
-    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger, lowFreqVolFac, sineA, sineB);
+    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger, lowFreqVolFac);
     synthAttack = presetManager.attack;
     
     
@@ -1079,7 +1078,7 @@ void Instrument::changePreset(bool test_) {
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, lowFreqVolFac, sineA,sineB);
+            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, lowFreqVolFac);
             it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-18,18),0,255),
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
@@ -1397,13 +1396,3 @@ void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
     }
 }
 
-ofColor Instrument::filterColor(ofColor c_){
-    ofColor temp;
-    temp.r = ofClamp(c_.r+20, 20, 230);
-    temp.g = ofClamp(c_.g+5, 20, 230);
-    temp.b = ofClamp(c_.b-20, 20, 230);
-    temp.a = ofClamp(c_.a, 10, 255);
-    
-    
-    return c_;
-}

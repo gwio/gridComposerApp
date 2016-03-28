@@ -17,7 +17,7 @@ public:
     SampleTable tableSineSimple, tableSaw, tableSaw2, tableNoiseSimple, sineSynth, sineSynth2, snare, snare2,bell1, bell2;
 
     
-    void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&, ControlGenerator&, RampedValue&, Generator*,  Generator*);
+    void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&, ControlGenerator&, RampedValue&);
     
     float getPresetColor(float, int);
 };

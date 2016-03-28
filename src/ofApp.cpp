@@ -10,8 +10,6 @@
 #define VERSION "0.93.5"
 
 
-#define SINEA 25.8
-#define SINEB 2
 
 
 
@@ -82,11 +80,9 @@ void ofApp::setup(){
     ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
     ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(4).input(pulse);
     
-    TonicFloat sa = SINEA;
-    TonicFloat sb = SINEB;
+  
     
-    sineA = SineWave().freq(sa);
-    sineB = SineWave().freq(sb);
+   
     
     
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
@@ -124,19 +120,19 @@ void ofApp::setup(){
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0], &sineA, &sineB,&currentState);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0],&currentState);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60+globalKey-12);
     synths[0].ownSlot = 0;
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1], &sineA, &sineB,&currentState);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1],&currentState);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60+globalKey);
     synths[1].ownSlot = 1;
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2], &sineA, &sineB,&currentState);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2],&currentState);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+globalKey+12);
     synths[2].ownSlot = 2;
@@ -202,6 +198,11 @@ void ofApp::setup(){
     debugCam = false;
     insideSynth = false;
     
+    
+    scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
+    scaleFac *= 0.35;
+    iconSize = fontSizeBigger*0.52;
+    
     //load icons
     ofImage tempImg;
     
@@ -209,20 +210,23 @@ void ofApp::setup(){
     backIcon.loadData(tempImg.getPixelsRef(),GL_RGBA);
     
     tempImg.loadImage("icons/left.png");
+    tempImg.resize(iconSize*3.33, iconSize);
     left.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
     tempImg.loadImage("icons/right.png");
+    tempImg.resize(iconSize*3.33, iconSize);
     right.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
     tempImg.loadImage("icons/leftDouble.png");
+    tempImg.resize(iconSize*3.33, iconSize);
     leftDouble.loadData(tempImg.getPixelsRef(), GL_RGBA);
 
     tempImg.loadImage("icons/rightDouble.png");
+    tempImg.resize(iconSize*3.33, iconSize);
     rightDouble.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
-    scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
-    scaleFac *= 0.35;
-    iconSize = fontSizeBigger*0.52;
+  
+    
     
     muster = MusterContainer(mainInterfaceData[39].drawStringPos, ofVec2f( mainInterfaceData[39].elementSize), TILES);
     muster.setup();
@@ -858,86 +862,70 @@ void ofApp::drawStringAndIcons(){
     
     ofSetColor(mainInterfaceData[58].displayColor);
     if (!synths[synthButton[0]].globalHarmony) {
-        right.draw(mainInterfaceData[58].drawStringPos.x+(mainInterfaceData[58].elementSize.x/2)-iconSize*3.33,
-                   mainInterfaceData[58].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+        right.draw(mainInterfaceData[58].drawStringPos.x+(mainInterfaceData[58].elementSize.x/2)-right.getWidth(),
+                   mainInterfaceData[58].drawStringPos.y-right.getHeight()*0.45);
         
         left.draw(mainInterfaceData[58].drawStringPos.x-(mainInterfaceData[58].elementSize.x/2),
-                   mainInterfaceData[58].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+                   mainInterfaceData[58].drawStringPos.y-left.getHeight()*0.45);
     } else {
-        rightDouble.draw(mainInterfaceData[58].drawStringPos.x+(mainInterfaceData[58].elementSize.x/2)-iconSize*3.33,
-                   mainInterfaceData[58].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+        rightDouble.draw(mainInterfaceData[58].drawStringPos.x+(mainInterfaceData[58].elementSize.x/2)-rightDouble.getWidth(),
+                   mainInterfaceData[58].drawStringPos.y-rightDouble.getHeight()*0.45);
 
         
         leftDouble.draw(mainInterfaceData[58].drawStringPos.x-(mainInterfaceData[58].elementSize.x/2),
-                   mainInterfaceData[58].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+                   mainInterfaceData[58].drawStringPos.y-leftDouble.getHeight()*0.45);
 
     }
     
     ofSetColor(mainInterfaceData[59].displayColor);
     if (!synths[synthButton[1]].globalHarmony) {
-        right.draw(mainInterfaceData[59].drawStringPos.x+(mainInterfaceData[59].elementSize.x/2)-iconSize*3.33,
-                   mainInterfaceData[59].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+        right.draw(mainInterfaceData[59].drawStringPos.x+(mainInterfaceData[59].elementSize.x/2)-right.getWidth(),
+                   mainInterfaceData[59].drawStringPos.y-right.getHeight()*0.45);
 
         
         left.draw(mainInterfaceData[59].drawStringPos.x-(mainInterfaceData[59].elementSize.x/2),
-                   mainInterfaceData[59].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+                   mainInterfaceData[59].drawStringPos.y-left.getHeight()*0.45);
     } else {
-        rightDouble.draw(mainInterfaceData[59].drawStringPos.x+(mainInterfaceData[59].elementSize.x/2)-iconSize*3.33,
-                   mainInterfaceData[59].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+        rightDouble.draw(mainInterfaceData[59].drawStringPos.x+(mainInterfaceData[59].elementSize.x/2)-rightDouble.getWidth(),
+                   mainInterfaceData[59].drawStringPos.y-rightDouble.getHeight()*0.45);
 
         
         leftDouble.draw(mainInterfaceData[59].drawStringPos.x-(mainInterfaceData[59].elementSize.x/2),
-                        mainInterfaceData[59].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+                        mainInterfaceData[59].drawStringPos.y-leftDouble.getHeight()*0.45);
     }
     
     ofSetColor(mainInterfaceData[60].displayColor);
     if (!synths[synthButton[2]].globalHarmony) {
-        right.draw(mainInterfaceData[60].drawStringPos.x+(mainInterfaceData[60].elementSize.x/2)-iconSize*3.33,
-                   mainInterfaceData[60].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+        right.draw(mainInterfaceData[60].drawStringPos.x+(mainInterfaceData[60].elementSize.x/2)-right.getWidth(),
+                   mainInterfaceData[60].drawStringPos.y-right.getHeight()*0.45);
 
         left.draw(mainInterfaceData[60].drawStringPos.x-(mainInterfaceData[60].elementSize.x/2),
-                   mainInterfaceData[60].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+                   mainInterfaceData[60].drawStringPos.y-left.getHeight()*0.45);
     } else {
-        rightDouble.draw(mainInterfaceData[60].drawStringPos.x+(mainInterfaceData[60].elementSize.x/2)-iconSize*3.33,
-                   mainInterfaceData[60].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+        rightDouble.draw(mainInterfaceData[60].drawStringPos.x+(mainInterfaceData[60].elementSize.x/2)-rightDouble.getWidth(),
+                   mainInterfaceData[60].drawStringPos.y-rightDouble.getHeight()*0.45);
         
         leftDouble.draw(mainInterfaceData[60].drawStringPos.x-(mainInterfaceData[60].elementSize.x/2),
-                   mainInterfaceData[60].drawStringPos.y-(iconSize*0.45),
-                   iconSize*3.33,iconSize);
+                   mainInterfaceData[60].drawStringPos.y-leftDouble.getHeight()*0.45);
 
     }
     
     
     ofSetColor(mainInterfaceData[61].displayColor);
-    right.draw(mainInterfaceData[61].drawStringPos.x+(mainInterfaceData[61].elementSize.x/2)-iconSize*3.33,
-               mainInterfaceData[61].drawStringPos.y-(iconSize*0.45),
-               iconSize*3.33,iconSize);
+    right.draw(mainInterfaceData[61].drawStringPos.x+(mainInterfaceData[61].elementSize.x/2)-right.getWidth(),
+               mainInterfaceData[61].drawStringPos.y-right.getHeight()*0.45);
 
     
     left.draw(mainInterfaceData[61].drawStringPos.x-(mainInterfaceData[61].elementSize.x/2),
-              mainInterfaceData[61].drawStringPos.y-(iconSize*0.45),
-              iconSize*3.33,iconSize);
+              mainInterfaceData[61].drawStringPos.y-left.getHeight()*0.45);
     
     ofSetColor(mainInterfaceData[62].displayColor);
-    right.draw(mainInterfaceData[62].drawStringPos.x+(mainInterfaceData[62].elementSize.x/2)-iconSize*3.33,
-               mainInterfaceData[62].drawStringPos.y-(iconSize*0.45),
-               iconSize*3.33,iconSize);
+    right.draw(mainInterfaceData[62].drawStringPos.x+(mainInterfaceData[62].elementSize.x/2)-right.getWidth(),
+               mainInterfaceData[62].drawStringPos.y-right.getHeight()*0.45);
 
     
     left.draw(mainInterfaceData[62].drawStringPos.x-(mainInterfaceData[62].elementSize.x/2),
-              mainInterfaceData[62].drawStringPos.y-(iconSize*0.45),
-              iconSize*3.33,iconSize);
+              mainInterfaceData[62].drawStringPos.y-left.getHeight()*0.45);
     
     
     ofSetColor(mainInterfaceData[7].displayColor);

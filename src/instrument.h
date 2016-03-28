@@ -72,7 +72,7 @@ public:
     Instrument();
     Instrument(string,int,float,float,int);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode, Tonic::Generator*,Tonic::Generator*,int*);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode,int*);
     void updateTonicOut();
     void update();
     void draw();
@@ -140,7 +140,6 @@ public:
     float borderSize;
     
     ofColor innerColorDefault, outerColorDefault, rasterColor;
-    ofColor filterColor(ofColor);
     vector<GlobalGUI> *guiPtr;
     
     //time
@@ -192,7 +191,6 @@ public:
     //interface planes
     InterfacePlane pulsePlane;
     //tonic
-    Tonic::Generator *sineA, *sineB;
     Tonic::ofxTonicSynth *mainTonicPtr;
     Tonic::Generator instrumentOut;
     Tonic::RampedValue outputRamp, lowFreqVolFac;

@@ -9,7 +9,7 @@ SynthPresetManager::SynthPresetManager() {
     
     //sampleTable
     
-    int tableSize =2049;
+    int tableSize =1025;
     
     //basic-noise
     tableNoiseSimple = SampleTable(tableSize,1);
@@ -132,7 +132,7 @@ SynthPresetManager::SynthPresetManager() {
 }
 
 
-void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_, RampedValue& freqVolFac_, Generator *sineA_,  Generator *sineB_) {
+void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_, RampedValue& freqVolFac_) {
     
     //1. sine synth__50 sine adder phase_* 0.5____________________________________________
     if (preset_ == 0) {
