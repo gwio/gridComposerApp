@@ -18,7 +18,7 @@ public:
     
     ofTexture texture;
     ofVec3f pos;
-    int size,gridTiles;
+    float size,gridTiles;
     
     vector<vector<bool> > layerInfo;
 

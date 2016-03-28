@@ -8,7 +8,7 @@ MusterFlip::MusterFlip() {
 }
 
 void MusterFlip::setup(float size_,int tiles_){
-    size = (int)size_;
+    size = size_;
     gridTiles = tiles_;
     ofFbo tempFbo;
     
@@ -65,7 +65,7 @@ void MusterFlip::makeTex(){
     ofPushStyle();
     ofFbo fbo_;
     
-    fbo_.allocate( (size/gridTiles)*gridTiles, (size/gridTiles)*gridTiles, GL_RGBA);
+    fbo_.allocate( size, size, GL_RGBA);
     
     fbo_.begin();
    

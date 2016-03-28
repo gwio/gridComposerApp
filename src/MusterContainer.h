@@ -22,6 +22,9 @@ public:
     
     void saveToFlip(int);
     
+    void makeBackgroundTex();
+    
+    ofTexture backgroundTex;
     vector<MusterFlip> flips;
     vector<MusterFlip> flipsBackground;
     ofVec3f centerPos;
@@ -39,4 +42,5 @@ public:
     ofColor displayColor, targetColor;
     ofColor elementColorOn, elementColorOff,elementColorDarker,elementColorTouch, elementColorDarkerTrans;
 
+    int offsetX,offsetY;
 };

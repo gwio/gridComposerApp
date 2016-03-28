@@ -296,7 +296,7 @@ void Instrument::update() {
     
     updateCubeMesh();
     
-    setNormals(cubes);
+   // setNormals(cubes);
     
 }
 

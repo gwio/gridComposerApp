@@ -531,7 +531,7 @@ void ofApp::update(){
         saveManager.update();
     }
     
-    light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
+    //light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {

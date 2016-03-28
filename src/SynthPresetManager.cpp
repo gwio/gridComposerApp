@@ -180,7 +180,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc snareOsc = TableLookupOsc().setLookupTable(snare).freq(freq_);
         TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(snare2).freq(freq_);
 
-        
+
         output_ =  (snareOsc2*adsr* (1+(freqVolFac_*150)) )>>BPF12().cutoff(freq_).Q(9*vol_+1);
     }
     
