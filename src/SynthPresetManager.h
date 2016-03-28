@@ -20,4 +20,6 @@ public:
     void createSynth(int,ofxTonicSynth&, Generator&, RampedValue&, RampedValue&, ControlGenerator&, RampedValue&);
     
     float getPresetColor(float, int);
+    
+    float getPresetLfvf(int);
 };

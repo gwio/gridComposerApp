@@ -145,7 +145,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc sine2 = TableLookupOsc().setLookupTable(tableSineSimple).freq(freq_  );
 
         
-        output_ = ((adsr*sine) + (adsr2*sine2))   * (1+(freqVolFac_*2)) *vol_;
+        output_ = ((adsr*sine) + (adsr2*sine2))    *vol_;
     }
     //2. simple squarewave_______________________________________________
     else if(preset_ ==1 ){
@@ -162,7 +162,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
         
-        output_  = ((myTable2*adsr2)+(myTable*adsr)  )  * (1+(freqVolFac_*3)) *vol_;
+        output_  = ((myTable2*adsr2)+(myTable*adsr)  )   *vol_;
         
         
     }
@@ -181,7 +181,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(snare2).freq(freq_);
 
 
-        output_ =  (snareOsc2*adsr* (1+(freqVolFac_*150)) )>>BPF12().cutoff(freq_).Q(9*vol_+1);
+        output_ =  (snareOsc2*adsr )>>BPF12().cutoff(freq_).Q(9*vol_+1);
     }
     
     
@@ -200,11 +200,24 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //output_ = ((bellAosc*adsr1)+(bellBosc*adsr2)) * vol_;
         
-        output_ =  (bellAosc*adsr1)+((bellBosc*adsr2))  * (1+(freqVolFac_*5)) *vol_;
+        output_ =  (bellAosc*adsr1)+((bellBosc*adsr2))   *vol_;
         
     }
     
     
+}
+float SynthPresetManager::getPresetLfvf(int preset_) {
+    float temp;
+    if (preset_%count == 0) {
+        temp = 2;
+    } else if (preset_%count == 1) {
+        temp = 3;
+    } else if (preset_%count == 2) {
+        temp = 125;
+    } else if (preset_%count == 3) {
+        temp = 5;
+    }
+    return temp;
 }
 
 float SynthPresetManager::getPresetColor(float hue_, int preset_){

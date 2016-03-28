@@ -215,4 +215,6 @@ public:
     int *globalStatePtr;
     
     bool globalHarmony;
+    
+    float getLfvf(int);
 };

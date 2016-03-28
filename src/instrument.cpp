@@ -268,16 +268,18 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     //setup main tonic out
   
     
+   
+    
+    
+    Tonic::ControlParameter lfvfTarget = mainTonicPtr_->addParameter("lfvf"+instrumentId).max(200.0).min(0.0);
+    mainTonicPtr->setParameter("lfvf"+instrumentId, 1.0);
+    lowFreqVolFac = Tonic::RampedValue().value(1.0).length(0.01).target(lfvfTarget);
+    //   cout << cubes.getNumVertices() << endl;
+    
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
     outputRamp = Tonic::RampedValue().value(0.5).length(0.1).target(rampTarget);
-    instrumentOut = instrumentOut * outputRamp;
-    
-    
-    Tonic::ControlParameter lfvfTarget = mainTonicPtr_->addParameter("lfvf"+instrumentId).max(1.0).min(0.0);
-    mainTonicPtr->setParameter("lfvf"+instrumentId, 1.0);
-    lowFreqVolFac = Tonic::RampedValue().value(1.0).length(0.002).target(lfvfTarget);
-    //   cout << cubes.getNumVertices() << endl;
+    instrumentOut = instrumentOut * outputRamp * lowFreqVolFac;
     
     globalStatePtr = globalState_;
 }
@@ -543,7 +545,7 @@ void Instrument::noteTriggerWest(){
         if (*stepperPos >= it->second.lowX && *stepperPos <= it->second.highX+1)  {
             
             if (it->second.highX+1 == *stepperPos){
-                it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+             //   it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = 1-powf(1-(float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles)),2) ;
@@ -596,7 +598,7 @@ void Instrument::noteTriggerNorth() {
         if (gridTiles-*stepperPos <= it->second.highY+1 && gridTiles-*stepperPos >= it->second.lowY) {
             
             if (it->second.lowY == gridTiles-*stepperPos){
-                it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+               // it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = 1-powf(1-(float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
@@ -650,7 +652,7 @@ void Instrument::noteTriggerEast() {
         if (gridTiles-*stepperPos <= it->second.highX+1 && gridTiles-*stepperPos >= it->second.lowX) {
             
             if (it->second.lowX == gridTiles-*stepperPos){
-                it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+              //  it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget = 1-powf(1-(float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
@@ -701,7 +703,7 @@ void Instrument::noteTriggerSouth() {
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if (*stepperPos >= it->second.lowY && *stepperPos <= it->second.highY+1) {
             if (it->second.highY+1 == *stepperPos){
-                it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
+               // it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
             } else {
                 float rampTarget =1-powf(1-(float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles)),2);
@@ -1130,10 +1132,11 @@ void Instrument::updateTonicOut(){
     }
    
     
+    mainTonicPtr->setParameter("lfvf"+instrumentId, getLfvf(preset) );
+
     
     
-    
-    instrumentOut = ( temp * outputRamp);
+    instrumentOut = ( temp * outputRamp  * lowFreqVolFac);
     synthHasChanged = true;
 }
 
@@ -1224,13 +1227,13 @@ void Instrument::setKeyNote(int keyNote_) {
             if(it->second.size > 0){
                 it->second.groupNote+=change;
                 it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
-                mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
                 
                 //cout << pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) << endl;
             }
         }
     }
-    
+    mainTonicPtr->setParameter("lfvf"+instrumentId, getLfvf(preset) );
+
 }
 
 void Instrument::blinkNoteInfo(int index_) {
@@ -1396,3 +1399,8 @@ void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
     }
 }
 
+float Instrument::getLfvf(int preset_){
+    float temp;
+    temp =   0.9+ pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 )*presetManager.getPresetLfvf(preset_);
+    return temp;
+}
