@@ -1083,7 +1083,7 @@ void ofApp::replaceMouseDragged(int x, int y){
         }
         
         else if (currentState == STATE_SAVE) {
-            if(!saveManager.animate){
+            if(!saveManager.animate && !saveManager.slotDetail){
                 if (!saveManager.touchDown){
                     saveManager.touchDown = true;
                     saveManager.touchPos = y;
@@ -2546,7 +2546,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     // back to default, STATE_SAVE
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(designGrid[0][0].x/2,0,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
     temp = GlobalGUI(47, string("BACK"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
@@ -2705,7 +2705,7 @@ void ofApp::setupGlobalInterface() {
     
     //save button, STATE_SAVE
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(designGrid[0][0].x/2,0,0);
     temp = GlobalGUI(125,"SAVE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
@@ -2733,7 +2733,7 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(129,string("GLOBAL SCALE"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //save button, STATE_SAVE
+    //mark button, STATE_SAVE
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     place = ofVec3f(0,0,0);
     temp = GlobalGUI(130,"MARK",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
