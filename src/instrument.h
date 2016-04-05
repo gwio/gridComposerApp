@@ -45,7 +45,8 @@ struct cubeGroup {
     Tonic::Generator output;
     Tonic::RampedValue rampVol, freqRamp;
     Tonic::ControlGenerator trigger;
-    
+    Tonic::ControlParameter release1, release2, attack1, attack2;
+    Tonic::ADSR adsr1, adsr2;
     cubeGroup(){
         
     };
@@ -72,7 +73,7 @@ public:
     Instrument();
     Instrument(string,int,float,float,int);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode,int*);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode,int*,int*);
     void updateTonicOut();
     void update();
     void draw();
@@ -97,7 +98,7 @@ public:
     void updateCubeMesh();
     void updateSoundsMap(int,int, bool);
     void resetCubeGroup(unsigned long, int, int);
-    void setupOneSynth(cubeGroup*);
+    void setupOneSynth(cubeGroup&);
     void changePreset(bool);
     void updateGroupInfo(unsigned long,int,int);
     void setTranslate(ofVec3f);
@@ -131,6 +132,7 @@ public:
     void applyPitchMod(float);
     int currentScaleVecPos;
     float synthAttack;
+    int *bpmPtr;
     
     string instrumentId;
     void changeSynthVolume(float &);
@@ -216,5 +218,8 @@ public:
     
     bool globalHarmony;
     
-    float getLfvf(int);
+    float getLfvf(int&);
+    float getSynthRelease(int&);
+    float getSynthAttack(int&);
+    void setAllADSR(int&);
 };
