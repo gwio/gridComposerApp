@@ -223,13 +223,13 @@ float SynthPresetManager::getPresetLfvf(int preset_) {
 float SynthPresetManager::getPresetColor(float hue_, int preset_){
     
     if (preset_ == 0) {
-        hue_ = 8;
+        hue_ = 9;
     } else if (preset_ == 1) {
-        hue_ = 50;
+        hue_ = 111;
     } else if (preset_ == 2) {
-        hue_ = 138;
+        hue_ = 137;
     } else if (preset_ == 3) {
-        hue_ = 230;
+        hue_ = 232;
     }
     return hue_;
     

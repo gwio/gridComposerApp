@@ -167,7 +167,7 @@ void ofApp::setup(){
     thisIntersect.setFrom(planeForIntersect);
     
     
-    ofBackground( ofColor(15,15,15) );
+    ofBackground( ofColor(19,19,19) );
     
     light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
     light.setDiffuseColor( ofColor(100,100,100));
@@ -298,7 +298,7 @@ void ofApp::setup(){
 void ofApp::setupFonts(){
     fontSizeDefault = designGrid[0][0].y/3.5;
     fontSizeSmall = fontSizeDefault*0.7;
-    fontSizeBigger = fontSizeDefault*1.333;
+    fontSizeBigger = fontSizeDefault*1.618;
     
     tekoLight.setup("fonts/Teko/Teko-Light.ttf", //font file, ttf only
                     1.0,					//lineheight percent
@@ -1071,7 +1071,7 @@ void ofApp::replaceMouseDragged(int x, int y){
         }
         
         else if (currentState == STATE_SAVE) {
-            if(!saveManager.animate){
+            if(!saveManager.animate && !saveManager.slotDetail){
                 if (!saveManager.touchDown){
                     saveManager.touchDown = true;
                     saveManager.touchPos = y;
@@ -2193,10 +2193,10 @@ void ofApp::setupStatesAndAnimation() {
     //---___---
     
     //synthlayer and camera for active edit position
-    synthActivePos.setPosition(0, -TILES*TILESIZE*1.9, TILESIZE*TILES*2.25);
-    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*5.125,TILES*TILESIZE*1.0));
+    synthActivePos.setPosition(0, -TILES*TILESIZE*2.35, TILESIZE*TILES*2.085);
+    camActiveSynth.setPosition(synthActivePos.getGlobalPosition()+ofVec3f(0,-TILESIZE*TILES*4.8,TILES*TILESIZE*1.0));
     camNotActiveSynth.setPosition(camNotActivePos);
-    camEditDetailPos.setPosition(camActiveSynth.getPosition()+ofVec3f(0,0,(TILESIZE*TILES)/2.55));
+    camEditDetailPos.setPosition(camActiveSynth.getPosition()+ofVec3f(0,0,(TILESIZE*TILES)/2.85));
     
     camActiveSynth.lookAt(synthActivePos.getPosition() - camActiveSynth.getZAxis());
     camNotActiveSynth.lookAt(synthPos[1].getPosition() - camNotActiveSynth.getZAxis());
@@ -2534,7 +2534,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     // back to default, STATE_SAVE
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(designGrid[0][0].x/2,0,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
     temp = GlobalGUI(47, string("BACK"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
@@ -2693,7 +2693,7 @@ void ofApp::setupGlobalInterface() {
     
     //save button, STATE_SAVE
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(designGrid[0][0].x/2,0,0);
     temp = GlobalGUI(125,"SAVE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
@@ -2721,7 +2721,7 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(129,string("GLOBAL SCALE"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
-    //save button, STATE_SAVE
+    //mark button, STATE_SAVE
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     place = ofVec3f(0,0,0);
     temp = GlobalGUI(130,"MARK",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
@@ -3516,10 +3516,10 @@ void ofApp::buttonOnePress(){
         
         synths[synthButton[0]].scaling = true;
         synths[synthButton[1]].scaling = true;
-        synths[synthButton[0]].myScaleDefault = 0.45;
+        synths[synthButton[0]].myScaleDefault = 0.5;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[0]].myScaleTarget = 1.0;
-        synths[synthButton[1]].myScaleTarget = 0.45;
+        synths[synthButton[1]].myScaleTarget = 0.5;
         
         
         synthButton[0] = synthButton[1];
@@ -3571,8 +3571,8 @@ void ofApp::buttonOnePress(){
         synths[synthButton[2]].scaling = true;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleDefault = 1.0;
-        synths[synthButton[1]].myScaleTarget = 0.45;
-        synths[synthButton[2]].myScaleTarget = 0.45;
+        synths[synthButton[1]].myScaleTarget = 0.5;
+        synths[synthButton[2]].myScaleTarget = 0.5;
         
         
         
@@ -3625,8 +3625,8 @@ void ofApp::buttonTwoPress(){
         
         synths[synthButton[0]].scaling = true;
         synths[synthButton[2]].scaling = true;
-        synths[synthButton[0]].myScaleDefault = 0.45;
-        synths[synthButton[2]].myScaleDefault = 0.45;
+        synths[synthButton[0]].myScaleDefault = 0.5;
+        synths[synthButton[2]].myScaleDefault = 0.5;
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
         
@@ -3668,8 +3668,8 @@ void ofApp::buttonTwoPress(){
         synths[synthButton[2]].scaling = true;
         synths[synthButton[0]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleDefault = 1.0;
-        synths[synthButton[0]].myScaleTarget = 0.45;
-        synths[synthButton[2]].myScaleTarget = 0.45;
+        synths[synthButton[0]].myScaleTarget = 0.5;
+        synths[synthButton[2]].myScaleTarget = 0.5;
         
         
         

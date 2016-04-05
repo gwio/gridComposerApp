@@ -47,7 +47,7 @@ void MusterFlip::makeBackTex(){
     fbo_.begin();
     
     // ofEnableDepthTest();
-    ofClear(ofColor::fromHsb(255,0,204,255));
+    ofClear(ofColor::fromHsb(255,0,195,255));
     
     fbo_.end();
     texture.clear();

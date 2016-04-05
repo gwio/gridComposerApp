@@ -99,7 +99,7 @@ public:
     ofVboMesh highlight;
     float highlightLine, rSize;
     
-    ofColor colorDef, colorA, colorB, colorC;
+    ofColor colorDef, colorA, colorB, colorC, colorD;
     
     ofxXmlSettings xmlTemp;
     

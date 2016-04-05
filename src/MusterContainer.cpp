@@ -3,7 +3,7 @@
 
 #define DISPLAY_NUMX 3
 #define DISPLAY_NUMY 3
-#define FLIP_SIZE_FAC 0.888
+#define FLIP_SIZE_FAC 0.8
 #define FLIP_MAX 3*3
 
 MusterContainer::MusterContainer() {
@@ -27,10 +27,10 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     for (int x = 0; x < DISPLAY_NUMX; x++) {
         for (int y = 0; y < DISPLAY_NUMY; y++) {
             int index = x+(y*DISPLAY_NUMX);
-            displayGrid.at(index).x = (x*flipSize)+(offsetX*x);
+            displayGrid.at(index).x =  (x*flipSize)+(offsetX*x);
           //  displayGrid.at(index).y = (y*designGrid.x)+( (designGrid.x-flipSize)/2);
 
-            displayGrid.at(index).y = (y*flipSize)+(offsetY*y);
+            displayGrid.at(index).y =  (y*flipSize)+(offsetY*y);
         }
     }
     
@@ -129,7 +129,7 @@ void MusterContainer::draw(){
 
 void MusterContainer::setColor(float hue_) {
     
-    elementColorOn = ofColor::fromHsb(hue_, 120, 140,255);
+    elementColorOn = ofColor::fromHsb(hue_, 235, 180,255);
     
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
