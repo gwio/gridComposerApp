@@ -157,7 +157,8 @@ class ofApp : public ofxiOSApp{
         float mainVol;
         Generator mainOut;
         Generator sineA, sineB;
-        
+        ControlParameter bpmpara, delayTime;
+    
         //scales
         GlobalScales scaleCollection;
         int globalScaleVecPos;

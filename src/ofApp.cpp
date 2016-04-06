@@ -73,7 +73,7 @@ void ofApp::setup(){
     
     bpm = BPM;
     
-    ControlParameter bpmpara = tonicSynth.addParameter("BPM");
+    bpmpara = tonicSynth.addParameter("BPM");
     tonicSynth.setParameter("BPM", bpm*4);
     ControlGenerator pulse = ControlMetro().bpm(bpmpara);
     ControlMetroDivider pulseDiv2 = ControlMetroDivider().divisions(2).input(pulse);
@@ -81,8 +81,9 @@ void ofApp::setup(){
     ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(4).input(pulse);
     
   
-    
-   
+    delayTime = tonicSynth.addParameter("delay");
+    tonicSynth.setParameter("delay", bpm*0.001);
+
     
     
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
@@ -120,19 +121,19 @@ void ofApp::setup(){
     synths.resize(3);
     
     synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0],&currentState);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0],&currentState,&bpm);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60+globalKey-12);
     synths[0].ownSlot = 0;
     
     synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1],&currentState);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1],&currentState,&bpm);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60+globalKey);
     synths[1].ownSlot = 1;
     
     synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2],&currentState);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2],&currentState,&bpm);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+globalKey+12);
     synths[2].ownSlot = 2;
@@ -383,14 +384,14 @@ void ofApp::setupAudio(){
      */
     
     
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.22f)
-    .delayTimeLeft( 0.07)
-    .delayTimeRight(0.22)
-    .feedback(0.1)
-    .dryLevel(0.95)
-    .wetLevel(0.12);
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.35,0.26)
+    .delayTimeRight(0.35- (delayTime*0.001))
+    .delayTimeLeft(0.35-  (delayTime*0.001))
+    .feedback(0.125)
+    .dryLevel(0.875)
+    .wetLevel(0.125);
     
-    
+
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
@@ -400,7 +401,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp)>>LPF12().cutoff(8000).Q(4) >> delay );
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(6) >> LPF12().cutoff(8000).Q(4) >>delay );
 }
 
 //--------------------------------------------------------------
@@ -1028,8 +1029,13 @@ void ofApp::replaceMouseDragged(int x, int y){
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX);
                 tonicSynth.setParameter("BPM",bpm*4);
+                tonicSynth.setParameter("delay", bpm);
                 mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+                
+                for (int i = 0; i < 3; i++){
+                    synths[i].setAllADSR(synths[i].preset);
+                }
             }
             
         }
@@ -1416,8 +1422,13 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX);
                 tonicSynth.setParameter("BPM",bpm*4);
+                tonicSynth.setParameter("delay", bpm);
                 mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+                
+                for (int i = 0; i < 3; i++){
+                    synths[i].setAllADSR(synths[i].preset);
+                }
             }
             //bpm synth bpm metro factor
             else if(mainInterfaceData[55].isInside(ofVec2f(x,y))) {
@@ -1426,10 +1437,11 @@ void ofApp::replaceMousePressed(int x, int y) {
                         synths[synthButton[0]].nextPulseDivision = 4-i;
                         mainInterfaceData[112+i].setOn();
                         mainInterfaceData[112+i].blinkOn();
+                        synths[synthButton[0]].setAllADSR(synths[synthButton[0]].preset);
                     } else {
                         mainInterfaceData[112+i].setOff();
-                        
                     }
+                  
                 }
             }
             
@@ -1439,10 +1451,12 @@ void ofApp::replaceMousePressed(int x, int y) {
                         synths[synthButton[1]].nextPulseDivision = 4-i;
                         mainInterfaceData[116+i].setOn();
                         mainInterfaceData[116+i].blinkOn();
+                        synths[synthButton[1]].setAllADSR(synths[synthButton[1]].preset);
                     } else {
                         mainInterfaceData[116+i].setOff();
                         
                     }
+                   
                 }
             }
             
@@ -1452,10 +1466,11 @@ void ofApp::replaceMousePressed(int x, int y) {
                         synths[synthButton[2]].nextPulseDivision = 4-i;
                         mainInterfaceData[120+i].setOn();
                         mainInterfaceData[120+i].blinkOn();
+                       synths[synthButton[2]].setAllADSR(synths[synthButton[2]].preset);
                     } else {
                         mainInterfaceData[120+i].setOff();
-                        
                     }
+                  
                 }
             }
             
@@ -4758,6 +4773,36 @@ void ofApp::loadFromXml(string path_){
     
     //--------------------------------
     
+    //bpm
+    settings.pushTag("BPM");
+    settings.pushTag("global");
+    bpm =ofClamp(settings.getValue("value", 200), 1, 2000);
+    tonicSynth.setParameter("BPM", bpm*4);
+    tonicSynth.setParameter("delay", bpm);
+    mainInterfaceData[38].elementName = ofToString(bpm);
+    mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+    
+    settings.popTag();
+    settings.pushTag("slots");
+    for (int i = 0; i < 3; i++) {
+        settings.pushTag("slot",i);
+        synths[synthButton[i]].nextPulseDivision = settings.getValue("bpm", 4);
+        settings.popTag();
+    }
+    settings.popTag();
+    settings.popTag();
+    
+    //globalKey
+    settings.pushTag("GlobalKey");
+    globalKey =settings.getValue("key",0);
+    settings.popTag();
+    
+    //globalKey
+    settings.pushTag("GlobalScale");
+    globalScaleVecPos =settings.getValue("pos",0);
+    settings.popTag();
+
+    //---------------------
     
     //synth global settings
     
@@ -4782,7 +4827,7 @@ void ofApp::loadFromXml(string path_){
         synths[synthButton[i]].globalHarmony = settings.getValue("globalHarmony", 1);
         
         //set the layer lowFreqVolumeFactor to keynote
-        synths[synthButton[i]].mainTonicPtr->setParameter("lfvf"+synths[synthButton[i]].instrumentId, pow( 1-(1-ofMap(float(synths[synthButton[i]].keyNote), 12, 127, 1.0, 0.0)),4 ) );
+        synths[synthButton[i]].mainTonicPtr->setParameter("lfvf"+synths[synthButton[i]].instrumentId, synths[synthButton[i]].getLfvf(synths[synthButton[i]].preset));
         
         //scaleNoteSteps
         string tempActiveScale = settings.getValue("ActiveScaleBool", "100000000000");
@@ -4927,33 +4972,6 @@ void ofApp::loadFromXml(string path_){
     }
     settings.popTag();
     
-    //bpm
-    settings.pushTag("BPM");
-    settings.pushTag("global");
-    bpm =ofClamp(settings.getValue("value", 200), 1, 2000);
-    tonicSynth.setParameter("BPM", bpm*4);
-    mainInterfaceData[38].elementName = ofToString(bpm);
-    mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
-    
-    settings.popTag();
-    settings.pushTag("slots");
-    for (int i = 0; i < 3; i++) {
-        settings.pushTag("slot",i);
-        synths[synthButton[i]].nextPulseDivision = settings.getValue("bpm", 4);
-        settings.popTag();
-    }
-    settings.popTag();
-    settings.popTag();
-    
-    //globalKey
-    settings.pushTag("GlobalKey");
-    globalKey =settings.getValue("key",0);
-    settings.popTag();
-    
-    //globalKey
-    settings.pushTag("GlobalScale");
-    globalScaleVecPos =settings.getValue("pos",0);
-    settings.popTag();
     
     setNewGUI();
 }

@@ -9,7 +9,7 @@ SynthPresetManager::SynthPresetManager() {
     
     //sampleTable
     
-    int tableSize =1025;
+    int tableSize =2049;
     
     //basic-noise
     tableNoiseSimple = SampleTable(tableSize,1);
@@ -61,61 +61,71 @@ SynthPresetManager::SynthPresetManager() {
         *tableNoiseData++ = ((TonicFloat)rand()/RAND_MAX) * 2.0f - 1.0f;
         
         //1.sine________________________________________
-        TonicFloat temp = 0;
-        int sums = 50;
+        TonicFloat sineA = 0;
+        int sums = 80;
         
         for (int j = 0; j < sums; j++) {
-            temp += sinf(phase*(float(j/2)))* powf((sums-float(j))/sums,4);
+            if(j%3 == 0){
+            sineA += sinf(phase*(float(j/2)))* powf((sums-float(j+1))/sums,4)*0.120;
+            }else {
+        sineA += sinf(phase*(float(j/2)))* (powf((sums-float(j+1))/sums,4)/4)*0.035;
+            }
         }
-        *sineSynthData++ = (temp*0.19);
+        *sineSynthData++ = sineA;
         
         
-        temp = 0;
-      
-        temp = sinf(phase) + (sinf(phase*2.133)*0.3) + (sinf(phase*3.977)*0.3) + (sinf(phase*6.1)*0.2) + (sinf(phase*8)*0.2) +  ((ofNoise(i*norm)*2-1)*0.1) ;
+        TonicFloat sineB = 0;
+        
+        sineB = (sinf(phase)*0.7) + (sinf(phase*2.133)*0.245) + (sinf(phase*3.977)*0.27) + (sinf(phase*6.1)*0.15) + (sinf(phase*8)*0.176) +  ((ofNoise(i*norm)*2-1)*0.1) ;
         
         
-        *sineSynthData2++ = temp;
+        *sineSynthData2++ = sineA;
         
- 
+        
+        
+        
         //2. saw________________________________________
+        TonicFloat sawA = 0;
+        TonicFloat sawB = 0;
+        
+        sawA =  ((((i *norm)*2-1))*0.5) + (sinf(phase)*0.25) + (sinf(phase*6)*0.15)  * (sinf(phase*4)) ;
+        *tableSawData++ = sawA;
         
         
-        temp = ( (((i *norm)*2-1) ) + (sinf(phase)*0.5) + (sinf(phase*12)*0.2) ) * (sinf(phase))+  ((ofNoise(i*norm)*2-1)*0.1) ;
-        *tableSawData++ = temp;
         
-     
-      
-        temp = ( (*(tableSineSimple.dataPointer()+i)*0.9) + (sinf(phase*2)*0.07)+ (sinf(phase*16)*0.025) + (sinf(phase*4)*0.1) + (sinf(phase*8)*0.05)   );
+        sawB = ( (*(tableSineSimple.dataPointer()+i)*0.9) + (sinf(phase*2)*0.07)+ (sinf(phase*10)*0.025) + (sinf(phase*4)*0.1) + (sinf(phase*4)*0.05)   );
         
-        *tableSawData2++ = temp*0.9;
+        *tableSawData2++ = sawB;
         
         
-       
+        
         //6. snare
         
-        temp = (*(tableNoiseSimple.dataPointer()+i))*sinf(phase*4)*cosf(phase*2)*4;
+        TonicFloat snareA  = 0;
+        TonicFloat snareB = 0;
+        snareA = (*(tableNoiseSimple.dataPointer()+i))*sinf(phase*4)*cosf(phase*2)*1.25;
         
-
-        *snareData++ = temp*3;
         
-       
-
+        *snareData++ = snareA;
         
-        temp = (*(tableNoiseSimple.dataPointer()+i)*sinf(phase*4))*sinf(phase*2);
         
-        *snareData2++ = temp*3;
-
-        if (temp > tempVolPlus) {
-            tempVolPlus = temp;
+        
+        
+        snareB = (*(tableNoiseSimple.dataPointer()+i)*sinf(phase*4))*sinf(phase*2);
+        
+        *snareData2++ = snareB*3;
+        
+        
+        if (snareA > tempVolPlus) {
+            tempVolPlus = snareA;
         }
         
-        if (temp < tempVolMinus) {
-            tempVolMinus= temp;
+        if (snareA < tempVolMinus) {
+            tempVolMinus= snareA;
         }
-        
         //8. bell
         
+        TonicFloat temp = 0;
         temp =         ((sinf(phase)*0.1)+ (sinf(phase*0.5)*0.002) +(sinf(phase)*0.02) + (sinf(phase*0.7)*0.001))*3;
         *bell1Data ++ = temp;
         
@@ -123,36 +133,46 @@ SynthPresetManager::SynthPresetManager() {
         temp =  ((sinf(phase*2.49)*0.02) +(sinf(phase*11)*0.04) + (sinf(phase*2.571)*0.02)) + ((sinf(phase*2.002)*0.008) +(sinf(phase*3)*0.02) + (sinf(phase*9.6)*0.004))*2;
         *bell2Data ++ = temp*4;
         
-      
+        
     }
     
     cout << tempVolPlus << " " << tempVolMinus << endl;
     
     
+    
 }
 
 
-void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_, RampedValue& freqVolFac_) {
+void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_, ADSR& adsr1_, ADSR& adsr2_,
+                                     ControlParameter& attack1_, ControlParameter& attack2_, ControlParameter& release1_, ControlParameter& release2_) {
+    
+    
+    
+    //decay adsr
+    
+    
+    Generator tempGen;
+    output_ = tempGen;
     
     //1. sine synth__50 sine adder phase_* 0.5____________________________________________
     if (preset_ == 0) {
         
-        attack = 0.32;
-        ADSR adsr = ADSR(attack, 0.15, 0.55, 0.12).doesSustain(true).legato(true).trigger(trigger_).exponential(0);
-        ADSR adsr2 = ADSR(0.05, 0.1, 0.42, 0.20).doesSustain(false).legato(true).trigger(trigger_).exponential(1);
-
+        ADSR  adsr1 = ADSR().attack(attack1_*0.9).decay(attack1_*0.45).sustain(0.86).release(release1_*0.9).doesSustain(true).legato(true).trigger(trigger_).exponential(true);
+        ADSR  adsr2 = ADSR().attack(attack2_*1.25).decay(attack2_*0.85).sustain(0.10).release(release2_*0.8).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
+        
         TableLookupOsc sine = TableLookupOsc().setLookupTable(sineSynth).freq(freq_  );
         TableLookupOsc sine2 = TableLookupOsc().setLookupTable(tableSineSimple).freq(freq_  );
-
         
-        output_ = ((adsr*sine) + (adsr2*sine2))    *vol_;
+        
+        tempGen = ((adsr1*sine) + (adsr2*sine2));
+        
     }
     //2. simple squarewave_______________________________________________
     else if(preset_ ==1 ){
         
-        attack = 0.05;
-        ADSR adsr = ADSR(attack, 0.08, 0.6, 0.05).doesSustain(false).legato(true).trigger(trigger_);
-        ADSR adsr2 = ADSR(0.15, 0.05, 0.3, 0.25).doesSustain(false).legato(true).trigger(trigger_);
+        
+        ADSR  adsr1 = ADSR().attack(attack1_*2).decay(attack1_*0.42).sustain(0.25).release(release1_*0.125).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
+        ADSR  adsr2 = ADSR().attack(attack2_).decay(attack2_*0.25).sustain(0.14).release(release2_*1.2).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
         
         
         TableLookupOsc myTable = TableLookupOsc().setLookupTable(tableSaw).freq(freq_);
@@ -162,26 +182,25 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
         
-        output_  = ((myTable2*adsr2)+(myTable*adsr)  )   *vol_;
+        tempGen  = ((myTable*adsr2)+(myTable2*adsr1  ))   ;
         
         
     }
- 
-  
+    
+    
     //6. snare_______________________________________________
     
     else if (preset_ == 2) {
-        attack = 0.0001;
         
-        ADSR adsr = ADSR(attack, 0.05, 0.61, 0.003).doesSustain(false).legato(true).trigger(trigger_).exponential(0);
-        ADSR adsr2 = ADSR(0.0002, 0.10, 0.7, 0.009).doesSustain(false).legato(true).trigger(trigger_);
-
+        ADSR  adsr1 = ADSR().attack(attack1_).decay(0.02).sustain(0.1).release(release1_).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
+        ADSR  adsr2 = ADSR().attack(attack2_).decay(attack2_*4).sustain(0.05).release(release2_).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
+        
         
         TableLookupOsc snareOsc = TableLookupOsc().setLookupTable(snare).freq(freq_);
         TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(snare2).freq(freq_);
-
-
-        output_ =  (snareOsc2*adsr )>>BPF12().cutoff(freq_).Q(9*vol_+1);
+        
+        
+        tempGen  =  (snareOsc*adsr2*50)>>BPF12().cutoff(freq_).Q(9*vol_+1);
     }
     
     
@@ -189,10 +208,8 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     
     else if (preset_ == 3) {
         
-        attack = 0.005;
-        ADSR adsr1 = ADSR(attack, 0.08, 0.7, 1.0).doesSustain(false).legato(true).trigger(trigger_);
-        ADSR adsr2 = ADSR(0.04, 0.08, 0.4, 0.75).doesSustain(false).legato(true).trigger(trigger_);
-        
+        ADSR   adsr1 = ADSR().attack(attack1_*1.2).decay(attack1_*3).sustain(0.65).release(release1_).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
+        ADSR   adsr2 = ADSR().attack(attack2_).decay(attack2_*3).sustain(0.4).release(release2_).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
         
         TableLookupOsc bellAosc = TableLookupOsc().setLookupTable(bell1).freq(freq_);
         TableLookupOsc bellBosc = TableLookupOsc().setLookupTable(bell2).freq(freq_);
@@ -200,37 +217,65 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //output_ = ((bellAosc*adsr1)+(bellBosc*adsr2)) * vol_;
         
-        output_ =  (bellAosc*adsr1)+((bellBosc*adsr2))   *vol_;
+        tempGen =  (bellAosc*adsr1)+((bellBosc*adsr2))*8.5   ;
         
     }
     
-    
+    output_ = tempGen;
 }
 float SynthPresetManager::getPresetLfvf(int preset_) {
     float temp;
     if (preset_%count == 0) {
         temp = 2;
     } else if (preset_%count == 1) {
-        temp = 3;
+        temp = 2;
     } else if (preset_%count == 2) {
-        temp = 125;
+        temp = 4;
     } else if (preset_%count == 3) {
-        temp = 5;
+        temp = 3;
     }
     return temp;
 }
 
 float SynthPresetManager::getPresetColor(float hue_, int preset_){
     
+    float hue;
     if (preset_ == 0) {
-        hue_ = 9;
+        hue = 9;
     } else if (preset_ == 1) {
-        hue_ = 111;
+        hue = 111;
     } else if (preset_ == 2) {
-        hue_ = 137;
+        hue = 137;
     } else if (preset_ == 3) {
-        hue_ = 232;
+        hue = 232;
     }
-    return hue_;
-    
+    return hue;
+}
+
+float SynthPresetManager::getPresetRelease(int preset_){
+    float rel;
+    if (preset_%count == 0) {
+        rel = 0.45;
+    } else if (preset_%count == 1) {
+        rel = 0.78;
+    } else if (preset_%count == 2) {
+        rel = 0.25;
+    } else if (preset_%count == 3) {
+        rel = 2.5;
+    }
+    return rel;
+}
+
+float SynthPresetManager::getPresetAttack(int preset_){
+    float att;
+    if (preset_%count == 0) {
+        att =  1.5;
+    } else if (preset_%count == 1) {
+        att = 0.56;
+    } else if (preset_%count == 2) {
+        att = 0.21;
+    } else if (preset_%count == 3) {
+        att = 0.15;
+    }
+    return att;
 }

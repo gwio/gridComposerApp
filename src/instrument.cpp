@@ -77,7 +77,8 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     globalHarmony = true;
 }
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_, Tonic::Generator* sineA_ , Tonic::Generator* sineB_,int* globalState_) {
+
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_,int* globalState_, int* bpm_) {
     
     // colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     colorHue = presetManager.getPresetColor(colorHue, preset);
@@ -266,9 +267,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     //setNormals(cubes);
     
     
-    //setup main tonic out
-    sineA = sineA_;
-    sineB = sineB_;
+ 
     
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
@@ -276,12 +275,13 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     instrumentOut = instrumentOut * outputRamp;
     
     
-    Tonic::ControlParameter lfvfTarget = mainTonicPtr_->addParameter("lfvf"+instrumentId).max(1.0).min(0.0);
+    Tonic::ControlParameter lfvfTarget = mainTonicPtr_->addParameter("lfvf"+instrumentId);
     mainTonicPtr->setParameter("lfvf"+instrumentId, 1.0);
     lowFreqVolFac = Tonic::RampedValue().value(1.0).length(0.002).target(lfvfTarget);
     //   cout << cubes.getNumVertices() << endl;
     
     globalStatePtr = globalState_;
+    bpmPtr = bpm_;
 }
 
 
@@ -820,9 +820,13 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         
         
         //set tonic synth
-        setupOneSynth(&temp);
         
         soundsMap[soundsCounter] = temp;
+
+        
+        setupOneSynth(soundsMap[soundsCounter]);
+
+        cout << "added " << soundsCounter << " to soundsmap" << endl;
         
         //reallocate all synths to mainout
         updateTonicOut();
@@ -1009,7 +1013,7 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
     
 }
 
-void Instrument::setupOneSynth(cubeGroup *cgPtr) {
+void Instrument::setupOneSynth(cubeGroup& cgPtr) {
     
     
     float rampLength = 0.06;
@@ -1017,24 +1021,43 @@ void Instrument::setupOneSynth(cubeGroup *cgPtr) {
     
     //low freq = +volume
     
-    
     //create volume ramp
-    Tonic::ControlParameter rampVolumeTarget = cgPtr->groupSynth.addParameter("rampVolumeTarget").max(1.0).min(0.0);
-    cgPtr->groupSynth.setParameter("rampVolumeTarget",0.0);
-    cgPtr->rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
+    Tonic::ControlParameter rampVolumeTarget = cgPtr.groupSynth.addParameter("rampVolumeTarget").max(1.0).min(0.0);
+    cgPtr.groupSynth.setParameter("rampVolumeTarget",0.0);
+    cgPtr.rampVol = Tonic::RampedValue().value(0.0).length(rampLength).target(rampVolumeTarget);
     
     //create freq ramp
-    Tonic::ControlParameter rampFreqTarget = cgPtr->groupSynth.addParameter("rampFreqTarget");
-    cgPtr->freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
-    cgPtr->groupNote = getRandomNote();
-    cgPtr->groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr->groupNote ));
+    Tonic::ControlParameter rampFreqTarget = cgPtr.groupSynth.addParameter("rampFreqTarget");
+    cgPtr.freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
+    cgPtr.groupNote = getRandomNote();
+    cgPtr.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr.groupNote ));
+       
+    cgPtr.trigger = cgPtr.groupSynth.addParameter("trigger");
+    
+    cgPtr.attack1 =  cgPtr.groupSynth.addParameter("attack1");
+    cgPtr.attack2 =  cgPtr.groupSynth.addParameter("attack2");
+    
+    cgPtr.release1 =  cgPtr.groupSynth.addParameter("release1");
+    cgPtr.release2 =  cgPtr.groupSynth.addParameter("release2");
     
     
+    presetManager.createSynth(preset%presetManager.count, cgPtr.groupSynth, cgPtr.output, cgPtr.freqRamp, cgPtr.rampVol, cgPtr.trigger, cgPtr.adsr1, cgPtr.adsr2,
+                              cgPtr.attack1, cgPtr.attack2, cgPtr.release1, cgPtr.release2);
     
-    cgPtr->trigger = cgPtr->groupSynth.addParameter("trigger");
-    presetManager.createSynth(preset%presetManager.count, cgPtr->groupSynth, cgPtr->output, cgPtr->freqRamp, cgPtr->rampVol, cgPtr->trigger, lowFreqVolFac, sineA, sineB);
+
     synthAttack = presetManager.attack;
+  
     
+   
+  
+    
+    cgPtr.groupSynth.setParameter("release1",getSynthRelease(preset));
+    cgPtr.groupSynth.setParameter("release2",getSynthRelease(preset));
+    
+    cgPtr.groupSynth.setParameter("attack1",getSynthAttack(preset));
+    cgPtr.groupSynth.setParameter("attack2",getSynthAttack(preset));
+    
+
     
 }
 
@@ -1053,16 +1076,34 @@ void Instrument::changePreset(bool test_) {
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, lowFreqVolFac, sineA,sineB);
+    
+            presetManager.createSynth(preset%presetManager.count, it->second.groupSynth, it->second.output, it->second.freqRamp, it->second.rampVol, it->second.trigger, it->second.adsr1, it->second.adsr2,
+                                      it->second.attack1, it->second.attack2, it->second.release1, it->second.release2);
+            
+     /*
+            it->second.attack1 =  it->second.groupSynth.addParameter("attack1");
+           it->second.attack2 =  it->second.groupSynth.addParameter("attack2");
+            
+            it->second.release1 =  it->second.groupSynth.addParameter("release1");
+           it->second.release2 =  it->second.groupSynth.addParameter("release2");
+            
+            it->second.groupSynth.setParameter("release1",getSynthRelease(preset));
+            it->second.groupSynth.setParameter("release2",getSynthRelease(preset));
+            
+            it->second.groupSynth.setParameter("attack1",getSynthAttack(preset));
+            it->second.groupSynth.setParameter("attack2",getSynthAttack(preset));
+*/
             it->second.groupColor = ofColor::fromHsb(ofWrap(colorHue+ofRandom(-HUE_VARIATION,HUE_VARIATION),0,255),
                                                      it->second.groupColor.getSaturation(),
                                                      it->second.groupColor.getBrightness()
                                                      );
+            
+         
         }
     }
     synthAttack = presetManager.attack;
     
-    
+    setAllADSR(preset);
     
     for (int x = 0; x < gridTiles; x++) {
         for (int y = 0; y <gridTiles; y++) {
@@ -1090,7 +1131,7 @@ void Instrument::changePreset(bool test_) {
             }
         }
     }
-    
+     mainTonicPtr->setParameter("lfvf"+instrumentId,getLfvf(preset) );
     updateTonicOut();
 }
 
@@ -1108,7 +1149,7 @@ void Instrument::updateTonicOut(){
     
     
     
-    instrumentOut = ( temp * outputRamp);
+    instrumentOut = ( temp * outputRamp * lowFreqVolFac);
     synthHasChanged = true;
 }
 
@@ -1157,7 +1198,7 @@ void Instrument::applyNewScale(){
             
             it->second.groupNote = getRandomNote();
             it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
-            mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
+            //mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
             
         }
     }
@@ -1199,11 +1240,12 @@ void Instrument::setKeyNote(int keyNote_) {
             if(it->second.size > 0){
                 it->second.groupNote+=change;
                 it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
-                mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
                 
                 //cout << pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) << endl;
             }
         }
+        mainTonicPtr->setParameter("lfvf"+instrumentId,getLfvf(preset) );
+
     }
     
 }
@@ -1372,3 +1414,40 @@ void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
 }
 
 
+float Instrument::getLfvf(int& preset_){
+    float temp;
+    temp =   0.85+ pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 )*presetManager.getPresetLfvf(preset_);
+    cout << " lfvf " << ofClamp(temp,0.0,250.0) << endl;
+
+    return ofClamp(temp,0.0,250.0);
+}
+
+float Instrument::getSynthRelease(int& preset_){
+    float tempR;
+    tempR =presetManager.getPresetRelease(preset_) * (ofMap((float)*bpmPtr, 0, 270, 1.0, 0.001) / (5-nextPulseDivision));
+    cout<< "release " << tempR<< endl;
+
+    return tempR;
+}
+
+float Instrument::getSynthAttack(int& preset_){
+    float tempD;
+    tempD =presetManager.getPresetAttack(preset_) * (ofMap((float)*bpmPtr, 0, 270, 1.0, 0.001) / (5-nextPulseDivision));
+    cout << "attack  "<< tempD << endl;
+    
+    return tempD;
+}
+
+void Instrument::setAllADSR(int& preset_){
+    
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+            it->second.groupSynth.setParameter("release1",getSynthRelease(preset));
+            it->second.groupSynth.setParameter("release2",getSynthRelease(preset));
+            
+            it->second.groupSynth.setParameter("attack1",getSynthAttack(preset));
+            it->second.groupSynth.setParameter("attack2",getSynthAttack(preset));
+            
+        }
+    }
+}
