@@ -93,14 +93,14 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
 void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     float zH = 0;
-    float zHharmony = 30;
+    float zHharmony = 25;
     float arrow_width = 8.0;
     arrow_width/=2;
     ofMatrix4x4 tempM, tempMB;
     vector<ofVec3f> tempVertices;
     tempVertices.clear();
     tempVertices.resize(10);
-    float scaleFac = 10;
+    float scaleFac = 11.85;
     //connected mesh default
     
     //----------------------direction mesh connected
@@ -129,7 +129,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     
     tempM.setTranslation(ofVec3f(-gridSize,0,0));
-    tempMB.setTranslation(ofVec3f(-gridSize*1.5,0,0));
+    tempMB.setTranslation(ofVec3f(-gridSize*1.9,0,0));
     
     
     for (int i=0; i < 10;i++) {

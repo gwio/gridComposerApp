@@ -236,25 +236,25 @@ void ofApp::setup(){
     
     for (int i = 0; i < 4; i++) {
         ofVboMesh &aMesh = synths[0].pulsePlane.directionMeshConBig;
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+0)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+1)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+3)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+7)*0.5*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+0)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+1)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+3)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+7)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
         directionClickZonesA[i].close();
         
         ofVboMesh &bMesh = synths[1].pulsePlane.directionMeshConBig;
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+0)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+1)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+3)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+7)*0.5*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+0)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+1)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+3)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+7)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
         directionClickZonesB[i].close();
         
         
         ofVboMesh &cMesh = synths[2].pulsePlane.directionMeshConBig;
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+0)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+1)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+3)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+7)*0.5*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+0)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+1)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+3)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+7)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].close();
         
     }
@@ -1046,21 +1046,21 @@ void ofApp::replaceMouseDragged(int x, int y){
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                mainInterfaceData[52].elementName = ofToString(value);
+                mainInterfaceData[52].elementName = ofToString(value,2);
                 mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                mainInterfaceData[53].elementName = ofToString(value);
+                mainInterfaceData[53].elementName = ofToString(value,2);
                 mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                mainInterfaceData[54].elementName = ofToString(value);
+                mainInterfaceData[54].elementName = ofToString(value,2);
                 mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
@@ -1068,7 +1068,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
-                mainInterfaceData[51].elementName = ofToString(value);
+                mainInterfaceData[51].elementName = ofToString(value,2);
                 mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
             
@@ -1303,21 +1303,21 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                mainInterfaceData[52].elementName = ofToString(value);
+                mainInterfaceData[52].elementName = ofToString(value,2);
                 mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                mainInterfaceData[53].elementName = ofToString(value);
+                mainInterfaceData[53].elementName = ofToString(value,2);
                 mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                mainInterfaceData[54].elementName = ofToString(value);
+                mainInterfaceData[54].elementName = ofToString(value,2);
                 mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
@@ -1325,7 +1325,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
-                mainInterfaceData[51].elementName = ofToString(value);
+                mainInterfaceData[51].elementName = ofToString(value,2);
                 mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
             
@@ -4074,9 +4074,9 @@ void ofApp::bpmButtonPress() {
         synths[synthButton[0]].myScaleDefault = 1.0;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleDefault = 1.0;
-        synths[synthButton[0]].myScaleTarget = 0.5;
-        synths[synthButton[1]].myScaleTarget = 0.5;
-        synths[synthButton[2]].myScaleTarget = 0.5;
+        synths[synthButton[0]].myScaleTarget = 0.45;
+        synths[synthButton[1]].myScaleTarget = 0.45;
+        synths[synthButton[2]].myScaleTarget = 0.45;
         
         aniPct = 0.0;
         
@@ -4108,9 +4108,9 @@ void ofApp::bpmButtonPress() {
         synths[synthButton[0]].scaling = true;
         synths[synthButton[1]].scaling = true;
         synths[synthButton[2]].scaling = true;
-        synths[synthButton[0]].myScaleDefault = 0.5;
-        synths[synthButton[1]].myScaleDefault = 0.5;
-        synths[synthButton[2]].myScaleDefault = 0.5;
+        synths[synthButton[0]].myScaleDefault = 0.45;
+        synths[synthButton[1]].myScaleDefault = 0.45;
+        synths[synthButton[2]].myScaleDefault = 0.45;
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
@@ -4248,17 +4248,17 @@ void ofApp::setNewGUI() {
     //volume slider
     mainInterfaceData[52].setColor(synths[synthButton[0]].colorHue);
     mainInterfaceData[52].activateOnColor();
-    mainInterfaceData[52].elementName = ofToString(synths[synthButton[0]].sVolume);
+    mainInterfaceData[52].elementName = ofToString(synths[synthButton[0]].sVolume,2);
     mainInterfaceData[52].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[53].setColor(synths[synthButton[1]].colorHue);
     mainInterfaceData[53].activateOnColor();
-    mainInterfaceData[53].elementName = ofToString(synths[synthButton[1]].sVolume);
+    mainInterfaceData[53].elementName = ofToString(synths[synthButton[1]].sVolume,2);
     mainInterfaceData[53].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[54].setColor(synths[synthButton[2]].colorHue);
     mainInterfaceData[54].activateOnColor();
-    mainInterfaceData[54].elementName = ofToString(synths[synthButton[2]].sVolume);
+    mainInterfaceData[54].elementName = ofToString(synths[synthButton[2]].sVolume,2);
     mainInterfaceData[54].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
     
     
@@ -4756,7 +4756,7 @@ void ofApp::loadFromXml(string path_){
     settings.pushTag("global");
     // volumeRampValueChanged(mainVol);
     volumeRestartTarget = settings.getValue("volume", 1.0);
-    mainInterfaceData[51].elementName = ofToString(volumeRestartTarget);
+    mainInterfaceData[51].elementName = ofToString(volumeRestartTarget,2);
     mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
     settings.popTag();
     settings.pushTag("slots");
