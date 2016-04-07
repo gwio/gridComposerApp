@@ -2,7 +2,7 @@
 #define TILES 5
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.065
-#define BPM (220*4)
+#define BPM (130)
 #define ANI_SPEED 0.030
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
@@ -24,12 +24,10 @@ void ofApp::setup(){
 #if TARGET_OS_IPHONE
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);
     setSampleRate(44100);
-    ofSoundStreamSetup(2, 1, this, 44100, 256*2, 1);
-    pitchCorrect = 0;
+    ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
 #else
     setSampleRate(44100);
-    ofSoundStreamSetup(2, 1, this, 44100, 256*2, 4);
-    pitchCorrect = 0;
+    ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
 #endif
     
     ofSetFrameRate(60);
@@ -2135,7 +2133,7 @@ void ofApp::volumeRampValueChanged(float & volumeRampValue) {
     
 }
 
-void ofApp::audioRequested (float * output, int bufferSize, int nChannels){
+void ofApp::audioOut (float * output, int bufferSize, int nChannels){
     tonicSynth.fillBufferOfFloats(output, bufferSize, nChannels);
 }
 
@@ -4776,7 +4774,7 @@ void ofApp::loadFromXml(string path_){
     //bpm
     settings.pushTag("BPM");
     settings.pushTag("global");
-    bpm =ofClamp(settings.getValue("value", 200), 1, 2000);
+    bpm =ofClamp(settings.getValue("value", 130), 1, 2000);
     tonicSynth.setParameter("BPM", bpm*4);
     tonicSynth.setParameter("delay", bpm);
     mainInterfaceData[38].elementName = ofToString(bpm);

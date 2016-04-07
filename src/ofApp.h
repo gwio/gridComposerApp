@@ -149,7 +149,7 @@ class ofApp : public ofxiOSApp{
         void pulseEventDiv3(float &);
         void pulseEventDiv4(float &);
         
-        void audioRequested (float * output, int bufferSize, int nChannels);
+        void audioOut (float * output, int bufferSize, int nChannels);
         //mainout
         ofxTonicSynth tonicSynth;
         RampedValue volumeRamp;

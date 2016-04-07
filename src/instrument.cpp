@@ -52,12 +52,9 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     octaveRange = 0;
     
     userScale = false;
-    
-    if ( ofIsStringInString(instrumentId,"b") ) {
-        trackSwitchOn = true;
-    } else {
-        trackSwitchOn = false;
-    }
+    trackSwitchOn = true;
+
+
     
     timeCounter = -1;
     pulseDivision = 4;
