@@ -7,7 +7,7 @@
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
-#define VERSION "0.93.5"
+#define VERSION "0.98.0"
 
 
 
@@ -1884,6 +1884,13 @@ void ofApp::gotMemoryWarning(){
 
 //--------------------------------------------------------------
 void ofApp::deviceOrientationChanged(int newOrientation){
+    if (newOrientation == OF_ORIENTATION_90_RIGHT) {
+        ofSetOrientation(OF_ORIENTATION_90_RIGHT);
+    }
+    
+    if(newOrientation == OF_ORIENTATION_90_LEFT){
+        ofSetOrientation(OF_ORIENTATION_90_LEFT);
+    }
     
 }
 #endif
