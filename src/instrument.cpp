@@ -11,7 +11,7 @@ Instrument::Instrument(){
     
 };
 
-Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int historyRows_) {
+Instrument::Instrument(int channel_,string id_,int gTiles_, float gSize_, float border_, int historyRows_) {
     
     cubeMap.clear();
     cubes.clear();
@@ -37,7 +37,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
     emptyInnerZ = EMPTY_Z;
     scanZ = SCAN_Z;
     
-    
+    channel = channel_;
     animate = false;
     inFocus = false;
     scaling = false;
@@ -75,7 +75,7 @@ Instrument::Instrument(string id_,int gTiles_, float gSize_, float border_, int 
 }
 
 
-void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_,int* globalState_, int* bpm_) {
+void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, ofNode node_,int* globalState_, int* bpm_, ofxMidiOut *midiOutPtr_) {
     
     // colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     colorHue = presetManager.getPresetColor(colorHue, preset);
@@ -279,6 +279,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     instrumentOut = instrumentOut * outputRamp * lowFreqVolFac;
     globalStatePtr = globalState_;
     bpmPtr = bpm_;
+    midiOutPtr = midiOutPtr_;
 }
 
 
@@ -335,6 +336,7 @@ void Instrument::removeCube(int x_, int y_){
     
     tPtr->size--;
     if (tPtr->size < 1) {
+        midiOutPtr->sendNoteOff(channel,soundsMap.at(layerInfo.at(x_).at(y_).cubeGroupId).groupNote-keyNote,0);
         soundsMap.erase(layerInfo.at(x_).at(y_).cubeGroupId);
         //reallocate all synths to mainout
         updateTonicOut();
@@ -541,10 +543,12 @@ void Instrument::noteTriggerWest(){
             if (it->second.highX+1 == *stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
+                midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
                 float rampTarget = 1-powf(1-(float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles)),2) ;
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
+                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
             }
         }
     }
@@ -594,10 +598,12 @@ void Instrument::noteTriggerNorth() {
             if (it->second.lowY == gridTiles-*stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
+                midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
                 float rampTarget = 1-powf(1-(float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
+                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
             }
         }
     }
@@ -648,10 +654,12 @@ void Instrument::noteTriggerEast() {
             if (it->second.lowX == gridTiles-*stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
+                midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
                 float rampTarget = 1-powf(1-(float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
+                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
             }
         }
     }
@@ -699,10 +707,12 @@ void Instrument::noteTriggerSouth() {
             if (it->second.highY+1 == *stepperPos){
                 it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
                 it->second.groupSynth.setParameter("trigger",0);
+                midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
                 float rampTarget =1-powf(1-(float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles)),2);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
+                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
             }
         }
     }
@@ -908,6 +918,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 //check for max,min, x,y
                                 updateGroupInfo(soundMapIndex, x, y);
                                 if (aPtr->size < 1) {
+                                    midiOutPtr->sendNoteOff(channel,soundsMap.at(neighbours[i]).groupNote-keyNote,0);
                                     soundsMap.erase(neighbours[i]);
                                     cout << "remove " << neighbours[i] << " from soundsmap in updateSoundINfo" << endl;
                                     updateTonicOut();
@@ -942,6 +953,7 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
                 
                 
                 if (cgPtr->size < 1) {
+                    midiOutPtr->sendNoteOff(channel,soundsMap.at(group_).groupNote-keyNote,0);
                     soundsMap.erase(group_);
                     cout << "remove " << group_ << " from soundsmap in resetcubegroup" << endl;
 
@@ -1242,6 +1254,8 @@ void Instrument::setKeyNote(int keyNote_) {
         //cout << keyNote << endl;
         for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
             if(it->second.size > 0){
+                midiOutPtr->sendNoteOff(channel, it->second.groupNote-keyNote,0);
+
                 it->second.groupNote+=change;
                 it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
                 
@@ -1387,6 +1401,7 @@ void Instrument::setAllNotesOff(){
         if(it->second.size > 0){
             it->second.groupSynth.setParameter("rampVolumeTarget", 0.0);
             it->second.groupSynth.setParameter("trigger",0);
+            midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
         }
     }
 }

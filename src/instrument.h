@@ -9,6 +9,7 @@
 #include "GlobalScales.h"
 #include "SynthPresetManager.h"
 #include "GlobalGUI.h"
+#include "ofxMidi.h"
 
 struct noteLog {
     vector<bool> notes;
@@ -71,9 +72,9 @@ public:
     
     
     Instrument();
-    Instrument(string,int,float,float,int);
+    Instrument(int, string,int,float,float,int);
     
-    void setup(int*, Tonic::ofxTonicSynth *,ofNode,int*,int*);
+    void setup(int*, Tonic::ofxTonicSynth *,ofNode,int*,int*, ofxMidiOut*);
     void updateTonicOut();
     void update();
     void draw();
@@ -222,4 +223,7 @@ public:
     float getSynthRelease(int&);
     float getSynthAttack(int&);
     void setAllADSR(int&);
+    
+    ofxMidiOut *midiOutPtr;
+    int channel;
 };

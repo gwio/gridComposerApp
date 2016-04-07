@@ -9,6 +9,7 @@
 #include "GlobalScales.h"
 #include "SaveLoad.h"
 #include "HistoryView.h"
+#include "ofxMidi.h"
 //#include "ofxFontStash.h"
 //#include "ofxXmlSettings.h"
 
@@ -316,5 +317,6 @@ class ofApp : public ofxiOSApp{
         int iconSize;
         
         void setupFonts();
-
+        void setupMidi();
+        ofxMidiOut midiOut;
     };

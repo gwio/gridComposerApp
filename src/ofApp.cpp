@@ -118,20 +118,20 @@ void ofApp::setup(){
     
     synths.resize(3);
     
-    synths[0] = Instrument("a",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0],&currentState,&bpm);
+    synths[0] = Instrument(1,"a",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
+    synths[0].setup(&timeCounter, &tonicSynth, synthPos[0],&currentState,&bpm,&midiOut);
     synths[0].setMusicScale(scaleCollection, 0);
     synths[0].setKeyNote(60+globalKey-12);
     synths[0].ownSlot = 0;
     
-    synths[1] = Instrument("b",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1],&currentState,&bpm);
+    synths[1] = Instrument(2,"b",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
+    synths[1].setup(&timeCounter, &tonicSynth, synthPos[1],&currentState,&bpm,&midiOut);
     synths[1].setMusicScale(scaleCollection, 0);
     synths[1].setKeyNote(60+globalKey);
     synths[1].ownSlot = 1;
     
-    synths[2] = Instrument("c",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
-    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2],&currentState,&bpm);
+    synths[2] = Instrument(3,"c",TILES,TILESIZE,TILEBORDER,HISTORY_ROWS);
+    synths[2].setup(&timeCounter, &tonicSynth, synthPos[2],&currentState,&bpm,&midiOut);
     synths[2].setMusicScale(scaleCollection, 0);
     synths[2].setKeyNote(60+globalKey+12);
     synths[2].ownSlot = 2;
@@ -289,7 +289,7 @@ void ofApp::setup(){
     
     //setNewGUI();
     setupAudio();
-    
+    setupMidi();
 }
 
 //--------------------------------------------------------------
@@ -361,6 +361,21 @@ void ofApp::setupFonts(){
 
     
     
+}
+//--------------------------------------------------------------
+
+void ofApp::setupMidi(){
+ 
+    
+    
+#if TARGET_OS_IPHONE
+ofxMidi::enableNetworking();
+    midiOut.listPorts();
+    midiOut.openPort(0);
+#else
+    midiOut.listPorts();
+    midiOut.openPort(0);
+#endif
 }
 //--------------------------------------------------------------
 
@@ -4481,6 +4496,7 @@ void ofApp::exit(){
     startUp = true;
     saveToXml("settings.xml");
     ofSoundStreamClose();
+    midiOut.closePort();
 }
 
 void ofApp::savePreset(){
