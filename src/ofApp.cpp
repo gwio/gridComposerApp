@@ -385,7 +385,7 @@ void ofApp::setupAudio(){
     
     
     Tonic::StereoDelay delay = Tonic::StereoDelay(0.35,0.26)
-    .delayTimeRight(0.35- (delayTime*0.001))
+    .delayTimeRight(0.30- (delayTime*0.001))
     .delayTimeLeft(0.35-  (delayTime*0.001))
     .feedback(0.125)
     .dryLevel(0.875)
@@ -401,7 +401,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(6) >> LPF12().cutoff(8000).Q(4) >>delay );
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(8) >> LPF12().cutoff(8400).Q(4) >>delay );
 }
 
 //--------------------------------------------------------------
