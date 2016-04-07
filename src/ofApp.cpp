@@ -4480,6 +4480,7 @@ void ofApp::markSynthNotes(){
 void ofApp::exit(){
     startUp = true;
     saveToXml("settings.xml");
+    ofSoundStreamClose();
 }
 
 void ofApp::savePreset(){
