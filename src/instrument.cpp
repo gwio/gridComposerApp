@@ -511,12 +511,16 @@ void Instrument::noteTriggerWest(){
                 soundsMap[layerInfo.at(0).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(0).at(i).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(0).at(i).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(true,true);
             }
         }
     } else if (*stepperPos == gridTiles ) {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(gridTiles-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setColor(false,false);
             }
         }
@@ -528,9 +532,13 @@ void Instrument::noteTriggerWest(){
                 soundsMap[layerInfo.at(*stepperPos).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(*stepperPos).at(i).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(*stepperPos).at(i).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(*stepperPos).at(i).cubeVecNum].setColor(true,true);
             }
             if (layerInfo.at(*stepperPos-1).at(i).hasCube) {
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(*stepperPos-1).at(i).cubeVecNum].setColor(false,false);
             }
         }
@@ -566,12 +574,16 @@ void Instrument::noteTriggerNorth() {
                 soundsMap[layerInfo.at(i).at(gridTiles-1).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(i).at(gridTiles-1).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(i).at(gridTiles-1).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(true,true);
             }
         }
     } else if (*stepperPos == gridTiles ) {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(i).at(0).hasCube) {
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(i).at(0).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(i).at(0).cubeVecNum].setColor(false,false);
             }
         }
@@ -583,9 +595,13 @@ void Instrument::noteTriggerNorth() {
                 soundsMap[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos-1).cubeVecNum].setColor(true,true);
             }
             if (layerInfo.at(i).at(gridTiles-*stepperPos).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(i).at(gridTiles-*stepperPos).cubeVecNum].setColor(false,false);
             }
         }
@@ -622,12 +638,16 @@ void Instrument::noteTriggerEast() {
                 soundsMap[layerInfo.at(gridTiles-1).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(gridTiles-1).at(i).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(gridTiles-1).at(i).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(gridTiles-1).at(i).cubeVecNum].setColor(true,true);
             }
         }
     } else if (*stepperPos == gridTiles ) {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(0).at(i).hasCube) {
                 cubeVector[layerInfo.at(0).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(0).at(i).cubeVecNum].setColor(false,false);
             }
         }
@@ -639,11 +659,14 @@ void Instrument::noteTriggerEast() {
                 soundsMap[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(gridTiles-*stepperPos-1).at(i).cubeVecNum].setColor(true,true);
             }
             if (layerInfo.at(gridTiles-*stepperPos).at(i).hasCube) {
                 cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
                 cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setColor(false,false);
-                
+            } else {
+                cubeVector[layerInfo.at(gridTiles-*stepperPos).at(i).cubeVecNum].setColor(false,false);
             }
         }
     }
@@ -675,12 +698,16 @@ void Instrument::noteTriggerSouth() {
                 soundsMap[layerInfo.at(i).at(0).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(i).at(0).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(i).at(0).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(i).at(0).cubeVecNum].setColor(true,true);
             }
         }
     } else if (*stepperPos == gridTiles ) {
         for (int  i = 0; i < gridTiles; i++) {
             if (layerInfo.at(i).at(gridTiles-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(i).at(gridTiles-1).cubeVecNum].setColor(false,false);
             }
         }
@@ -692,9 +719,13 @@ void Instrument::noteTriggerSouth() {
                 soundsMap[layerInfo.at(i).at(*stepperPos).cubeGroupId].groupSynth.setParameter("trigger",1);
                 blinkNoteInfo(soundsMap[layerInfo.at(i).at(*stepperPos).cubeGroupId].groupNote-keyNote);
                 tempLog.notes[soundsMap[layerInfo.at(i).at(*stepperPos).cubeGroupId].groupNote-keyNote] = true;
+            } else {
+                cubeVector[layerInfo.at(i).at(*stepperPos).cubeVecNum].setColor(true,true);
             }
             if (layerInfo.at(i).at(*stepperPos-1).hasCube) {
                 cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+                cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(i).at(*stepperPos-1).cubeVecNum].setColor(false,false);
             }
         }
@@ -1388,6 +1419,8 @@ void Instrument::setSaturationOff(){
             if ( layerInfo.at(x).at(y).hasCube) {
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(false,false);
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].setDefaultHeight(CUBE_Z_HEIGHT);
+            } else {
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(false,false);
             }
         }
     }
@@ -1412,6 +1445,8 @@ void Instrument::setSaturationOn(){
         for (int y = 0; y <gridTiles; y++) {
             cubeVector[layerInfo.at(x).at(y).cubeVecNum].satOn();
             if ( layerInfo.at(x).at(y).hasCube) {
+                cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(false,false);
+            } else {
                 cubeVector[layerInfo.at(x).at(y).cubeVecNum].setColor(false,false);
             }
         }

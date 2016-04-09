@@ -765,7 +765,7 @@ void InterfacePlane::draw( bool& pause_){
         directionMesh.drawWireframe();
         
         
-        
+        /*
         if (scanDir >=0) {
             ofPushMatrix();
             
@@ -788,7 +788,7 @@ void InterfacePlane::draw( bool& pause_){
             
             ofPopMatrix();
         }
-        
+        */
     }
 }
 
