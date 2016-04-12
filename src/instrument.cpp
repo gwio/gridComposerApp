@@ -239,6 +239,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     pulsePlane = InterfacePlane(gridTiles, gridSize, connectedDirection, activeDirection);
+    pulsePlane.setColor(colorHue);
     
     ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
     
@@ -291,11 +292,10 @@ void Instrument::update() {
         }
     }
     
-    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause, *globalStatePtr);
+    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause, *globalStatePtr, colorHue);
     
     updateCubeMesh();
     
-    setNormals(cubes);
     
 }
 
@@ -480,6 +480,8 @@ void Instrument::nextDirection() {
     if( scanDirection >= 0) {
         pulsePlane.pulseDir(scanDirection);
         pulsePlane.barCounter++;
+        pulsePlane.flipTrailMesh();
+
     }
     
     if (scanDirection != -1) {
@@ -848,7 +850,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         cubeGroup temp = cubeGroup(gridTiles);
         temp.ownId = soundsCounter;
         temp.size = 1;
-        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-HUE_VARIATION,HUE_VARIATION),0,255), 180+ofRandom(-50,28), 100+ofRandom(0,100));
+        ofColor gColor = ofColor::fromHsb(   ofWrap(colorHue+ofRandom(-HUE_VARIATION,HUE_VARIATION),0,255), 200+ofRandom(-50,28), 100+ofRandom(0,100));
         temp.groupColor = gColor;
         temp.lowX = x_;
         temp.highX = x_;
@@ -1120,7 +1122,7 @@ void Instrument::changePreset(bool test_) {
     }
     //colorHue = ofWrap( ofMap(preset%presetManager.count, 0, presetManager.count, 0, 255),0,255);
     colorHue =  ofWrap(presetManager.getPresetColor(colorHue, preset%presetManager.count),0,255 );
-    
+    pulsePlane.setColor(colorHue);
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
     
@@ -1383,34 +1385,7 @@ ofPolyline Instrument::getEmptyPath(ofVec3f pos_) {
     return temp;
 }
 
-void Instrument::setNormals(ofVboMesh& mesh_) {
-    
-    mesh_.clearNormals();
-    
-    for( int i=0; i < mesh_.getIndices().size(); i+=3 ){
-        const int ia = mesh_.getIndices()[i];
-        const int ib = mesh_.getIndices()[i+1];
-        const int ic = mesh_.getIndices()[i+2];
-        
-        ofVec3f e1 = mesh_.getVertices()[ia] - mesh_.getVertices()[ib];
-        ofVec3f e2 = mesh_.getVertices()[ic] - mesh_.getVertices()[ib];
-        ofVec3f no = e2.cross( e1 );
-        
-        // depending on your clockwise / winding order, you might want to reverse the e2 / e1 above if your normals are flipped.
-        
-        mesh_.getNormals()[ia] += no;
-        mesh_.getNormals()[ib] += no;
-        mesh_.getNormals()[ic] += no;
-    }
-    
-    /*
-     if (bNormalize)
-     for(int i=0; i < mesh.getNormals().size(); i++ ) {
-     mesh.getNormals()[i].normalize();
-     }
-     }
-     */
-}
+
 
 void Instrument::setSaturationOff(){
     for (int x = 0; x < gridTiles; x++) {

@@ -106,7 +106,6 @@ public:
     void setRotate(ofQuaternion);
     void setScale(float);
     void planeMovement(float);
-    void setNormals(ofVboMesh&);
     void loadMuster(vector< vector<bool> >&);
     
     void setSaturationOff();

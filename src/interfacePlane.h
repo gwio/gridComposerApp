@@ -13,7 +13,7 @@ class InterfacePlane {
     
     InterfacePlane(int, float,bool[],bool[]);
     
-    void update(int&, float&, int&, bool[],bool[], bool&, int&);
+    void update(int&, float&, int&, bool[],bool[], bool&, int&, float&);
     void draw(bool&);
     
     void pulseDir(int);
@@ -25,6 +25,8 @@ class InterfacePlane {
     void transformButton(bool[],bool[], int&);
     
     void blinkP();
+    
+    void setColor(float);
 
     bool animate;
     
@@ -66,7 +68,7 @@ class InterfacePlane {
     
     ofVboMesh directionMesh;
 
-    vector<ofVec3f> lineMeshVertices;
+    deque<ofVec3f> lineMeshQA,lineMeshQB;
     
     bool nextDirs[4];
     
@@ -88,5 +90,9 @@ class InterfacePlane {
     
     ofColor tempC;
     ofVec3f tempVec;
+    
+    bool trailMesh;
+    void flipTrailMesh();
+    ofColor trailColor;
 };
 

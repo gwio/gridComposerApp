@@ -768,7 +768,7 @@ void ofApp::drawInterface(){
     
     //bpm fx
     if (currentState == STATE_BPM) {
-        glLineWidth(	2);
+       // glLineWidth(	2);
         bpmFx.draw();
     }
     

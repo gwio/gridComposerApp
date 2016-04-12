@@ -48,47 +48,26 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     gridSize = (tileSize*tiles)*0.5+10;
     
     lineMesh.clear();
+    lineMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
     
     float zH = 22.55;
-    //pulse lines
-    lineMesh.addVertex(ofVec3f(-50,-50,zH));
-    lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(-50,50,zH));
-    lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(50,+50,zH));
-    lineMesh.addColor(ofColor(255,255,255,0));
-    lineMesh.addVertex(ofVec3f(50,-50,zH));
-    lineMesh.addColor(ofColor(255,255,255,0));
+
     
     connected = ofColor::fromHsb(73,135,178,255);
     active = ofColor::fromHsb(28,160,170,255);
-    offColor = ofColor::fromHsb(0,127, 175, 255);
+    offColor = ofColor::fromHsb(255, 0, 51, 255);
     pulseColor = ofColor::fromHsb(0, 0, 255,255);
     
-    //connect lines
-    
-    lineMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    
-    lineMeshVertices.clear();
-    lineMeshVertices.reserve(8*2);
-    
-    for (int i = 0; i < lineMesh.getNumVertices(); i++) {
-        lineMeshVertices.push_back(lineMesh.getVertex(i));
-    }
-    
-    
-    pulseLine.addVertex(ofVec3f(-50,-50,0));
-    pulseLine.addVertex(ofVec3f(-50,-50,0));;
-    pulseLine.addColor(ofColor(255,255,255,0));
-    pulseLine.addColor(ofColor(255,255,255,100));
-    pulseLine.setUsage( GL_DYNAMIC_DRAW );
-    pulseLine.setMode(OF_PRIMITIVE_LINES);
-    
+        
     
     setupMeshes(connected_, active_);
     
 }
 
+void InterfacePlane::setColor(float hue_){
+    connected = ofColor::fromHsb(hue_, 235, 200,255);
+    active = ofColor::fromHsb(hue_, 235, 100,180);
+}
 
 void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
@@ -615,7 +594,7 @@ void InterfacePlane::blinkP(){
     }
 }
 
-void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_) {
+void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_, float &hue_) {
     
     transformButton(connected_, active_, globalState_);
     blinkP();
@@ -639,11 +618,26 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         ofMatrix4x4 aaa;
         
         
+        
         if (nextDirs[1] && nextDirs[0]) {
             alpha = ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI) + scanDir_*HALF_PI;
             alpha -= HALF_PI;
             alpha += len*alphaPart;
-            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+scanDir_*HALF_PI, 0, 0, 1) ;
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+scanDir_*HALF_PI, 0, 0, 1);
+            if(connected_[scanDir]){
+                if (connected_[(scanDir+1)%4]){
+                    trailColor = connected;
+                } else if(active_[(scanDir+1)%4]){
+                    trailColor = connected.getLerped(active, pctBar);
+                }
+            } else if(active_[scanDir]){
+                if(connected_[(scanDir+1)%4]){
+                    trailColor = active.getLerped(connected, pctBar);
+                } else if(active_[(scanDir+1)%4]){
+                    trailColor = active;
+                }
+            }
+           
         }else if (!nextDirs[1]){
             if(nextDirs[2]) {
                 alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
@@ -652,19 +646,61 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
                 alpha+= len*(alphaPart*2);
                 aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+(HALF_PI*pctBar), 0, 0, 1) ;
                 
+                if(connected_[scanDir]){
+                    if (connected_[(scanDir+2)%4]){
+                        trailColor = connected;
+                    } else if(active_[(scanDir+2)%4]){
+                        trailColor = connected.getLerped(active, pctBar);
+                    }
+                } else if(active_[scanDir]){
+                    if(connected_[(scanDir+2)%4]){
+                        trailColor = active.getLerped(connected, pctBar);
+                    } else if(active_[(scanDir+2)%4]){
+                        trailColor = active;
+                    }
+                }
+                
             } else if (nextDirs[3]) {
                 alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
                 alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*2;
                 alpha -= HALF_PI;
                 alpha+= len*(alphaPart*3);
-                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*2), 0, 0, 1) ;
+                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*2), 0, 0, 1);
+                
+                if(connected_[scanDir]){
+                    if (connected_[(scanDir+3)%4]){
+                        trailColor = connected;
+                    } else if(active_[(scanDir+3)%4]){
+                        trailColor = connected.getLerped(active, pctBar);
+                    }
+                } else if(active_[scanDir]){
+                    if(connected_[(scanDir+3)%4]){
+                        trailColor = active.getLerped(connected, pctBar);
+                    } else if(active_[(scanDir+3)%4]){
+                        trailColor = active;
+                    }
+                }
                 
             } else {
                 alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
                 alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*3;
                 alpha -= HALF_PI;
                 alpha+= len*(alphaPart*4);
-                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*3), 0, 0, 1) ;
+                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*3), 0, 0, 1);
+                
+                if(connected_[scanDir]){
+                    if (connected_[(scanDir+4)%4]){
+                        trailColor = connected;
+                    } else if(active_[(scanDir+4)%4]){
+                        trailColor = connected.getLerped(active, pctBar);
+                    }
+                } else if(active_[scanDir]){
+                    if(connected_[(scanDir+4)%4]){
+                        trailColor = active.getLerped(connected, pctBar);
+                    } else if(active_[(scanDir+4)%4]){
+                        trailColor = active;
+                    }
+                }
             }
             
         }
@@ -682,68 +718,59 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         
         posNode.setPosition(alphaPos);
         
-        float scalePct = (abs(sin(pctScale-(HALF_PI*1.25)))*1);
-        float thisScale =  ofClamp(pow(scalePct, 6),0.0,1.0);
+        float scalePct = (abs(sin(pctScale-(HALF_PI*1.3)))*1);
+        float thisScale =  ofClamp(pow(scalePct, 4),0.0,1.0);
         
         linePct = ofClamp(ofMap(pctBar, 0.0, 1.0, 0.0, (1.0+(1/tiles))), 0.0, 1.0);
         
         
         posNode.setPosition( posNode.getPosition()* ((-thisScale*0.15) +1.0) ) ;
-        posNode.setScale( (thisScale*1) +0.65 );
+        posNode.setScale( (thisScale*2) +0.65 );
         
         //cout << linePct << endl;
-        
-        if (scanDir == 0 && (active_[0] && connected_[0]) ) {
-            pulseLine.setVertex(0, lineMeshVertices.at(0) +  (lineMeshVertices.at(3)-lineMeshVertices.at(0))*linePct/2);
-            pulseLine.setVertex(1, lineMeshVertices.at(0) + (lineMeshVertices.at(3)-lineMeshVertices.at(0))*linePct);
-            
-        } else if (scanDir == 1 && (active_[1] && connected_[1])) {
-            pulseLine.setVertex(0, lineMeshVertices.at(1)+ (lineMeshVertices.at(0)-lineMeshVertices.at(1))*linePct/2);
-            pulseLine.setVertex(1, lineMeshVertices.at(1) + (lineMeshVertices.at(0)-lineMeshVertices.at(1))*linePct);
-            
-            
-        } else if (scanDir == 2 && (active_[2] && connected_[2])) {
-            pulseLine.setVertex(0, lineMeshVertices.at(2)+ (lineMeshVertices.at(1)-lineMeshVertices.at(2))*linePct/2);
-            pulseLine.setVertex(1, lineMeshVertices.at(2) + (lineMeshVertices.at(1)-lineMeshVertices.at(2))*linePct);
-            
-            
-        } else if (scanDir == 3 && (active_[3] && connected_[3])) {
-            pulseLine.setVertex(0, lineMeshVertices.at(3)+ (lineMeshVertices.at(2)-lineMeshVertices.at(3))*linePct/2);
-            pulseLine.setVertex(1, lineMeshVertices.at(3) + (lineMeshVertices.at(2)-lineMeshVertices.at(3))*linePct);
-            
-        } else {
-            pulseLine.setVertex(0, ofVec3f(2000,2000,2000));
-            pulseLine.setVertex(1, ofVec3f(2000,2000,2000));
-            pulseLine.setColor(0, ofColor(255,255,255,0));
-            pulseLine.setColor(1, ofColor(255,255,255,0));
-        }
-        
-        
-        
-        
-        if (stepper == 5) {
-            
-            // pulseLine.setColor(0, pulseLine.getColor(0).lerp(ofColor(255,255,255,0), 0.2));
-            pulseLine.setColor(1, pulseLine.getColor(1).lerp(ofColor(255,255,255,0), 0.1));
-        } else {
-            pulseLine.setColor(0, ofColor(255,255,255,0));
-            pulseLine.setColor(1, ofColor::fromHsb(0, 0, 255,200));
-        }
-        
-        // cout <<  tickTime_ << "  " <<  stepCounter << " " << thisTime  << "  " << ofGetElapsedTimeMillis() << "  " << len << endl;
-        //cout <<  fmod( double(pctBar), 0.25) << endl;
-        
-        
-        //  if (stepper != 5) {
-        
-        
-        
-        // lineAlpha = abs(sin(pctScale-HALF_PI))*150;
-        
+     
         
     }
     
+    
+    //linemesh
+    ofVec3f tempA = ofVec3f(5,0,0)*posNode.getGlobalTransformMatrix();
+    
+    ofVec3f tempB = ofVec3f(-5,0,0)*posNode.getGlobalTransformMatrix();
+    
+    if (trailMesh){
+    lineMeshQA.push_back(tempA);
+    lineMeshQB.push_back(tempB);
+    }else {
+        lineMeshQA.push_back(tempB);
+        lineMeshQB.push_back(tempA);
+    }
+    
+    if (lineMeshQA.size() > 50) {
+        lineMeshQA.pop_front();
+        lineMeshQB.pop_front();
+    }
+    
+
+
+    lineMesh.clear();
+    for (int i = 0; i < lineMeshQA.size(); i++) {
+        lineMesh.addVertex(lineMeshQA.at(i));
+        trailColor.a = (255/50)*i;
+        lineMesh.addColor(trailColor);
+        
+       
+    }
+    
+    
+    for (int i = lineMeshQA.size()-1; i > 0; i--) {
+        lineMesh.addVertex(lineMeshQB.at(i));
+        trailColor.a = (255/50)*i;
+        lineMesh.addColor(trailColor);
+    }
+    
 }
+
 
 void InterfacePlane::draw( bool& pause_){
     
@@ -753,16 +780,17 @@ void InterfacePlane::draw( bool& pause_){
         posNode.transformGL();
         
         // ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
-        ofSetColor( ofColor( 255, 255, 255,180) );
         
-        glLineWidth(2);
+      //  glLineWidth(2);
 
-        ofLine(-8, 0, 8, 0);
+       // ofLine(-8, 0, 8, 0);
+        
+   
         
         posNode.restoreTransformGL();
         //  ofPopStyle();
-        //  lineMesh.draw();
-        directionMesh.drawWireframe();
+          lineMesh.draw();
+        directionMesh.draw();
         
         
         /*
@@ -801,5 +829,11 @@ void InterfacePlane::pulseDir(int dir_) {
         directionMesh.setColor(j, pulseColor);
     }
     
+}
+
+void InterfacePlane::flipTrailMesh(){
+    trailMesh = !trailMesh;
+    
+    cout << "FLIP " << endl;
 }
 
