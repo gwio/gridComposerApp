@@ -26,7 +26,7 @@ Instrument::Instrument(int channel_,string id_,int gTiles_, float gSize_, float 
     
     
     innerColorDefault =  ofColor::fromHsb(138,0,195);
-    outerColorDefault = ofColor(21,21,21);
+    outerColorDefault = ofColor(19,19,19);
     rasterColor = ofColor::black;
     
     soundsCounter = 1;
@@ -239,7 +239,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     
     pulsePlane = InterfacePlane(gridTiles, gridSize, connectedDirection, activeDirection);
-    pulsePlane.setColor(colorHue);
+    //pulsePlane.setColor(colorHue);
     
     ofVec3f tranVec = -ofVec3f((gridTiles*gridSize)/2,(gridTiles*gridSize)/2,0);
     
@@ -1154,6 +1154,14 @@ void Instrument::changePreset(bool test_) {
     
     setAllADSR(preset);
     
+    for (int i = 0; i < 4; i++){
+       pulsePlane.blink[i] = true;
+        pulsePlane.blinkPct[i] = 0.01;
+        for (int j = i*pulsePlane.dirMeshVerts; j < (i*pulsePlane.dirMeshVerts)+pulsePlane.dirMeshVerts; j++) {
+            pulsePlane.directionMesh.setColor(j, pulsePlane.pulseColor);
+        }
+    }
+    
     for (int x = 0; x < gridTiles; x++) {
         for (int y = 0; y <gridTiles; y++) {
             
@@ -1333,6 +1341,10 @@ void Instrument::planeMovement(float pct_){
         
         //time menu animation
         pulsePlane.animationTransition(pct_);
+        pulsePlane.positionMod = ofLerp(pulsePlane.positionModDef, pulsePlane.positionModTar, pct_);
+        pulsePlane.scaleMod = ofLerp(pulsePlane.scaleModDef, pulsePlane.scaleModTar, pct_);
+        
+    
         
     } else if (animate) {
         if (aniPath.size() > 1) {
@@ -1349,7 +1361,9 @@ void Instrument::planeMovement(float pct_){
         
         //time menu animation
         pulsePlane.animationTransition(pct_);
-        
+        pulsePlane.positionMod = ofLerp(pulsePlane.positionModDef, pulsePlane.positionModTar,pct_);
+        pulsePlane.scaleMod = ofLerp(pulsePlane.scaleModDef, pulsePlane.scaleModTar, pct_);
+        cout << ofLerp(pct_, pulsePlane.scaleModDef, pulsePlane.scaleModTar) << endl;
     }
     
     

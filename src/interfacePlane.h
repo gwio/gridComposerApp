@@ -67,6 +67,8 @@ class InterfacePlane {
     ofVboMesh directionMeshOffBig;
     
     ofVboMesh directionMesh;
+    
+    int dirMeshVerts;
 
     deque<ofVec3f> lineMeshQA,lineMeshQB;
     
@@ -94,5 +96,10 @@ class InterfacePlane {
     bool trailMesh;
     void flipTrailMesh();
     ofColor trailColor;
+    
+    float positionMod, scaleMod;
+    float positionModDef, positionModTar, scaleModDef, scaleModTar;
+    int linePowMod;
+    float thisScale;
 };
 

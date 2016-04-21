@@ -1,12 +1,22 @@
 #include "ofApp.h"
 #define TILES 5
 #define TILESIZE (100/TILES)
-#define TILEBORDER 0.065
+#define TILEBORDER 0.055
 #define BPM (130)
-#define ANI_SPEED 0.030
+#define ANI_SPEED 0.020
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
+
+#define ppPosModFocus 1.0;
+#define ppPosModDefault 1.0;
+
+#define ppScaleModFocus 1.0;
+#define ppScaleModDefault 1.0;
+
+#define ppScaleModTempo 4.0;
+#define ppPosModTempo 1.65;
+
 #define VERSION "0.98.0"
 
 
@@ -34,6 +44,7 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofEnableDepthTest();
     ofEnableAlphaBlending();
+    
     
     // ofSetDataPathRoot("../Resources/data/");
     
@@ -234,25 +245,25 @@ void ofApp::setup(){
     
     for (int i = 0; i < 4; i++) {
         ofVboMesh &aMesh = synths[0].pulsePlane.directionMeshConBig;
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+0)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+1)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+3)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
-        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*10)+7)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+0)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+1)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+3)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
+        directionClickZonesA[i].addVertex(testCam.worldToScreen((aMesh.getVertex((i*9)+4)*0.45*timeMatrix.getOrientationQuat())+OneTimePathOn.getVertices().back()));
         directionClickZonesA[i].close();
         
         ofVboMesh &bMesh = synths[1].pulsePlane.directionMeshConBig;
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+0)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+1)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+3)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
-        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*10)+7)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+0)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+1)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+3)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
+        directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+4)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
         directionClickZonesB[i].close();
         
         
         ofVboMesh &cMesh = synths[2].pulsePlane.directionMeshConBig;
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+0)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+1)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+3)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
-        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*10)+7)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+0)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+1)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+3)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
+        directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+4)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].close();
         
     }
@@ -697,7 +708,7 @@ void ofApp::updateInterfaceMesh() {
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    // glLineWidth(	2);
+     glLineWidth(	2);
     
     //glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
@@ -768,7 +779,7 @@ void ofApp::drawInterface(){
     
     //bpm fx
     if (currentState == STATE_BPM) {
-       // glLineWidth(	2);
+        glLineWidth(	2);
         bpmFx.draw();
     }
     
@@ -3556,6 +3567,18 @@ void ofApp::buttonOnePress(){
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 0.5;
         
+      
+
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModFocus;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModFocus;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModFocus;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModFocus;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
         
         synthButton[0] = synthButton[1];
         synths[synthButton[0]].ownSlot = 0;
@@ -3610,6 +3633,12 @@ void ofApp::buttonOnePress(){
         synths[synthButton[2]].myScaleTarget = 0.5;
         
         
+        synths[temp].pulsePlane.positionModDef = ppPosModDefault;
+        synths[temp].pulsePlane.positionModTar = ppPosModFocus;
+        synths[temp].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[temp].pulsePlane.scaleModTar = ppScaleModFocus;
+
+
         
         synthButton[0] = synthButton[1];
         synths[synthButton[0]].ownSlot = 0;
@@ -3665,7 +3694,12 @@ void ofApp::buttonTwoPress(){
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
         
-        
+     
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModFocus;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModFocus;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+
         
         //camani
         camQuatDefault = camActiveSynth.getOrientationQuat();
@@ -3706,7 +3740,10 @@ void ofApp::buttonTwoPress(){
         synths[synthButton[0]].myScaleTarget = 0.5;
         synths[synthButton[2]].myScaleTarget = 0.5;
         
-        
+        synths[temp].pulsePlane.positionModDef = ppPosModDefault;
+        synths[temp].pulsePlane.positionModTar = ppPosModFocus;
+        synths[temp].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[temp].pulsePlane.scaleModTar = ppScaleModFocus;
         
         //cam
         camQuatDefault = camNotActiveSynth.getOrientationQuat();
@@ -3763,6 +3800,16 @@ void ofApp::buttonThreePress(){
         synths[synthButton[2]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 0.45;
         
+     
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModFocus;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModFocus;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModFocus;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModFocus;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         synthButton[2] = synthButton[1];
         synths[synthButton[2]].ownSlot = 2;
@@ -3811,6 +3858,10 @@ void ofApp::buttonThreePress(){
         synths[synthButton[0]].myScaleTarget = 0.45;
         synths[synthButton[1]].myScaleTarget = 0.45;
         
+        synths[temp].pulsePlane.positionModDef = ppPosModDefault;
+        synths[temp].pulsePlane.positionModTar = ppPosModFocus;
+        synths[temp].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[temp].pulsePlane.scaleModTar = ppScaleModFocus;
         
         synthButton[2] = synthButton[1];
         synths[synthButton[2]].ownSlot = 2;
@@ -3864,8 +3915,22 @@ void ofApp::buttonFourPress() {
         synths[synthButton[2]].myDefault = synthPos[2].getOrientationQuat();
         synths[synthButton[2]].myTarget = volumeMatrix.getOrientationQuat();
         synths[synthButton[2]].animate = true ;
+       
         
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
         
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         aniPct = 0.0;
         
@@ -3887,6 +3952,21 @@ void ofApp::buttonFourPress() {
         synths[synthButton[2]].myTarget = synthPos[0].getOrientationQuat();
         synths[synthButton[2]].myDefault = volumeMatrix.getOrientationQuat();
         synths[synthButton[2]].animate = true ;
+        
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         aniPct = 0.0;
         
@@ -3929,6 +4009,21 @@ void ofApp::buttonEditDetail() {
         synths[synthButton[2]].scaling = true;
         synths[synthButton[2]].myScaleDefault = 0.5;
         synths[synthButton[2]].myScaleTarget = 0.0;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModFocus;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModFocus;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         
         // mainInterfaceData[5].animationB = true;
@@ -3977,6 +4072,22 @@ void ofApp::buttonEditDetail() {
         synths[synthButton[2]].scaling = true;
         synths[synthButton[2]].myScaleDefault = 0.0;
         synths[synthButton[2]].myScaleTarget = 0.5;
+        
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModFocus;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModFocus;
+        
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         aniPct = 0.0;
         interfaceMoving = true;
@@ -4027,6 +4138,22 @@ void ofApp::harmonyButtonPress() {
         synths[synthButton[1]].myScaleTarget = 0.75;
         synths[synthButton[2]].myScaleTarget = 0.75;
         
+        
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
         aniPct = 0.0;
         
         pauseInterfaceOff();
@@ -4058,6 +4185,21 @@ void ofApp::harmonyButtonPress() {
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
+        
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         aniPct = 0.0;
         
@@ -4098,6 +4240,21 @@ void ofApp::bpmButtonPress() {
         synths[synthButton[1]].myScaleTarget = 0.45;
         synths[synthButton[2]].myScaleTarget = 0.45;
         
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModTempo;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModTempo;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModTempo;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModTempo;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModTempo;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModTempo;
+        
         aniPct = 0.0;
         
         for (int i = 0; i < 3; i++){
@@ -4134,6 +4291,21 @@ void ofApp::bpmButtonPress() {
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
+        
+        synths[synthButton[0]].pulsePlane.positionModDef = ppPosModTempo;
+        synths[synthButton[0]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModTempo;
+        synths[synthButton[0]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[1]].pulsePlane.positionModDef = ppPosModTempo;
+        synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModTempo;
+        synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
+        
+        synths[synthButton[2]].pulsePlane.positionModDef = ppPosModTempo;
+        synths[synthButton[2]].pulsePlane.positionModTar = ppPosModDefault;
+        synths[synthButton[2]].pulsePlane.scaleModDef = ppScaleModTempo;
+        synths[synthButton[2]].pulsePlane.scaleModTar = ppScaleModDefault;
         
         aniPct = 0.0;
         
@@ -4837,6 +5009,16 @@ void ofApp::loadFromXml(string path_){
         synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
         
         synths[synthButton[i]].colorHue = settings.getValue("cHue", 0);
+        
+        synths[synthButton[i]].pulsePlane.setColor(synths[synthButton[i]].colorHue);
+       
+        for (int k = 0; k < 4; k++){
+            synths[synthButton[i]].pulsePlane.blink[k] = true;
+            synths[synthButton[i]].pulsePlane.blinkPct[k] = 0.01;
+            for (int j = k*synths[synthButton[i]].pulsePlane.dirMeshVerts; j < (k*synths[synthButton[i]].pulsePlane.dirMeshVerts)+synths[synthButton[i]].pulsePlane.dirMeshVerts; j++) {
+                synths[synthButton[i]].pulsePlane.directionMesh.setColor(j, synths[synthButton[i]].pulsePlane.pulseColor);
+            }
+        }
         
         synths[synthButton[i]].preset = settings.getValue("patchPreset", 0);
         

@@ -175,7 +175,7 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
         ofColor tc = ofColor::fromHsb(xml_.getValue("cHue", 0), 235, 180, 255);
         
         ofSetColor(colorDef);
-        // glLineWidth(2);
+         glLineWidth(2);
         //  ofDrawLine(0, slotSize_.y-offset, slotSize_.x, slotSize_.y-offset);
         ofFill();
         ofDrawRectangle(offset*i,0, rSize*5,rSize*5);
