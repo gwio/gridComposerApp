@@ -862,12 +862,10 @@ void ofApp::drawStringAndIcons(){
                 mainInterfaceData[i].drawFontString(0, -(designGrid[0][0].y/2)  );
             }
             
-            else if(i<51 || i>54){
-                mainInterfaceData[i].drawFontString();
-            }
+           
             
             else {
-                mainInterfaceData[i].drawFontString(0,-(designGrid[0][0].y/2) );
+                mainInterfaceData[i].drawFontString();
             }
         }
         
@@ -1070,30 +1068,30 @@ void ofApp::replaceMouseDragged(int x, int y){
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                mainInterfaceData[52].elementName = ofToString(value,2);
-                mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
+                //mainInterfaceData[52].elementName = ofToString(value,2);
+                //mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                mainInterfaceData[53].elementName = ofToString(value,2);
-                mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
+               // mainInterfaceData[53].elementName = ofToString(value,2);
+               // mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                mainInterfaceData[54].elementName = ofToString(value,2);
-                mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
+              //  mainInterfaceData[54].elementName = ofToString(value,2);
+              //  mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
-                mainInterfaceData[51].elementName = ofToString(value,2);
-                mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
+                //mainInterfaceData[51].elementName = ofToString(value,2);
+                //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
             
             
@@ -1327,30 +1325,30 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                mainInterfaceData[52].elementName = ofToString(value,2);
-                mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
+               // mainInterfaceData[52].elementName = ofToString(value,2);
+               // mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                mainInterfaceData[53].elementName = ofToString(value,2);
-                mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
+               // mainInterfaceData[53].elementName = ofToString(value,2);
+                //mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                mainInterfaceData[54].elementName = ofToString(value,2);
-                mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
+                //mainInterfaceData[54].elementName = ofToString(value,2);
+                //mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
-                mainInterfaceData[51].elementName = ofToString(value,2);
-                mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
+                //mainInterfaceData[51].elementName = ofToString(value,2);
+                //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
@@ -3062,16 +3060,16 @@ void ofApp::volumeInterfacOn() {
     mainInterfaceData[3].animation = true;
     mainInterfaceData[3].moveDir = 1;
     
-    mainInterfaceData[51].showString = true;
+    mainInterfaceData[51].showString = false;
     mainInterfaceData[51].animation = true;
     mainInterfaceData[51].moveDir = 1;
-    mainInterfaceData[52].showString = true;
+    mainInterfaceData[52].showString = false;
     mainInterfaceData[52].animation = true;
     mainInterfaceData[52].moveDir = 1;
-    mainInterfaceData[53].showString = true;
+    mainInterfaceData[53].showString = false;
     mainInterfaceData[53].animation = true;
     mainInterfaceData[53].moveDir = 1;
-    mainInterfaceData[54].showString = true;
+    mainInterfaceData[54].showString = false;
     mainInterfaceData[54].animation = true;
     mainInterfaceData[54].moveDir = 1;
     
@@ -4440,18 +4438,18 @@ void ofApp::setNewGUI() {
     //volume slider
     mainInterfaceData[52].setColor(synths[synthButton[0]].colorHue);
     mainInterfaceData[52].activateOnColor();
-    mainInterfaceData[52].elementName = ofToString(synths[synthButton[0]].sVolume,2);
-    mainInterfaceData[52].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
+   // mainInterfaceData[52].elementName = ofToString(synths[synthButton[0]].sVolume,2);
+   // mainInterfaceData[52].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[53].setColor(synths[synthButton[1]].colorHue);
     mainInterfaceData[53].activateOnColor();
-    mainInterfaceData[53].elementName = ofToString(synths[synthButton[1]].sVolume,2);
-    mainInterfaceData[53].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
+   // mainInterfaceData[53].elementName = ofToString(synths[synthButton[1]].sVolume,2);
+   // mainInterfaceData[53].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[54].setColor(synths[synthButton[2]].colorHue);
     mainInterfaceData[54].activateOnColor();
-    mainInterfaceData[54].elementName = ofToString(synths[synthButton[2]].sVolume,2);
-    mainInterfaceData[54].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
+    //mainInterfaceData[54].elementName = ofToString(synths[synthButton[2]].sVolume,2);
+    //mainInterfaceData[54].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
     
     
     //bpm buttons
@@ -4950,8 +4948,8 @@ void ofApp::loadFromXml(string path_){
     settings.pushTag("global");
     // volumeRampValueChanged(mainVol);
     volumeRestartTarget = settings.getValue("volume", 1.0);
-    mainInterfaceData[51].elementName = ofToString(volumeRestartTarget,2);
-    mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
+    //mainInterfaceData[51].elementName = ofToString(volumeRestartTarget,2);
+    //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
     settings.popTag();
     settings.pushTag("slots");
     for (int i = 0; i < 3; i++) {
