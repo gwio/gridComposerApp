@@ -10,6 +10,9 @@
 #include "SaveLoad.h"
 #include "HistoryView.h"
 #include "ofxMidi.h"
+#if TARGET_OS_IPHONE
+#include <AVFoundation/AVFoundation.h>
+#endif
 //#include "ofxFontStash.h"
 //#include "ofxXmlSettings.h"
 

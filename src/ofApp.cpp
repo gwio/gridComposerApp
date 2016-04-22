@@ -17,7 +17,7 @@
 #define ppScaleModTempo 4.0;
 #define ppPosModTempo 1.65;
 
-#define VERSION "0.98.0"
+#define VERSION "0.98.2"
 
 
 
@@ -35,6 +35,8 @@ void ofApp::setup(){
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);
     setSampleRate(44100);
     ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
 #else
     setSampleRate(44100);
     ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
