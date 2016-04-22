@@ -164,7 +164,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc sine2 = TableLookupOsc().setLookupTable(tableSineSimple).freq(freq_  );
         
         
-        tempGen = ((adsr1*sine) + (adsr2*sine2))*2;
+        tempGen = ((adsr1*sine) + (adsr2*sine2))*2*vol_;
         
     }
     //2. simple squarewave_______________________________________________
@@ -182,7 +182,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
         
-        tempGen  = ((myTable*adsr2)+(myTable2*adsr1  ))*2   ;
+        tempGen  = ((myTable*adsr2)+(myTable2*adsr1  ))*2*vol_   ;
         
         
     }
@@ -217,7 +217,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //output_ = ((bellAosc*adsr1)+(bellBosc*adsr2)) * vol_;
         
-        tempGen =  (bellAosc*adsr1)+((bellBosc*adsr2))*10   ;
+        tempGen =  (bellAosc*adsr1)+((bellBosc*adsr2))*10 *vol_  ;
         
     }
     

@@ -48,16 +48,16 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
                 tempC = guiIndex_.at(interfaceIndex+j).elementColorOn;
                 tempC.a = alpha;
                 
-                float volumeB = noteLog_.at(i).volume.at(j);
+                float volumeB = (1.0-noteLog_.at(i).volume.at(j))*elementSize.y/2;
                 
                 //read the position form the main interface vertices
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp);
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp+ofVec3f(0,2,0));
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+2)-temp+ofVec3f(0,2,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp+ofVec3f(+volumeB,0,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp+ofVec3f(+volumeB,2,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+2)-temp+ofVec3f(-volumeB,2,0));
                 
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+2)-temp+ofVec3f(0,2,0));
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+2)-temp);
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp);
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+2)-temp+ofVec3f(-volumeB,2,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+2)-temp+ofVec3f(-volumeB,0,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp+ofVec3f(+volumeB,0,0));
                 
                 mesh.addColor(tempC);
                 mesh.addColor(tempC);
@@ -103,16 +103,16 @@ void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<Global
                 tempC = guiIndex_.at(newIndex_+j).elementColorOn;
                 tempC.a = alpha;
                 
-                float volumeB = noteLog_.at(i).volume.at(j);
+                float volumeB = (1.0-noteLog_.at(i).volume.at(j))*elementSize.y/2;
                 
                 //read the position form the main interface vertices
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+1)-temp);
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+1)-temp+ofVec3f(0,2,0));
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+2)-temp+ofVec3f(0,2,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+1)-temp+ofVec3f(+volumeB,0,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+1)-temp+ofVec3f(+volumeB,2,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+2)-temp+ofVec3f(-volumeB,2,0));
                 
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+2)-temp+ofVec3f(0,2,0));
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+2)-temp);
-                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+1)-temp);
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+2)-temp+ofVec3f(-volumeB,2,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+2)-temp+ofVec3f(-volumeB,0,0));
+                mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(newIndex_+j).counter+1)-temp+ofVec3f(+volumeB,0,0));
                 
                 mesh.addColor(tempC);
                 mesh.addColor(tempC);
