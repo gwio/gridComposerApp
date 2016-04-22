@@ -103,5 +103,5 @@ public:
     
     ofxXmlSettings xmlTemp;
     
-    
+    bool confirmDel;
 };

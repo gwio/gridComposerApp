@@ -8,6 +8,7 @@ SaveLoad::SaveLoad(){
     velo = 0;
     animate = false;
     slotDetail = false;
+    confirmDel = false;
     moveDir = 0;
     loadString = "";
     highlight.clear();

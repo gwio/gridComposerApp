@@ -1770,7 +1770,12 @@ void ofApp::replaceMousePressed(int x, int y) {
                 if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
                     closeSlotInterface();
                     mainInterfaceData[50].blinkOn();
-                    
+                    if(saveManager.confirmDel) {
+                        mainInterfaceData[124].setColor( ofColor::fromHsb(255,0,195,255) );
+                        mainInterfaceData[124].activateOnColor();
+                        mainInterfaceData[124].blinkOn();
+                        saveManager.confirmDel = false;
+                    }
                 }
                 
                 else if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
@@ -1781,9 +1786,20 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
                 
                 else  if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
+                    if (saveManager.confirmDel){
                     saveManager.deleteSave();
                     mainInterfaceData[124].blinkOn();
                     closeSlotInterface();
+                        saveManager.confirmDel = false;
+                      mainInterfaceData[124].setColor( ofColor::fromHsb(255,0,195,255) );
+                        mainInterfaceData[124].activateOnColor();
+                        mainInterfaceData[124].blinkOn();
+                    } else {
+                        mainInterfaceData[124].setColor(0);
+                        mainInterfaceData[124].activateOnColor();
+                        mainInterfaceData[124].blinkOn();
+                        saveManager.confirmDel = true;
+                    }
                     
                 } else  if (mainInterfaceData[130].isInside(ofVec2f(x,y))) {
                     mainInterfaceData[130].blinkOn();
