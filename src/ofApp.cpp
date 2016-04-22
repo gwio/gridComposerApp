@@ -610,11 +610,11 @@ void ofApp::updateInterfaceMesh() {
         mainInterfaceData[25+i].updateMainMesh(mainInterface,designGrid[1][0],tweenFloat);
     }
     
-    mainInterfaceData[4].updateMainMesh(mainInterface,designGrid[0][0],tweenFloat);
+    mainInterfaceData[4].updateMainMesh(mainInterface,designGrid[0][1],tweenFloat);
     
-    mainInterfaceData[6].updateMainMesh(mainInterface,designGrid[1][0],tweenFloat);
+    mainInterfaceData[6].updateMainMesh(mainInterface,designGrid[1][1],tweenFloat);
     
-    mainInterfaceData[127].updateMainMesh(mainInterface,designGrid[2][0],tweenFloat);
+    mainInterfaceData[127].updateMainMesh(mainInterface,designGrid[2][1],tweenFloat);
 
 
     // mainInterfaceData[5].updateMainMesh(mainInterface, ofVec3f(0, designGrid[0][1].y,0) ,tweenFloat);
@@ -649,13 +649,13 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[57].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
     
     
-    mainInterfaceData[58].updateMainMeshSlider(mainInterface,designGrid[0][0], tweenFloat);
-    mainInterfaceData[59].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
-    mainInterfaceData[60].updateMainMeshSlider(mainInterface, designGrid[2][0],tweenFloat);
+    mainInterfaceData[58].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[59].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[60].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
     
-    mainInterfaceData[61].updateMainMeshSlider(mainInterface, designGrid[0][0],tweenFloat);
+    mainInterfaceData[61].updateMainMeshSlider(mainInterface, designGrid[0][2],tweenFloat);
     
-    mainInterfaceData[62].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
+    mainInterfaceData[62].updateMainMeshSlider(mainInterface, designGrid[1][2],tweenFloat);
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[63+i].updateMainMesh(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y,0) ,tweenFloat);
@@ -663,13 +663,13 @@ void ofApp::updateInterfaceMesh() {
     }
     
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[75+i].updateMainMesh(mainInterface, designGrid[0][1] ,tweenFloat);
+        mainInterfaceData[75+i].updateMainMesh(mainInterface, designGrid[0][0] ,tweenFloat);
     }
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[87+i].updateMainMesh(mainInterface,designGrid[1][1] ,tweenFloat);
+        mainInterfaceData[87+i].updateMainMesh(mainInterface,designGrid[1][0] ,tweenFloat);
     }
     for (int i = 0; i < 12; i++) {
-        mainInterfaceData[99+i].updateMainMesh(mainInterface, designGrid[2][1] ,tweenFloat);
+        mainInterfaceData[99+i].updateMainMesh(mainInterface, designGrid[2][0] ,tweenFloat);
     }
     
     mainInterfaceData[111].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
@@ -696,11 +696,14 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[126].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     
-    mainInterfaceData[128].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
-    mainInterfaceData[129].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
+    mainInterfaceData[128].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
+    mainInterfaceData[129].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
 
     
     mainInterfaceData[130].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
+    
+    mainInterfaceData[131].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
+
 
     saveManager.animateGrid(tweenFloat);
 }
@@ -792,16 +795,16 @@ void ofApp::drawInterface(){
 
 void ofApp::drawSliderPos(){
     ofPushStyle();
-    float sliderY = designGrid[0][0].y*2*0.045;
+    float sliderY = designGrid[0][0].y*2*0.180;
     ofVec2f rectLine = ofVec2f(designGrid[0][0].x*0.12,sliderY*2.0);
-    float lineOff = abs(rectLine.y-(designGrid[0][0].y*2*0.045))/2.0;
+    float lineOff = abs(rectLine.y-(designGrid[0][0].y*2*0.180))/2.0;
     
     //volume slider white  line
     if ( (currentState == STATE_VOLUME) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         for (int i = 0; i < 4; i++){
             ofSetColor(ofColor(21,21,21,80));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x*1.5/2.0),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y,
-                            rectLine.x*1.5, sliderY);
+            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x*2.5/2.0),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y,
+                            rectLine.x*2.5, sliderY);
 
             ofSetColor(ofColor::fromHsb(255,0,204,255));
             ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y-lineOff,
@@ -812,8 +815,8 @@ void ofApp::drawSliderPos(){
     //bpm slider white line
     if ( (currentState == STATE_BPM) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         ofSetColor(ofColor(21,21,21,80));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x*1.5/2.0),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
-                        rectLine.x*1.5, rectLine.y);
+        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x*2.5/2.0),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
+                        rectLine.x*2.5, rectLine.y);
         
         ofSetColor(ofColor::fromHsb(255,0,204,255));
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
@@ -823,8 +826,8 @@ void ofApp::drawSliderPos(){
     //STATE_EDT_DETAIL keynote slider white line
     if ( (currentState == STATE_EDIT_DETAIL) || (interfaceMoving && currentState == STATE_EDIT) ){
         ofSetColor(ofColor(21,21,21,80));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x*1.5/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
-                        rectLine.x*1.5, rectLine.y);
+        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x*2.5/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
+                        rectLine.x*2.5, rectLine.y);
         
         ofSetColor(ofColor::fromHsb(255,0,204,255));
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
@@ -857,16 +860,12 @@ void ofApp::drawStringAndIcons(){
              mainInterfaceData[i].drawStringPos.y >= (0-200) &&  mainInterfaceData[i].drawStringPos.y <= ((designGrid[0][0].y*6)+200 ))
             ) {
             
-            if(i == 38) {
-                //bpm global slider
-                mainInterfaceData[i].drawFontString(0, -(designGrid[0][0].y/2)  );
-            }
-            
            
             
-            else {
+           
+           
                 mainInterfaceData[i].drawFontString();
-            }
+            
         }
         
        
@@ -1052,8 +1051,8 @@ void ofApp::replaceMouseDragged(int x, int y){
                 bpm=ceil(value*BPM_MAX);
                 tonicSynth.setParameter("BPM",bpm*4);
                 tonicSynth.setParameter("delay", bpm);
-                mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
-                mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+                //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
+                //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
                 
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
@@ -1300,15 +1299,24 @@ void ofApp::replaceMousePressed(int x, int y) {
             
             else if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
                 buttonFourPress();
+                mainInterfaceData[131].elementName = "VOLUME";
+                mainInterfaceData[131].setStringWidth(mainInterfaceData[7].fsPtr->getBBox("VOLUME", mainInterfaceData[131].fontSize, 0, 0).getWidth());
+                mainInterfaceData[131].activateDarkerColor();
                 mainInterfaceData[37].blinkOn();
             }
             
             else if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[41].blinkOn();
+                mainInterfaceData[131].elementName = "TEMPO";
+                mainInterfaceData[131].setStringWidth(mainInterfaceData[7].fsPtr->getBBox("TEMPO", mainInterfaceData[131].fontSize, 0, 0).getWidth());
+                mainInterfaceData[131].activateDarkerColor();
                 bpmButtonPress();
             }
             else if (mainInterfaceData[42].isInside(ofVec2f(x,y))) {
                 mainInterfaceData[42].blinkOn();
+                mainInterfaceData[131].elementName = "HARMONY";
+                mainInterfaceData[131].setStringWidth(mainInterfaceData[7].fsPtr->getBBox("HARMONY", mainInterfaceData[131].fontSize, 0, 0).getWidth());
+                mainInterfaceData[131].activateDarkerColor();
                 harmonyButtonPress();
             }
             
@@ -1445,8 +1453,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 bpm=ceil(value*BPM_MAX);
                 tonicSynth.setParameter("BPM",bpm*4);
                 tonicSynth.setParameter("delay", bpm);
-                mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
-                mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+               // mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
+               // mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
                 
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
@@ -2313,11 +2321,11 @@ void ofApp::setupStatesAndAnimation() {
     harmonyMatrix.rotate(50, -1, 0, 0);
     
     TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
-    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*1.25,-(TILESIZE*TILES)*0.25));
+    TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,0), ofVec3f(0,0,0), ofVec3f(0,0,0));
     // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
-    TwoHarmonyPathOff.addVertex(ofVec3f(0,-(TILESIZE*TILES)*1.25,-(TILESIZE*TILES)*0.25));
-    TwoHarmonyPathOff.bezierTo(ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,0,0));
+    TwoHarmonyPathOff.addVertex(ofVec3f(0,0,0));
+    TwoHarmonyPathOff.bezierTo(ofVec3f(0,0,0), ofVec3f(0,0,0), ofVec3f(0,0,0));
     // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
     OneHarmonyPathOn = TwoHarmonyPathOn;
@@ -2429,7 +2437,7 @@ void ofApp::setupGlobalInterface() {
     ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
     ofVec3f gridRect = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2,0);
-    float hSliderYscale = 0.045;
+    float hSliderYscale = 0.180;
     
     //---------------------------------------------------------------------------
     
@@ -2450,7 +2458,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //slot a octave/note, STATE_HARMONY
-    place = ofVec3f(0,+designGrid[0][0].y/4,0);
+    place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     temp = GlobalGUI(4,string(""),ofVec3f(smallButton.x,smallButton.y,0),ofColor(54,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
@@ -2462,7 +2470,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //slot b octave/note , STATE_HARMONY
-    place = ofVec3f(0,+designGrid[0][0].y/4,0);
+    place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     temp = GlobalGUI(6,string(""),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
@@ -2638,30 +2646,30 @@ void ofApp::setupGlobalInterface() {
     
     //harmony settings, a,b,c, keynote STATE_HARMONY
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,designGrid[0][0].y*0.5,0);
-    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(gridRect.x*0.777, gridRect.y*0.333,0),ofColor(57,0,0),place,offPlace,fontBig,true,&tekoSemibold);
+    place = ofVec3f(0,designGrid[0][0].y/2,0);
+    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(gridRect.x*0.777, gridRect.y/4,0),ofColor(57,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,designGrid[0][0].y*0.5,0);
-    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(gridRect.x*0.777, gridRect.y*0.333,0),ofColor(57,0,0),place,offPlace,fontBig,true,&tekoSemibold);
+    place = ofVec3f(0,designGrid[0][0].y/2,0);
+    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(gridRect.x*0.777, gridRect.y/4,0),ofColor(57,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(0,designGrid[0][0].y*0.5,0);
-    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(gridRect.x*0.777, gridRect.y*0.333,0),ofColor(57,0,0),place,offPlace,fontBig,true,&tekoSemibold);
+    place = ofVec3f(0,designGrid[0][0].y/2,0);
+    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(gridRect.x*0.777, gridRect.y/4,0),ofColor(57,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //harmony menu,  global keynote, STATE_HARMONY
-    offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
+    offPlace = ofVec3f(0,+designGrid[0][0].y*12,0);
     place = ofVec3f(designGrid[0][0].x,-designGrid[0][0].y/2,0);
-    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(gridRect.x*0.777, gridRect.y*0.333,0),ofColor(57,0,0),place,offPlace,fontBig,true,&tekoSemibold);
+    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(gridRect.x*0.777, gridRect.y/4,0),ofColor(255,255,255),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //harmony menu -> global scale, STATE_HARMONY
-    offPlace = ofVec3f(0,-designGrid[0][0].y*12,0);
+    offPlace = ofVec3f(0,+designGrid[0][0].y*12,0);
     place = ofVec3f(designGrid[0][0].x,-designGrid[0][0].y/2,0);
-    temp = GlobalGUI(62,scaleCollection.scaleVec.at(globalScaleVecPos%scaleCollection.scaleVec.size()).name,ofVec3f(gridRect.x*0.777, gridRect.y*0.333,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoRegular);
+    temp = GlobalGUI(62,scaleCollection.scaleVec.at(globalScaleVecPos%scaleCollection.scaleVec.size()).name,ofVec3f(gridRect.x*0.777, gridRect.y/4,0),ofColor(255,255,255),place,offPlace,fontDefault,false,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     
@@ -2748,21 +2756,21 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //slot c octave/note , STATE_HARMONY
-    place = ofVec3f(0,+designGrid[0][0].y/4,0);
+    place = ofVec3f(0,designGrid[0][0].y,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     temp = GlobalGUI(127,string(""),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
 
-    //string globa key , STATE_HARMONY
-    place = ofVec3f(+designGrid[0][0].x,-designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(128,string("GLOBAL KEY"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
+    //string global key , STATE_HARMONY
+    place = ofVec3f(+designGrid[0][0].x,0,0);
+    offPlace = ofVec3f(0,+designGrid[0][0].y*6,0);
+    temp = GlobalGUI(128,string("GLOBAL KEY"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(55,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //string globa scale , STATE_HARMONY
-    place = ofVec3f(+designGrid[0][0].x,-designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(129,string("GLOBAL SCALE"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(56,0,0),place,offPlace,fontSmall,true,&tekoRegular);
+    place = ofVec3f(+designGrid[0][0].x,0,0);
+    offPlace = ofVec3f(0,+designGrid[0][0].y*6,0);
+    temp = GlobalGUI(129,string("GLOBAL SCALE"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(55,0,0),place,offPlace,fontSmall,true,&tekoRegular);
     mainInterfaceData.push_back(temp);
     
     //mark button, STATE_SAVE
@@ -2770,6 +2778,13 @@ void ofApp::setupGlobalInterface() {
     place = ofVec3f(0,0,0);
     temp = GlobalGUI(130,"MARK",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
+    
+    //mark button, STATE_SAVE
+    offPlace = ofVec3f(0,+designGrid[0][0].y*6,0);
+    place = ofVec3f(0,+designGrid[0][0].y/2,0);
+    temp = GlobalGUI(131,"MENU",smallButton,ofColor(57,0,0),place,offPlace,fontSmall,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+
     
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -3092,7 +3107,11 @@ void ofApp::volumeInterfacOn() {
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 1;
     
+    mainInterfaceData[131].showString = true;
+    mainInterfaceData[131].animation = true;
+    mainInterfaceData[131].moveDir = 1;
     
+   
 }
 
 //--------------------------------------------------------------
@@ -3122,6 +3141,8 @@ void ofApp::volumeInterfaceOff() {
     mainInterfaceData[0].moveDir = 0;
     mainInterfaceData[0].animation = true;
     
+    mainInterfaceData[131].moveDir = 0;
+    mainInterfaceData[131].animation = true;
     /*
      mainInterfaceData[37].showString = true;
      mainInterfaceData[37].animation = true;
@@ -3209,7 +3230,7 @@ void ofApp::bpmInterfaceOn() {
     
     mainInterfaceData[38].animation = true;
     mainInterfaceData[38].moveDir = 1;
-    mainInterfaceData[38].showString = true;
+    mainInterfaceData[38].showString = false;
     
     mainInterfaceData[45].sliderPct = ofMap( bpm, 0,BPM_MAX,-1.0,1.0);
     mainInterfaceData[45].animation = true;
@@ -3231,6 +3252,12 @@ void ofApp::bpmInterfaceOn() {
     mainInterfaceData[57].showString = false;
     mainInterfaceData[57].animation = true;
     mainInterfaceData[57].moveDir = 1;
+    
+    
+    mainInterfaceData[131].animation = true;
+    mainInterfaceData[131].moveDir = 1;
+    mainInterfaceData[131].showString = true;
+
     
     /*
      mainInterfaceData[55].sliderPct =ofMap( (1/(4/float(synths[synthButton[0]].nextPulseDivision))), 0.0,1.0,-1.0,1.0);
@@ -3269,6 +3296,8 @@ void ofApp::bpmInterfaceOff(){
     mainInterfaceData[57].animation = true;
     mainInterfaceData[57].moveDir = 0;
     
+    mainInterfaceData[131].animation = true;
+    mainInterfaceData[131].moveDir = 0;
 }
 
 //--------------------------------------------------------------
@@ -3314,6 +3343,11 @@ void ofApp::harmonyInterfaceOn() {
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 1;
     
+   
+    mainInterfaceData[131].showString = true;
+    mainInterfaceData[131].animation = true;
+    mainInterfaceData[131].moveDir = 1;
+
     for (int i = 0; i < 12*3; i++) {
         mainInterfaceData[75+i].moveDir = 1;
         mainInterfaceData[75+i].animation = true;
@@ -3353,6 +3387,9 @@ void ofApp::harmonyInterfaceOff() {
     
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 0;
+    
+    mainInterfaceData[131].animation = true;
+    mainInterfaceData[131].moveDir = 0;
     
     for (int i = 0; i < 12*3; i++) {
         mainInterfaceData[75+i].moveDir = 0;
@@ -4971,8 +5008,8 @@ void ofApp::loadFromXml(string path_){
     bpm =ofClamp(settings.getValue("value", 130), 1, 2000);
     tonicSynth.setParameter("BPM", bpm*4);
     tonicSynth.setParameter("delay", bpm);
-    mainInterfaceData[38].elementName = ofToString(bpm);
-    mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+   // mainInterfaceData[38].elementName = ofToString(bpm);
+   // mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
     
     settings.popTag();
     settings.pushTag("slots");

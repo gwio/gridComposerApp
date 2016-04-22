@@ -9,7 +9,7 @@ GlobalGUI::GlobalGUI(){
 GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pickc_, ofVec3f placement_, ofVec3f offPlacement_, int fontS_, bool trans_, ofxFontStash* fsPtr_) {
     elementName = name_;
     auxString ="";
-    
+    pickColor = pickc_;
     isTrans = trans_;
     
     if (!trans_) {
@@ -371,7 +371,10 @@ void GlobalGUI::drawFontString() {
                     );
     } else if (showString) {
         ofPushStyle();
-        if(onOff) {
+        if(pickColor == ofColor(255,255,255)) {
+            ofSetColor(ofColor(19,19,19));
+            //hack for harmony strings
+        } else if(onOff){
             ofSetColor(ofColor::fromHsb(255,0,195,255));
         } else {
             ofSetColor(elementColorDarker);

@@ -31,6 +31,7 @@ public:
     float sliderPct;
     
     ofVec3f drawStringPos;
+    ofColor pickColor;
     
     void setStringWidth(float);
     void setAuxStringWidth(float);
