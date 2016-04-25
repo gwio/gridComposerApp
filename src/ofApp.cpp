@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.055
 #define BPM (130)
-#define ANI_SPEED 0.020
+#define ANI_SPEED 0.025
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
@@ -17,7 +17,7 @@
 #define ppScaleModTempo 4.0;
 #define ppPosModTempo 1.65;
 
-#define VERSION "0.98.2"
+#define VERSION "0.98.22"
 
 
 
