@@ -28,9 +28,15 @@ void HistoryView::setupSpacer(ofVec3f pos_, float scale_, ofVec3f size_) {
         spacer.addVertex(position+ofVec3f(0,6,0)+ofVec3f(elementDist*i,0,0));
         spacer.addVertex(position+ofVec3f(0,-6,0)+ofVec3f(elementDist*i,0,0));
         
-        spacer.addColor(ofColor::fromHsb(255,0,204,255));
-        spacer.addColor(ofColor::fromHsb(255,0,204,255));
+        spacer.addColor(ofColor::fromHsb(255,0,195,255));
+        spacer.addColor(ofColor::fromHsb(255,0,195,255));
     }
+    spacer.addVertex(position+ofVec3f(elementDist*0,0,0));
+    spacer.addVertex(position+ofVec3f(elementDist*12,0,0));
+    
+    spacer.addColor(ofColor::fromHsb(255,0,195,255));
+    spacer.addColor(ofColor::fromHsb(255,0,195,255));
+    
 }
 
 void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_, ofVboMesh &mainMesh_){
@@ -81,11 +87,15 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
     
     //move spacer with interface animation
     if ( (spacer.getVertex(0).y != guiPtr->drawStringPos.y+6)  || (spacer.getVertex(0).x != guiPtr->drawStringPos.x-(elementWhiteSpace*2)) ) {
-        for (int i = 0; i < spacer.getNumVertices(); i+=2) {
+        for (int i = 0; i < spacer.getNumVertices()-2; i+=2) {
             spacer.setVertex(i, ofVec3f(guiPtr->drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y/4),0) );
             spacer.setVertex(i+1, ofVec3f(guiPtr->drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y-(elementSize.y/4),0) );
         }
+        spacer.setVertex(spacer.getNumVertices()-2, ofVec3f(guiPtr->drawStringPos.x+(0*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y),0) );
+        spacer.setVertex(spacer.getNumVertices()-1, ofVec3f(guiPtr->drawStringPos.x+(24*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y),0) );
     }
+    
+  
 }
 
 void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_, ofVboMesh &mainMesh_, int newIndex_){
@@ -126,17 +136,53 @@ void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<Global
     
     //move spacer with interface animation
     if ( (spacer.getVertex(0).y != guiIndex_.at(newIndex_).drawStringPos.y+6)  || (spacer.getVertex(0).x != guiIndex_.at(newIndex_).drawStringPos.x-(elementWhiteSpace*2)) ) {
-        for (int i = 0; i < spacer.getNumVertices(); i+=2) {
+        for (int i = 0; i < spacer.getNumVertices()-2; i+=2) {
             spacer.setVertex(i, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y/4),0) );
             spacer.setVertex(i+1, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y-(elementSize.y/4),0) );
         }
-    }
+        spacer.setVertex(spacer.getNumVertices()-2, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(0*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y),0) );
+        spacer.setVertex(spacer.getNumVertices()-1, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(24*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y),0) );    }
     
-   
+    
+
 }
 
+void HistoryView::updateColor(){
+    
+    if (changeColor) {
+        myTween = (myTween*1.12)+0.01;
+        
+        if (displayC != targetC) {
+            displayC = displayC.lerp(targetC, myTween);
+        }
+        
+        if (myTween >= 1.0) {
+            displayC = targetC;
+            myTween = 0.0;
+            changeColor = false;
+        }
+        
+        for(int i = 0; i < spacer.getNumVertices();i++){
+        spacer.setColor(i, displayC);
+                }
+    }
+    
+}
 
 void HistoryView::draw(){
     mesh.draw();
     spacer.draw();
+}
+
+void HistoryView::blink(){
+    displayC = ofColor(255,255,255);
+    myTween = 0.0;
+    changeColor = true;
+}
+
+void HistoryView::changeC(ofColor target_){
+    displayC = ofColor(255,255,255);
+    targetC = target_;
+    myTween = 0.0;
+    changeColor = true;
 }

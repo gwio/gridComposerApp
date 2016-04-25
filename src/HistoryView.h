@@ -29,4 +29,12 @@ public:
     ofVboMesh mesh, spacer;
     GlobalGUI *guiPtr;
 
+    bool changeColor;
+    ofColor displayC, targetC;
+    float myTween;
+    
+    void updateColor();
+    void changeC(ofColor);
+    
+    void blink();
 };

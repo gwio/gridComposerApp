@@ -562,6 +562,15 @@ void ofApp::update(){
         saveManager.update();
     }
     
+    if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT ){
+        hvSlotD.updateColor();
+    }
+    
+    if (currentState == STATE_HARMONY){
+        hvSlotA.updateColor();
+        hvSlotB.updateColor();
+        hvSlotC.updateColor();
+    }
     //light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
@@ -666,6 +675,10 @@ void ofApp::updateInterfaceMesh() {
         mainInterfaceData[63+i].updateMainMeshB(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
     }
     
+    mainInterfaceData[135].updateMainMesh(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y,0) ,tweenFloat);
+    mainInterfaceData[135].updateMainMeshB(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
+
+    
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[75+i].updateMainMesh(mainInterface, designGrid[0][0] ,tweenFloat);
     }
@@ -708,6 +721,9 @@ void ofApp::updateInterfaceMesh() {
     
     mainInterfaceData[131].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
 
+    for (int i = 0; i < 3; i++) {
+        mainInterfaceData[132+i].updateMainMesh(mainInterface, designGrid[i][0],tweenFloat);
+    }
 
     saveManager.animateGrid(tweenFloat);
 }
@@ -1371,6 +1387,15 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[11].blinkOn();
             }
             
+            else if(mainInterfaceData[135].isInside(ofVec2f(x,y))){
+                if (  (x-mainInterfaceData[135].minX) > ((mainInterfaceData[135].maxX-mainInterfaceData[135].minX)/2)) {
+                    synths[activeSynth].makeScaleStep(1);
+                } else {
+                    synths[activeSynth].makeScaleStep(-1);
+                }
+            }
+            markScaleSteps(63);
+            
           
             
             for (int i = 1; i < 12; i++) {
@@ -1528,10 +1553,7 @@ void ofApp::replaceMousePressed(int x, int y) {
         
         else if (currentState == STATE_HARMONY) {
             
-            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
-                harmonyButtonPress();
-                mainInterfaceData[43].blinkOn();
-            }
+        
             
             for(int i = 0; i < 3; i++) {
                 if(  mainInterfaceData[58+i].isInside(ofVec2f(x,y))) {
@@ -1552,10 +1574,34 @@ void ofApp::replaceMousePressed(int x, int y) {
                     mainInterfaceData[58+i].setStringWidth(mainInterfaceData[58+i].fsPtr->getBBox(mainInterfaceData[58+i].elementName, mainInterfaceData[58+i].fontSize, 0, 0).getWidth());
                     
                     mainInterfaceData[58+i].blinkOn();
-                    setNewGUI();
+                    //setNewGUI();
                 }
             }
             
+            for (int i = 132; i < 132+3; i++){
+                if(mainInterfaceData[i].isInside(ofVec2f(x,y))){
+                    if (  (x-mainInterfaceData[i].minX) > ((mainInterfaceData[i].maxX-mainInterfaceData[i].minX)/2)) {
+                        synths[synthButton[i-132]].makeScaleStep(1);
+                    } else {
+                        synths[synthButton[i-132]].makeScaleStep(-1);
+                    }
+                    
+                    if(i-132 == 0){
+                        hvSlotA.blink();
+                    } else if(i-132 == 1) {
+                        hvSlotB.blink();
+                    }else if(i -132 == 2) {
+                        hvSlotC.blink();
+                    }
+                }
+                markScaleSteps();
+                
+            }
+            
+            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                harmonyButtonPress();
+                mainInterfaceData[43].blinkOn();
+            } else
             
             
             if (mainInterfaceData[61].isInside(ofVec2f(x,y))) {
@@ -1574,7 +1620,9 @@ void ofApp::replaceMousePressed(int x, int y) {
                         } else {
                             synths[synthButton[i]].setKeyNote(    (globalKey%12) - (synths[synthButton[i]].keyNote%12) );
                         }
-                        
+                        mainInterfaceData[58+i].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
+                        mainInterfaceData[58+i].setStringWidth(mainInterfaceData[58+i].fsPtr->getBBox(mainInterfaceData[58+i].elementName, mainInterfaceData[58+i].fontSize, 0, 0).getWidth());
+                        mainInterfaceData[58+i].blinkOn();
                     }
                 }
                 
@@ -1582,6 +1630,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[61].setStringWidth(mainInterfaceData[61].fsPtr->getBBox(mainInterfaceData[61].elementName, mainInterfaceData[61].fontSize, 0, 0).getWidth());
                 mainInterfaceData[61].blinkOn();
                 
+                /*
                 mainInterfaceData[58].elementName = ofToString(synths[synthButton[0]].keyNote)+" "+ofToString(notes[synths[synthButton[0]].keyNote%12]);
                 mainInterfaceData[58].setStringWidth(mainInterfaceData[58].fsPtr->getBBox(mainInterfaceData[58].elementName, mainInterfaceData[58].fontSize, 0, 0).getWidth());
                 mainInterfaceData[58].blinkOn();
@@ -1593,7 +1642,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[60].elementName = ofToString(synths[synthButton[2]].keyNote)+" "+ofToString(notes[synths[synthButton[2]].keyNote%12]);
                 mainInterfaceData[60].setStringWidth(mainInterfaceData[60].fsPtr->getBBox(mainInterfaceData[60].elementName, mainInterfaceData[60].fontSize, 0, 0).getWidth());
                 mainInterfaceData[60].blinkOn();
-            }
+                 */
+            } else
             
             if(  mainInterfaceData[62].isInside(ofVec2f(x,y))) {
                 if (  (x-mainInterfaceData[62].minX) > ((mainInterfaceData[62].maxX-mainInterfaceData[62].minX)/2)) {
@@ -1624,6 +1674,19 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[62].setStringWidth(mainInterfaceData[62].fsPtr->getBBox(mainInterfaceData[62].elementName, mainInterfaceData[62].fontSize, 0, 0).getWidth());
                 
                 mainInterfaceData[62].blinkOn();
+                
+                if(synths[synthButton[0]].globalHarmony) {
+                    hvSlotA.blink();
+                }
+                
+                if(synths[synthButton[1]].globalHarmony) {
+                    hvSlotB.blink();
+                }
+
+                if(synths[synthButton[2]].globalHarmony) {
+                    hvSlotC.blink();
+                }
+
             }
             
         }
@@ -1714,16 +1777,27 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[activeSynth].userScale = false;
                     synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                     synths[activeSynth].setKeyNote( (globalKey%12) - (synths[activeSynth].keyNote%12));
+                    hvSlotD.changeC(ofColor::fromHsb(255,0,195,255));
                     // cout << notes[ synths[activeSynth].keyNote%12 ] << endl;
                     setNewGUI();
                 } else {
                     mainInterfaceData[111].elementName = "LOCAL HARMONY";
                     mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
                     mainInterfaceData[44].activateOnColor();
+                    hvSlotD.changeC(ofColor::fromHsb(synths[activeSynth].colorHue, 235, 180,255));
                     setNewGUI();
                 }
                 
             }
+            
+            else if(mainInterfaceData[135].isInside(ofVec2f(x,y))){
+                if (  (x-mainInterfaceData[135].minX) > ((mainInterfaceData[135].maxX-mainInterfaceData[135].minX)/2)) {
+                    synths[activeSynth].makeScaleStep(1);
+                } else {
+                    synths[activeSynth].makeScaleStep(-1);
+                }
+            }
+            markScaleSteps(63);
             
             
             //toggle get random grid
@@ -2777,6 +2851,21 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(131,"MENU",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
 
+    //scale step button, STATE_HARMONY
+    for(int i = 0; i < 3; i++){
+        offPlace = ofVec3f(0,-designGrid[0][0].y*8,0);
+        place = ofVec3f(0,designGrid[0][0].y*0.25,0);
+        temp = GlobalGUI(132+i,"",ofVec3f(designGrid[0][0].x*2, designGrid[0][0].y,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+        mainInterfaceData.push_back(temp);
+    }
+
+    //scale step button, STATE_EDIT
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    place = ofVec3f( 0 ,0,0);
+    temp = GlobalGUI(135,"",ofVec3f(designGrid[0][0].x*2, designGrid[0][0].y,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+
+
 
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     
@@ -2867,6 +2956,9 @@ void ofApp::editInterfaceOn(){
         mainInterfaceData[63+i].animation = true;
     }
     
+    mainInterfaceData[135].moveDir = 1;
+    mainInterfaceData[135].animation = true;
+
 }
 
 //--------------------------------------------------------------
@@ -2919,6 +3011,9 @@ void ofApp::editInterfaceOff(){
         mainInterfaceData[63+i].moveDir = 0;
         mainInterfaceData[63+i].animation = true;
     }
+    
+    mainInterfaceData[135].moveDir = 0;
+    mainInterfaceData[135].animation = true;
 }
 
 //--------------------------------------------------------------
@@ -3348,6 +3443,11 @@ void ofApp::harmonyInterfaceOn() {
         mainInterfaceData[75+i].moveDir = 1;
         mainInterfaceData[75+i].animation = true;
     }
+    
+    for (int i = 0; i < 3; i++) {
+        mainInterfaceData[132+i].moveDir = 1;
+        mainInterfaceData[132+i].animation = true;
+    }
     markScaleSteps();
 }
 
@@ -3390,6 +3490,10 @@ void ofApp::harmonyInterfaceOff() {
     for (int i = 0; i < 12*3; i++) {
         mainInterfaceData[75+i].moveDir = 0;
         mainInterfaceData[75+i].animation = true;
+    }
+    for (int i = 0; i < 3; i++) {
+        mainInterfaceData[132+i].moveDir = 0;
+        mainInterfaceData[132+i].animation = true;
     }
 }
 
@@ -4066,7 +4170,8 @@ void ofApp::buttonEditDetail() {
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[63+i].animationB = true;
         }
-        
+        mainInterfaceData[135].animationB = true;
+
         
         aniPct = 0.0;
         interfaceMoving = true;
@@ -4133,6 +4238,8 @@ void ofApp::buttonEditDetail() {
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[63+i].animationB = true;
         }
+        mainInterfaceData[135].animationB = true;
+
         
         detailEditInterfaceOff();
         aniPct = 0.0;
@@ -4529,10 +4636,12 @@ void ofApp::setNewGUI() {
         mainInterfaceData[111].elementName = "GLOBAL HARMONY";
         mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
         mainInterfaceData[44].activateDarkerColor();
+        hvSlotD.changeC(ofColor::fromHsb(255,0,195,255));
     } else {
         mainInterfaceData[111].elementName = "LOCAL HARMONY";
         mainInterfaceData[111].setStringWidth(mainInterfaceData[111].fsPtr->getBBox(mainInterfaceData[111].elementName, mainInterfaceData[111].fontSize, 0, 0).getWidth());
         mainInterfaceData[44].activateOnColor();
+        hvSlotD.changeC(ofColor::fromHsb(synths[activeSynth].colorHue, 235, 180,255));
     }
     
     //pause play
@@ -4580,8 +4689,10 @@ void ofApp::setNewGUI() {
     
     if (synths[synthButton[0]].globalHarmony) {
         mainInterfaceData[4].elementName = "OCTAVE";
+        hvSlotA.changeC(ofColor::fromHsb(255,0,195,255));
     } else {
         mainInterfaceData[4].elementName = "NOTE";
+        hvSlotA.changeC(ofColor::fromHsb(synths[synthButton[0]].colorHue, 235, 180,255));
     }
     mainInterfaceData[4].setColor(synths[synthButton[0]].colorHue);
     mainInterfaceData[4].activateOnColor();
@@ -4590,8 +4701,10 @@ void ofApp::setNewGUI() {
     //b
     if (synths[synthButton[1]].globalHarmony) {
         mainInterfaceData[6].elementName = "OCTAVE";
+        hvSlotB.changeC(ofColor::fromHsb(255,0,195,255));
     } else {
         mainInterfaceData[6].elementName = "NOTE";
+        hvSlotB.changeC(ofColor::fromHsb(synths[synthButton[1]].colorHue, 235, 180,255));
     }
     mainInterfaceData[6].setColor(synths[synthButton[1]].colorHue);
     mainInterfaceData[6].activateOnColor();
@@ -4600,8 +4713,10 @@ void ofApp::setNewGUI() {
     //c
     if (synths[synthButton[2]].globalHarmony) {
         mainInterfaceData[127].elementName = "OCTAVE";
+        hvSlotC.changeC(ofColor::fromHsb(255,0,195,255));
     } else {
         mainInterfaceData[127].elementName = "NOTE";
+        hvSlotC.changeC(ofColor::fromHsb(synths[synthButton[2]].colorHue, 235, 180,255));
     }
     mainInterfaceData[127].setColor(synths[synthButton[2]].colorHue);
     mainInterfaceData[127].activateOnColor();
@@ -4782,6 +4897,7 @@ void ofApp::saveToXml(string path_){
                     settings.addValue("y", y);
                     int pitch =  synths[ synthButton[i] ].soundsMap[ synths[synthButton[i]].layerInfo.at(x).at(y).cubeGroupId ].groupNote;
                     settings.addValue("pitch", pitch);
+                    settings.addValue("scalePos", synths[ synthButton[i] ].soundsMap[ synths[synthButton[i]].layerInfo.at(x).at(y).cubeGroupId ].scalePos);
                     settings.popTag();
                 } else {
                     temp.at(x+(TILES*y)) = '0';
@@ -5186,6 +5302,7 @@ void ofApp::loadFromXml(string path_){
             for (int j = 0; j < settings.getNumTags("Note"); j++) {
                 settings.pushTag("Note",j);
                 
+                //laod pitch
                 int tempPitch =
                 synths[synthButton[i]].soundsMap[
                                                  synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
@@ -5202,6 +5319,19 @@ void ofApp::loadFromXml(string path_){
                                                      synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
                                                      ].groupSynth.setParameter("rampFreqTarget", Tonic::mtof(settings.getValue("pitch", 60) ));
                 }
+                
+                //load scale position
+                int tempScalePos =
+                synths[synthButton[i]].soundsMap[
+                                                 synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
+                                                 ].scalePos;
+                
+                
+                if (tempScalePos != settings.getValue("scalePos", 60)) {
+                    synths[synthButton[i]].soundsMap[
+                                                     synths[synthButton[i]].layerInfo.at(settings.getValue("x",0)).at(settings.getValue("y",0)).cubeGroupId
+                                                     ].scalePos = settings.getValue("scalePos", 60);
+                                  }
                 settings.popTag();
             }
         }

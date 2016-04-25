@@ -1078,8 +1078,13 @@ void Instrument::setupOneSynth(cubeGroup& cgPtr) {
     //create freq ramp
     Tonic::ControlParameter rampFreqTarget = cgPtr.groupSynth.addParameter("rampFreqTarget");
     cgPtr.freqRamp = Tonic::RampedValue(0.0).value( 0 ).length(freqRamp).target(rampFreqTarget);
-    cgPtr.groupNote = getRandomNote();
-    cgPtr.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr.groupNote ));
+    
+    
+   cgPtr.scalePos = getRandomNote();
+   cgPtr.groupNote = scaleNoteSteps[cgPtr.scalePos] + keyNote;
+
+   // cgPtr.groupNote = getRandomNote();
+    cgPtr.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(cgPtr.groupNote));
        
     cgPtr.trigger = cgPtr.groupSynth.addParameter("trigger");
     
@@ -1253,7 +1258,9 @@ void Instrument::applyNewScale(){
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             
-            it->second.groupNote = getRandomNote();
+            it->second.scalePos = getRandomNote();
+            it->second.groupNote = scaleNoteSteps[it->second.scalePos] + keyNote;
+          
             it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
             //mainTonicPtr->setParameter("lfvf"+instrumentId, pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 ) );
             
@@ -1285,6 +1292,23 @@ void Instrument::setMusicScale(GlobalScales& scale_,int num_){
     activeScale = scale_.scaleVec.at(num_);
     
     applyNewScale();
+}
+
+void Instrument::makeScaleStep(int dir_){
+    
+    for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
+        if(it->second.size > 0){
+            it->second.scalePos = it->second.scalePos+dir_;
+            if(it->second.scalePos < 0){
+                it->second.scalePos = scaleNoteSteps.size()-1;
+            }
+            it->second.scalePos = it->second.scalePos % scaleNoteSteps.size();
+            it->second.groupNote = scaleNoteSteps[it->second.scalePos] + keyNote;
+
+            it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));
+        }
+    }
+    
 }
 
 void Instrument::setKeyNote(int keyNote_) {
@@ -1383,11 +1407,11 @@ void Instrument::planeMovement(float pct_){
 int Instrument::getRandomNote(){
     int note;
     if ( ofRandom(100) > 80) {
-        note = scaleNoteSteps[ 0 ] + (keyNote);
+        note = 0;
     } else {
         int ranPos = ofRandom(scaleNoteSteps.size());
         //cout << ranPos << endl;
-        note = scaleNoteSteps[ ranPos ] + (keyNote);
+        note = ranPos;
     }
     return note;
 }

@@ -39,6 +39,7 @@ struct cubeGroup {
     int lowX, highX;
     int lowY, highY;
     int groupNote;
+    int scalePos;
     
     vector< int> y_in_x_elements;
     vector< int> x_in_y_elements;
@@ -225,4 +226,6 @@ public:
     
     ofxMidiOut *midiOutPtr;
     int channel;
+    
+    void makeScaleStep(int);
 };
