@@ -68,9 +68,10 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     connected = ofColor::fromHsb(73,135,178,255);
     active = ofColor::fromHsb(28,160,170,255);
     offColor = ofColor::fromHsb(255, 0, 51, 200);
-    pulseColor = ofColor::fromHsb(0, 0, 255,255);
+    pulseColorA = ofColor::fromHsb(0, 0, 255,255);
+    pulseColorC = ofColor::fromHsb(0, 0, 255,255);
+
     
-        
     
     setupMeshes(connected_, active_);
     
@@ -79,6 +80,11 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
 void InterfacePlane::setColor(float hue_){
     connected = ofColor::fromHsb(hue_, 235, 230,200);
     active = ofColor::fromHsb(hue_, 150, 100 ,200);
+    
+    pulseColorC =  ofColor::fromHsb(connected.getHue(), connected.getSaturation()-200, 255, 220);
+    pulseColorA =  ofColor::fromHsb(connected.getHue(), connected.getSaturation()-20, 200, 220);
+
+    
 }
 
 void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
@@ -858,7 +864,11 @@ void InterfacePlane::pulseDir(int dir_) {
     blink[dir_] = true;
     blinkPct[dir_] = 0.01;
     for (int j = dir_*dirMeshVerts; j < (dir_*dirMeshVerts)+dirMeshVerts; j++) {
-        directionMesh.setColor(j, pulseColor);
+        if(meshState[dir_] == STATE_ACTIVE){
+        directionMesh.setColor(j, pulseColorA);
+        } else {
+            directionMesh.setColor(j, pulseColorC);
+        }
     }
     
 }

@@ -1163,7 +1163,11 @@ void Instrument::changePreset(bool test_) {
        pulsePlane.blink[i] = true;
         pulsePlane.blinkPct[i] = 0.01;
         for (int j = i*pulsePlane.dirMeshVerts; j < (i*pulsePlane.dirMeshVerts)+pulsePlane.dirMeshVerts; j++) {
-            pulsePlane.directionMesh.setColor(j, pulsePlane.pulseColor);
+            if(pulsePlane.meshState[i] == 0){
+            pulsePlane.directionMesh.setColor(j, pulsePlane.pulseColorA);
+            } else {
+                pulsePlane.directionMesh.setColor(j, pulsePlane.pulseColorC);
+            }
         }
     }
     

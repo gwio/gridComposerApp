@@ -88,7 +88,8 @@ class InterfacePlane {
     ofColor connected;
     ofColor active;
     ofColor offColor;
-    ofColor pulseColor;
+    ofColor pulseColorA;
+    ofColor pulseColorC;
     
     ofColor tempC;
     ofVec3f tempVec;

@@ -175,13 +175,13 @@ void HistoryView::draw(){
 }
 
 void HistoryView::blink(){
-    displayC = ofColor(255,255,255);
+    displayC = ofColor::fromHsb(displayC.getHue(), displayC.getSaturation()-50, 255, 255);
     myTween = 0.0;
     changeColor = true;
 }
 
 void HistoryView::changeC(ofColor target_){
-    displayC = ofColor(255,255,255);
+    displayC = ofColor::fromHsb(target_.getHue(), target_.getSaturation()-50, 255, 255);
     targetC = target_;
     myTween = 0.0;
     changeColor = true;

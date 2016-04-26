@@ -372,7 +372,7 @@ void GlobalGUI::drawFontString() {
     } else if (showString) {
         ofPushStyle();
         if(pickColor == ofColor(255,255,255)) {
-            ofSetColor(ofColor(19,19,19));
+            ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
             //hack for harmony strings
         } else if(onOff){
             ofSetColor(ofColor::fromHsb(255,0,195,255));
