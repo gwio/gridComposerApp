@@ -1050,7 +1050,10 @@ void ofApp::replaceMouseDragged(int x, int y){
         
         if (currentState == STATE_BPM) {
             
-            if(mainInterfaceData[45].isInside(ofVec2f(x,y))) {
+            if(mainInterfaceData[45].isInside(ofVec2f(x,y)) || mainInterfaceData[45].touchDown) {
+                if(!mainInterfaceData[45].touchDown){
+                    mainInterfaceData[45].touchDown = true;
+                }
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX);
@@ -1068,21 +1071,30 @@ void ofApp::replaceMouseDragged(int x, int y){
         
         else if (currentState == STATE_VOLUME) {
             
-            if (mainInterfaceData[1].isInside(ofVec2f(x,y))) {
+            if (mainInterfaceData[1].isInside(ofVec2f(x,y)) || mainInterfaceData[1].touchDown) {
+                if(!mainInterfaceData[1].touchDown){
+                    mainInterfaceData[1].touchDown = true;
+                }
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
                 //mainInterfaceData[52].elementName = ofToString(value,2);
                 //mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
-            else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[2].isInside(ofVec2f(x,y)) || mainInterfaceData[2].touchDown) {
+                if(!mainInterfaceData[2].touchDown){
+                    mainInterfaceData[2].touchDown = true;
+                }
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
                // mainInterfaceData[53].elementName = ofToString(value,2);
                // mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
-            else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[3].isInside(ofVec2f(x,y)) || mainInterfaceData[3].touchDown) {
+                if(!mainInterfaceData[3].touchDown){
+                    mainInterfaceData[3].touchDown = true;
+                }
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
@@ -1090,7 +1102,10 @@ void ofApp::replaceMouseDragged(int x, int y){
               //  mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
-            else if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[0].isInside(ofVec2f(x,y)) || mainInterfaceData[0].touchDown) {
+                if(!mainInterfaceData[0].touchDown){
+                    mainInterfaceData[0].touchDown = true;
+                }
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 volumeRampValueChanged(value);
@@ -1121,7 +1136,10 @@ void ofApp::replaceMouseDragged(int x, int y){
         else if (currentState == STATE_EDIT_DETAIL) {
             
             
-            if(mainInterfaceData[49].isInside(ofVec2f(x,y))) {
+            if(mainInterfaceData[49].isInside(ofVec2f(x,y)) || mainInterfaceData[49].touchDown) {
+                if(!mainInterfaceData[49].touchDown){
+                    mainInterfaceData[49].touchDown = true;
+                }
                 float value = ofClamp(ofMap(x, mainInterfaceData[49].minX, mainInterfaceData[49].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[49].setSlider(mainInterface, value);
                 int keyMod = ofMap(value, 0.0, 1.0, 12, 95);
@@ -1906,7 +1924,34 @@ void ofApp::replaceMouseReleased(int x,int y) {
         if (currentState == STATE_EDIT_DETAIL) {
             
             
-        } else if (currentState == STATE_SAVE){
+        }
+        
+        else if (currentState == STATE_BPM){
+            if(mainInterfaceData[45].touchDown){
+                mainInterfaceData[45].touchDown = false;
+            }
+        } else if(currentState == STATE_VOLUME){
+            if(mainInterfaceData[0].touchDown){
+                mainInterfaceData[0].touchDown = false;
+            }
+            if(mainInterfaceData[1].touchDown){
+                mainInterfaceData[1].touchDown = false;
+            }
+            if(mainInterfaceData[2].touchDown){
+                mainInterfaceData[2].touchDown = false;
+            }
+            if(mainInterfaceData[3].touchDown){
+                mainInterfaceData[3].touchDown = false;
+            }
+        }
+        
+        else if (currentState == STATE_EDIT_DETAIL){
+            if(mainInterfaceData[49].touchDown){
+                mainInterfaceData[49].touchDown = false;
+            }
+        }
+        
+        else if (currentState == STATE_SAVE){
             
             
             if(saveManager.touchDown) {
