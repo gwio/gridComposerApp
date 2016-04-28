@@ -611,6 +611,16 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[2][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
     
+    mainInterfaceData[136].updateMainMesh(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[136].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+                                          ,tweenFloat);
+    
+    mainInterfaceData[137].updateMainMesh(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[137].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+                                           ,tweenFloat);
+
+
+    
     mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[2][0], tweenFloat);
     
     
@@ -826,7 +836,7 @@ void ofApp::drawSliderPos(){
             ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y,
                             rectLine.x*2.0, sliderY);
 
-            ofSetColor(ofColor::fromHsb(255,0,204,255));
+            ofSetColor(ofColor::fromHsb(255,0,195,255));
             ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y-lineOff,
                             rectLine.x, rectLine.y);
         }
@@ -838,19 +848,27 @@ void ofApp::drawSliderPos(){
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
                         rectLine.x*2.0, rectLine.y);
         
-        ofSetColor(ofColor::fromHsb(255,0,204,255));
+        ofSetColor(ofColor::fromHsb(255,0,195,255));
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
                         rectLine.x, rectLine.y);
     }
     
     //STATE_EDT_DETAIL keynote slider white line
-    if ( (currentState == STATE_EDIT_DETAIL) || (interfaceMoving && currentState == STATE_EDIT) ){
+    if ( (currentState == STATE_EDIT_DETAIL) || (currentState == STATE_EDIT) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         ofSetColor(ofColor(21,21,21,80));
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x*2.0/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
                         rectLine.x*2.0, rectLine.y);
         
-        ofSetColor(ofColor::fromHsb(255,0,204,255));
+        ofSetColor(ofColor::fromHsb(255,0,195,255));
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
+                        rectLine.x, rectLine.y);
+        
+        ofSetColor(ofColor(21,21,21,80));
+        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(136).counter+3).x-(rectLine.x*2.0/2),mainInterface.getVertex(mainInterfaceData.at(137).counter+3).y-lineOff,
+                        rectLine.x*2.0, rectLine.y);
+        
+        ofSetColor(ofColor::fromHsb(255,0,195,255));
+        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(136).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(137).counter+3).y-lineOff,
                         rectLine.x, rectLine.y);
 
     }
@@ -956,13 +974,14 @@ void ofApp::drawStringAndIcons(){
 
     
     ofSetColor(mainInterfaceData[7].displayColor);
-    right.draw(mainInterface.getVertex(mainInterfaceData[7].counter+3).x-(144*scaleFac),
-               mainInterface.getVertex(mainInterfaceData[7].counter+3).y,
-               144*scaleFac,144*scaleFac);
+    ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(7).counter+1),
+                   mainInterface.getVertices().at(mainInterfaceData.at(7).counter+1)+ ofVec3f(0,-mainInterfaceData.at(7).elementSize.y,0),
+                   mainInterface.getVertices().at(mainInterfaceData.at(7).counter+1)+ ofVec3f(-12,-mainInterfaceData.at(7).elementSize.y/2,0));
     
-    left.draw(mainInterface.getVertex(mainInterfaceData[7].counter+0).x,
-              mainInterface.getVertex(mainInterfaceData[7].counter+0).y,
-              144*scaleFac,144*scaleFac);
+    ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(7).counter+2),
+                   mainInterface.getVertices().at(mainInterfaceData.at(7).counter+2)+ ofVec3f(0,-mainInterfaceData.at(7).elementSize.y,0),
+                   mainInterface.getVertices().at(mainInterfaceData.at(7).counter+2)+ ofVec3f(+12,-mainInterfaceData.at(7).elementSize.y/2,0));
+
     
     
     
@@ -1067,6 +1086,16 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
             }
             
+        } else if(currentState == STATE_EDIT) {
+            
+            if(mainInterfaceData[136].isInside(ofVec2f(x,y)) || mainInterfaceData[136].touchDown) {
+                if(!mainInterfaceData[136].touchDown){
+                    mainInterfaceData[136].touchDown = true;
+                }
+                float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[136].setSlider(mainInterface, value);
+
+            }
         }
         
         else if (currentState == STATE_VOLUME) {
@@ -1135,6 +1164,15 @@ void ofApp::replaceMouseDragged(int x, int y){
         
         else if (currentState == STATE_EDIT_DETAIL) {
             
+            
+            if(mainInterfaceData[136].isInside(ofVec2f(x,y)) || mainInterfaceData[136].touchDown) {
+                if(!mainInterfaceData[136].touchDown){
+                    mainInterfaceData[136].touchDown = true;
+                }
+                float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[136].setSlider(mainInterface, value);
+
+            }
             
             if(mainInterfaceData[49].isInside(ofVec2f(x,y)) || mainInterfaceData[49].touchDown) {
                 if(!mainInterfaceData[49].touchDown){
@@ -1241,6 +1279,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[synthButton[2]].trackSwitchOn = true;
                 }
             }
+            
+            
             
         }
         
@@ -1386,6 +1426,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                     muster.flips.at(musterIndex).makeTex();
                     muster.saveReady = false;
                 }
+                
+                
             }
             
             
@@ -1411,10 +1453,19 @@ void ofApp::replaceMousePressed(int x, int y) {
                 } else {
                     synths[activeSynth].makeScaleStep(-1);
                 }
+                hvSlotD.blink();
+
+                markScaleSteps(63);
             }
-            markScaleSteps(63);
             
-          
+            else if(mainInterfaceData[136].isInside(ofVec2f(x,y))) {
+              
+                
+                float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[136].setSlider(mainInterface, value);
+
+                
+            }
             
             for (int i = 1; i < 12; i++) {
                 
@@ -1611,8 +1662,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                     }else if(i -132 == 2) {
                         hvSlotC.blink();
                     }
+                    markScaleSteps();
                 }
-                markScaleSteps();
                 
             }
             
@@ -1817,9 +1868,20 @@ void ofApp::replaceMousePressed(int x, int y) {
                 } else {
                     synths[activeSynth].makeScaleStep(-1);
                 }
+                
+              
+                    hvSlotD.blink();
+         
+                markScaleSteps(63);
+
             }
-            markScaleSteps(63);
             
+            else if(mainInterfaceData[136].isInside(ofVec2f(x,y))) {
+             
+                float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
+                mainInterfaceData[136].setSlider(mainInterface, value);
+
+            }
             
             //toggle get random grid
             /*
@@ -1921,8 +1983,10 @@ void ofApp::mouseReleased(int x, int y, int button){
 void ofApp::replaceMouseReleased(int x,int y) {
     
     if(!interfaceMoving){
-        if (currentState == STATE_EDIT_DETAIL) {
-            
+        if (currentState == STATE_EDIT) {
+            if(mainInterfaceData[136].touchDown){
+                mainInterfaceData[136].touchDown = false;
+            }
             
         }
         
@@ -1948,6 +2012,10 @@ void ofApp::replaceMouseReleased(int x,int y) {
         else if (currentState == STATE_EDIT_DETAIL){
             if(mainInterfaceData[49].touchDown){
                 mainInterfaceData[49].touchDown = false;
+            }
+            
+            if(mainInterfaceData[136].touchDown){
+                mainInterfaceData[136].touchDown = false;
             }
         }
         
@@ -2592,7 +2660,7 @@ void ofApp::setupGlobalInterface() {
     //synth preset, STATE_DETAIL
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
     place = ofVec3f(0,designGrid[0][0].y-gridRect.y/8,0);
-    temp = GlobalGUI(7,string(presetNames.at(0)),ofVec3f(gridRect.x*0.777,gridRect.y/4,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoSemibold);
+    temp = GlobalGUI(7,string(presetNames.at(0)),ofVec3f(gridRect.x*0.75,gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //PAUSE A B C, STATE_DEFAULT
@@ -2761,29 +2829,29 @@ void ofApp::setupGlobalInterface() {
     //harmony settings, a,b,c, keynote STATE_HARMONY
     offPlace = ofVec3f(0,designGrid[0][0].y*10,0);
     place = ofVec3f(0,designGrid[0][0].y*0.75,0);
-    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(gridRect.x*0.7, gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoBold);
+    temp = GlobalGUI(58,ofToString(synths[synthButton[0]].keyNote),ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,designGrid[0][0].y*10,0);
     place = ofVec3f(0,designGrid[0][0].y*0.75,0);
-    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(gridRect.x*0.7, gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoBold);
+    temp = GlobalGUI(59,ofToString(synths[synthButton[1]].keyNote),ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     offPlace = ofVec3f(0,designGrid[0][0].y*10,0);
     place = ofVec3f(0,designGrid[0][0].y*0.75,0);
-    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(gridRect.x*0.7, gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoBold);
+    temp = GlobalGUI(60,ofToString(synths[synthButton[2]].keyNote),ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     //harmony menu,  global keynote, STATE_HARMONY
     offPlace = ofVec3f(0,+designGrid[0][0].y*12,0);
     place = ofVec3f(designGrid[0][0].x,-designGrid[0][0].y/2,0);
-    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(gridRect.x*0.7, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontBig,false,&tekoSemibold);
+    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //harmony menu -> global scale, STATE_HARMONY
     offPlace = ofVec3f(0,+designGrid[0][0].y*12,0);
     place = ofVec3f(designGrid[0][0].x,-designGrid[0][0].y/2,0);
-    temp = GlobalGUI(62,scaleCollection.scaleVec.at(globalScaleVecPos%scaleCollection.scaleVec.size()).name,ofVec3f(gridRect.x*0.7, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontDefault,false,&tekoSemibold);
+    temp = GlobalGUI(62,scaleCollection.scaleVec.at(globalScaleVecPos%scaleCollection.scaleVec.size()).name,ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontDefault,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     
@@ -2791,7 +2859,7 @@ void ofApp::setupGlobalInterface() {
     for (int i= 0; i < 12; i++) {
         float offset =  (horizontalSlider.x*HARMONY_ROWS_SCALE)/12 ;
         offPlace = ofVec3f(-designGrid[0][0].x*6- ((offset*i) + (offset/2) ),0,0);
-        place = ofVec3f( (-offset*6) + (offset*i) + (offset/2) ,designGrid[0][0].y/4,0);
+        place = ofVec3f( (-offset*6) + (offset*i) + (offset/2) ,-designGrid[0][0].y/4,0);
         temp = GlobalGUI(63+i,"o",ofVec3f(offset*0.5,offset*0.5,0),ofColor(57*i,0,0),place,offPlace,fontDefault,false,&tekoLight);
         mainInterfaceData.push_back(temp);
     }
@@ -2909,10 +2977,21 @@ void ofApp::setupGlobalInterface() {
 
     //scale step button, STATE_EDIT
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    place = ofVec3f( 0 ,0,0);
+    place = ofVec3f( 0 ,-designGrid[0][0].y/2,0);
     temp = GlobalGUI(135,"",ofVec3f(designGrid[0][0].x*2, designGrid[0][0].y,0),ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
 
+    //soft<->hard settings , STATE_EDIT
+    place = ofVec3f(0,designGrid[0][0].y/4,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*6,0,0);
+    temp = GlobalGUI(136,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+    
+    //slider background, STATE_EDIT
+    place = ofVec3f(0,designGrid[0][0].y/4,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*6,0,0);
+    temp = GlobalGUI(137,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
 
 
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
@@ -3006,6 +3085,13 @@ void ofApp::editInterfaceOn(){
     
     mainInterfaceData[135].moveDir = 1;
     mainInterfaceData[135].animation = true;
+    
+    mainInterfaceData[136].moveDir = 1;
+    mainInterfaceData[136].animation = true;
+
+    mainInterfaceData[137].moveDir = 1;
+    mainInterfaceData[137].animation = true;
+
 
 }
 
@@ -3062,6 +3148,12 @@ void ofApp::editInterfaceOff(){
     
     mainInterfaceData[135].moveDir = 0;
     mainInterfaceData[135].animation = true;
+    
+    mainInterfaceData[136].moveDir = 0;
+    mainInterfaceData[136].animation = true;
+    
+    mainInterfaceData[137].moveDir = 0;
+    mainInterfaceData[137].animation = true;
 }
 
 //--------------------------------------------------------------
@@ -4214,6 +4306,8 @@ void ofApp::buttonEditDetail() {
         mainInterfaceData[39].animationB = true;
         mainInterfaceData[12].animationB = true;
         mainInterfaceData[40].animationB = true;
+        mainInterfaceData[136].animationB = true;
+        mainInterfaceData[137].animationB = true;
         
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[63+i].animationB = true;
@@ -4282,6 +4376,8 @@ void ofApp::buttonEditDetail() {
         mainInterfaceData[39].animationB = true;
         mainInterfaceData[12].animationB = true;
         mainInterfaceData[40].animationB = true;
+        mainInterfaceData[136].animationB = true;
+        mainInterfaceData[137].animationB = true;
         
         for (int i = 0; i < 12; i++) {
             mainInterfaceData[63+i].animationB = true;
@@ -4641,6 +4737,11 @@ void ofApp::setNewGUI() {
     //mainInterfaceData[54].elementName = ofToString(synths[synthButton[2]].sVolume,2);
     //mainInterfaceData[54].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
     
+    
+    //sof-hard slider
+    mainInterfaceData[137].setColor(synths[activeSynth].colorHue);
+    mainInterfaceData[137].activateOnColor();
+
     
     //bpm buttons
     
