@@ -17,7 +17,7 @@
 #define ppScaleModTempo 4.0;
 #define ppPosModTempo 1.65;
 
-#define VERSION "0.98.22"
+#define VERSION "0.98.25"
 
 
 

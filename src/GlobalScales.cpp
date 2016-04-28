@@ -15,43 +15,7 @@ void GlobalScales::loadScales() {
     
     
     
-    //___________________
-    
-    
-    tempNotes.clear();
-    temp.name = "M PENTA";
-    {
-        bool notes[] = {1,0,1,0,1,0,0,1,0,1,0,0};
-        for (int i = 0; i < 12; i++) {
-            temp.steps[i] = notes[i];
-            if (notes[i]) {
-                tempNotes.push_back(i);
-            }
-        }
-    }
-    scaleVec.push_back(temp);
-    scaleNotes.push_back(tempNotes);
-    
-    
-    //___________________
-    
-    
-    tempNotes.clear();
-    temp.name = "m PENTA";
-    {
-        bool notes[] = {1,0,0,1,0,1,0,1,0,0,1,0};
-        for (int i = 0; i < 12; i++) {
-            temp.steps[i] = notes[i];
-            if (notes[i]) {
-                tempNotes.push_back(i);
-            }
-        }
-    }
-    scaleVec.push_back(temp);
-    scaleNotes.push_back(tempNotes);
-
-    
-    
+   
     
     //___________________
     
@@ -167,13 +131,14 @@ void GlobalScales::loadScales() {
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
    
-    //___________________
+  
     
+    //_____________________
     
     tempNotes.clear();
-    temp.name = "HIRAJOSHI";
+    temp.name = "M PENTATONIC";
     {
-        bool notes[] = {1,0,1,1,0,0,0,1,1,0,0,0};
+        bool notes[] = {1,0,1,0,1,0,0,1,0,1,0,0};
         for (int i = 0; i < 12; i++) {
             temp.steps[i] = notes[i];
             if (notes[i]) {
@@ -183,4 +148,74 @@ void GlobalScales::loadScales() {
     }
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
+    
+    
+    //___________________
+    
+    
+    tempNotes.clear();
+    temp.name = "m PENTATONIC";
+    {
+        bool notes[] = {1,0,0,1,0,1,0,1,0,0,1,0};
+        for (int i = 0; i < 12; i++) {
+            temp.steps[i] = notes[i];
+            if (notes[i]) {
+                tempNotes.push_back(i);
+            }
+        }
+    }
+    scaleVec.push_back(temp);
+    scaleNotes.push_back(tempNotes);
+    
+    //___________________
+    
+    
+    tempNotes.clear();
+    temp.name = "m HARMONIC";
+    {
+        bool notes[] = {1,0,1,1,0,1,0,1,1,0,0,1};
+        for (int i = 0; i < 12; i++) {
+            temp.steps[i] = notes[i];
+            if (notes[i]) {
+                tempNotes.push_back(i);
+            }
+        }
+    }
+    scaleVec.push_back(temp);
+    scaleNotes.push_back(tempNotes);
+    
+    //___________________
+    
+    
+    tempNotes.clear();
+    temp.name = "m MELODIC";
+    {
+        bool notes[] = {1,0,1,1,0,1,0,1,0,1,0,1};
+        for (int i = 0; i < 12; i++) {
+            temp.steps[i] = notes[i];
+            if (notes[i]) {
+                tempNotes.push_back(i);
+            }
+        }
+    }
+    scaleVec.push_back(temp);
+    scaleNotes.push_back(tempNotes);
+    
+    //___________________
+    
+    
+    tempNotes.clear();
+    temp.name = "HUNGARIAN";
+    {
+        bool notes[] = {1,0,1,1,0,0,1,1,1,0,1,0};
+        for (int i = 0; i < 12; i++) {
+            temp.steps[i] = notes[i];
+            if (notes[i]) {
+                tempNotes.push_back(i);
+            }
+        }
+    }
+    scaleVec.push_back(temp);
+    scaleNotes.push_back(tempNotes);
+    
 }
