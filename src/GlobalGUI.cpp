@@ -240,6 +240,56 @@ void GlobalGUI::updateMainMeshSlider(ofVboMesh& mesh_, ofVec3f vec_, float& twee
     
 }
 
+void GlobalGUI::updateMainMeshSliderB(ofVboMesh& mesh_, ofVec3f vec_,float& tween_){
+    
+    if (animationB) {
+        mesh_.setVertex(0+counter, vec_+ofVec3f(-elementSize.x/2, -elementSize.y/2,0)+placement);
+        mesh_.setVertex(1+counter, vec_+ofVec3f(-elementSize.x/2, elementSize.y/2,0)+placement);
+        mesh_.setVertex(2+counter, vec_+ofVec3f( (elementSize.x/2)*sliderPct , elementSize.y/2,0)+placement);
+        mesh_.setVertex(3+counter, vec_+ofVec3f( (elementSize.x/2)*sliderPct, -elementSize.y/2,0)+placement);
+        
+        minX = -elementSize.x/2+placement.x+vec_.x;
+        maxX = elementSize.x/2+placement.x+vec_.x;
+        minY = -elementSize.y/2+placement.y+vec_.y;
+        maxY = elementSize.y/2+placement.y+vec_.y;
+        
+        drawStringPos = vec_+placement;
+        curPos = vec_;
+    }
+    if(animationB && tween_ >= 1.0){
+        animationB = false;
+    }
+    
+    
+    
+    if (blink) {
+        myTween = (myTween*1.12)+0.01;
+        
+        if (displayColor != targetColor) {
+            displayColor = displayColor.lerp(targetColor, myTween);
+            if (!isTrans){
+                mesh_.setColor(0+counter,displayColor);
+                mesh_.setColor(1+counter,displayColor);
+                mesh_.setColor(2+counter,displayColor);
+                mesh_.setColor(3+counter,displayColor);
+            }
+        }
+        if (myTween >= 1.0) {
+            displayColor = targetColor;
+            if(!isTrans) {
+                mesh_.setColor(0+counter,displayColor);
+                mesh_.setColor(1+counter,displayColor);
+                mesh_.setColor(2+counter,displayColor);
+                mesh_.setColor(3+counter,displayColor);
+            }
+            blink = false;
+            myTween = 1.0;
+        }
+    }
+    
+
+}
+
 void GlobalGUI::setColor(float hue_) {
     
     elementColorOn = ofColor::fromHsb(hue_, 235, 180,255);

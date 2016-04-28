@@ -60,6 +60,8 @@ public:
     void updateMainMeshB(ofVboMesh&, ofVec3f, float&);
 
     void updateMainMeshSlider(ofVboMesh&, ofVec3f, float&);
+    void updateMainMeshSliderB(ofVboMesh&, ofVec3f, float&);
+
     
     void setSlider(ofVboMesh&, float);
     float sliderPos;

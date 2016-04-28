@@ -604,15 +604,15 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[53].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[54].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     
-    mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[1][0], tweenFloat);
+   // mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[1][0], tweenFloat);
     
     
     mainInterfaceData[39].updateMainMesh(mainInterface,designGrid[2][1], tweenFloat);
     mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[2][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
     
-    mainInterfaceData[136].updateMainMesh(mainInterface,designGrid[0][1], tweenFloat);
-    mainInterfaceData[136].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
+    mainInterfaceData[136].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[136].updateMainMeshSliderB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
                                           ,tweenFloat);
     
     mainInterfaceData[137].updateMainMesh(mainInterface,designGrid[0][1], tweenFloat);
@@ -2725,10 +2725,10 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(39,string("Container"),ofVec3f( gridRect.x*0.777,designGrid[0][0].y*2,0),ofColor(55,0,0),place,offPlace,fontDefault,true,&tekoLight);
     mainInterfaceData.push_back(temp);
     
-    //keynote drag slider STATE_EDIT_DETAIL
+    //keynote drag slider EMPTY
     place = ofVec3f(0,designGrid[0][0].y+(keyButton.y/2),0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(40,string(""), ofVec3f( (gridRect.x*0.888*2)+gridRect.x,keyButton.y,0) ,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoLight);
+    temp = GlobalGUI(40,string(""), ofVec3f( (gridRect.x*0.888*2)+gridRect.x,keyButton.y,0) ,ofColor(63,0,0),place,offPlace,fontDefault,false,&tekoLight);
     mainInterfaceData.push_back(temp);
     
     //toggle bpm icon, STATE_DEFFAULT
@@ -2983,13 +2983,13 @@ void ofApp::setupGlobalInterface() {
 
     //soft<->hard settings , STATE_EDIT
     place = ofVec3f(0,designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(-designGrid[0][0].y*6,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
     temp = GlobalGUI(136,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //slider background, STATE_EDIT
     place = ofVec3f(0,designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(-designGrid[0][0].y*6,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
     temp = GlobalGUI(137,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
 
@@ -3163,9 +3163,6 @@ void ofApp::detailEditInterfaceOn() {
     mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
     
     
-    mainInterfaceData[40].showString = false;
-    mainInterfaceData[40].moveDir = 1;
-    mainInterfaceData[40].animation = true;
     
     mainInterfaceData[131].showString = true;
     mainInterfaceData[131].moveDir = 1;
@@ -3274,9 +3271,6 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[12].moveDir = 1;
     mainInterfaceData[12].animation = true;
     
-    mainInterfaceData[40].showString = false;
-    mainInterfaceData[40].moveDir = 0;
-    mainInterfaceData[40].animation = true;
     
     mainInterfaceData[111].showString = true;
     mainInterfaceData[111].moveDir = 1;

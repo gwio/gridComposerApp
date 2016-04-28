@@ -106,7 +106,7 @@ void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<Global
     mesh.clearVertices();
     mesh.clearColors();
     for (int i = noteLog_.size()-1; i > 0 ; i--) {
-        temp = ofVec3f(0 ,(noteLog_.size()-i-1) *5+elementSize.y,0);
+        temp = ofVec3f(0 ,(noteLog_.size()-i-1) *4+elementSize.y,0);
         alpha =255*( 1- abs(ofMap( (255/noteLog_.size())*i,0,255,1,0 )) ) ;
         for (int j = 0; j < 12; j++) {
             if(noteLog_.at(i).notes.at(j)){
