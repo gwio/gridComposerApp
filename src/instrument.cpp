@@ -50,6 +50,7 @@ Instrument::Instrument(int channel_,string id_,int gTiles_, float gSize_, float 
     sVolume = 1.0;
     pitchMod = 0;
     octaveRange = 0;
+    attackSlider = 0.5;
     
     userScale = false;
     trackSwitchOn = true;
@@ -1105,11 +1106,11 @@ void Instrument::setupOneSynth(cubeGroup& cgPtr) {
    
   
     
-    cgPtr.groupSynth.setParameter("release1",getSynthRelease(preset));
-    cgPtr.groupSynth.setParameter("release2",getSynthRelease(preset));
+    cgPtr.groupSynth.setParameter("release1",getSynthRelease1(preset));
+    cgPtr.groupSynth.setParameter("release2",getSynthRelease2(preset));
     
-    cgPtr.groupSynth.setParameter("attack1",getSynthAttack(preset));
-    cgPtr.groupSynth.setParameter("attack2",getSynthAttack(preset));
+    cgPtr.groupSynth.setParameter("attack1",getSynthAttack1(preset));
+    cgPtr.groupSynth.setParameter("attack2",getSynthAttack2(preset));
     
 
     
@@ -1493,31 +1494,48 @@ float Instrument::getLfvf(int& preset_){
     return ofClamp(temp,0.0,250.0);
 }
 
-float Instrument::getSynthRelease(int& preset_){
+float Instrument::getSynthRelease1(int& preset_){
     float tempR;
-    tempR =presetManager.getPresetRelease(preset_) * (ofMap((float)*bpmPtr, 0, 270, 1.0, 0.001) / (5-nextPulseDivision));
+    tempR = (presetManager.getPresetRelease(preset_)  / (5-nextPulseDivision)) * attackSlider;
     cout<< "release " << tempR<< endl;
 
     return tempR;
 }
 
-float Instrument::getSynthAttack(int& preset_){
-    float tempD;
-    tempD =presetManager.getPresetAttack(preset_) * (ofMap((float)*bpmPtr, 0, 270, 1.0, 0.001) / (5-nextPulseDivision));
-    cout << "attack  "<< tempD << endl;
+float Instrument::getSynthAttack1(int& preset_){
+    float tempA;
+    tempA = (presetManager.getPresetAttack(preset_)  / (5-nextPulseDivision)) * attackSlider;
+    cout << "attack  "<< tempA << endl;
     
-    return tempD;
+    return tempA;
 }
+
+float Instrument::getSynthRelease2(int& preset_){
+    float tempR;
+    tempR = (presetManager.getPresetRelease(preset_)  / (5-nextPulseDivision)) * attackSlider * 1.25;
+    cout<< "release " << tempR<< endl;
+    
+    return tempR;
+}
+
+float Instrument::getSynthAttack2(int& preset_){
+    float tempA;
+    tempA = (presetManager.getPresetAttack(preset_)  / (5-nextPulseDivision)) * attackSlider * 1.25;
+    cout << "attack  "<< tempA << endl;
+    
+    return tempA;
+}
+
 
 void Instrument::setAllADSR(int& preset_){
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-            it->second.groupSynth.setParameter("release1",getSynthRelease(preset));
-            it->second.groupSynth.setParameter("release2",getSynthRelease(preset));
+            it->second.groupSynth.setParameter("release1",getSynthRelease1(preset));
+            it->second.groupSynth.setParameter("release2",getSynthRelease2(preset));
             
-            it->second.groupSynth.setParameter("attack1",getSynthAttack(preset));
-            it->second.groupSynth.setParameter("attack2",getSynthAttack(preset));
+            it->second.groupSynth.setParameter("attack1",getSynthAttack1(preset));
+            it->second.groupSynth.setParameter("attack2",getSynthAttack2(preset));
             
         }
     }

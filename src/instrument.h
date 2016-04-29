@@ -220,12 +220,16 @@ public:
     bool globalHarmony;
     
     float getLfvf(int&);
-    float getSynthRelease(int&);
-    float getSynthAttack(int&);
+    float getSynthRelease1(int&);
+    float getSynthAttack1(int&);
+    float getSynthRelease2(int&);
+    float getSynthAttack2(int&);
+
     void setAllADSR(int&);
     
     ofxMidiOut *midiOutPtr;
     int channel;
     
     void makeScaleStep(int);
+    float attackSlider;
 };

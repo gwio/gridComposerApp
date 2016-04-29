@@ -1094,6 +1094,8 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].setAllADSR(synths[activeSynth].preset);
 
             }
         }
@@ -1171,7 +1173,8 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
-
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].setAllADSR(synths[activeSynth].preset);
             }
             
             if(mainInterfaceData[49].isInside(ofVec2f(x,y)) || mainInterfaceData[49].touchDown) {
@@ -1463,6 +1466,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].setAllADSR(synths[activeSynth].preset);
 
                 
             }
@@ -1880,6 +1885,9 @@ void ofApp::replaceMousePressed(int x, int y) {
              
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
+
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].setAllADSR(synths[activeSynth].preset);
 
             }
             
@@ -4736,7 +4744,8 @@ void ofApp::setNewGUI() {
     mainInterfaceData[137].setColor(synths[activeSynth].colorHue);
     mainInterfaceData[137].activateOnColor();
 
-    
+    mainInterfaceData[136].setSlider(mainInterface, ofMap(synths[activeSynth].attackSlider, 1.5, 0.5, 0.0, 1.0));
+
     //bpm buttons
     
     for (int i = 0; i < 4; i++) {
@@ -5106,6 +5115,7 @@ void ofApp::saveToXml(string path_){
         settings.addValue("pauseStatus", synths[synthButton[i]].pause);
         settings.addValue("keyNote", synths[synthButton[i]].keyNote);
         settings.addValue("globalHarmony", synths[synthButton[i]].globalHarmony);
+        settings.addValue("attack", synths[synthButton[i]].attackSlider);
         //activeScale Bools[12]
         string scaleBool = "000000000000";
         for (int j = 0; j < 12; j++) {
@@ -5341,6 +5351,8 @@ void ofApp::loadFromXml(string path_){
         
         synths[synthButton[i]].globalHarmony = settings.getValue("globalHarmony", 1);
         
+        synths[synthButton[i]].attackSlider = settings.getValue("attack", 0.5);
+
         //set the layer lowFreqVolumeFactor to keynote
         synths[synthButton[i]].mainTonicPtr->setParameter("lfvf"+synths[synthButton[i]].instrumentId, synths[synthButton[i]].getLfvf(synths[synthButton[i]].preset));
         
