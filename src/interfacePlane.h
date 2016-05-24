@@ -13,7 +13,7 @@ class InterfacePlane {
     
     InterfacePlane(int, float,bool[],bool[]);
     
-    void update(int&, float&, int&, bool[],bool[], bool&, int&, float&);
+    void update(int&, float&, int&, bool[],bool[], bool&, int&, float&, int&);
     void draw(bool&);
     
     void pulseDir(int);

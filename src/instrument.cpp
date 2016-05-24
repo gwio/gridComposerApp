@@ -293,7 +293,7 @@ void Instrument::update() {
         }
     }
     
-    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause, *globalStatePtr, colorHue);
+    pulsePlane.update(*stepperPos,bpmTick,scanDirection,  connectedDirection, activeDirection, pause, *globalStatePtr, colorHue, nextPulseDivision);
     
     updateCubeMesh();
     

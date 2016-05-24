@@ -620,7 +620,7 @@ void InterfacePlane::blinkP(){
     }
 }
 
-void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_, float &hue_) {
+void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_, float &hue_, int& pulseDiv_) {
     
     transformButton(connected_, active_, globalState_);
     blinkP();
@@ -784,7 +784,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         lineMeshQB.push_back(tempA);
     }
     
-    if (lineMeshQA.size() > 50) {
+    while (lineMeshQA.size() > (50  / (5-pulseDiv_) ) ) {
         lineMeshQA.pop_front();
         lineMeshQB.pop_front();
     }
@@ -794,7 +794,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     lineMesh.clear();
     for (int i = 0; i < lineMeshQA.size(); i++) {
         lineMesh.addVertex(lineMeshQA.at(i));
-        trailColor.a = (255/50)*i;
+        trailColor.a = (255/lineMeshQA.size())*i;
         lineMesh.addColor(trailColor);
         
        
@@ -803,7 +803,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
     for (int i = lineMeshQA.size()-1; i > 0; i--) {
         lineMesh.addVertex(lineMeshQB.at(i));
-        trailColor.a = (255/50)*i;
+        trailColor.a = (255/lineMeshQA.size())*i;
         lineMesh.addColor(trailColor);
     }
     

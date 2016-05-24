@@ -181,8 +181,10 @@ void HistoryView::blink(){
 }
 
 void HistoryView::changeC(ofColor target_){
+    if(displayC != target_){
     displayC = ofColor::fromHsb(target_.getHue(), target_.getSaturation()-50, 255, 255);
     targetC = target_;
     myTween = 0.0;
     changeColor = true;
+    }
 }

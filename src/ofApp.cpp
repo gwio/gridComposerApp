@@ -1493,6 +1493,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                     synths[activeSynth].userScale = true;
                     
                     markScaleSteps(63);
+                    hvSlotD.blink();
                     // cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
@@ -1645,13 +1646,26 @@ void ofApp::replaceMousePressed(int x, int y) {
                             synths[synthButton[i]].setKeyNote(-12);
                         } else {
                             synths[synthButton[i]].setKeyNote(-1);
-                        }                    }
+                        }
+                    }
                     
                     mainInterfaceData[58+i].elementName = ofToString(notes[synths[synthButton[i]].keyNote%12]) +" / "+ofToString(synths[synthButton[i]].keyNote);
                     mainInterfaceData[58+i].setStringWidth(mainInterfaceData[58+i].fsPtr->getBBox(mainInterfaceData[58+i].elementName, mainInterfaceData[58+i].fontSize, 0, 0).getWidth());
                     
                     mainInterfaceData[58+i].blinkOn();
                     //setNewGUI();
+                    
+                    if(i==0) {
+                        hvSlotA.blink();
+                    }
+                    
+                    if(i==1) {
+                        hvSlotB.blink();
+                    }
+                    
+                    if(i==2) {
+                        hvSlotC.blink();
+                    }
                 }
             }
             
