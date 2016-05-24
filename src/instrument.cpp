@@ -1512,7 +1512,7 @@ float Instrument::getSynthAttack1(int& preset_){
 
 float Instrument::getSynthRelease2(int& preset_){
     float tempR;
-    tempR = (presetManager.getPresetRelease(preset_)  / (5-nextPulseDivision)) * attackSlider * 1.25;
+    tempR = (presetManager.getPresetRelease(preset_)  / (5-nextPulseDivision)) * attackSlider;
     cout<< "release " << tempR<< endl;
     
     return tempR;
@@ -1520,7 +1520,7 @@ float Instrument::getSynthRelease2(int& preset_){
 
 float Instrument::getSynthAttack2(int& preset_){
     float tempA;
-    tempA = (presetManager.getPresetAttack(preset_)  / (5-nextPulseDivision)) * attackSlider * 1.25;
+    tempA = (presetManager.getPresetAttack(preset_)  / (5-nextPulseDivision)) * attackSlider;
     cout << "attack  "<< tempA << endl;
     
     return tempA;

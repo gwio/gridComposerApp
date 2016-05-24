@@ -876,6 +876,5 @@ void InterfacePlane::pulseDir(int dir_) {
 void InterfacePlane::flipTrailMesh(){
     trailMesh = !trailMesh;
     
-    cout << "FLIP " << endl;
 }
 

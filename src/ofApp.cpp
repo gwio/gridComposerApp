@@ -8,15 +8,18 @@
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
 
-#define ppPosModFocus 1.0;
-#define ppPosModDefault 1.0;
+#define ppPosModFocus 1.0
+#define ppPosModDefault 1.0
 
-#define ppScaleModFocus 1.0;
-#define ppScaleModDefault 1.0;
+#define ppScaleModFocus 1.0
+#define ppScaleModDefault 1.0
 
-#define ppScaleModTempo 4.0;
-#define ppPosModTempo 1.65;
+#define ppScaleModTempo 4.0
+#define ppPosModTempo 1.65
 
+
+#define attSldMin 0.5
+#define attSldMax 2.0
 #define VERSION "0.98.25"
 
 
@@ -410,7 +413,7 @@ void ofApp::setupAudio(){
      */
     
     
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.35,0.26)
+    Tonic::StereoDelay delay = Tonic::StereoDelay(0.30,0.35)
     .delayTimeRight(0.30- (delayTime*0.001))
     .delayTimeLeft(0.35-  (delayTime*0.001))
     .feedback(0.125)
@@ -427,7 +430,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(8) >> LPF12().cutoff(8400).Q(4) >>delay );
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(12) >> LPF12().cutoff(8400).Q(4) >>delay );
 }
 
 //--------------------------------------------------------------
@@ -1094,7 +1097,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
-                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, attSldMax, attSldMin);
                 synths[activeSynth].setAllADSR(synths[activeSynth].preset);
 
             }
@@ -1173,7 +1176,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
-                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, attSldMax, attSldMin);
                 synths[activeSynth].setAllADSR(synths[activeSynth].preset);
             }
             
@@ -1466,7 +1469,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
-                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, attSldMax,  attSldMin);
                 synths[activeSynth].setAllADSR(synths[activeSynth].preset);
 
                 
@@ -1886,7 +1889,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[136].minX, mainInterfaceData[136].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[136].setSlider(mainInterface, value);
 
-                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, 1.5, 0.5);
+                synths[activeSynth].attackSlider = ofMap(value, 0.0, 1.0, attSldMax, attSldMin);
                 synths[activeSynth].setAllADSR(synths[activeSynth].preset);
 
             }
@@ -4744,7 +4747,7 @@ void ofApp::setNewGUI() {
     mainInterfaceData[137].setColor(synths[activeSynth].colorHue);
     mainInterfaceData[137].activateOnColor();
 
-    mainInterfaceData[136].setSlider(mainInterface, ofMap(synths[activeSynth].attackSlider, 1.5, 0.5, 0.0, 1.0));
+    mainInterfaceData[136].setSlider(mainInterface, ofMap(synths[activeSynth].attackSlider, attSldMax, attSldMin, 0.0, 1.0));
 
     //bpm buttons
     
