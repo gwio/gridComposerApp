@@ -83,7 +83,8 @@ void MusterContainer::makeBackgroundTex(){
     tempB.begin();
     ofClear(0, 0, 0,0);
     for (int i = 0; i < displayGrid.size(); i++) {
-        ofSetColor(ofColor::fromHsb(255,0,204,255));
+        //ofSetColor(ofColor::fromHsb(255,0,204,255));
+        ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
         ofDrawRectangle(displayGrid.at(i).x, displayGrid.at(i).y, rSize, rSize);
     }
     tempB.end();

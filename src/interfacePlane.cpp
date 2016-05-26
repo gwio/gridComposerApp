@@ -784,7 +784,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         lineMeshQB.push_back(tempA);
     }
     
-    while (lineMeshQA.size() > (50  / (5-pulseDiv_) ) ) {
+    while (lineMeshQA.size() > (40  / (5-pulseDiv_) ) ) {
         lineMeshQA.pop_front();
         lineMeshQB.pop_front();
     }

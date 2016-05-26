@@ -1,7 +1,7 @@
 
 #include "cube.h"
 
-#define SPEED 2.5
+#define SPEED 3.6
 
 
 Cube::Cube(){

@@ -182,7 +182,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
         
-        tempGen  = ((myTable*adsr1)+(myTable2*adsr2))*4*vol_   ;
+        tempGen  = ((myTable*adsr1)+(myTable2*adsr2))*vol_   ;
         
         
     }
@@ -217,7 +217,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //output_ = ((bellAosc*adsr1)+(bellBosc*adsr2)) * vol_;
         
-        tempGen =  ((bellAosc*adsr1)+(bellBosc*adsr2))*20*vol_  ;
+        tempGen =  ((bellAosc*adsr1)+(bellBosc*adsr2))*vol_  ;
         
     }
     
@@ -226,13 +226,13 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
 float SynthPresetManager::getPresetLfvf(int preset_) {
     float temp;
     if (preset_%count == 0) {
-        temp = 2;
+        temp = 0;
     } else if (preset_%count == 1) {
-        temp = 2;
+        temp = 0;
     } else if (preset_%count == 2) {
         temp = 4;
     } else if (preset_%count == 3) {
-        temp = 3;
+        temp = 0;
     }
     return temp;
 }

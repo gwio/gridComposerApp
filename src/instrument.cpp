@@ -63,7 +63,7 @@ Instrument::Instrument(int channel_,string id_,int gTiles_, float gSize_, float 
     
     bpmTick = 0.0;
     lastTick = 0.0;
-    tickTimes.resize(5);
+    tickTimes.resize(1);
     
     historyRows = historyRows_;
     noteHistory.resize(historyRows);

@@ -2,7 +2,7 @@
 #define TILES 5
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.055
-#define BPM (130)
+#define BPM (120)
 #define ANI_SPEED 0.025
 #define BPM_MAX 250
 #define HISTORY_ROWS 35
@@ -414,11 +414,11 @@ void ofApp::setupAudio(){
     
     
     Tonic::StereoDelay delay = Tonic::StereoDelay(0.30,0.35)
-    .delayTimeRight(0.30- (delayTime*0.001))
-    .delayTimeLeft(0.35-  (delayTime*0.001))
+    .delayTimeRight( ( delayTime*0.001*2) - (delayTime*0.001))
+    .delayTimeLeft( (delayTime*0.001*2) -  (delayTime*0.001))
     .feedback(0.125)
-    .dryLevel(0.875)
-    .wetLevel(0.125);
+    .dryLevel(0.675)
+    .wetLevel(0.325);
     
 
     //compressor
@@ -2338,12 +2338,12 @@ void ofApp::pulseEvent(int div){
             
             synths[i].bpmTick = 0.0;
             
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j < synths[i].tickTimes.size(); j++) {
                 synths[i].bpmTick+= synths[i].tickTimes.at(j);
             }
             
             
-            synths[i].bpmTick /= 5;
+            synths[i].bpmTick /= synths[i].tickTimes.size();
             
         }
     }
@@ -2551,7 +2551,7 @@ void ofApp::setupStatesAndAnimation() {
     //---___---
     
     //time mode
-    timeMatrix.rotate(-10,-1,0,0);
+    timeMatrix.rotate(-5,-1,0,0);
     
     TwoTimePathOn.addVertex(ofVec3f(0,0,0));
     TwoTimePathOn.bezierTo(ofVec3f(0,0,-(TILESIZE*TILES)/4), ofVec3f(0,(TILES*TILESIZE)/4,-(TILES*TILESIZE)/2), ofVec3f(0,-(TILESIZE*TILES)*0.75,-(TILESIZE*TILES)*0.0));
@@ -5304,7 +5304,7 @@ void ofApp::loadFromXml(string path_){
     //bpm
     settings.pushTag("BPM");
     settings.pushTag("global");
-    bpm =ofClamp(settings.getValue("value", 130), 1, 2000);
+    bpm =ofClamp(settings.getValue("value", 50), 0, 500);
     tonicSynth.setParameter("BPM", bpm*4);
     tonicSynth.setParameter("delay", bpm);
    // mainInterfaceData[38].elementName = ofToString(bpm);
