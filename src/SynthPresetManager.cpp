@@ -164,7 +164,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc sine2 = TableLookupOsc().setLookupTable(sineSynth2).freq(freq_);
         
         
-        tempGen = ((adsr1*sine) + (adsr2*sine2))*4*vol_;
+        tempGen = ((adsr1*sine) + (adsr2*sine2))*vol_;
         
     }
     //2. simple squarewave_______________________________________________
@@ -200,7 +200,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(snare2).freq(freq_);
         
         
-        tempGen  =  (snareOsc*adsr2*50)>>BPF12().cutoff(freq_).Q(9*vol_+1);
+        tempGen  =  (snareOsc*adsr2)>>BPF12().cutoff(freq_).Q(9*vol_+1);
     }
     
     

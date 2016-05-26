@@ -430,7 +430,7 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(12) >> LPF12().cutoff(8400).Q(4) >>delay );
+    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(12) >> LPF12().cutoff(8400).Q(4)  );
 }
 
 //--------------------------------------------------------------
