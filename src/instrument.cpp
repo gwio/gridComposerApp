@@ -265,8 +265,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     for( int i=0; i < cubes.getVertices().size(); i++ ) cubes.addNormal(ofPoint(0,0,0));
     //setNormals(cubes);
     
-    
- 
+   
     
     Tonic::ControlParameter rampTarget = mainTonicPtr->addParameter("mainVolumeRamp"+instrumentId).max(1.0).min(0.0);
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId, 1.0);
@@ -1206,17 +1205,15 @@ void Instrument::changePreset(bool test_) {
 void Instrument::updateTonicOut(){
     Tonic::Generator temp;
     
+   
+    
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
             temp = temp + it->second.output;
         }
     }
-    
-    
-    
-    
-    
-    instrumentOut = ( temp * outputRamp * lowFreqVolFac);
+ 
+    instrumentOut = ( temp * outputRamp ) ;
     synthHasChanged = true;
 }
 

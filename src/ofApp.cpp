@@ -4,7 +4,7 @@
 #define TILEBORDER 0.055
 #define BPM (120)
 #define ANI_SPEED 0.025
-#define BPM_MAX 250
+#define BPM_MAX 220
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
 
@@ -18,7 +18,7 @@
 #define ppPosModTempo 1.65
 
 
-#define attSldMin 0.5
+#define attSldMin 0.25
 #define attSldMax 2.0
 #define VERSION "0.98.25"
 
@@ -98,7 +98,6 @@ void ofApp::setup(){
     delayTime = tonicSynth.addParameter("delay");
     tonicSynth.setParameter("delay", bpm*0.001);
 
-    
     
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
     ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1, OF_EVENT_ORDER_AFTER_APP );
@@ -402,35 +401,27 @@ void ofApp::setupAudio(){
         temp = temp + synths[i].instrumentOut;
     }
     mainOut = temp ;
+
     
-    /*
-     Tonic::StereoDelay delay = Tonic::StereoDelay(0.07f,0.18f)
-     .delayTimeLeft( 0.7 )
-     .delayTimeRight(0.18)
-     .feedback(0.18)
-     .dryLevel(0.8)
-     .wetLevel(0.2);
-     */
-    
-    
-    Tonic::StereoDelay delay = Tonic::StereoDelay(0.30,0.35)
-    .delayTimeRight( ( delayTime*0.001*2) - (delayTime*0.001))
-    .delayTimeLeft( (delayTime*0.001*2) -  (delayTime*0.001))
-    .feedback(0.125)
-    .dryLevel(0.675)
-    .wetLevel(0.325);
-    
+  
+    Tonic::StereoDelay delay = StereoDelay(0.60,0.65)
+    .delayTimeRight( ((1.0-(delayTime/BPM_MAX))*0.35) + 0.09)
+    .delayTimeLeft(  ((1.0-(delayTime/BPM_MAX))*0.30) + 0.05)
+    .feedback( ((1.0-(delayTime/BPM_MAX))*0.45) + 0.1)
+    .dryLevel(1.0)
+    .wetLevel(0.15);
 
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
     .attack(0.0001)
-    .threshold( dBToLin(-6) )
+    .threshold( dBToLin(-30) )
     .ratio(6)
     .lookahead(0.001)
+    .makeupGain(2.5)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut)*volumeRamp) >> HPF12().cutoff(25).Q(12) >> LPF12().cutoff(8400).Q(4)  );
+    tonicSynth.setOutputGen( ((mainOut>>compressor>>delay)*volumeRamp) >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
 }
 
 //--------------------------------------------------------------
@@ -1078,12 +1069,12 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
-                bpm=ceil(value*BPM_MAX);
+                bpm=ceil(value*BPM_MAX)+20;
                 tonicSynth.setParameter("BPM",bpm*4);
                 tonicSynth.setParameter("delay", bpm);
                 //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
-                
+                cout << bpm << endl;
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
                 }
@@ -1525,7 +1516,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
-                bpm=ceil(value*BPM_MAX);
+                bpm=ceil(value*BPM_MAX)+20;
                 tonicSynth.setParameter("BPM",bpm*4);
                 tonicSynth.setParameter("delay", bpm);
                // mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
@@ -3482,7 +3473,7 @@ void ofApp::bpmInterfaceOn() {
     mainInterfaceData[38].moveDir = 1;
     mainInterfaceData[38].showString = false;
     
-    mainInterfaceData[45].sliderPct = ofMap( bpm, 0,BPM_MAX,-1.0,1.0);
+    mainInterfaceData[45].sliderPct = ofMap( bpm, 20,BPM_MAX+20,-1.0,1.0);
     mainInterfaceData[45].animation = true;
     mainInterfaceData[45].moveDir = 1;
     mainInterfaceData[45].showString = false;
