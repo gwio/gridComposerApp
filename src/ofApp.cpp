@@ -96,7 +96,7 @@ void ofApp::setup(){
     
   
     delayTime = tonicSynth.addParameter("delay");
-    tonicSynth.setParameter("delay", bpm*0.001);
+    tonicSynth.setParameter("delay", bpm);
 
     
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
@@ -402,26 +402,35 @@ void ofApp::setupAudio(){
     }
     mainOut = temp ;
 
-    
-  
     Tonic::StereoDelay delay = StereoDelay(0.60,0.65)
-    .delayTimeRight( ((1.0-(delayTime/BPM_MAX))*0.35) + 0.09)
-    .delayTimeLeft(  ((1.0-(delayTime/BPM_MAX))*0.30) + 0.05)
-    .feedback( ((1.0-(delayTime/BPM_MAX))*0.45) + 0.1)
+    .delayTimeRight(((1.0-(delayTime/(BPM_MAX+22)))*0.25)*1.125 )
+    .delayTimeLeft( ((1.0-(delayTime/(BPM_MAX+22)))*0.25) )
+    .feedback( ((1.0-(delayTime/(BPM_MAX+22)))*0.45) + 0.1)
     .dryLevel(1.0)
     .wetLevel(0.15);
+    
+    Tonic::Reverb rev = Reverb()
+    .decayTime(((1.0-(delayTime/(BPM_MAX+22)))*4.0)+1)
+    .preDelayTime(((1.0-(delayTime/(BPM_MAX+22)))*0.15))
+    .roomShape(0.125)
+    .roomSize(0.85)
+    //.inputLPFCutoff(7000)
+    .dryLevel(0.95)
+    .wetLevel(0.15)
+    .density(0.5)
+    .stereoWidth(1.0);
 
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
     .attack(0.0001)
     .threshold( dBToLin(-30) )
-    .ratio(6)
+    .ratio(4)
     .lookahead(0.001)
     .makeupGain(2.5)
     .bypass(false);
     
-    tonicSynth.setOutputGen( ((mainOut>>compressor>>delay)*volumeRamp) >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+    tonicSynth.setOutputGen( ((mainOut >>compressor >>rev)*volumeRamp)>> LPF24().cutoff(7500).Q(0.15)  );
 }
 
 //--------------------------------------------------------------
