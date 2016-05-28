@@ -9,7 +9,7 @@ SynthPresetManager::SynthPresetManager() {
     
     //sampleTable
     
-    int tableSize =2049;
+    int tableSize =4097;
     
     //basic-noise
     tableNoiseSimple = SampleTable(tableSize,1);
