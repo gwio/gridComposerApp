@@ -87,7 +87,7 @@ SynthPresetManager::SynthPresetManager() {
         TonicFloat sawA = 0;
         TonicFloat sawB = 0;
         
-        sawA =  (  ((((i*norm)*2-1))* abs(sinf(phase*4)))  + (sinf(phase)*0.35) + (sinf(phase*6)*0.15)  + (*(tableNoiseSimple.dataPointer()+i)*0.045)) * 1.85 ;
+        sawA =  (  ((((i*norm)*2-1))* abs(sinf(phase*2)))  + (sinf(phase)*0.35) + (sinf(phase*6)*0.15)  + (*(tableNoiseSimple.dataPointer()+i)*0.045)) * 1.85 ;
         *tableSawData++ = sawA;
         
         
@@ -281,7 +281,7 @@ float SynthPresetManager::getPresetAttack(int preset_){
     } else if (preset_%count == 1) {
         att = 0.1;
     } else if (preset_%count == 2) {
-        att = 0.065;
+        att = 0.085;
     } else if (preset_%count == 3) {
         att = 0.065;
     }
