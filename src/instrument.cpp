@@ -333,10 +333,11 @@ void Instrument::addCube(int x_, int y_){
 void Instrument::removeCube(int x_, int y_){
     layerInfo.at(x_).at(y_).hasCube = false;
     cubeGroup *tPtr = &  soundsMap[layerInfo.at(x_).at(y_).cubeGroupId];
-    
+    midiOutPtr->sendNoteOff(channel,tPtr->groupNote,0);
+
     tPtr->size--;
     if (tPtr->size < 1) {
-        midiOutPtr->sendNoteOff(channel,soundsMap.at(layerInfo.at(x_).at(y_).cubeGroupId).groupNote-keyNote,0);
+        midiOutPtr->sendNoteOff(channel,tPtr->groupNote,0);
         soundsMap.erase(layerInfo.at(x_).at(y_).cubeGroupId);
         //reallocate all synths to mainout
         updateTonicOut();
@@ -555,7 +556,7 @@ void Instrument::noteTriggerWest(){
                 it->second.groupSynth.setParameter("trigger",0);
                 midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
-                float rampTarget = 1-powf(1-(float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles)),2) ;
+                float rampTarget = float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles) ;
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
@@ -618,7 +619,7 @@ void Instrument::noteTriggerNorth() {
                 it->second.groupSynth.setParameter("trigger",0);
                 midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
-                float rampTarget = 1-powf(1-(float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
+                float rampTarget = float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
@@ -681,7 +682,7 @@ void Instrument::noteTriggerEast() {
                 it->second.groupSynth.setParameter("trigger",0);
                 midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
-                float rampTarget = 1-powf(1-(float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles)),2);
+                float rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
@@ -742,7 +743,7 @@ void Instrument::noteTriggerSouth() {
                 it->second.groupSynth.setParameter("trigger",0);
                 midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
             } else {
-                float rampTarget =1-powf(1-(float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles)),2);
+                float rampTarget =float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
@@ -951,7 +952,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 //check for max,min, x,y
                                 updateGroupInfo(soundMapIndex, x, y);
                                 if (aPtr->size < 1) {
-                                    midiOutPtr->sendNoteOff(channel,soundsMap.at(neighbours[i]).groupNote-keyNote,0);
+                                    midiOutPtr->sendNoteOff(channel,soundsMap.at(neighbours[i]).groupNote,0);
                                     soundsMap.erase(neighbours[i]);
                                     cout << "remove " << neighbours[i] << " from soundsmap in updateSoundINfo" << endl;
                                     updateTonicOut();
@@ -970,8 +971,11 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
 
 void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) {
     
+
     int minusCouter = 0;
     cubeGroup *cgPtr = &soundsMap[group_];
+    
+
     vector<ofVec2f> tempPosis;
     tempPosis.clear();
     bool breakTest = false;
@@ -983,10 +987,12 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
                 layerInfo.at(x).at(y).cubeGroupId = 0;
                 cgPtr->size--;
                 tempPosis.push_back(ofVec2f(x,y));
-                
+                midiOutPtr->sendNoteOff(channel,cgPtr->groupNote,0);
+
                 
                 if (cgPtr->size < 1) {
-                    midiOutPtr->sendNoteOff(channel,soundsMap.at(group_).groupNote-keyNote,0);
+                    midiOutPtr->sendNoteOff(channel,cgPtr->groupNote,0);
+
                     soundsMap.erase(group_);
                     cout << "remove " << group_ << " from soundsmap in resetcubegroup" << endl;
 
@@ -1259,7 +1265,8 @@ void Instrument::applyNewScale(){
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
-            
+            midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
+
             it->second.scalePos = getRandomNote();
             it->second.groupNote = scaleNoteSteps[it->second.scalePos] + keyNote;
           
@@ -1300,6 +1307,8 @@ void Instrument::makeScaleStep(int dir_){
     
     for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
         if(it->second.size > 0){
+            midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
+
             it->second.scalePos = it->second.scalePos+dir_;
             if(it->second.scalePos < 0){
                 it->second.scalePos = scaleNoteSteps.size()-1;
@@ -1321,7 +1330,7 @@ void Instrument::setKeyNote(int keyNote_) {
         //cout << keyNote << endl;
         for (map<unsigned long,cubeGroup>::iterator it=soundsMap.begin(); it!=soundsMap.end(); ++it){
             if(it->second.size > 0){
-                midiOutPtr->sendNoteOff(channel, it->second.groupNote-keyNote,0);
+                midiOutPtr->sendNoteOff(channel, it->second.groupNote,0);
 
                 it->second.groupNote+=change;
                 it->second.groupSynth.setParameter("rampFreqTarget", Tonic::mtof(it->second.groupNote ));

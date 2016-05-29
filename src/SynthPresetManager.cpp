@@ -166,7 +166,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc sine2 = TableLookupOsc().setLookupTable(sineSynth2).freq(freq_);
         
         
-        tempGen = ((adsr1*sine) + (adsr2*sine2))*vol_*0.0325;
+        tempGen = ((adsr1*sine) + (adsr2*sine2))*vol_*0.03;
         
     }
    
