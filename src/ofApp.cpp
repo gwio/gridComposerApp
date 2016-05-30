@@ -739,6 +739,27 @@ void ofApp::updateInterfaceMesh() {
     }
 
     saveManager.animateGrid(tweenFloat);
+    
+    interfaceDraw.clear();
+    int indexCounter = 0;
+    for (int i = 0; i < mainInterfaceData.size(); i++) {
+        if ((mainInterfaceData[i].drawStringPos.x >= (-mainInterfaceData[i].elementSize.x/2) &&  mainInterfaceData[i].drawStringPos.x <= ((designGrid[0][0].x*6)+(mainInterfaceData[i].elementSize.x/2) )) &&
+            mainInterfaceData[i].drawStringPos.y >= (0-mainInterfaceData[i].elementSize.y/2) &&  mainInterfaceData[i].drawStringPos.y <= ((designGrid[0][0].y*6)+(mainInterfaceData[i].elementSize.y/2) )) {
+            
+            for (int j = 0; j < 4; j++){
+                interfaceDraw.addVertex(mainInterface.getVertex((i*4)+j));
+                interfaceDraw.addColor(mainInterface.getColor((i*4)+j));
+
+            }
+            
+            for (int j = 0; j < 6; j++) {
+                interfaceDraw.addIndex(mainInterfaceData.at(i).index[j]+(4*indexCounter));
+            }
+            
+            indexCounter++;
+        }
+        
+    }
 }
 
 //--------------------------------------------------------------
@@ -793,7 +814,8 @@ void ofApp::draw(){
 }
 
 void ofApp::drawInterface(){
-    mainInterface.draw();
+    //mainInterface.draw();
+    interfaceDraw.draw();
     
     if ( (currentState == STATE_HARMONY) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         hvSlotA.draw();
@@ -3020,6 +3042,8 @@ void ofApp::setupGlobalInterface() {
 
 
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
+    interfaceDraw.clear();
+    interfaceDraw.setMode(OF_PRIMITIVE_TRIANGLES);
     
     for (int i = 0; i < mainInterfaceData.size(); i++) {
         

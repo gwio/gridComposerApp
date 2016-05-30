@@ -322,4 +322,6 @@ class ofApp : public ofxiOSApp{
         void setupFonts();
         void setupMidi();
         ofxMidiOut midiOut;
+        
+        ofVboMesh interfaceDraw;
     };
