@@ -40,6 +40,8 @@ struct cubeGroup {
     int lowY, highY;
     int groupNote;
     int scalePos;
+    bool midiPlaying;
+    int midiNote;
     
     vector< int> y_in_x_elements;
     vector< int> x_in_y_elements;
