@@ -71,7 +71,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     pulseColorA = ofColor::fromHsb(0, 0, 255,255);
     pulseColorC = ofColor::fromHsb(0, 0, 255,255);
 
-    
+    flipCounter = 0;
     
     setupMeshes(connected_, active_);
     
@@ -776,7 +776,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     tempA.z = 18 + meshZ - (18*thisScale) + 1;
     ofVec3f tempB = ofVec3f(-4,0,0) * posNode.getGlobalTransformMatrix();
     tempB.z = 18 + meshZ - (18*thisScale) + 1;
-    if (trailMesh){
+    if (flipCounter%2==0){
     lineMeshQA.push_back(tempA);
     lineMeshQB.push_back(tempB);
     }else {
@@ -873,8 +873,5 @@ void InterfacePlane::pulseDir(int dir_) {
     
 }
 
-void InterfacePlane::flipTrailMesh(){
-    trailMesh = !trailMesh;
-    
-}
+
 

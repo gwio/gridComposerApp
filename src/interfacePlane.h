@@ -94,13 +94,12 @@ class InterfacePlane {
     ofColor tempC;
     ofVec3f tempVec;
     
-    bool trailMesh;
-    void flipTrailMesh();
     ofColor trailColor;
     
     float positionMod, scaleMod;
     float positionModDef, positionModTar, scaleModDef, scaleModTar;
     int linePowMod;
     float thisScale;
+    int flipCounter;
 };
 

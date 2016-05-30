@@ -490,7 +490,7 @@ void Instrument::nextDirection() {
     if( scanDirection >= 0) {
         pulsePlane.pulseDir(scanDirection);
         pulsePlane.barCounter++;
-        pulsePlane.flipTrailMesh();
+        pulsePlane.flipCounter++;
 
     }
     
