@@ -74,7 +74,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         string xmlKeyDay = tempXml.year+tempXml.month+tempXml.day;
         
         // tempXml.slotInfo.thumb.allocate(designGrid.x,designGrid.y,OF_IMAGE_COLOR_ALPHA);
-     cout << tempXml.slotInfo.thumb.load(saveDir.getAbsolutePath()+"/"+xmlKeyDay+"#"+ofToString(tempXml.number)+".png") << endl;
+        cout << tempXml.slotInfo.thumb.load(saveDir.getAbsolutePath()+"/"+xmlKeyDay+"#"+ofToString(tempXml.number)+".png") << endl;
         
         xmlSavesMap[xmlKeyDay][tempXml.number] = tempXml;
     }
@@ -128,7 +128,7 @@ void SaveLoad::checkDate(){
 
 void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     xmlSave tempXml;
-   
+    
     xml_.pushTag("date");
     
     tempXml.year = xml_.getValue("year", "");
@@ -137,7 +137,7 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     tempXml.number = xml_.getValue("number", 1);
     tempXml.hour = xml_.getValue("hour", "");
     
-xml_.popTag();
+    xml_.popTag();
     string xmlKey = tempXml.year+tempXml.month+tempXml.day;
     
     tempXml.slotInfo.thumb = makePng(xml_, xmlKey+"#"+ofToString(tempXml.number),slotSize);
@@ -176,7 +176,7 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
         ofColor tc = ofColor::fromHsb(xml_.getValue("cHue", 0), 235, 180, 255);
         
         ofSetColor(colorDef);
-         glLineWidth(2);
+        glLineWidth(2);
         //  ofDrawLine(0, slotSize_.y-offset, slotSize_.x, slotSize_.y-offset);
         ofFill();
         ofDrawRectangle(offset*i,0, rSize*5,rSize*5);
@@ -249,8 +249,8 @@ void SaveLoad::updatePosition(){
         datePosVec.push_back(diTemp);
     }
     
-    saveDir.listDir();
-    cout << "new sizue" << saveDir.size() << endl;
+    //saveDir.listDir();
+    //cout << "new sizue" << saveDir.size() << endl;
     
 }
 void SaveLoad::setup(float fs_, float fd_, float fb_,ofVec3f dGrid_,
@@ -296,10 +296,10 @@ void SaveLoad::update(){
     } else {
         velo = 0.0;
     }
-
+    
     
     updateHighlightVertices();
-
+    
     
 }
 
@@ -322,11 +322,11 @@ void SaveLoad::draw(){
                 //ofDrawRectangle(innerIt->second.slotInfo.testRect);
                 //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 //ofFill();
-               // ofSetColor(ofColor::fromHsb(255,0,204,255));
+                // ofSetColor(ofColor::fromHsb(255,0,204,255));
                 ofSetColor(innerIt->second.slotInfo.displayC);
-                  fsPtrSemi->draw(innerIt->second.slotInfo.name, fontDefault*1.4,
-                                  innerIt->second.slotInfo.testRect.position.x-(fsPtrSemi->getBBox(innerIt->second.slotInfo.name, fontDefault*1.4, 0, 0).width)-(rSize*1.5),
-                                  innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-2);
+                fsPtrSemi->draw(innerIt->second.slotInfo.name, fontDefault*1.4,
+                                innerIt->second.slotInfo.testRect.position.x-(fsPtrSemi->getBBox(innerIt->second.slotInfo.name, fontDefault*1.4, 0, 0).width)-(rSize*1.5),
+                                innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-2);
                 //    float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 //    ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 //    fsPtrLight->draw(innerIt->second.hour, fontBig,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
@@ -347,22 +347,26 @@ void SaveLoad::isInside(ofVec3f pos_) {
     int counter = 0;
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
-            if(innerIt->second.slotInfo.testRect.inside(pos_+ofVec3f(0,-scrollLocation,0))){
-                cout << innerIt->second.slotInfo.name << endl;
-                innerIt->second.slotInfo.active = true;
-                animate = true;
-                datePosVec.at(counter).active = true;
-                breaking = true;
-                
-                selectOuterIt = outerIt;
-                selectInnerIt = innerIt;
-                
-                loadString = saveDir.getAbsolutePath()+"/"+selectInnerIt->second.year+selectInnerIt->second.month+selectInnerIt->second.day+"#"+ofToString(selectInnerIt->second.number)+".xml";
-
-                xmlTemp.clear();
-                xmlTemp.load(loadString);
-                
-                break;
+            float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
+            if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*7) {
+                if(innerIt->second.slotInfo.testRect.inside(pos_+ofVec3f(0,-scrollLocation,0))){
+                    
+                    cout << innerIt->second.slotInfo.name << endl;
+                    innerIt->second.slotInfo.active = true;
+                    animate = true;
+                    datePosVec.at(counter).active = true;
+                    breaking = true;
+                    
+                    selectOuterIt = outerIt;
+                    selectInnerIt = innerIt;
+                    
+                    loadString = saveDir.getAbsolutePath()+"/"+selectInnerIt->second.year+selectInnerIt->second.month+selectInnerIt->second.day+"#"+ofToString(selectInnerIt->second.number)+".xml";
+                    
+                    xmlTemp.clear();
+                    xmlTemp.load(loadString);
+                    
+                    break;
+                }
             }
         }
         counter++;
@@ -395,12 +399,19 @@ void SaveLoad::isInside(ofVec3f pos_) {
 void SaveLoad::deleteSave(){
     ofFile temp;
     cout << saveDir.getAbsolutePath()+"/"+selectInnerIt->second.year+selectInnerIt->second.month+selectInnerIt->second.day+"#"+ofToString(selectInnerIt->second.number)+".xml" << endl;
-    
+    //remove xml
     temp.open(saveDir.getAbsolutePath()+"/"+
               selectInnerIt->second.year+selectInnerIt->second.month+
               selectInnerIt->second.day+"#"+
               ofToString(selectInnerIt->second.number)+".xml");
     temp.remove();
+    //remove png
+    temp.open(saveDir.getAbsolutePath()+"/"+
+              selectInnerIt->second.year+selectInnerIt->second.month+
+              selectInnerIt->second.day+"#"+
+              ofToString(selectInnerIt->second.number)+".png");
+    temp.remove();
+
     selectOuterIt->second.erase(selectInnerIt);
     if(selectOuterIt->second.size() == 0){
         xmlSavesMap.erase(selectOuterIt->first);
@@ -476,14 +487,14 @@ void SaveLoad::updateHighlightVertices(){
                 temp.y += slotSize.y-rSize;
                 temp.x -= rSize+(rSize/2);
                 /*
-                highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
-                highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,highlightLine,0));
-                highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,0,0));
-                
-                highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,0,0));
-                highlight.addVertex(temp+ofVec3f(0,0,0));
-                highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
-                */
+                 highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
+                 highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,highlightLine,0));
+                 highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,0,0));
+                 
+                 highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,0,0));
+                 highlight.addVertex(temp+ofVec3f(0,0,0));
+                 highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
+                 */
                 highlight.addVertex(temp+ofVec3f(0,0,0));
                 highlight.addVertex(temp+ofVec3f(0,-rSize*5,0));
                 highlight.addVertex(temp+ofVec3f(rSize/2,-rSize*5,0));
@@ -491,7 +502,7 @@ void SaveLoad::updateHighlightVertices(){
                 highlight.addVertex(temp+ofVec3f(rSize/2,-rSize*5,0));
                 highlight.addVertex(temp+ofVec3f(rSize/2,0,0));
                 highlight.addVertex(temp+ofVec3f(0,0,0));
-
+                
                 for (int i = 0; i < 6; i++) {
                     highlight.addColor(slot.displayC);
                 }
@@ -510,7 +521,7 @@ void SaveLoad::updateHighlightVertices(){
                     }
                 }
                 
-               
+                
                 
                 
             }
@@ -521,15 +532,15 @@ void SaveLoad::updateHighlightVertices(){
 void SaveLoad::cycleHighlightColor(){
     
     saveSlot &slot = selectInnerIt->second.slotInfo;
-
+    
     slot.highlight = (slot.highlight+1)%5;
     
-  xmlTemp.pushTag("date");
-   xmlTemp.setValue("highlight", slot.highlight);
-   xmlTemp.popTag();
-   
+    xmlTemp.pushTag("date");
+    xmlTemp.setValue("highlight", slot.highlight);
+    xmlTemp.popTag();
     
-   xmlTemp.save(loadString);
+    
+    xmlTemp.save(loadString);
     
     if(slot.highlight == 0){
         slot.targetC = colorDef;

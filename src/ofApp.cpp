@@ -40,6 +40,7 @@ void ofApp::setup(){
     ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
 #else
     setSampleRate(44100);
     ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
@@ -2110,6 +2111,9 @@ void ofApp::lostFocus(){
     
     //    mainVol = 0.0;
     
+    for (int i = 0; i < 3; i++){
+        synths[i].setAllNotesOff();
+    }
     cout << "lost focus"  << endl;
 }
 
@@ -5266,13 +5270,14 @@ void ofApp::loadFromXml(string path_){
         
         settings.pushTag("Version");
         //dont load old xmlsettings
+        /*
         if (ofToString( settings.getValue("number", "") ) != appVersion) {
             cout << "old xml settings" << endl;
             settings.loadFile("settingsDefault.xml");
         } else {
             settings.popTag();
         }
-        
+        */
     }else if (settings.loadFile("settingsDefault.xml")) {
         cout << "loadDefault" << endl;
     }
