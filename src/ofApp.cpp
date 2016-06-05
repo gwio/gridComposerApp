@@ -91,24 +91,26 @@ void ofApp::setup(){
     bpmpara = tonicSynth.addParameter("BPM");
     tonicSynth.setParameter("BPM", bpm*4);
     ControlGenerator pulse = ControlMetro().bpm(bpmpara);
+    ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara/4*3);
+
     ControlMetroDivider pulseDiv2 = ControlMetroDivider().divisions(2).input(pulse);
-    ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
+    //ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
     ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(4).input(pulse);
     
   
     delayTime = tonicSynth.addParameter("delay");
     tonicSynth.setParameter("delay", bpm);
 
-    
+    // 1/4   -> x4
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
     ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1, OF_EVENT_ORDER_AFTER_APP );
-    
-    ofEvent<float>* pulseEventDiv2 = tonicSynth.createOFEvent(pulseDiv2);
+    //triad -> x3
+    ofEvent<float>* pulseEventDiv2 = tonicSynth.createOFEvent(pulseTriad);
     ofAddListener(*pulseEventDiv2, this, &ofApp::pulseEventDiv2, OF_EVENT_ORDER_AFTER_APP );
-    
-    ofEvent<float>* pulseEventDiv3 = tonicSynth.createOFEvent(pulseDiv3);
+    //2/4 -> x2
+    ofEvent<float>* pulseEventDiv3 = tonicSynth.createOFEvent(pulseDiv2);
     ofAddListener(*pulseEventDiv3, this, &ofApp::pulseEventDiv3, OF_EVENT_ORDER_AFTER_APP );
-    
+    // 4/4 -> x1
     ofEvent<float>* pulseEventDiv4= tonicSynth.createOFEvent(pulseDiv4);
     ofAddListener(*pulseEventDiv4, this, &ofApp::pulseEventDiv4, OF_EVENT_ORDER_AFTER_APP );
     
