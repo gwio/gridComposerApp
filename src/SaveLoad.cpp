@@ -217,13 +217,13 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
 }
 
 void SaveLoad::updatePosition(){
-    float slotOffset = 0.666;
+    float slotOffset = 0.333;
     int counterOut = 0;
     int counterIn = 0;
-    offsetDown = ofVec3f(0,+designGrid.y*1.333,0);
+    offsetDown = ofVec3f(0,designGrid.y,0);
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         counterIn = 0;
-        offsetDown.y += ((((outerIt->second.size()-1)/3))* (slotSize.y+slotSize.y*slotOffset)  );
+        offsetDown.y += ((((outerIt->second.size()-1)/3))*(slotSize.y+(slotSize.y*slotOffset))  );
         xmlSave& xmlName = outerIt->second.begin()->second;
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             saveSlot& slot = innerIt->second.slotInfo;
@@ -240,10 +240,10 @@ void SaveLoad::updatePosition(){
             slot.pos+=ofVec3f(counterIn%3* (designGrid.x*4*0.133),  0,0);
             
             slot.testRect.set((int)slot.pos.x, (int)slot.pos.y, slotSize.x, slotSize.y);
-            slot.name =ofToString(innerIt->second.number)+"  ";
+            slot.name =ofToString(innerIt->second.number);
             counterIn++;
         }
-        offsetDown.y +=  (slotSize.y+slotSize.y*slotOffset)*2;
+        offsetDown.y +=  designGrid.y+ (slotSize.y+(slotSize.y*slotOffset));
         
         if( datePosVec.size() != counterOut+1 ){
         dateInfo diTemp;
@@ -252,8 +252,8 @@ void SaveLoad::updatePosition(){
         
        // string tempName = getDateString(xmlName.year,xmlName.month,xmlName.day);
 
-        datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).width
-                                                       , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(slotSize.y*0.666)
+        datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).width-rSize
+                                                       , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).height/2)
                                                        ,0);
         datePosVec.at(counterOut).displayPos =  datePosVec.at(counterOut).defaultPos;
         counterOut++;
@@ -338,8 +338,8 @@ void SaveLoad::draw(){
                 //ofFill();
                  //ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 ofSetColor(innerIt->second.slotInfo.displayC);
-                fsPtrBold->draw(innerIt->second.slotInfo.name, fontDefault*1.125,
-                                innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.125, 0, 0).width)-(rSize),
+                fsPtrBold->draw(innerIt->second.slotInfo.name, fontDefault*1.25,
+                                innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.25, 0, 0).width)-(rSize*2.5),
                                 innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-1);
                 //    float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 //    ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
@@ -400,7 +400,7 @@ void SaveLoad::isInside(ofVec3f pos_) {
                     slot.offPos = ofVec3f(designGrid.x*3,designGrid.y*3,0)
                     -(slotSize/2)
                     -(slot.pos+ofVec3f(0,scrollLocation,0))
-                    +ofVec3f( (fsPtrSemi->getBBox(slot.name, fontDefault*1.4, 0, 0).width/2),0,0);
+                    +ofVec3f( (fsPtrSemi->getBBox(slot.name, fontDefault*1.25, 0, 0).width/2)+(rSize*1.5),0,0);
                 }
             }
                             datePosVec.at(counter).offPos = getOffPos(pos_, datePosVec.at(counter).defaultPos);
