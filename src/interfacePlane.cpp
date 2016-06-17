@@ -55,7 +55,7 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     
     tileSize = tileSize_;
     
-    posNode.setPosition(0, 0, 0);
+    //posNode.setPosition(0, 0, 0);
     
     gridSize = (tileSize*tiles)*0.5+10;
     
@@ -76,6 +76,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     setupMeshes(connected_, active_);
     
 }
+
+
 
 void InterfacePlane::setColor(float hue_){
     connected = ofColor::fromHsb(hue_, 235, 230,200);
@@ -625,6 +627,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     transformButton(connected_, active_, globalState_);
     blinkP();
     
+    ofNode tempNode;
     if (!pause_) {
         
         thisTime = (ofGetElapsedTimeMillis()- lastTick) ;
@@ -636,127 +639,8 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
             len =ofMap( fmod(thisTime, tickTime_ ), 0.0  , tickTime_ , 0.0, 1.0);
         }
         
-        
-        alphaPart = TWO_PI/((tiles+1)*4);
-        
-        pctBar = ofMap(stepper+len, 0, tiles+1, 0.0, 1.0);
-        
-        ofMatrix4x4 aaa;
-        
-        
-        
-        if (nextDirs[1] && nextDirs[0]) {
-            alpha = ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI) + scanDir_*HALF_PI;
-            alpha -= HALF_PI;
-            alpha += len*alphaPart;
-            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+scanDir_*HALF_PI, 0, 0, 1);
-            linePowMod = 3;
-            if(connected_[scanDir]){
-                if (connected_[(scanDir+1)%4]){
-                    trailColor = connected;
-                } else if(active_[(scanDir+1)%4]){
-                    trailColor = connected.getLerped(active, pctBar);
-                }
-            } else if(active_[scanDir]){
-                if(connected_[(scanDir+1)%4]){
-                    trailColor = active.getLerped(connected, pctBar);
-                } else if(active_[(scanDir+1)%4]){
-                    trailColor = active;
-                }
-            }
-           
-        }else if (!nextDirs[1]){
-            if(nextDirs[2]) {
-                linePowMod = 5;
-                alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
-                alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI);
-                alpha -= HALF_PI;
-                alpha+= len*(alphaPart*2);
-                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+(HALF_PI*pctBar), 0, 0, 1) ;
-                
-                if(connected_[scanDir]){
-                    if (connected_[(scanDir+2)%4]){
-                        trailColor = connected;
-                    } else if(active_[(scanDir+2)%4]){
-                        trailColor = connected.getLerped(active, pctBar);
-                    }
-                } else if(active_[scanDir]){
-                    if(connected_[(scanDir+2)%4]){
-                        trailColor = active.getLerped(connected, pctBar);
-                    } else if(active_[(scanDir+2)%4]){
-                        trailColor = active;
-                    }
-                }
-                
-            } else if (nextDirs[3]) {
-                linePowMod = 10;
-                alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
-                alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*2;
-                alpha -= HALF_PI;
-                alpha+= len*(alphaPart*3);
-                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*2), 0, 0, 1);
-                
-                if(connected_[scanDir]){
-                    if (connected_[(scanDir+3)%4]){
-                        trailColor = connected;
-                    } else if(active_[(scanDir+3)%4]){
-                        trailColor = connected.getLerped(active, pctBar);
-                    }
-                } else if(active_[scanDir]){
-                    if(connected_[(scanDir+3)%4]){
-                        trailColor = active.getLerped(connected, pctBar);
-                    } else if(active_[(scanDir+3)%4]){
-                        trailColor = active;
-                    }
-                }
-                
-            } else {
-                linePowMod = 18;
-                alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
-                alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*3;
-                alpha -= HALF_PI;
-                alpha+= len*(alphaPart*4);
-                aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*3), 0, 0, 1);
-                
-                if(connected_[scanDir]){
-                    if (connected_[(scanDir+4)%4]){
-                        trailColor = connected;
-                    } else if(active_[(scanDir+4)%4]){
-                        trailColor = connected.getLerped(active, pctBar);
-                    }
-                } else if(active_[scanDir]){
-                    if(connected_[(scanDir+4)%4]){
-                        trailColor = active.getLerped(connected, pctBar);
-                    } else if(active_[(scanDir+4)%4]){
-                        trailColor = active;
-                    }
-                }
-            }
-            
-        }
-        
-        
-        alphaPos = ofVec3f(sin(alpha)*gridSize*(1.3 +( (scaleMod-1.0)*0.4 )), cos(alpha)*gridSize*(1.3  +( (scaleMod-1.0)*0.4)),0 );
-        
-        
-        float pctScale = ofMap(stepCounter+len,0, (tiles+1)*4,0.0,TWO_PI*2);
-        
-        
-        pulseRot.setRotate(aaa.getRotate().inverse());
-        
-        posNode.setOrientation(pulseRot.getRotate());
-        
-        posNode.setPosition(alphaPos);
-        
-        float scalePct = (abs(sin(pctScale-(HALF_PI*1.3333)))*1);
-         thisScale =  ofClamp(pow(scalePct, linePowMod),0.0,1.0);
-        
-        linePct = ofClamp(ofMap(pctBar, 0.0, 1.0, 0.0, (1.0+(1/tiles))), 0.0, 1.0);
-        
-        
-        posNode.setPosition( posNode.getPosition()*((-thisScale*0.18*positionMod)+1.0)) ;
-        posNode.setScale( (thisScale*1.25*scaleMod) +0.45 );
-        
+        tempNode = getRotNode(stepper, len, scanDir_, connected_, active_);
+
         //cout << linePct << endl;
      
         
@@ -771,10 +655,11 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         meshZ = 0;
     }
     
+    
     //linemesh
-    ofVec3f tempA = ofVec3f(4,0,0) * posNode.getGlobalTransformMatrix();
+    ofVec3f tempA = ofVec3f(4,0,0) * tempNode.getGlobalTransformMatrix();
     tempA.z = 18 + meshZ - (18*thisScale) + 1;
-    ofVec3f tempB = ofVec3f(-4,0,0) * posNode.getGlobalTransformMatrix();
+    ofVec3f tempB = ofVec3f(-4,0,0) * tempNode.getGlobalTransformMatrix();
     tempB.z = 18 + meshZ - (18*thisScale) + 1;
     if (flipCounter%2==0){
     lineMeshQA.push_back(tempA);
@@ -809,13 +694,142 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     
 }
 
+ofNode InterfacePlane::getRotNode(int& stepper, float& len, int& scanDir_ , bool connected_[],bool active_[]){
+    
+   
+    
+    alphaPart = TWO_PI/((tiles+1)*4);
+    
+    pctBar = ofMap(stepper+len, 0, tiles+1, 0.0, 1.0);
+    
+    ofMatrix4x4 aaa;
+    
+    
+    
+    if (nextDirs[1] && nextDirs[0]) {
+        alpha = ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI) + scanDir_*HALF_PI;
+        alpha -= HALF_PI;
+        alpha += len*alphaPart;
+        aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+scanDir_*HALF_PI, 0, 0, 1);
+        linePowMod = 3;
+        if(connected_[scanDir]){
+            if (connected_[(scanDir+1)%4]){
+                trailColor = connected;
+            } else if(active_[(scanDir+1)%4]){
+                trailColor = connected.getLerped(active, pctBar);
+            }
+        } else if(active_[scanDir]){
+            if(connected_[(scanDir+1)%4]){
+                trailColor = active.getLerped(connected, pctBar);
+            } else if(active_[(scanDir+1)%4]){
+                trailColor = active;
+            }
+        }
+        
+    }else if (!nextDirs[1]){
+        if(nextDirs[2]) {
+            linePowMod = 5;
+            alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
+            alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI);
+            alpha -= HALF_PI;
+            alpha+= len*(alphaPart*2);
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+(HALF_PI*pctBar), 0, 0, 1) ;
+            
+            if(connected_[scanDir]){
+                if (connected_[(scanDir+2)%4]){
+                    trailColor = connected;
+                } else if(active_[(scanDir+2)%4]){
+                    trailColor = connected.getLerped(active, pctBar);
+                }
+            } else if(active_[scanDir]){
+                if(connected_[(scanDir+2)%4]){
+                    trailColor = active.getLerped(connected, pctBar);
+                } else if(active_[(scanDir+2)%4]){
+                    trailColor = active;
+                }
+            }
+            
+        } else if (nextDirs[3]) {
+            linePowMod = 10;
+            alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
+            alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*2;
+            alpha -= HALF_PI;
+            alpha+= len*(alphaPart*3);
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*2), 0, 0, 1);
+            
+            if(connected_[scanDir]){
+                if (connected_[(scanDir+3)%4]){
+                    trailColor = connected;
+                } else if(active_[(scanDir+3)%4]){
+                    trailColor = connected.getLerped(active, pctBar);
+                }
+            } else if(active_[scanDir]){
+                if(connected_[(scanDir+3)%4]){
+                    trailColor = active.getLerped(connected, pctBar);
+                } else if(active_[(scanDir+3)%4]){
+                    trailColor = active;
+                }
+            }
+            
+        } else {
+            linePowMod = 18;
+            alpha =   ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)  + scanDir_*HALF_PI;
+            alpha += ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI)*3;
+            alpha -= HALF_PI;
+            alpha+= len*(alphaPart*4);
+            aaa.rotateRad(ofLerp(0.0, PI+HALF_PI,pctBar)+(scanDir_*HALF_PI)+((HALF_PI*pctBar)*3), 0, 0, 1);
+            
+            if(connected_[scanDir]){
+                if (connected_[(scanDir+4)%4]){
+                    trailColor = connected;
+                } else if(active_[(scanDir+4)%4]){
+                    trailColor = connected.getLerped(active, pctBar);
+                }
+            } else if(active_[scanDir]){
+                if(connected_[(scanDir+4)%4]){
+                    trailColor = active.getLerped(connected, pctBar);
+                } else if(active_[(scanDir+4)%4]){
+                    trailColor = active;
+                }
+            }
+        }
+        
+    }
+    
+    
+    alphaPos = ofVec3f(sin(alpha)*gridSize*(1.3 +( (scaleMod-1.0)*0.4 )), cos(alpha)*gridSize*(1.3  +( (scaleMod-1.0)*0.4)),0 );
+    
+    
+    float pctScale = ofMap(stepCounter+len,0, (tiles+1)*4,0.0,TWO_PI*2);
+    
+    
+    pulseRot.setRotate(aaa.getRotate().inverse());
+    
+    ofNode posNode;
+    
+    posNode.setOrientation(pulseRot.getRotate());
+    
+    posNode.setPosition(alphaPos);
+    
+    float scalePct = (abs(sin(pctScale-(HALF_PI*1.3333)))*1);
+    thisScale =  ofClamp(pow(scalePct, linePowMod),0.0,1.0);
+    
+    linePct = ofClamp(ofMap(pctBar, 0.0, 1.0, 0.0, (1.0+(1/tiles))), 0.0, 1.0);
+    
+    
+    posNode.setPosition( posNode.getPosition()*((-thisScale*0.18*positionMod)+1.0)) ;
+    posNode.setScale( (thisScale*1.25*scaleMod) +0.45 );
+    
+    return posNode;
+}
+
 
 void InterfacePlane::draw( bool& pause_){
     
     if (!pause_) {
         
         // ofPushStyle();
-        posNode.transformGL();
+       // posNode.transformGL();
         
         // ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
         
@@ -825,7 +839,7 @@ void InterfacePlane::draw( bool& pause_){
         
    
         
-        posNode.restoreTransformGL();
+       // posNode.restoreTransformGL();
         //  ofPopStyle();
         directionMesh.draw();
         
@@ -834,7 +848,7 @@ void InterfacePlane::draw( bool& pause_){
         /*
         if (scanDir >=0) {
             ofPushMatrix();
-            
+         
             for (int i = 1; i < tiles; i++) {
                 
                 if (scanDir == 0) {

@@ -32,7 +32,7 @@ class InterfacePlane {
     
     ofVec3f pos;
     ofVec3f tempDir;
-    ofNode posNode;
+    ofNode getRotNode(int&,float&, int&, bool[],bool[]);
     
     float tiles;
     int stepCounter;
