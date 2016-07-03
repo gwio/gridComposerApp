@@ -38,6 +38,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     positionModTar = 1.0;
     scaleModDef = 1.0;
     scaleModTar = 1.0;
+    thisTime = 0.0;
+    lastTime = 0.0;
     
     for (int i = 0; i < 4 ; i++) {
         aniPct[i] = 1.0;
@@ -628,70 +630,107 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     blinkP();
     
     ofNode tempNode;
+    lineMesh.clear();
+    
+    lastStepper = curStepper;
+    curStepper = stepper;
+    stepperArg = stepper;
+    
+    lastTime = thisTime;
+    thisTime = (ofGetElapsedTimeMillis()- lastTick) ;
+
+
     if (!pause_) {
         
-        thisTime = (ofGetElapsedTimeMillis()- lastTick) ;
-        scanDir = scanDir_;
-        
-        if (thisTime >= tickTime_ ) {
-            len = 1.0;
-        } else {
-            len =ofMap( fmod(thisTime, tickTime_ ), 0.0  , tickTime_ , 0.0, 1.0);
-        }
-        
-        tempNode = getRotNode(stepper, len, scanDir_, connected_, active_);
-
-        //cout << linePct << endl;
-     
-        
-    }
-    
-    float meshZ;
-    
-        if(meshBig){
-    meshZ = 32;
-        }
-    else {
-        meshZ = 0;
-    }
-    
-    
-    //linemesh
-    ofVec3f tempA = ofVec3f(4,0,0) * tempNode.getGlobalTransformMatrix();
-    tempA.z = 18 + meshZ - (18*thisScale) + 1;
-    ofVec3f tempB = ofVec3f(-4,0,0) * tempNode.getGlobalTransformMatrix();
-    tempB.z = 18 + meshZ - (18*thisScale) + 1;
-    if (flipCounter%2==0){
-    lineMeshQA.push_back(tempA);
-    lineMeshQB.push_back(tempB);
-    }else {
-        lineMeshQA.push_back(tempB);
-        lineMeshQB.push_back(tempA);
-    }
-    
-    while (lineMeshQA.size() > (40  / (5-pulseDiv_) ) ) {
-        lineMeshQA.pop_front();
-        lineMeshQB.pop_front();
-    }
-    
-
-
-    lineMesh.clear();
-    for (int i = 0; i < lineMeshQA.size(); i++) {
-        lineMesh.addVertex(lineMeshQA.at(i));
-        trailColor.a = (255/lineMeshQA.size())*i;
-        lineMesh.addColor(trailColor);
-        
        
+        scanDir = scanDir_;
+
+        
+        //cout << linePct << endl;
+        
+        
+        float meshZ;
+        
+        if(meshBig){
+            meshZ = 32;
+        }
+        else {
+            meshZ = 0;
+        }
+        
+        //linemesh
+        for (int i = (4-pulseDiv_); i >= 0; i--) {
+            float temptick =len(tickTime_, i, pulseDiv_);
+            tempNode = getRotNode(stepperArg, temptick, scanDir_, connected_, active_);
+            ofVec3f tempA = ofVec3f(4,0,0) * tempNode.getGlobalTransformMatrix();
+            tempA.z = 18 + meshZ - (18*thisScale) + 1;
+            ofVec3f tempB = ofVec3f(-4,0,0) * tempNode.getGlobalTransformMatrix();
+            tempB.z = 18 + meshZ - (18*thisScale) + 1;
+            if (flipCounter%2==0){
+                lineMeshQA.push_back(tempA);
+                lineMeshQB.push_back(tempB);
+            }else {
+                lineMeshQA.push_back(tempB);
+                lineMeshQB.push_back(tempA);
+            }
+            
+            
+            
+        }
+        
+        while (lineMeshQA.size() > (20  * (5-pulseDiv_) ) ) {
+            lineMeshQA.pop_front();
+            lineMeshQB.pop_front();
+        }
+        
+        for (int i = 0; i < lineMeshQA.size(); i++) {
+            lineMesh.addVertex(lineMeshQA.at(i));
+            trailColor.a = (255/lineMeshQA.size())*i;
+            lineMesh.addColor(trailColor);
+            
+            
+        }
+        
+        
+        for (int i = lineMeshQA.size()-1; i > 0; i--) {
+            lineMesh.addVertex(lineMeshQB.at(i));
+            trailColor.a = (255/lineMeshQA.size())*i;
+            lineMesh.addColor(trailColor);
+        }
+        
+        
     }
     
     
-    for (int i = lineMeshQA.size()-1; i > 0; i--) {
-        lineMesh.addVertex(lineMeshQB.at(i));
-        trailColor.a = (255/lineMeshQA.size())*i;
-        lineMesh.addColor(trailColor);
+    
+    
+    
+}
+
+float InterfacePlane::len(float tickTime_, int div_, int& pDiv_){
+    float temp;
+ 
+    if(thisTime >= tickTime_){
+        temp = 1.0;
+    } else {
+        float timeDivision = thisTime-lastTime;
+        if(timeDivision < 0.0){
+            timeDivision = thisTime;
+           // stepperArg = (curStepper-1)%5;
+        } else {
+           // stepperArg = curStepper;
+        }
+        float useTime = thisTime -  ((timeDivision/(5-pDiv_))*div_) ;
+ 
+        useTime = ofWrap(useTime, 0.0, tickTime_);
+        temp =ofMap( fmod(useTime, tickTime_ ), 0.0  , tickTime_ , 0.0, 1.0);
+        
+        
+        cout << "tickTime " << tickTime_ << "   timeDivision "<< timeDivision <<  "   thisTime " << thisTime <<   "   iterator " << div_ <<"   useTime " << useTime << "  map  " << temp << endl;
     }
     
+    
+     return temp;
 }
 
 ofNode InterfacePlane::getRotNode(int& stepper, float& len, int& scanDir_ , bool connected_[],bool active_[]){

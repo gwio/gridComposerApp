@@ -33,6 +33,8 @@ class InterfacePlane {
     ofVec3f pos;
     ofVec3f tempDir;
     ofNode getRotNode(int&,float&, int&, bool[],bool[]);
+    float len(float, int, int&);
+    int stepperArg, curStepper, lastStepper;
     
     float tiles;
     int stepCounter;
@@ -43,7 +45,7 @@ class InterfacePlane {
     float alphaPart;
     float lastTick;
     float thisTime;
-    float len;
+    float lastTime;
     
     float tileSize;
     float gridSize;
