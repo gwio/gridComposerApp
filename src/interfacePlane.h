@@ -103,5 +103,8 @@ class InterfacePlane {
     int linePowMod;
     float thisScale;
     int flipCounter;
+    
+    int activeDirs;
+    bool lineWaitForBeat;
 };
 

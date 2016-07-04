@@ -1622,12 +1622,20 @@ void ofApp::replaceMousePressed(int x, int y) {
                             synths[synthButton[0]].connectedDirection[i] =  false;
                         } else if (!synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i]) {
                             synths[synthButton[0]].activeDirection[i] =  false;
+                            synths[synthButton[0]].pulsePlane.activeDirs--;
                         } else {
                             synths[synthButton[0]].connectedDirection[i] =  true;
                             synths[synthButton[0]].activeDirection[i] =  true;
+                            synths[synthButton[0]].pulsePlane.activeDirs++;
                         }
                     }
                 }
+                synths[synthButton[0]].pulsePlane.lineMeshQA.clear();
+                synths[synthButton[0]].pulsePlane.lineMeshQB.clear();
+                synths[synthButton[0]].pulsePlane.lineMesh.clear();
+                synths[synthButton[0]].pulsePlane.lineWaitForBeat = true;
+
+                
             }
             
             else if (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) {
@@ -1637,12 +1645,19 @@ void ofApp::replaceMousePressed(int x, int y) {
                             synths[synthButton[1]].connectedDirection[i] =  false;
                         } else if (!synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i]) {
                             synths[synthButton[1]].activeDirection[i] =  false;
+                            synths[synthButton[1]].pulsePlane.activeDirs--;
                         } else {
                             synths[synthButton[1]].connectedDirection[i] =  true;
                             synths[synthButton[1]].activeDirection[i] =  true;
+                            synths[synthButton[1]].pulsePlane.activeDirs++;
                         }
                     }
                 }
+                synths[synthButton[1]].pulsePlane.lineMeshQA.clear();
+                synths[synthButton[1]].pulsePlane.lineMeshQB.clear();
+                synths[synthButton[1]].pulsePlane.lineMesh.clear();
+                synths[synthButton[1]].pulsePlane.lineWaitForBeat = true;
+
             }
             
             else if (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) {
@@ -1652,13 +1667,18 @@ void ofApp::replaceMousePressed(int x, int y) {
                             synths[synthButton[2]].connectedDirection[i] =  false;
                         } else if (!synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i]) {
                             synths[synthButton[2]].activeDirection[i] =  false;
+                            synths[synthButton[2]].pulsePlane.activeDirs--;
                         } else {
                             synths[synthButton[2]].connectedDirection[i] =  true;
                             synths[synthButton[2]].activeDirection[i] =  true;
+                            synths[synthButton[2]].pulsePlane.activeDirs++;
                         }
                     }
                 }
-                
+                synths[synthButton[2]].pulsePlane.lineMeshQA.clear();
+                synths[synthButton[2]].pulsePlane.lineMeshQB.clear();
+                synths[synthButton[2]].pulsePlane.lineMesh.clear();
+                synths[synthButton[2]].pulsePlane.lineWaitForBeat = true;
                 
             }
         }
@@ -4717,6 +4737,13 @@ void ofApp::loadSaveButtonPress(){
         volumeRamp.value(0.0);
         
     }
+    
+    for (int i = 0; i < 3; i++){
+        synths[i].pulsePlane.lineMeshQA.clear();
+        synths[i].pulsePlane.lineMeshQB.clear();
+        synths[i].pulsePlane.lineMesh.clear();
+        synths[i].pulsePlane.lineWaitForBeat = true;
+    }
 }
 
 //--------------------------------------------------------------
@@ -5441,11 +5468,13 @@ void ofApp::loadFromXml(string path_){
         //activeDirection
         settings.pushTag("activeDirection");
         string activeDirection = settings.getValue("bools", "1111");
+        synths[synthButton[i]].pulsePlane.activeDirs = 0;
         for (int j = 0; j < 4; j++) {
             if (activeDirection.at(j) == '1') {
-                synths[synthButton[i]].activeDirection[j] = true;;
+                synths[synthButton[i]].activeDirection[j] = true;
+                synths[synthButton[i]].pulsePlane.activeDirs++;
             } else{
-                synths[synthButton[i]].activeDirection[j] = false;;
+                synths[synthButton[i]].activeDirection[j] = false;
             }
         }
         settings.popTag();

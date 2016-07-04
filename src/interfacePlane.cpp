@@ -40,6 +40,8 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     scaleModTar = 1.0;
     thisTime = 0.0;
     lastTime = 0.0;
+    activeDirs = 0;
+    lineWaitForBeat = true;
     
     for (int i = 0; i < 4 ; i++) {
         aniPct[i] = 1.0;
@@ -632,15 +634,12 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     ofNode tempNode;
     lineMesh.clear();
     
-    lastStepper = curStepper;
-    curStepper = stepper;
-    stepperArg = stepper;
-    
+       
     lastTime = thisTime;
     thisTime = (ofGetElapsedTimeMillis()- lastTick) ;
 
 
-    if (!pause_) {
+    if (!pause_ && !lineWaitForBeat) {
         
        
         scanDir = scanDir_;
@@ -661,7 +660,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         //linemesh
         for (int i = (4-pulseDiv_); i >= 0; i--) {
             float temptick =len(tickTime_, i, pulseDiv_);
-            tempNode = getRotNode(stepperArg, temptick, scanDir_, connected_, active_);
+            tempNode = getRotNode(stepper, temptick, scanDir_, connected_, active_);
             ofVec3f tempA = ofVec3f(4,0,0) * tempNode.getGlobalTransformMatrix();
             tempA.z = 18 + meshZ - (18*thisScale) + 1;
             ofVec3f tempB = ofVec3f(-4,0,0) * tempNode.getGlobalTransformMatrix();
@@ -678,7 +677,7 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
             
         }
         
-        while (lineMeshQA.size() > (20  * (5-pulseDiv_) ) ) {
+        while (lineMeshQA.size() > (10*activeDirs) * (5-pulseDiv_) ) {
             lineMeshQA.pop_front();
             lineMeshQB.pop_front();
         }
@@ -687,8 +686,6 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
             lineMesh.addVertex(lineMeshQA.at(i));
             trailColor.a = (255/lineMeshQA.size())*i;
             lineMesh.addColor(trailColor);
-            
-            
         }
         
         
@@ -716,9 +713,6 @@ float InterfacePlane::len(float tickTime_, int div_, int& pDiv_){
         float timeDivision = thisTime-lastTime;
         if(timeDivision < 0.0){
             timeDivision = thisTime;
-           // stepperArg = (curStepper-1)%5;
-        } else {
-           // stepperArg = curStepper;
         }
         float useTime = thisTime -  ((timeDivision/(5-pDiv_))*div_) ;
  
@@ -726,7 +720,7 @@ float InterfacePlane::len(float tickTime_, int div_, int& pDiv_){
         temp =ofMap( fmod(useTime, tickTime_ ), 0.0  , tickTime_ , 0.0, 1.0);
         
         
-        cout << "tickTime " << tickTime_ << "   timeDivision "<< timeDivision <<  "   thisTime " << thisTime <<   "   iterator " << div_ <<"   useTime " << useTime << "  map  " << temp << endl;
+       // cout << "tickTime " << tickTime_ << "   timeDivision "<< timeDivision <<  "   thisTime " << thisTime <<   "   iterator " << div_ <<"   useTime " << useTime << "  map  " << temp << endl;
     }
     
     
@@ -923,7 +917,7 @@ void InterfacePlane::pulseDir(int dir_) {
             directionMesh.setColor(j, pulseColorC);
         }
     }
-    
+    lineWaitForBeat = false;
 }
 
 
