@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.98.55"
+#define VERSION "0.98.85"
 
 
 
@@ -771,7 +771,7 @@ void ofApp::updateInterfaceMesh() {
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-     glLineWidth(	2);
+     glLineWidth(2);
     
     //glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
@@ -811,9 +811,10 @@ void ofApp::draw(){
     }
     
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_MULTISAMPLE);
+
     drawInterface();
 
-    glDisable(GL_MULTISAMPLE);
     
     
     
@@ -843,7 +844,7 @@ void ofApp::drawInterface(){
     
     //bpm fx
     if (currentState == STATE_BPM) {
-        glLineWidth(	2);
+       // glLineWidth(1);
         bpmFx.draw();
     }
     
