@@ -14,6 +14,7 @@ SaveLoad::SaveLoad(){
     highlight.clear();
     highlight.setMode(OF_PRIMITIVE_TRIANGLES);
     datePosVec.clear();
+    firstStart = false;
 
     colorDef = ofColor::fromHsb(255,0,195,255);
     colorA = ofColor::fromHsb(9, 235, 180,255);
@@ -100,6 +101,20 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     cout << saveLastNumber << endl;
     cout << " xmlmap size" << xmlSavesMap.size() << endl;
     updatePosition();
+    
+    
+    //add tutorial to documents folder on first start
+    if(firstStart){
+        ofxXmlSettings example;
+        example.loadFile("ex1.xml");
+#if TARGET_OS_IPHONE
+        example.saveFile(ofxiOSGetDocumentsDirectory()+path_);
+#else
+        example.saveFile("saves/example1.xml");
+#endif
+        addNewSave(example);
+        
+    }
 }
 
 
@@ -123,7 +138,7 @@ void SaveLoad::checkDate(){
         saveLastNumber = 1;
     }
     
-    
+
     
 }
 
@@ -155,19 +170,19 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
     // ofTexture tex;
     // tex.allocate(designGrid.x, designGrid.y, GL_RGBA);
     ofPixels pix;
-    
+
     ofFbo fbo;
     fbo.allocate(slotSize_.x, slotSize_.y,GL_RGBA);
     
     // int offset = (rSize*5)+((slotSize_.x-(rSize*15))/2);
     
     float offset = (rSize*5)+rSize;
-    
+
     fbo.begin();
-    ofClear(0, 0, 0,0);
-    
+    ofClear(0, 0, 0, 0);
+
     for (int i = 0; i < 3; i++) {
-        
+    
         xml_.pushTag("currentGrids");
         xml_.pushTag("grid",i);
         string temp = xml_.getValue("info", "0");
@@ -182,20 +197,20 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
         //  ofDrawLine(0, slotSize_.y-offset, slotSize_.x, slotSize_.y-offset);
         ofFill();
         ofDrawRectangle(offset*i,0, rSize*5,rSize*5);
-        
+
         ofSetColor(tc);
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
                 if (temp.at(x+(5*y)) == '1') {
-                    
+    
                     ofVec2f point = ofVec2f(x*rSize+(offset*i), (rSize*4) - (y*rSize) );
                     ofDrawRectangle(point, rSize, rSize);
-                    
-                    
+        
+
                 }
             }
         }
-        
+   
         xml_.popTag();
         xml_.popTag();
         

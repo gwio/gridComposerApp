@@ -107,4 +107,5 @@ public:
     ofxXmlSettings xmlTemp;
     
     bool confirmDel;
+    bool firstStart;
 };

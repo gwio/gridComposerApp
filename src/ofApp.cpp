@@ -48,7 +48,7 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
-    ofEnableDepthTest();
+    //ofEnableDepthTest();
     ofEnableAlphaBlending();
     
     
@@ -294,6 +294,14 @@ void ofApp::setup(){
         bpmFx.addColor(ofColor(0,0,0,0));
     }
     
+    
+    //load previous settings
+#if TARGET_OS_IPHONE
+    loadFromXml(ofxiOSGetDocumentsDirectory()+"settings.xml");
+#else
+    loadFromXml("settings.xml");
+#endif
+    
     //load saves
 #if TARGET_OS_IPHONE
     saveManager.loadSaveFolder(ofxiOSGetDocumentsDirectory());
@@ -302,12 +310,7 @@ void ofApp::setup(){
 #endif
 
     
-    //load previous settings
-#if TARGET_OS_IPHONE
-    loadFromXml(ofxiOSGetDocumentsDirectory()+"settings.xml");
-#else
-    loadFromXml("settings.xml");
-#endif
+
     
     //setNewGUI();
     setupAudio();
@@ -5319,6 +5322,7 @@ void ofApp::loadFromXml(string path_){
         }
         */
     }else if (settings.loadFile("settingsDefault.xml")) {
+        saveManager.firstStart = true;
         cout << "loadDefault" << endl;
     }
     
