@@ -108,7 +108,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         ofxXmlSettings example;
         example.loadFile("ex1.xml");
 #if TARGET_OS_IPHONE
-        example.saveFile(ofxiOSGetDocumentsDirectory()+path_);
+        example.saveFile(iosFolder_+"saves/");
 #else
         example.saveFile("saves/example1.xml");
 #endif
@@ -340,7 +340,7 @@ void SaveLoad::draw(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
         ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
-        fsPtrBold->draw(temp.dateDisplay, fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        fsPtrBold->draw(temp.dateDisplay, fontDefault,int(datePosVec.at(counter).displayPos.x), int(datePosVec.at(counter).displayPos.y));
         
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
@@ -354,8 +354,8 @@ void SaveLoad::draw(){
                  //ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 ofSetColor(innerIt->second.slotInfo.displayC);
                 fsPtrBold->draw(innerIt->second.slotInfo.name, fontDefault*1.25,
-                                innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.25, 0, 0).width)-(rSize*2.5),
-                                innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-1);
+                                int(innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.25, 0, 0).width)-(rSize*2.5)),
+                                int(innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize));
                 //    float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 //    ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 //    fsPtrLight->draw(innerIt->second.hour, fontBig,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);

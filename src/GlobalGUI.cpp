@@ -416,8 +416,8 @@ void GlobalGUI::drawFontString() {
         ofSetColor(displayColor);
         fsPtr->draw(elementName,
                     fontSize,
-                    drawStringPos.x-stringWidth,
-                    drawStringPos.y+stringHeight
+                    int(drawStringPos.x-stringWidth),
+                    int(drawStringPos.y+stringHeight)
                     );
     } else if (showString) {
         ofPushStyle();
@@ -431,8 +431,8 @@ void GlobalGUI::drawFontString() {
         }
         fsPtr->draw(elementName,
                     fontSize,
-                    drawStringPos.x-stringWidth,
-                    drawStringPos.y+stringHeight
+                   int( drawStringPos.x-stringWidth),
+                    int(drawStringPos.y+stringHeight)
                     );
     }
     ofPopStyle();
@@ -446,8 +446,8 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
         ofSetColor(displayColor);
         fsPtr->draw(elementName,
                     fontSize,
-                    drawStringPos.x-stringWidth+offsetX_,
-                    drawStringPos.y+stringHeight+offsetY_
+                   int(drawStringPos.x-stringWidth+offsetX_),
+                   int(drawStringPos.y+stringHeight+offsetY_)
                     );
     } else if (showString) {
         ofPushStyle();
@@ -458,8 +458,8 @@ void GlobalGUI::drawFontString(float offsetX_, float offsetY_) {
         }
         fsPtr->draw(elementName,
                     fontSize,
-                    drawStringPos.x-stringWidth+offsetX_,
-                    drawStringPos.y+stringHeight+offsetY_
+                   int(drawStringPos.x-stringWidth+offsetX_),
+                    int(drawStringPos.y+stringHeight+offsetY_)
                     );
     }
     ofPopStyle();
