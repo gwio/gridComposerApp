@@ -108,4 +108,6 @@ public:
     
     bool confirmDel;
     bool firstStart;
+    
+    void checkFirstStart();
 };

@@ -104,20 +104,52 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     
     
     //add tutorial to documents folder on first start
-    if(firstStart){
-        ofxXmlSettings example;
-        example.loadFile("ex1.xml");
-#if TARGET_OS_IPHONE
-        example.saveFile(ofxiOSGetDocumentsDirectory()+path_);
-#else
-        example.saveFile("saves/example1.xml");
-#endif
-        addNewSave(example);
-        
-    }
+    checkFirstStart();
 }
 
-
+void SaveLoad::checkFirstStart(){
+    
+    if(firstStart){
+        ofxXmlSettings example1, example2, example3;
+        example1.loadFile("ex1.xml");
+        example2.loadFile("ex2.xml");
+        example3.loadFile("ex3.xml");
+        
+        example1.pushTag("date");
+        string ex1FileName = ofToString(example1.getValue("year", ""))+
+        ofToString(example1.getValue("month", ""))+
+        ofToString(example1.getValue("day", ""))+"#"+
+        ofToString(example1.getValue("number", 1))+".xml";
+        example1.popTag();
+        
+        example2.pushTag("date");
+        string ex2FileName = ofToString(example2.getValue("year", ""))+
+        ofToString(example2.getValue("month", ""))+
+        ofToString(example2.getValue("day", ""))+"#"+
+        ofToString(example2.getValue("number", 1))+".xml";
+        example2.popTag();
+        
+        example3.pushTag("date");
+        string ex3FileName = ofToString(example3.getValue("year", ""))+
+        ofToString(example3.getValue("month", ""))+
+        ofToString(example3.getValue("day", ""))+"#"+
+        ofToString(example3.getValue("number", 1))+".xml";
+        example3.popTag();
+        
+#if TARGET_OS_IPHONE
+        example1.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex1FileName);
+        example2.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex2FileName);
+        example3.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex3FileName);
+#else
+        example1.saveFile("saves/"+ex1FileName);
+        example2.saveFile("saves/"+ex2FileName);
+        example3.saveFile("saves/"+ex3FileName);
+#endif
+        addNewSave(example1);
+        addNewSave(example2);
+        addNewSave(example3);
+    }
+}
 void SaveLoad::checkDate(){
     
     string cYear = ofGetTimestampString("%Y");
