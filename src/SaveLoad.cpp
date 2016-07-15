@@ -137,9 +137,11 @@ void SaveLoad::checkFirstStart(){
         example3.popTag();
         
 #if TARGET_OS_IPHONE
+
         example1.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex1FileName);
         example2.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex2FileName);
         example3.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex3FileName);
+
 #else
         example1.saveFile("saves/"+ex1FileName);
         example2.saveFile("saves/"+ex2FileName);
@@ -380,12 +382,14 @@ void SaveLoad::draw(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
         ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
+
         if(outerIt == --xmlSavesMap.rend()){
             //example string instead date
-        fsPtrBold->draw("EXAMPLES", fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        fsPtrBold->draw("EXAMPLES", fontDefault, int(datePosVec.at(counter).displayPos.x), int(datePosVec.at(counter).displayPos.y));
         } else {
-            fsPtrBold->draw(temp.dateDisplay, fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+            fsPtrBold->draw(temp.dateDisplay, fontDefault, int(datePosVec.at(counter).displayPos.x), int(datePosVec.at(counter).displayPos.y));
         }
+
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
             if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*7) {
@@ -398,8 +402,8 @@ void SaveLoad::draw(){
                  //ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 ofSetColor(innerIt->second.slotInfo.displayC);
                 fsPtrBold->draw(innerIt->second.slotInfo.name, fontDefault*1.25,
-                                innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.25, 0, 0).width)-(rSize*2.5),
-                                innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-1);
+                                int(innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.25, 0, 0).width)-(rSize*2.5)),
+                                int(innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize));
                 //    float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 //    ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 //    fsPtrLight->draw(innerIt->second.hour, fontBig,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
