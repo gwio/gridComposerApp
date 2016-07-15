@@ -5418,7 +5418,7 @@ void ofApp::loadFromXml(string path_){
         
         synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
         
-        synths[synthButton[i]].colorHue = settings.getValue("cHue", 0);
+        synths[synthButton[i]].colorHue = settings.getValue("cHue", 9);
         
         synths[synthButton[i]].pulsePlane.setColor(synths[synthButton[i]].colorHue);
        
