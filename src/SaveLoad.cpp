@@ -299,9 +299,17 @@ void SaveLoad::updatePosition(){
         
        // string tempName = getDateString(xmlName.year,xmlName.month,xmlName.day);
 
-        datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).width-rSize
-                                                       , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).height/2)
+        if(outerIt == --xmlSavesMap.rend()){
+            //examples name string instead date
+        datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox("EXAMPLES", fontDefault, 0, 0).width-rSize
+                                                       , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox("EXAMPLES", fontDefault, 0, 0).height/2)
                                                        ,0);
+        } else {
+            datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).width-rSize
+                                                           , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).height/2)
+                                                           ,0);
+
+        }
         datePosVec.at(counterOut).displayPos =  datePosVec.at(counterOut).defaultPos;
         counterOut++;
 
@@ -372,8 +380,12 @@ void SaveLoad::draw(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
         ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
-        fsPtrBold->draw(temp.dateDisplay, fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
-        
+        if(outerIt == --xmlSavesMap.rend()){
+            //example string instead date
+        fsPtrBold->draw("EXAMPLES", fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        } else {
+            fsPtrBold->draw(temp.dateDisplay, fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        }
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
             if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*7) {
@@ -458,6 +470,8 @@ void SaveLoad::isInside(ofVec3f pos_) {
 }
 
 void SaveLoad::deleteSave(){
+    //dont delete examples
+    if(selectOuterIt != --xmlSavesMap.rend()){
     ofFile temp;
     cout << saveDir.getAbsolutePath()+"/"+selectInnerIt->second.year+selectInnerIt->second.month+selectInnerIt->second.day+"#"+ofToString(selectInnerIt->second.number)+".xml" << endl;
     //remove xml
@@ -478,6 +492,7 @@ void SaveLoad::deleteSave(){
         xmlSavesMap.erase(selectOuterIt->first);
     }
     updatePosition();
+    }
 }
 
 ofVec3f SaveLoad::getOffPos(ofVec3f& clicktarget_, ofVec3f& pos_) {
