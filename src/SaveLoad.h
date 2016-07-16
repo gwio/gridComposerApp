@@ -95,6 +95,7 @@ public:
     int moveDir;
     bool slotDetail;
     string loadString;
+    string iosFolder;
     
     vector<dateInfo> datePosVec;
     float fontSmall, fontDefault, fontBig;

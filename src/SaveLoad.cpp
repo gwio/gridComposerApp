@@ -104,6 +104,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     
     
     //add tutorial to documents folder on first start
+    iosFolder = iosFolder_;
     checkFirstStart();
 }
 
@@ -116,6 +117,10 @@ void SaveLoad::checkFirstStart(){
         example3.loadFile("ex3.xml");
         
         example1.pushTag("date");
+        example1.setValue("year", "2000");
+        example1.setValue("month", "01");
+        example1.setValue("day", "01");
+        example1.setValue("number", 1);
         string ex1FileName = ofToString(example1.getValue("year", ""))+
         ofToString(example1.getValue("month", ""))+
         ofToString(example1.getValue("day", ""))+"#"+
@@ -123,6 +128,11 @@ void SaveLoad::checkFirstStart(){
         example1.popTag();
         
         example2.pushTag("date");
+        example2.pushTag("date");
+        example2.setValue("year", "2000");
+        example2.setValue("month", "01");
+        example2.setValue("day", "01");
+        example2.setValue("number", 2);
         string ex2FileName = ofToString(example2.getValue("year", ""))+
         ofToString(example2.getValue("month", ""))+
         ofToString(example2.getValue("day", ""))+"#"+
@@ -130,6 +140,11 @@ void SaveLoad::checkFirstStart(){
         example2.popTag();
         
         example3.pushTag("date");
+        example3.pushTag("date");
+        example3.setValue("year", "2000");
+        example3.setValue("month", "01");
+        example3.setValue("day", "01");
+        example3.setValue("number", 3);
         string ex3FileName = ofToString(example3.getValue("year", ""))+
         ofToString(example3.getValue("month", ""))+
         ofToString(example3.getValue("day", ""))+"#"+
@@ -138,9 +153,9 @@ void SaveLoad::checkFirstStart(){
         
 #if TARGET_OS_IPHONE
 
-        example1.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex1FileName);
-        example2.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex2FileName);
-        example3.saveFile(ofxiOSGetDocumentsDirectory()+"saves/"+ex3FileName);
+        example1.saveFile(iosFolder+"saves/"+ex1FileName);
+        example2.saveFile(iosFolder+"saves/"+ex2FileName);
+        example3.saveFile(iosFolder+"saves/"+ex3FileName);
 
 #else
         example1.saveFile("saves/"+ex1FileName);

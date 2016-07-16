@@ -299,7 +299,7 @@ void ofApp::setup(){
 #if TARGET_OS_IPHONE
     loadFromXml(ofxiOSGetDocumentsDirectory()+"settings.xml");
 #else
-    loadFromXml("settings.xml");
+    loadFromXml("settings.xml",true);
 #endif
     
     //load saves
@@ -5098,7 +5098,7 @@ void ofApp::savePreset(){
 
 void ofApp::loadPreset(){
     
-    loadFromXml(saveManager.loadString);
+    loadFromXml(saveManager.loadString, false);
 }
 
 
@@ -5304,7 +5304,7 @@ void ofApp::saveToXml(string path_){
     
 }
 
-void ofApp::loadFromXml(string path_){
+void ofApp::loadFromXml(string path_, bool settings_){
     startUp = true;
     volumeRestartTarget = mainVol;
     volumeRestart = 0.0;
@@ -5314,16 +5314,20 @@ void ofApp::loadFromXml(string path_){
     
     if (settings.loadFile(path_)) {
         
-        //settings.pushTag("Version");
-        //dont load old xmlsettings
-        /*
-        if (ofToString( settings.getValue("number", "") ) != appVersion) {
-            cout << "old xml settings" << endl;
-            settings.loadFile("settingsDefault.xml");
-        } else {
-            settings.popTag();
+        
+        if(settings_){
+            settings.pushTag("Version");
+            //dont load old xmlsettings
+            
+            if (ofToString( settings.getValue("number", "") ) != appVersion) {
+                cout << "old xml settings" << endl;
+                saveManager.firstStart = true;
+                settings.popTag();
+            } else {
+                settings.popTag();
+            }
         }
-        */
+        
     }else if (settings.loadFile("settingsDefault.xml")) {
         saveManager.firstStart = true;
         cout << "loadDefault" << endl;

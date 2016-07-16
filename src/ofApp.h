@@ -137,7 +137,7 @@ class ofApp : public ofxiOSApp{
         void harmonyButtonPress();
         void loadSaveButtonPress();
         
-        void loadFromXml(string);
+        void loadFromXml(string, bool);
         void saveToXml(string);
         void savePreset();
         void loadPreset();
