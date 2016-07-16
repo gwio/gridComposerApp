@@ -31,8 +31,8 @@ void HistoryView::setupSpacer(ofVec3f pos_, float scale_, ofVec3f size_) {
         spacer.addColor(ofColor::fromHsb(255,0,195,255));
         spacer.addColor(ofColor::fromHsb(255,0,195,255));
     }
-    spacer.addVertex(position+ofVec3f(elementDist*0,0,0));
-    spacer.addVertex(position+ofVec3f(elementDist*12,0,0));
+   // spacer.addVertex(position+ofVec3f(elementDist*0,0,0));
+   // spacer.addVertex(position+ofVec3f(elementDist*12,0,0));
     
     spacer.addColor(ofColor::fromHsb(255,0,195,255));
     spacer.addColor(ofColor::fromHsb(255,0,195,255));
@@ -54,7 +54,7 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
                 tempC = guiIndex_.at(interfaceIndex+j).elementColorOn;
                 tempC.a = alpha;
                 
-                float volumeB = (1.0-noteLog_.at(i).volume.at(j))*elementSize.y/2;
+                float volumeB = (1.0-noteLog_.at(i).volume.at(j))*elementSize.x/2;
                 
                 //read the position form the main interface vertices
                 mesh.addVertex(mainMesh_.getVertex(guiIndex_.at(interfaceIndex+j).counter+1)-temp+ofVec3f(+volumeB,0,0));
@@ -87,12 +87,12 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
     
     //move spacer with interface animation
     if ( (spacer.getVertex(0).y != guiPtr->drawStringPos.y+6)  || (spacer.getVertex(0).x != guiPtr->drawStringPos.x-(elementWhiteSpace*2)) ) {
-        for (int i = 0; i < spacer.getNumVertices()-2; i+=2) {
+        for (int i = 0; i < spacer.getNumVertices(); i+=2) {
             spacer.setVertex(i, ofVec3f(guiPtr->drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y/4),0) );
             spacer.setVertex(i+1, ofVec3f(guiPtr->drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y-(elementSize.y/4),0) );
         }
-        spacer.setVertex(spacer.getNumVertices()-2, ofVec3f(guiPtr->drawStringPos.x+(0*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y),0) );
-        spacer.setVertex(spacer.getNumVertices()-1, ofVec3f(guiPtr->drawStringPos.x+(24*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y),0) );
+       // spacer.setVertex(spacer.getNumVertices()-2, ofVec3f(guiPtr->drawStringPos.x+(0*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y),0) );
+       // spacer.setVertex(spacer.getNumVertices()-1, ofVec3f(guiPtr->drawStringPos.x+(24*elementWhiteSpace*2)-(elementWhiteSpace*2),guiPtr->drawStringPos.y+(elementSize.y),0) );
     }
     
   
@@ -100,6 +100,7 @@ void HistoryView::update(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_
 
 void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<GlobalGUI>& guiIndex_, ofVboMesh &mainMesh_, int newIndex_){
     
+    /*
     ofVec3f temp;
     ofColor tempC;
     float alpha;
@@ -133,15 +134,16 @@ void HistoryView::updateStateEditDetail(vector<noteLog>& noteLog_, vector<Global
             }
         }
     }
-    
+    */
     //move spacer with interface animation
     if ( (spacer.getVertex(0).y != guiIndex_.at(newIndex_).drawStringPos.y+6)  || (spacer.getVertex(0).x != guiIndex_.at(newIndex_).drawStringPos.x-(elementWhiteSpace*2)) ) {
-        for (int i = 0; i < spacer.getNumVertices()-2; i+=2) {
+        for (int i = 0; i < spacer.getNumVertices(); i+=2) {
             spacer.setVertex(i, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y/4),0) );
             spacer.setVertex(i+1, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(i*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y-(elementSize.y/4),0) );
         }
-        spacer.setVertex(spacer.getNumVertices()-2, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(0*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y),0) );
-        spacer.setVertex(spacer.getNumVertices()-1, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(24*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y),0) );    }
+       // spacer.setVertex(spacer.getNumVertices()-2, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(0*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y),0) );
+        //spacer.setVertex(spacer.getNumVertices()-1, ofVec3f(guiIndex_.at(newIndex_).drawStringPos.x+(24*elementWhiteSpace*2)-(elementWhiteSpace*2),guiIndex_.at(newIndex_).drawStringPos.y+(elementSize.y),0) );
+    }
     
     
 
