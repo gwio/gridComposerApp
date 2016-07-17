@@ -5451,7 +5451,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
         
         synths[synthButton[i]].globalHarmony = settings.getValue("globalHarmony", 1);
         
-        synths[synthButton[i]].attackSlider = settings.getValue("attack", 0.5);
+        synths[synthButton[i]].attackSlider = ofClamp(settings.getValue("attack", 1.0), attSldMin, attSldMax );
 
         //set the layer lowFreqVolumeFactor to keynote
         synths[synthButton[i]].mainTonicPtr->setParameter("lfvf"+synths[synthButton[i]].instrumentId, synths[synthButton[i]].getLfvf(synths[synthButton[i]].preset));
