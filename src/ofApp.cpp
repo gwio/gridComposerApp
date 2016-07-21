@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.98.90"
+#define VERSION "0.99.00"
 
 
 
@@ -847,7 +847,7 @@ void ofApp::drawInterface(){
     
     //bpm fx
     if (currentState == STATE_BPM) {
-       // glLineWidth(1);
+        glLineWidth(2);
         bpmFx.draw();
     }
     
@@ -2185,7 +2185,8 @@ void ofApp::deviceOrientationChanged(int newOrientation){
 #if !TARGET_OS_IPHONE
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-    makeDesignGrid();
+  //  makeDesignGrid();
+    ofSetWindowShape(1024*1.25, 750);
 }
 
 //--------------------------------------------------------------
