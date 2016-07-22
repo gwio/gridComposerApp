@@ -281,11 +281,7 @@ void ofApp::setup(){
                       &tekoSemibold,
                       &tekoBold,
                       &mainInterfaceData[48].drawStringPos);
-#if TARGET_OS_IPHONE
-    saveManager.loadSaveFolder(ofxiOSGetDocumentsDirectory());
-#else
-    saveManager.loadSaveFolder(";-)");
-#endif
+
     
     //setup stateBpm Fx Mesh
     bpmFx.setMode(OF_PRIMITIVE_LINES);
@@ -297,6 +293,14 @@ void ofApp::setup(){
     }
     
     //load saves
+#if TARGET_OS_IPHONE
+    saveManager.loadSaveFolder(ofxiOSGetDocumentsDirectory());
+#else
+    saveManager.loadSaveFolder(";-)");
+#endif
+
+    
+    //load previous settings
 #if TARGET_OS_IPHONE
     loadFromXml(ofxiOSGetDocumentsDirectory()+"settings.xml");
 #else
@@ -719,19 +723,18 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
     mainInterfaceData[48].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
     
-    mainInterfaceData[50].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
+    mainInterfaceData[50].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
     
-    mainInterfaceData[124].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+    mainInterfaceData[124].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
     
     mainInterfaceData[125].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
     
-    mainInterfaceData[126].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
+    mainInterfaceData[126].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
     
     mainInterfaceData[128].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
     mainInterfaceData[129].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
 
     
-    mainInterfaceData[130].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
     
     mainInterfaceData[131].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
 
@@ -945,6 +948,15 @@ void ofApp::drawStringAndIcons(){
     
     ofSetColor(mainInterfaceData[11].displayColor);
     backIcon.draw(mainInterfaceData[11].drawStringPos.x-tempTrans, mainInterfaceData[11].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+    
+    ofSetColor(mainInterfaceData[50].displayColor);
+    backIcon.draw(mainInterfaceData[50].drawStringPos.x-tempTrans, mainInterfaceData[50].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+
+    
+    
+    ofSetColor(mainInterfaceData[47].displayColor);
+    backIcon.draw(mainInterfaceData[47].drawStringPos.x-tempTrans, mainInterfaceData[47].drawStringPos.y-tempTrans,144*scaleFac,144*scaleFac);
+
     
     
     ofSetColor(mainInterfaceData[58].displayColor);
@@ -1967,7 +1979,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
             }
             
-            if(saveManager.slotDetail) {
+            if(saveManager.slotDetail && !saveManager.animate) {
                 if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
                     closeSlotInterface();
                     mainInterfaceData[50].blinkOn();
@@ -2002,8 +2014,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                         saveManager.confirmDel = true;
                     }
                     
-                } else  if (mainInterfaceData[130].isInside(ofVec2f(x,y))) {
-                    mainInterfaceData[130].blinkOn();
+                } else if (saveManager.selectInnerIt->second.slotInfo.testRect.inside(ofVec2f(x,y-saveManager.scrollLocation))) {
                     saveManager.cycleHighlightColor();
                 }
             }
@@ -2075,7 +2086,7 @@ void ofApp::replaceMouseReleased(int x,int y) {
             }
             
             if (lastClick.x == x && lastClick.y == y){
-                if (!saveManager.slotDetail) {
+                if (!saveManager.slotDetail && !saveManager.animate) {
                     saveManager.isInside(ofVec3f(x,y,0));
                     if(saveManager.animate){
                         openSlotInterface();
@@ -2717,13 +2728,13 @@ void ofApp::setupGlobalInterface() {
     //PAUSE A B C, STATE_DEFAULT
     place = ofVec3f(0,designGrid[0][0].y/2,0);
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(8,string("PAUSE"),smallButton*0.5,ofColor(59,0,0),place,offPlace,fontSmall,true,&tekoSemibold);
+    temp = GlobalGUI(8,string("PAUSE"),smallButton*0.5,ofColor(59,0,0),place,offPlace,fontSmall,true,&tekoBold);
     mainInterfaceData.push_back(temp);
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    temp = GlobalGUI(9,string("PAUSE"),smallButton*0.5,ofColor(60,0,0),place,offPlace,fontSmall,true,&tekoSemibold);
+    temp = GlobalGUI(9,string("PAUSE"),smallButton*0.5,ofColor(60,0,0),place,offPlace,fontSmall,true,&tekoBold);
     mainInterfaceData.push_back(temp);
     offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(10,string("PAUSE"),smallButton*0.5,ofColor(61,0,0),place,offPlace,fontSmall,true,&tekoSemibold);
+    temp = GlobalGUI(10,string("PAUSE"),smallButton*0.5,ofColor(61,0,0),place,offPlace,fontSmall,true,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     //toggle detail off, STATE_EDIT
@@ -2819,9 +2830,9 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     // back to default, STATE_SAVE
-    place = ofVec3f(designGrid[0][0].x/2,0,0);
+    place = ofVec3f(designGrid[0][0].x/2,designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*6,0);
-    temp = GlobalGUI(47, string("BACK"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(47, string(""), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     // animation data for load save grid, STATE_SAVE
@@ -2837,9 +2848,9 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //return to load grid, STATE_SAVE
-    place = ofVec3f( 0,0,0);
-    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(50, string("BACK"), smallButton,ofColor(0,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    place = ofVec3f( 0,designGrid[0][0].y/2,0);
+    offPlace = ofVec3f(0,+designGrid[0][0].y*6,0);
+    temp = GlobalGUI(50, string(""), smallButton,ofColor(0,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     
@@ -2896,13 +2907,13 @@ void ofApp::setupGlobalInterface() {
     //harmony menu,  global keynote, STATE_HARMONY
     offPlace = ofVec3f(0,+designGrid[0][0].y*12,0);
     place = ofVec3f(designGrid[0][0].x,-designGrid[0][0].y/2,0);
-    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontBig,false,&tekoSemibold);
+    temp = GlobalGUI(61,ofToString(notes[globalKey%12]),ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontDefault,false,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     //harmony menu -> global scale, STATE_HARMONY
     offPlace = ofVec3f(0,+designGrid[0][0].y*12,0);
     place = ofVec3f(designGrid[0][0].x,-designGrid[0][0].y/2,0);
-    temp = GlobalGUI(62,scaleCollection.scaleVec.at(globalScaleVecPos%scaleCollection.scaleVec.size()).name,ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontDefault,false,&tekoSemibold);
+    temp = GlobalGUI(62,scaleCollection.scaleVec.at(globalScaleVecPos%scaleCollection.scaleVec.size()).name,ofVec3f(gridRect.x*0.75, gridRect.y/5,0),ofColor(255,255,255),place,offPlace,fontDefault,false,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     
@@ -2971,20 +2982,20 @@ void ofApp::setupGlobalInterface() {
     }
     
     //delete save STATE_SAVE
-    offPlace = ofVec3f(0,+designGrid[0][0].y*6,0);
-    place = ofVec3f(0,0,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*6,0,0);
+    place = ofVec3f(0,designGrid[0][0].y/2,0);
     temp = GlobalGUI(124,"DELETE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //save button, STATE_SAVE
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
-    place = ofVec3f(designGrid[0][0].x/2,0,0);
+    place = ofVec3f(designGrid[0][0].x/2,-designGrid[0][0].y/2,0);
     temp = GlobalGUI(125,"SAVE",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //load save, STATE_SAVE
     offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
-    place = ofVec3f(0,0,0);
+    place = ofVec3f(0,designGrid[0][0].y/2,0);
     temp = GlobalGUI(126,"LOAD",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
@@ -3006,10 +3017,10 @@ void ofApp::setupGlobalInterface() {
     temp = GlobalGUI(129,string("GLOBAL SCALE"),ofVec3f(smallButton.x,smallButton.y,0),ofColor(55,0,0),place,offPlace,fontSmall,true,&tekoBold);
     mainInterfaceData.push_back(temp);
     
-    //mark button, STATE_SAVE
+    //mark button, empty
     offPlace = ofVec3f(0,-designGrid[0][0].y*6,0);
     place = ofVec3f(0,0,0);
-    temp = GlobalGUI(130,"MARK",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(130,"MARK",smallButton,ofColor(57,0,0),place,offPlace,fontDefault,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //global info String, all
@@ -3795,9 +3806,7 @@ void ofApp::openSlotInterface(){
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 1;
     
-    mainInterfaceData[130].showString = true;
-    mainInterfaceData[130].animation = true;
-    mainInterfaceData[130].moveDir = 1;
+   
 }
 
 //--------------------------------------------------------------
@@ -3820,8 +3829,6 @@ void ofApp::closeSlotInterface(){
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 0;
     
-    mainInterfaceData[130].animation = true;
-    mainInterfaceData[130].moveDir = 0;
     
     if (currentState != STATE_DEFAULT) {
         mainInterfaceData[47].animation = true;
@@ -4654,6 +4661,9 @@ void ofApp::bpmButtonPress() {
 
 void ofApp::loadSaveButtonPress(){
     
+
+    
+    
     if(currentState == STATE_DEFAULT) {
         synths[synthButton[0]].aniPath = OneLoadPathOn;
         synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
@@ -5268,7 +5278,7 @@ void ofApp::loadFromXml(string path_){
     
     if (settings.loadFile(path_)) {
         
-        settings.pushTag("Version");
+        //settings.pushTag("Version");
         //dont load old xmlsettings
         /*
         if (ofToString( settings.getValue("number", "") ) != appVersion) {

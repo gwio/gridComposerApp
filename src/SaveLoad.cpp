@@ -13,12 +13,13 @@ SaveLoad::SaveLoad(){
     loadString = "";
     highlight.clear();
     highlight.setMode(OF_PRIMITIVE_TRIANGLES);
-    
+    datePosVec.clear();
+
     colorDef = ofColor::fromHsb(255,0,195,255);
     colorA = ofColor::fromHsb(9, 235, 180,255);
-    colorB = ofColor::fromHsb(111, 235, 180,255);
-    colorC = ofColor::fromHsb(137, 235, 180,255);
-    colorD = ofColor::fromHsb(232, 235, 180,255);
+    colorB = ofColor::fromHsb(232, 235, 180,255);
+    colorC = ofColor::fromHsb(35, 235, 180,255);
+    colorD = ofColor::fromHsb(137, 235, 180,255);
 }
 
 void SaveLoad::loadSaveFolder(string iosFolder_){
@@ -59,7 +60,7 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         tempXml.number = loader.getValue("number", 1);
         tempXml.hour = loader.getValue("hour","");
         tempXml.slotInfo.highlight = loader.getValue("highlight", 0);
-        
+        tempXml.dateDisplay = getDateString(tempXml.day, tempXml.month, tempXml.year);
         if(tempXml.slotInfo.highlight == 0){
             tempXml.slotInfo.displayC = colorDef;
         } else if (tempXml.slotInfo.highlight == 1){
@@ -136,7 +137,8 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     tempXml.day = xml_.getValue("day", "");
     tempXml.number = xml_.getValue("number", 1);
     tempXml.hour = xml_.getValue("hour", "");
-    
+    tempXml.dateDisplay = getDateString(tempXml.day, tempXml.month, tempXml.year);
+
     xml_.popTag();
     string xmlKey = tempXml.year+tempXml.month+tempXml.day;
     
@@ -215,7 +217,6 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
 }
 
 void SaveLoad::updatePosition(){
-    datePosVec.clear();
     float slotOffset = 0.666;
     int counterOut = 0;
     int counterIn = 0;
@@ -223,8 +224,9 @@ void SaveLoad::updatePosition(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         counterIn = 0;
         offsetDown.y += ((((outerIt->second.size()-1)/3))* (slotSize.y+slotSize.y*slotOffset)  );
+        xmlSave& xmlName = outerIt->second.begin()->second;
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
-            saveSlot &slot = innerIt->second.slotInfo;
+            saveSlot& slot = innerIt->second.slotInfo;
             //slot.name = outerIt->first+" #"+ofToString(innerIt->first);
             //slot.name = "# "+ofToString(innerIt->first);
             
@@ -241,14 +243,26 @@ void SaveLoad::updatePosition(){
             slot.name =ofToString(innerIt->second.number)+"  ";
             counterIn++;
         }
-        counterOut++;
         offsetDown.y +=  (slotSize.y+slotSize.y*slotOffset)*2;
+        
+        if( datePosVec.size() != counterOut+1 ){
         dateInfo diTemp;
-        diTemp.defaultPos = ofVec3f(designGrid.x*2*0.133*2, outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(slotSize.y*0.666),0);
-        diTemp.displayPos = diTemp.defaultPos;
         datePosVec.push_back(diTemp);
+        }
+        
+       // string tempName = getDateString(xmlName.year,xmlName.month,xmlName.day);
+
+        datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).width
+                                                       , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(slotSize.y*0.666)
+                                                       ,0);
+        datePosVec.at(counterOut).displayPos =  datePosVec.at(counterOut).defaultPos;
+        counterOut++;
+
+        
     }
-    
+    while (datePosVec.size() > counterOut+1){
+        datePosVec.pop_back();
+    }
     //saveDir.listDir();
     //cout << "new sizue" << saveDir.size() << endl;
     
@@ -310,8 +324,8 @@ void SaveLoad::draw(){
     int counter =0;
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
-        ofSetColor(ofColor::fromHsb(255,0,204,255));
-        fsPtrSemi->draw(temp.year+" "+temp.month+" "+temp.day, fontDefault*1.4, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
+        ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
+        fsPtrBold->draw(temp.dateDisplay, fontDefault, datePosVec.at(counter).displayPos.x, datePosVec.at(counter).displayPos.y);
         
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
@@ -322,11 +336,11 @@ void SaveLoad::draw(){
                 //ofDrawRectangle(innerIt->second.slotInfo.testRect);
                 //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
                 //ofFill();
-                // ofSetColor(ofColor::fromHsb(255,0,204,255));
+                 //ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 ofSetColor(innerIt->second.slotInfo.displayC);
-                fsPtrSemi->draw(innerIt->second.slotInfo.name, fontDefault*1.4,
-                                innerIt->second.slotInfo.testRect.position.x-(fsPtrSemi->getBBox(innerIt->second.slotInfo.name, fontDefault*1.4, 0, 0).width)-(rSize*1.5),
-                                innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-2);
+                fsPtrBold->draw(innerIt->second.slotInfo.name, fontDefault*1.125,
+                                innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.125, 0, 0).width)-(rSize),
+                                innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize-1);
                 //    float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
                 //    ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 //    fsPtrLight->draw(innerIt->second.hour, fontBig,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
@@ -383,14 +397,14 @@ void SaveLoad::isInside(ofVec3f pos_) {
                 if (!slot.active){
                     slot.offPos = getOffPos(pos_, slot.pos);
                 } else {
-                    slot.offPos = ofVec3f(designGrid.x*3,designGrid.y*3,0) -(slotSize/2) - (slot.pos+ofVec3f(0,scrollLocation,0));
+                    slot.offPos = ofVec3f(designGrid.x*3,designGrid.y*3,0)
+                    -(slotSize/2)
+                    -(slot.pos+ofVec3f(0,scrollLocation,0))
+                    +ofVec3f( (fsPtrSemi->getBBox(slot.name, fontDefault*1.4, 0, 0).width/2),0,0);
                 }
             }
-            if (datePosVec.at(counter).active){
-                datePosVec.at(counter).offPos = ofVec3f(designGrid.x*3,designGrid.y*3,0) -(slotSize/2) - (datePosVec.at(counter).displayPos+ofVec3f(0,scrollLocation+rSize*2,0));
-            } else {
-                datePosVec.at(counter).offPos = getOffPos(pos_, datePosVec.at(counter).defaultPos);
-            }
+                            datePosVec.at(counter).offPos = getOffPos(pos_, datePosVec.at(counter).defaultPos);
+            
             counter++;
         }
     }
@@ -559,7 +573,39 @@ void SaveLoad::cycleHighlightColor(){
     
 }
 
-
+string SaveLoad::getDateString(string day_, string month_, string year_){
+    string retString;
+    string m;
+    switch(ofToInt(month_)) {
+        case 1 : m = "JANUARY";
+            break;
+        case 2 : m = "FEBRUARY";
+            break;
+        case 3 : m = "MARCH";
+            break;
+        case 4 : m = "APRIL";
+            break;
+        case 5 : m = "MAY";
+            break;
+        case 6 : m = "JUNE";
+            break;
+        case 7 : m = "JULY";
+            break;
+        case 8 : m = "AUGUST";
+            break;
+        case 9 : m = "SEPTEMBER";
+            break;
+        case 10 : m = "OCTOBER";
+            break;
+        case 11 : m = "NOVEMBER";
+            break;
+        case 12 : m = "DECEMBER";
+            break;
+    }
+    
+    retString = day_+"/"+m+"/"+year_;
+    return retString;
+}
 
 
 

@@ -39,6 +39,7 @@ struct saveSlot{
 
 struct xmlSave{
     string year, month, day, hour;
+    string dateDisplay;
     int number;
     saveSlot slotInfo;
 };
@@ -66,6 +67,8 @@ public:
     void updateHighlightVertices();
     void deleteSave();
     void cycleHighlightColor();
+    
+    string getDateString(string,string,string);
     
     ofxFontStash *fsPtrLight, *fsPtrRegular, *fsPtrMedium, *fsPtrSemi , *fsPtrBold;
     ofVec3f slotSize;
