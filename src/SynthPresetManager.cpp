@@ -203,7 +203,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
         
-        tempGen  = ((myTable*adsr1)+(myTable2*adsr2))*vol_ *0.0575;
+        tempGen  = ((myTable*adsr1)+(myTable2*adsr2))*vol_ *0.0580;
         
         
     }
@@ -221,7 +221,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(snare2).freq(freq_);
         
         
-        tempGen  =  (snareOsc*adsr2*0.425)>>BPF12().cutoff(freq_).Q(0.5-(0.2*vol_));
+        tempGen  =  (snareOsc*adsr2*0.375)>>BPF12().cutoff(freq_).Q(0.7-(0.3*vol_));
     }
     
     
@@ -232,13 +232,13 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
 float SynthPresetManager::getPresetLfvf(int preset_) {
     float temp;
     if (preset_%count == 0) {
-        temp = 0;
+        temp = 2;
     } else if (preset_%count == 1) {
-        temp = 0;
+        temp = 2;
     } else if (preset_%count == 2) {
-        temp = 4;
+        temp = 2;
     } else if (preset_%count == 3) {
-        temp = 0;
+        temp = 3;
     }
     return temp;
 }

@@ -1259,7 +1259,7 @@ void Instrument::updateTonicOut(){
         }
     }
  
-    instrumentOut = ( temp * outputRamp ) ;
+    instrumentOut = ( temp * outputRamp * lowFreqVolFac) ;
     synthHasChanged = true;
 }
 
@@ -1536,7 +1536,7 @@ void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
 
 float Instrument::getLfvf(int& preset_){
     float temp;
-    temp =   0.85+ pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),4 )*presetManager.getPresetLfvf(preset_);
+    temp =   0.95+ pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),10 )*presetManager.getPresetLfvf(preset_);
     cout << " lfvf " << ofClamp(temp,0.0,250.0) << endl;
 
     return ofClamp(temp,0.0,250.0);

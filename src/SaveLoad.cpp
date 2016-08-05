@@ -110,63 +110,63 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
 
 void SaveLoad::checkFirstStart(){
     
-    if(firstStart){
-        ofxXmlSettings example1, example2, example3;
-        example1.loadFile("ex1.xml");
-        example2.loadFile("ex2.xml");
-        example3.loadFile("ex3.xml");
-        
-        example1.pushTag("date");
-        example1.setValue("year", "2000");
-        example1.setValue("month", "01");
-        example1.setValue("day", "01");
-        example1.setValue("number", 1);
-        string ex1FileName = ofToString(example1.getValue("year", ""))+
-        ofToString(example1.getValue("month", ""))+
-        ofToString(example1.getValue("day", ""))+"#"+
-        ofToString(example1.getValue("number", 1))+".xml";
-        example1.popTag();
-        
-        example2.pushTag("date");
-        example2.pushTag("date");
-        example2.setValue("year", "2000");
-        example2.setValue("month", "01");
-        example2.setValue("day", "01");
-        example2.setValue("number", 2);
-        string ex2FileName = ofToString(example2.getValue("year", ""))+
-        ofToString(example2.getValue("month", ""))+
-        ofToString(example2.getValue("day", ""))+"#"+
-        ofToString(example2.getValue("number", 1))+".xml";
-        example2.popTag();
-        
-        example3.pushTag("date");
-        example3.pushTag("date");
-        example3.setValue("year", "2000");
-        example3.setValue("month", "01");
-        example3.setValue("day", "01");
-        example3.setValue("number", 3);
-        string ex3FileName = ofToString(example3.getValue("year", ""))+
-        ofToString(example3.getValue("month", ""))+
-        ofToString(example3.getValue("day", ""))+"#"+
-        ofToString(example3.getValue("number", 1))+".xml";
-        example3.popTag();
-        
+    
 #if TARGET_OS_IPHONE
-
-        example1.saveFile(iosFolder+"saves/"+ex1FileName);
-        example2.saveFile(iosFolder+"saves/"+ex2FileName);
-        example3.saveFile(iosFolder+"saves/"+ex3FileName);
-
-#else
-        example1.saveFile("saves/"+ex1FileName);
-        example2.saveFile("saves/"+ex2FileName);
-        example3.saveFile("saves/"+ex3FileName);
-#endif
-        addNewSave(example1);
-        addNewSave(example2);
-        addNewSave(example3);
+    
+    
+    if(firstStart){
+        
+        int exCount = 12;
+        ofxXmlSettings example;
+        for (int i = 0; i < exCount; i++){
+            if(example.loadFile("ex"+ofToString(i+1)+".xml")){;
+                example.pushTag("date");
+                example.setValue("year", "2000");
+                example.setValue("month", "01");
+                example.setValue("day", "01");
+                example.setValue("number", i+1);
+                string exFileName = ofToString(example.getValue("year", ""))+
+                ofToString(example.getValue("month", ""))+
+                ofToString(example.getValue("day", ""))+"#"+
+                ofToString(example.getValue("number", i+1))+".xml";
+                example.popTag();
+                example.saveFile(iosFolder+"saves/"+exFileName);
+                addNewSave(example);
+            }
+        }
     }
+    
+   
+    
+#else
+    
+    if(firstStart){
+        
+        int exCount = 12;
+        ofxXmlSettings example;
+        for (int i = 0; i < exCount; i++){
+            if(example.loadFile("ex"+ofToString(i+1)+".xml")){;
+                example.pushTag("date");
+                example.setValue("year", "2000");
+                example.setValue("month", "01");
+                example.setValue("day", "01");
+                example.setValue("number", i+1);
+                string exFileName = ofToString(example.getValue("year", ""))+
+                ofToString(example.getValue("month", ""))+
+                ofToString(example.getValue("day", ""))+"#"+
+                ofToString(example.getValue("number", i+1))+".xml";
+                example.popTag();
+                example.saveFile("saves/"+exFileName);
+                addNewSave(example);
+            }
+        }
+    }
+    
+#endif
+    
+    
 }
+
 void SaveLoad::checkDate(){
     
     string cYear = ofGetTimestampString("%Y");

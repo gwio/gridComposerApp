@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.99.00"
+#define VERSION "0.99.02"
 
 
 
@@ -2186,7 +2186,7 @@ void ofApp::deviceOrientationChanged(int newOrientation){
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
   //  makeDesignGrid();
-    ofSetWindowShape(1024*1.25, 750);
+    ofSetWindowShape(1334, 750);
 }
 
 //--------------------------------------------------------------
