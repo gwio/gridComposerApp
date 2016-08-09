@@ -80,7 +80,7 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     
     // colorHue =  ofMap(preset, 0, presetManager.count, 0, 255);
     colorHue = presetManager.getPresetColor(colorHue, preset);
-    
+    soundsMapTrash.clear();
     myNode = node_;
     
     for (int i = 0; i < 4 ; i++) {
@@ -347,10 +347,8 @@ void Instrument::removeCube(int x_, int y_){
             midiOutPtr->sendNoteOff(channel,tPtr->midiNote,0);
             tPtr->midiPlaying = false;
         }
-        soundsMap.erase(layerInfo.at(x_).at(y_).cubeGroupId);
-        //reallocate all synths to mainout
-        updateTonicOut();
-        cout << "remove " << layerInfo.at(x_).at(y_).cubeGroupId << " from soundsmap in remove cube" << endl;
+        soundsMapTrash.push_back(layerInfo.at(x_).at(y_).cubeGroupId);
+        
     }
     
     layerInfo.at(x_).at(y_).cubeGroupId = 0;
@@ -412,8 +410,24 @@ void Instrument::replaceCube(int x_, int y_, float zH_, ofColor c_) {
     
 }
 
-void Instrument::noteTrigger() {
+void Instrument::cleanSoundsMap(){
+    vector<unsigned long> tempList = soundsMapTrash;
+    for (int i = 0; i < tempList.size(); i++){
+        soundsMap.erase(tempList.at(i));
+        cout << "remove " << soundsMapTrash.at(i) << " from soundsmap in remove cube" << endl;
+    }
+    if(tempList.size() > 0){
+        updateTonicOut();
+    }
+    soundsMapTrash.clear();
     
+    cout << soundsMap.size() << endl;
+    //reallocate all synths to mainout
+}
+
+void Instrument::noteTrigger() {
+    cleanSoundsMap();
+
     if(!pause && *globalStatePtr != 6){
     tempLog = noteLog();
     
@@ -990,10 +1004,20 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                                 //check for max,min, x,y
                                 updateGroupInfo(soundMapIndex, x, y);
                                 if (aPtr->size < 1) {
-                                    midiOutPtr->sendNoteOff(channel,soundsMap.at(neighbours[i]).groupNote,0);
-                                    soundsMap.erase(neighbours[i]);
-                                    cout << "remove " << neighbours[i] << " from soundsmap in updateSoundINfo" << endl;
-                                    updateTonicOut();
+                                    
+                                    if(aPtr->midiPlaying){
+
+                                        midiOutPtr->sendNoteOff(channel,aPtr->midiNote,0);
+                                        aPtr->midiPlaying = false;
+                                    }
+
+                                    
+                                    soundsMapTrash.push_back(neighbours[i]);
+
+                                    
+                                   // soundsMap.erase(neighbours[i]);
+                                   // cout << "remove " << neighbours[i] << " from soundsmap in updateSoundINfo" << endl;
+                                   // updateTonicOut();
                                     break;
                                 }
                             }
@@ -1025,19 +1049,20 @@ void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) 
                 layerInfo.at(x).at(y).cubeGroupId = 0;
                 cgPtr->size--;
                 tempPosis.push_back(ofVec2f(x,y));
-              
                 
                 if (cgPtr->size < 1) {
                     //midiOutPtr->sendNoteOff(channel,cgPtr->groupNote,0);
-                    if(cgPtr->midiPlaying){
+                if(cgPtr->midiPlaying){
                         midiOutPtr->sendNoteOff(channel,cgPtr->midiNote,0);
                         cgPtr->midiPlaying = false;
-                    }
-                    soundsMap.erase(group_);
-                    cout << "remove " << group_ << " from soundsmap in resetcubegroup" << endl;
+                }
+                   // soundsMap.erase(group_);
+                    soundsMapTrash.push_back(group_);
+
+                    //cout << "remove " << group_ << " from soundsmap in resetcubegroup" << endl;
 
                     //reallocate all synths to mainout
-                    updateTonicOut();
+                   // updateTonicOut();
                     breakTest = true;
                     break;
                 }
@@ -1319,16 +1344,22 @@ void Instrument::applyNewScale(){
 
 void Instrument::loadMuster(vector< vector<bool> >& info_){
     
+    
+    //clear the grid
+    for (int x = 0; x < info_.size(); x++) {
+        for (int y = 0; y <info_.size(); y++) {
+            if (layerInfo.at(x).at(y).hasCube) {
+                tapEvent(x, y);
+            }
+        }
+    }
+    
     for (int i = 0; i < info_.size(); i++) {
         for (int j = 0; j < info_.at(i).size(); j++) {
             if (info_.at(i).at(j) ){
-                if (!layerInfo.at(i).at(j).hasCube) {
+               
                     tapEvent(i, j);
-                }
-            } else {
-                if (layerInfo.at(i).at(j).hasCube) {
-                    tapEvent(i, j);
-                }
+                
             }
         }
     }

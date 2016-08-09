@@ -110,6 +110,7 @@ public:
     void setScale(float);
     void planeMovement(float);
     void loadMuster(vector< vector<bool> >&);
+    void cleanSoundsMap();
     
     void setSaturationOff();
     void setSaturationOn();
@@ -167,7 +168,7 @@ public:
     vector<vector<synthInfo> > layerInfo;
     map<unsigned long,cubeGroup> soundsMap;
     unsigned long soundsCounter;
-    
+    vector<unsigned long> soundsMapTrash;
     
     //transformation
     ofNode myNode;

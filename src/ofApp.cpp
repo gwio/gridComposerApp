@@ -1854,7 +1854,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 int musterIndex =  muster.isInside(ofVec2f(x,y));
                 
                 if (!muster.saveReady) {
-                    if ( musterIndex >= 0) {
+                    if (musterIndex >= 0) {
                         synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
                         markSynthNotes(63);
                     }
@@ -2018,10 +2018,10 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
                 
                 else if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[126].blinkOn();
+                    loadPreset();
                     loadSaveButtonPress();
                     closeSlotInterface();
-                    loadPreset();
-                    mainInterfaceData[126].blinkOn();
                 }
                 
                 else  if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
@@ -2186,7 +2186,7 @@ void ofApp::deviceOrientationChanged(int newOrientation){
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
   //  makeDesignGrid();
-    ofSetWindowShape(1334, 750);
+    ofSetWindowShape(1280, 750);
 }
 
 //--------------------------------------------------------------
