@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.99.02"
+#define VERSION "0.99.08"
 
 
 
@@ -46,13 +46,17 @@ void ofApp::setup(){
     ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
 #endif
     
+#if TARGET_OS_MAC
+   // ofSetDataPathRoot("../Resources/data/");
+#endif
+    
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
     //ofEnableDepthTest();
     ofEnableAlphaBlending();
     
     
-    // ofSetDataPathRoot("../Resources/data/");
+    
     
   
     
@@ -4745,7 +4749,6 @@ void ofApp::loadSaveButtonPress(){
         volumeRestartTarget = mainVol;
         volumeRestart = 0.0;
         volumeRamp.value(0.0);
-        volumeRamp.value(0.0);
         
     }
     
@@ -5312,7 +5315,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
     startUp = true;
     volumeRestartTarget = mainVol;
     volumeRestart = 0.0;
-    volumeRamp.value(0.0);
+   // volumeRamp.value(0.0);
     
     //load grid presets from xml
     
@@ -5371,6 +5374,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
     settings.pushTag("global");
     // volumeRampValueChanged(mainVol);
     volumeRestartTarget = settings.getValue("volume", 1.0);
+    mainVol = volumeRestartTarget;
     //mainInterfaceData[51].elementName = ofToString(volumeRestartTarget,2);
     //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
     settings.popTag();
