@@ -33,8 +33,8 @@ public:
     ofVec3f drawStringPos;
     ofColor pickColor;
     
-    void setStringWidth(float);
-    void setAuxStringWidth(float);
+    void setStringWidth();
+    void setAuxStringWidth();
 
     float stringWidth, auxStringWidth, stringHeight;
     

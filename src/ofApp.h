@@ -168,7 +168,7 @@ class ofApp : public ofxiOSApp{
         int globalScaleVecPos;
         
         //font
-        ofxFontStash tekoLight, tekoRegular, tekoMedium, tekoSemibold, tekoBold;
+        ofxFontStash tekoLight, tekoRegular, tekoMedium, tekoSemibold, tekoBold, micon;
         
         
         //save function
@@ -291,7 +291,7 @@ class ofApp : public ofxiOSApp{
         int editDetailMoveDirection;
         
         //icons
-        ofTexture backIcon, left, right, leftDouble, rightDouble ;
+        ofTexture backIcon, left, right, leftDouble, rightDouble, pause, play ;
         
         float scaleFac;
         

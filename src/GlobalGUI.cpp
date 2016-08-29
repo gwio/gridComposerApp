@@ -61,6 +61,7 @@ GlobalGUI::GlobalGUI(int counter_, string name_,ofVec3f elementSize_ ,ofColor pi
     fsPtr = fsPtr_;
     
     drawStringPos = ofVec3f(-2000,-2000,0);
+    stringHeight = fontS_/2;
 }
 
 void GlobalGUI::updateMainMesh(ofVboMesh& mesh_, ofVec3f vec_){
@@ -395,12 +396,14 @@ void GlobalGUI::setOff() {
 }
 
 
-void GlobalGUI::setStringWidth(float sW_) {
-    stringWidth = (sW_/2)-fsPtr->getSpaceSize()/2;
+void GlobalGUI::setStringWidth() {
+    //stringWidth = (sW_/2)-fsPtr->getSpaceSize()/2;
+    stringWidth = fsPtr->getBBox(elementName,fontSize, 0, 0).getWidth()/2;
 }
 
-void GlobalGUI::setAuxStringWidth(float sW_) {
-    auxStringWidth = (sW_/2)-fsPtr->getSpaceSize()/2;
+void GlobalGUI::setAuxStringWidth() {
+    //auxStringWidth = (sW_/2)-fsPtr->getSpaceSize()/2;
+    stringWidth = fsPtr->getBBox(elementName,fontSize, 0, 0).getWidth()/2;
 }
 
 void GlobalGUI::blinkOn(){
