@@ -112,7 +112,9 @@ class ofApp : public ofxiOSApp{
         
         void openSlotInterface();
         void closeSlotInterface();
-        //void bothEditInterfaceOff();
+
+        void openSettingsInterface();
+        void closeSettingsInterface();
         
         void setNewGUI();
         
@@ -136,6 +138,7 @@ class ofApp : public ofxiOSApp{
         void bpmButtonPress();
         void harmonyButtonPress();
         void loadSaveButtonPress();
+        void settingsButtonPress();
         
         void loadFromXml(string, bool);
         void saveToXml(string);
@@ -297,6 +300,9 @@ class ofApp : public ofxiOSApp{
         
         bool startUp;
         
+        bool sendMidi;
+        bool dynamicVelo;
+        float globalVelo;
         float volumeRestart, volumeRestartTarget;
         
         string appVersion;

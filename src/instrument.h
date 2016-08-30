@@ -137,6 +137,8 @@ public:
     int currentScaleVecPos;
     float synthAttack;
     int *bpmPtr;
+    float velocity;
+    bool dynamicVelo;
     
     string instrumentId;
     void changeSynthVolume(float &);
