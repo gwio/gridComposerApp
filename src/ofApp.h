@@ -160,11 +160,12 @@ class ofApp : public ofxiOSApp{
         //mainout
         ofxTonicSynth tonicSynth;
         RampedValue volumeRamp;
+        RampedValue delayRamp;
         
         float mainVol;
         Generator mainOut;
         Generator sineA, sineB;
-        ControlParameter bpmpara, delayTime;
+        ControlParameter bpmpara;
     
         //scales
         GlobalScales scaleCollection;
@@ -302,6 +303,8 @@ class ofApp : public ofxiOSApp{
         
         bool sendMidi;
         bool dynamicVelo;
+        bool soundDelay, autoDelay;
+        float globalDelay;
         float globalVelo;
         float volumeRestart, volumeRestartTarget;
         
