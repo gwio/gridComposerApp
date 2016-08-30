@@ -734,7 +734,7 @@ void Instrument::noteTriggerEast() {
             } else {
                 float rampTarget;
                 if (dynamicVelo) {
-                    float rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
+                     rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
                 } else {
                     rampTarget = velocity;
                 }
