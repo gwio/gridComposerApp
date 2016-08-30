@@ -2124,6 +2124,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 if(dynamicVelo) {
                     mainInterfaceData[138].elementName = "DYNAMIC VELOCITY";
                     mainInterfaceData[138].setStringWidth();
+                    mainInterfaceData[140].activateDarkerColor();
                     for (int i = 0; i < 3; i++) {
                         synths[i].dynamicVelo = true;
                     }
@@ -2131,17 +2132,23 @@ void ofApp::replaceMousePressed(int x, int y) {
                 } else {
                     mainInterfaceData[138].elementName = "STATIC VELOCITY";
                     mainInterfaceData[138].setStringWidth();
+                    mainInterfaceData[140].activateOnColor();
                     for (int i = 0; i < 3; i++) {
                         synths[i].dynamicVelo = false;
                     }
                 }
-            }  else if (mainInterfaceData[139].isInside(ofVec2f(x,y))) {
+            }
+            else if (mainInterfaceData[139].isInside(ofVec2f(x,y))) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[139].minX, mainInterfaceData[139].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[139].setSlider(mainInterface, value);
                 globalVelo = value;
                 for (int i = 0; i < 3; i++) {
                     synths[i].velocity = value;
                 }
+            }
+            else if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                mainInterfaceData[43].blinkOn();
+                settingsButtonPress();
             }
                 
         }
@@ -4026,6 +4033,10 @@ void ofApp::openSettingsInterface(){
     mainInterfaceData[140].animation = true;
     mainInterfaceData[140].moveDir = 1;
     mainInterfaceData[140].showString = false;
+    
+    mainInterfaceData[43].showString = true;
+    mainInterfaceData[43].animation = true;
+    mainInterfaceData[43].moveDir = 1;
 }
 
 //--------------------------------------------------------------
@@ -4042,6 +4053,10 @@ void ofApp::closeSettingsInterface(){
     
     mainInterfaceData[140].animation = true;
     mainInterfaceData[140].moveDir = 0;
+    
+    mainInterfaceData[43].showString = true;
+    mainInterfaceData[43].animation = true;
+    mainInterfaceData[43].moveDir = 0;
 }
 
 //--------------------------------------------------------------
@@ -5208,6 +5223,17 @@ void ofApp::setNewGUI() {
     //set scaleNote Info
     
     markScaleSteps(63);
+    
+    //settings
+    if(dynamicVelo){
+        mainInterfaceData[140].displayColor = mainInterfaceData[140].elementColorDarker;
+        mainInterfaceData[138].elementName = "DYNAMIC VELOCITY";
+        mainInterfaceData[138].setStringWidth();
+    } else {
+        mainInterfaceData[140].displayColor = mainInterfaceData[140].elementColorOn;
+        mainInterfaceData[138].elementName = "STATIC VELOCITY";
+        mainInterfaceData[138].setStringWidth();
+    }
 }
 
 //--------------------------------------------------------------
@@ -5649,6 +5675,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
         synths[i].velocity = globalVelo;
         synths[i].dynamicVelo = dynamicVelo;
     }
+  
     
     //globalScale
     settings.pushTag("GlobalScale");
