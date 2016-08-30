@@ -335,7 +335,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 
 void ofApp::setupFonts(){
-    fontSizeDefault = designGrid[0][0].y/3.5;
+    fontSizeDefault = designGrid[0][0].y/3.25;
     fontSizeSmall = fontSizeDefault*0.7;
     fontSizeBigger = fontSizeDefault*1.618;
     
@@ -815,13 +815,12 @@ void ofApp::draw(){
     } else {
         cam.begin();
     }
-    
-    //  thisIntersect.draw();
+       //  thisIntersect.draw();
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
         
         synths[i].draw();
-        
+      
         synths[i].myNode.restoreTransformGL();
     }
     
@@ -2542,6 +2541,7 @@ void ofApp::setupStatesAndAnimation() {
     synthActivePos.setOrientation(camActiveSynth.getOrientationQuat());
     camEditDetailPos.lookAt(synthActivePos.getPosition() - camEditDetailPos.getZAxis());
     
+    
     //movements camera and synths from default to active
     centerToOne.addVertex(synthPos[1].getPosition());
     centerToOne.lineTo(synthPos[0].getPosition());
@@ -2607,7 +2607,7 @@ void ofApp::setupStatesAndAnimation() {
     //---___---
     //harmony mode
     //from default to volume
-    harmonyMatrix.rotate(45, -1, 0, 0);
+    harmonyMatrix.rotate(55, -1, 0, 0);
     
     TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
     TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,0), ofVec3f(0,0,0), ofVec3f(0,(TILES*TILESIZE)/5.0,-(TILES*TILESIZE)/4));
@@ -4521,9 +4521,9 @@ void ofApp::harmonyButtonPress() {
         synths[synthButton[0]].myScaleDefault = 1.0;
         synths[synthButton[1]].myScaleDefault = 1.0;
         synths[synthButton[2]].myScaleDefault = 1.0;
-        synths[synthButton[0]].myScaleTarget = 0.85;
-        synths[synthButton[1]].myScaleTarget = 0.85;
-        synths[synthButton[2]].myScaleTarget = 0.85;
+        synths[synthButton[0]].myScaleTarget = 0.8;
+        synths[synthButton[1]].myScaleTarget = 0.8;
+        synths[synthButton[2]].myScaleTarget = 0.8;
         
         
         synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
@@ -4566,9 +4566,9 @@ void ofApp::harmonyButtonPress() {
         synths[synthButton[0]].scaling = true;
         synths[synthButton[1]].scaling = true;
         synths[synthButton[2]].scaling = true;
-        synths[synthButton[0]].myScaleDefault = 0.85;
-        synths[synthButton[1]].myScaleDefault = 0.85;
-        synths[synthButton[2]].myScaleDefault = 0.85;
+        synths[synthButton[0]].myScaleDefault = 0.8;
+        synths[synthButton[1]].myScaleDefault = 0.8;
+        synths[synthButton[2]].myScaleDefault = 0.8;
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
