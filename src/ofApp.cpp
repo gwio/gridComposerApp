@@ -5226,11 +5226,11 @@ void ofApp::setNewGUI() {
     
     //settings
     if(dynamicVelo){
-        mainInterfaceData[140].displayColor = mainInterfaceData[140].elementColorDarker;
+        mainInterfaceData[140].activateDarkerColor();
         mainInterfaceData[138].elementName = "DYNAMIC VELOCITY";
         mainInterfaceData[138].setStringWidth();
     } else {
-        mainInterfaceData[140].displayColor = mainInterfaceData[140].elementColorOn;
+        mainInterfaceData[140].activateOnColor();
         mainInterfaceData[138].elementName = "STATIC VELOCITY";
         mainInterfaceData[138].setStringWidth();
     }
