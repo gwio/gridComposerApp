@@ -274,6 +274,7 @@ class ofApp : public ofxiOSApp{
         int timeCounter;
         int bpm;
      
+        float lastTouch, sleepTimer;
         
         void volumeRampValueChanged(float&volumeRampValue);
         
@@ -338,6 +339,10 @@ class ofApp : public ofxiOSApp{
         
         void setupFonts();
         void setupMidi();
+        
+        void updateSleepTimer();
+        bool sleepMode;
+        int defaultStateIndex[8] = {8,9,10,37,40,42,46,41};
         ofxMidiOut midiOut;
         
         ofVboMesh interfaceDraw;

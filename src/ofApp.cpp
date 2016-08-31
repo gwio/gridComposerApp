@@ -88,6 +88,8 @@ void ofApp::setup(){
     staticDelayValue = 0.5;
     dynamicDelayValue = 0.5;
     
+    lastTouch = 0.0;
+    sleepTimer = 0.0;
     
     dynamicVelo = true;
     globalKey = 0;
@@ -227,7 +229,7 @@ void ofApp::setup(){
     drawInfo = false;
     
     timeCounter = -1;
-    
+    sleepMode = false;
     
     focusCam = false;
     
@@ -656,6 +658,10 @@ void ofApp::update(){
         hvSlotB.updateColor();
         hvSlotC.updateColor();
     }
+    
+    updateSleepTimer();
+        
+
     //light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
@@ -1234,7 +1240,10 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 void ofApp::replaceMouseDragged(int x, int y){
     
-    if (!interfaceMoving) {
+    
+    //-------------------------
+    
+    if (!interfaceMoving && !sleepMode) {
         
         
         if (currentState == STATE_BPM) {
@@ -1417,6 +1426,19 @@ void ofApp::replaceMouseDragged(int x, int y){
         }
         
     }
+    //-----------------------------
+    //for the sleeptimer
+    if (!sleepMode){
+        lastTouch = ofGetElapsedTimef();
+    } else {
+        sleepMode = false;
+        lastTouch = ofGetElapsedTimef();
+        for  (int i = 0; i < 8; i++){
+            mainInterfaceData.at(defaultStateIndex[i]).switchColor();
+        }
+    }
+    
+
 }
 
 
@@ -1442,8 +1464,8 @@ void ofApp::mousePressed(int x, int y, int button){
 void ofApp::replaceMousePressed(int x, int y) {
     
     
-    
-    if (!interfaceMoving) {
+    //-------------------------
+    if (!interfaceMoving && !sleepMode) {
         if (currentState == STATE_EDIT) {
             intersectPlane(x, y);
             if ( (intersectPos.x < 100 && intersectPos.x > 0) && (intersectPos.y < 100 && intersectPos.y > 0) ) {
@@ -1458,7 +1480,7 @@ void ofApp::replaceMousePressed(int x, int y) {
     
     
     
-    if (!interfaceMoving) {
+    if (!interfaceMoving && !sleepMode) {
         
         if (currentState == STATE_DEFAULT) {
             
@@ -1515,7 +1537,7 @@ void ofApp::replaceMousePressed(int x, int y) {
         
     }
     
-    if ( (!interfaceMoving) && (!insideSynth) ){
+    if ( !interfaceMoving && !insideSynth && !sleepMode ){
         
         
         if (currentState == STATE_DEFAULT) {
@@ -2459,6 +2481,18 @@ void ofApp::replaceMouseReleased(int x,int y) {
         }
     }
     
+    //for the sleeptimer
+    if (!sleepMode){
+        lastTouch = ofGetElapsedTimef();
+    } else {
+        sleepMode = false;
+        lastTouch = ofGetElapsedTimef();
+        for  (int i = 0; i < 8; i++){
+            mainInterfaceData.at(defaultStateIndex[i]).switchColor();
+        }
+    }
+    
+
 }
 
 #if TARGET_OS_IPHONE
@@ -3096,13 +3130,13 @@ void ofApp::setupGlobalInterface() {
     //PAUSE A B C, STATE_DEFAULT
     place = ofVec3f(0,-designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,+designGrid[0][0].y*lowOff,0);
-    temp = GlobalGUI(8,string(""),smallButton*0.5,ofColor(59,0,0),place,offPlace,fontBig,true,&micon);
+    temp = GlobalGUI(8,string(""),smallButton*0.5,ofColor(59,0,0),place,offPlace,fontBig*0.85,true,&micon);
     mainInterfaceData.push_back(temp);
     offPlace = ofVec3f(0,+designGrid[0][0].y*lowOff,0);
-    temp = GlobalGUI(9,string(""),smallButton*0.5,ofColor(60,0,0),place,offPlace,fontBig,true,&micon);
+    temp = GlobalGUI(9,string(""),smallButton*0.5,ofColor(60,0,0),place,offPlace,fontBig*0.85,true,&micon);
     mainInterfaceData.push_back(temp);
     offPlace = ofVec3f(0,+designGrid[0][0].y*lowOff,0);
-    temp = GlobalGUI(10,string(""),smallButton*0.5,ofColor(61,0,0),place,offPlace,fontBig,true,&micon);
+    temp = GlobalGUI(10,string(""),smallButton*0.5,ofColor(61,0,0),place,offPlace,fontBig*0.85,true,&micon);
     mainInterfaceData.push_back(temp);
     
     //toggle detail off, STATE_EDIT
@@ -3158,7 +3192,7 @@ void ofApp::setupGlobalInterface() {
     //settings button , STATE_DEFAULT
     place = ofVec3f(designGrid[0][0].x,designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(40,string("\uE8B8"), smallButton ,ofColor(63,0,0),place,offPlace,fontBig,true,&micon);
+    temp = GlobalGUI(40,string("\uE8B8"), smallButton ,ofColor(63,0,0),place,offPlace,fontBig*0.85,true,&micon);
     mainInterfaceData.push_back(temp);
     
     //toggle bpm icon, STATE_DEFFAULT
@@ -3194,7 +3228,7 @@ void ofApp::setupGlobalInterface() {
     // load save button STATE_DEFAULT
     place = ofVec3f(designGrid[0][0].x,designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(46, string("\uE2C8"), smallButton, ofColor(23,23,23), place, offPlace,fontBig,true,&micon);
+    temp = GlobalGUI(46, string("\uE2C8"), smallButton, ofColor(23,23,23), place, offPlace,fontBig*0.85,true,&micon);
     mainInterfaceData.push_back(temp);
     
     // back to default, STATE_SAVE
@@ -6331,3 +6365,14 @@ float ofApp::getRevSize(float in){
     return ofClamp(temp, 0.0, 1.0);
 }
 
+void ofApp::updateSleepTimer(){
+    if (currentState == STATE_DEFAULT){
+        sleepTimer = ofGetElapsedTimef() - lastTouch;
+        if(sleepTimer > 20 && !sleepMode){
+            for  (int i = 0; i < 8; i++){
+                mainInterfaceData.at(defaultStateIndex[i]).switchColor();
+            }
+            sleepMode = true;
+        }
+    }
+}
