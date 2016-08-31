@@ -108,7 +108,7 @@ void ofApp::setup(){
     volumeRestartTarget = 0.0;
     
     ControlParameter delayTarget = tonicSynth.addParameter("delay");
-    tonicSynth.setParameter("delay", bpm);
+    tonicSynth.setParameter("delay", 0.25);
     delayRamp = RampedValue().value(0.0).length(0.35).target(delayTarget);
 
     
@@ -460,7 +460,7 @@ void ofApp::setupAudio(){
     }
     mainOut = temp ;
 
-    Tonic::StereoDelay delay = StereoDelay(0.60,0.65)
+     StereoDelay delay = StereoDelay(0.60,0.65)
     .delayTimeRight(delayRamp*1.1)
     .delayTimeLeft(delayRamp)
     .feedback(0.2+(delayRamp*0.15))
@@ -468,7 +468,7 @@ void ofApp::setupAudio(){
     .wetLevel(0.15);
     
     
-    Tonic::Reverb rev = Reverb()
+     Reverb rev = Reverb()
     .decayTime(reverbTime)
     .preDelayTime(0.02)
     .roomShape(0.425)
@@ -481,7 +481,7 @@ void ofApp::setupAudio(){
 
     
     //compressor
-    Tonic::Compressor compressor = Compressor()
+    Compressor compressor = Compressor()
     .release(0.015)
     .attack(0.001)
     .threshold( dBToLin(-30) )
@@ -490,7 +490,10 @@ void ofApp::setupAudio(){
     .makeupGain(4.5)
     .bypass(false);
     
-    Tonic::Generator revMix;
+    
+   
+
+    Generator revMix;
     revMix = mainOut >> compressor >> rev;
     
     if(soundDelay && soundReverb){
@@ -501,6 +504,14 @@ void ofApp::setupAudio(){
         tonicSynth.setOutputGen( ( (((mainOut  >>compressor)*0.85) + (revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     } else {
         tonicSynth.setOutputGen( ((mainOut  >>compressor  )*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+    }
+    
+    tonicSynth.setParameter("revTime", getRevTime(revTime));
+    tonicSynth.setParameter("revSize", getRevSize(revSize));
+    if(autoDelay){
+        tonicSynth.setParameter("delay",getBpmValue(dynamicDelayValue));
+    } else {
+        tonicSynth.setParameter("delay", getBpmValue(staticDelayValue));
     }
 }
 
@@ -3145,7 +3156,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     //settings button , STATE_DEFAULT
-    place = ofVec3f(0,designGrid[0][0].y/2,0);
+    place = ofVec3f(designGrid[0][0].x,designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*farOff,0);
     temp = GlobalGUI(40,string("\uE8B8"), smallButton ,ofColor(63,0,0),place,offPlace,fontBig,true,&micon);
     mainInterfaceData.push_back(temp);
@@ -3181,7 +3192,7 @@ void ofApp::setupGlobalInterface() {
     mainInterfaceData.push_back(temp);
     
     // load save button STATE_DEFAULT
-    place = ofVec3f(0,designGrid[0][0].y/2,0);
+    place = ofVec3f(designGrid[0][0].x,designGrid[0][0].y/2,0);
     offPlace = ofVec3f(0,designGrid[0][0].y*farOff,0);
     temp = GlobalGUI(46, string("\uE2C8"), smallButton, ofColor(23,23,23), place, offPlace,fontBig,true,&micon);
     mainInterfaceData.push_back(temp);
@@ -3376,7 +3387,7 @@ void ofApp::setupGlobalInterface() {
     
     //midi toggle button, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(130,string("MIDI ON"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
@@ -3414,73 +3425,79 @@ void ofApp::setupGlobalInterface() {
 
     //velocity toggle , STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(138,string("DYNAMIC VELOCITY"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //velo slider, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(139,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
+    temp = GlobalGUI(139,string("VELOCITY"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
+    mainInterfaceData.back().activateDarkerColor();
+
 
     //velo slider background, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y/4,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(140,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
 
     //delay toggle , STATE_SETTINGS
     place = ofVec3f(0,-designGrid[0][0].y*0.75,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(141,string("DELAY ON"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //autodelay toggle , STATE_SETTINGS
     place = ofVec3f(0,-designGrid[0][0].y*0.75,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(142,string(""),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //delay slider, STATE_SETTINGS
     place = ofVec3f(0,-designGrid[0][0].y*0.75,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(143,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
+    temp = GlobalGUI(143,string("DELAY TIME"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
+    mainInterfaceData.back().activateDarkerColor();
+
     
     //delay slider background, STATE_SETTINGS
     place = ofVec3f(0,-designGrid[0][0].y*0.75,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(144,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //reverb toggle , STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(145,string("REV"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //reverb time slider, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(146,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
+    temp = GlobalGUI(146,string("REVERB TIME"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
+    mainInterfaceData.back().activateDarkerColor();
     
     //reverb time background, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(147,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //reverb size slider, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(148,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
+    temp = GlobalGUI(148,string("REVERB SIZE"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
+    mainInterfaceData.back().activateDarkerColor();
     
     //reverb size background, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
-    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    offPlace = ofVec3f(-designGrid[0][0].y*farOff,0,0);
     temp = GlobalGUI(149,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
 
@@ -4299,7 +4316,7 @@ void ofApp::openSettingsInterface(){
     
     mainInterfaceData[139].animation = true;
     mainInterfaceData[139].moveDir = 1;
-    mainInterfaceData[139].showString = false;
+    mainInterfaceData[139].showString = true;
     
     mainInterfaceData[140].animation = true;
     mainInterfaceData[140].moveDir = 1;
@@ -4317,7 +4334,7 @@ void ofApp::openSettingsInterface(){
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 1;
     
-    mainInterfaceData[143].showString = false;
+    mainInterfaceData[143].showString = true;
     mainInterfaceData[143].animation = true;
     mainInterfaceData[143].moveDir = 1;
     
@@ -4329,7 +4346,7 @@ void ofApp::openSettingsInterface(){
     mainInterfaceData[145].animation = true;
     mainInterfaceData[145].moveDir = 1;
     
-    mainInterfaceData[146].showString = false;
+    mainInterfaceData[146].showString = true;
     mainInterfaceData[146].animation = true;
     mainInterfaceData[146].moveDir = 1;
     
@@ -4337,7 +4354,7 @@ void ofApp::openSettingsInterface(){
     mainInterfaceData[147].animation = true;
     mainInterfaceData[147].moveDir = 1;
     
-    mainInterfaceData[148].showString = false;
+    mainInterfaceData[148].showString = true;
     mainInterfaceData[148].animation = true;
     mainInterfaceData[148].moveDir = 1;
     

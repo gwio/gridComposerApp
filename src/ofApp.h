@@ -173,7 +173,7 @@ class ofApp : public ofxiOSApp{
         ControlParameter reverbTime;
         ControlParameter reverbSize;
         
-        //scales
+               //scales
         GlobalScales scaleCollection;
         int globalScaleVecPos;
         
