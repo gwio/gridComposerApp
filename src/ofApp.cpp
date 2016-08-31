@@ -85,7 +85,8 @@ void ofApp::setup(){
     farClip = 10000;
     
     bpm = BPM;
-    globalDelay = 0.5;
+    staticDelayValue = 0.5;
+    dynamicDelayValue = 0.5;
     
     //global volume
     ControlParameter rampTarget = tonicSynth.addParameter("mainVolumeRamp").max(1.0).min(0.0);
@@ -98,7 +99,7 @@ void ofApp::setup(){
     
     ControlParameter delayTarget = tonicSynth.addParameter("delay");
     tonicSynth.setParameter("delay", bpm);
-    delayRamp = RampedValue().value(0.0).length(0.25).target(delayTarget);
+    delayRamp = RampedValue().value(0.0).length(0.35).target(delayTarget);
 
     
     
@@ -449,13 +450,13 @@ void ofApp::setupAudio(){
     mainOut = temp ;
 
     Tonic::StereoDelay delay = StereoDelay(0.60,0.65)
-    .delayTimeRight((((1.0-(delayRamp/(BPM_MAX+22)))*0.25)*1.125)+0.1 )
-    .delayTimeLeft( ((1.0-(delayRamp/(BPM_MAX+22)))*0.25)+0.1 )
-    .feedback( ((1.0-(delayRamp/(BPM_MAX+22)))*0.25) + 0.1)
+    .delayTimeRight(delayRamp*1.1)
+    .delayTimeLeft(delayRamp)
+    .feedback(0.1+(delayRamp*0.25))
     .dryLevel(0.95)
     .wetLevel(0.15);
     
-    
+    /*
     Tonic::Reverb rev = Reverb()
     .decayTime(((1.0-(globalDelay/(BPM_MAX+22)))*4.0)+1)
     .preDelayTime(((1.0-(globalDelay/(BPM_MAX+22)))*0.15))
@@ -466,7 +467,8 @@ void ofApp::setupAudio(){
     .wetLevel(0.15)
     .density(0.25)
     .stereoWidth(1.0);
-
+*/
+    
     //compressor
     Tonic::Compressor compressor = Compressor()
     .release(0.015)
@@ -478,7 +480,7 @@ void ofApp::setupAudio(){
     .bypass(false);
     
     if(soundDelay){
-    tonicSynth.setOutputGen( ((mainOut>>delay >>compressor )*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+    tonicSynth.setOutputGen( ((mainOut >>compressor >>delay)*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     }
     
     
@@ -1190,9 +1192,10 @@ void ofApp::replaceMouseDragged(int x, int y){
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX)+20;
+                dynamicDelayValue = value;
                 tonicSynth.setParameter("BPM",bpm*4);
                 if (autoDelay){
-                tonicSynth.setParameter("delay", bpm);
+                tonicSynth.setParameter("delay", getBpmValue(dynamicDelayValue));
                 }
                 //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
@@ -1326,11 +1329,12 @@ void ofApp::replaceMouseDragged(int x, int y){
                     mainInterfaceData[143].touchDown = true;
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[143].minX, mainInterfaceData[143].maxX, 0.0, 1.0), 0.0, 1.0);
-                globalDelay = ceil((1.0-value)*BPM_MAX)+20;
+                    staticDelayValue = 1.0-value;
                 mainInterfaceData[143].setSlider(mainInterface, value);
                 if(!autoDelay){
-                    tonicSynth.setParameter("delay",globalDelay);
+                    tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
                 }
+                    cout << "bpm::" << getBpmValue(staticDelayValue) << endl;
                 }
             }
             
@@ -1668,13 +1672,14 @@ void ofApp::replaceMousePressed(int x, int y) {
                 
                 float value = ofClamp(ofMap(x, mainInterfaceData[45].minX, mainInterfaceData[45].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[45].setSlider(mainInterface,value);
+                // +20 to get a minimum delay time !0
                 bpm=ceil(value*BPM_MAX)+20;
+                dynamicDelayValue = value;
                 tonicSynth.setParameter("BPM",bpm*4);
                 if(autoDelay){
-                tonicSynth.setParameter("delay", bpm);
+                tonicSynth.setParameter("delay", getBpmValue(dynamicDelayValue));
                 }
-               // mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
-               // mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+        
                 
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
@@ -2229,14 +2234,14 @@ void ofApp::replaceMousePressed(int x, int y) {
                 if(autoDelay) {
                     mainInterfaceData[142].elementName = "DYNAMIC DELAY";
                     mainInterfaceData[142].setStringWidth();
-                    tonicSynth.setParameter("delay",bpm);
+                    tonicSynth.setParameter("delay",getBpmValue(dynamicDelayValue));
                     mainInterfaceData[144].activateDarkerColor();
                 } else {
                     mainInterfaceData[142].elementName = "STATIC DELAY";
                     mainInterfaceData[142].setStringWidth();
                     mainInterfaceData[144].activateOnColor();
                     if(!autoDelay){
-                        tonicSynth.setParameter("delay",globalDelay);
+                        tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
                     }
                 }
                 }
@@ -2245,10 +2250,10 @@ void ofApp::replaceMousePressed(int x, int y) {
             else if (mainInterfaceData[143].isInside(ofVec2f(x,y))) {
                 if(soundDelay && !autoDelay){
                 float value = ofClamp(ofMap(x, mainInterfaceData[143].minX, mainInterfaceData[143].maxX, 0.0, 1.0), 0.0, 1.0);
-                globalDelay = ceil((1.0-value)*BPM_MAX)+20;
+                    staticDelayValue =1.0-value;
                 mainInterfaceData[143].setSlider(mainInterface, value);
                 if(!autoDelay){
-                tonicSynth.setParameter("delay",globalDelay);
+                tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
                 }
                 }
             }
@@ -4145,7 +4150,7 @@ void ofApp::closeSlotInterface(){
 //--------------------------------------------------------------
 void ofApp::openSettingsInterface(){
     mainInterfaceData[139].sliderPct = ofMap( globalVelo, 0.0,1.0,-1.0,1.0);
-    mainInterfaceData[143].sliderPct = ofMap( globalDelay, 20,BPM_MAX+20,1.0,-1.0);
+    mainInterfaceData[143].sliderPct = ofMap( staticDelayValue,0.0,1.0,1.0,-1.0);
     
     mainInterfaceData[130].animation = true;
     mainInterfaceData[130].moveDir = 1;
@@ -5703,8 +5708,11 @@ void ofApp::saveToXml(string path_){
     settings.pushTag("global");
     settings.addValue("value", bpm);
     settings.addValue("toggleDelay", soundDelay);
-    settings.addValue("autoAuto", autoDelay);
-    settings.addValue("globalDelay", globalDelay);
+    settings.addValue("autoDelay", autoDelay);
+    settings.addValue("staticDelay", staticDelayValue);
+    settings.addValue("dynamicDelay", dynamicDelayValue);
+  
+    
     settings.popTag();
     settings.addTag("slots");
     settings.pushTag("slots");
@@ -5834,9 +5842,14 @@ void ofApp::loadFromXml(string path_, bool settings_){
     bpm =ofClamp(settings.getValue("value", 50), 0, 500);
     tonicSynth.setParameter("BPM", bpm*4);
     soundDelay = settings.getValue("toggleDelay", true);
-    autoDelay = settings.getValue("autoAuto", true);
-    globalDelay = settings.getValue("globalDelay", 100);
- 
+    autoDelay = settings.getValue("autoDelay", true);
+    staticDelayValue = settings.getValue("staticDelay", 0.5);
+    dynamicDelayValue = settings.getValue("dynamicDelay", 0.5);
+    if(autoDelay) {
+        tonicSynth.setParameter("delay",getBpmValue(dynamicDelayValue));
+    } else {
+        tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
+    }
    // mainInterfaceData[38].elementName = ofToString(bpm);
    // mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
     
@@ -6077,6 +6090,11 @@ void ofApp::loadFromXml(string path_, bool settings_){
     setNewGUI();
 }
 
-
+float ofApp::getBpmValue(float in){
+    float bpmFac, temp;
+    bpmFac = (ofClamp(in,0.0,1.0)*BPM_MAX)/BPM_MAX;
+    temp = (1.0-bpmFac)*1.0;
+    return ofClamp(temp,0.0001,1.0);
+}
 
 

@@ -145,6 +145,7 @@ class ofApp : public ofxiOSApp{
         void savePreset();
         void loadPreset();
         
+        float getBpmValue(float);
         //xml
         ofxXmlSettings settings;
         
@@ -304,7 +305,7 @@ class ofApp : public ofxiOSApp{
         bool sendMidi;
         bool dynamicVelo;
         bool soundDelay, autoDelay;
-        float globalDelay;
+        float staticDelayValue, dynamicDelayValue;
         float globalVelo;
         float volumeRestart, volumeRestartTarget;
         
