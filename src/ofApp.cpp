@@ -88,6 +88,16 @@ void ofApp::setup(){
     staticDelayValue = 0.5;
     dynamicDelayValue = 0.5;
     
+    
+    dynamicVelo = true;
+    globalKey = 0;
+    globalVelo = 0.5;
+    revTime = 0.5;
+    revSize = 0.5;
+    soundDelay = true;
+    autoDelay = true;
+    soundReverb = false;
+    
     //global volume
     ControlParameter rampTarget = tonicSynth.addParameter("mainVolumeRamp").max(1.0).min(0.0);
     tonicSynth.setParameter("mainVolumeRamp", 0.0);
@@ -102,6 +112,11 @@ void ofApp::setup(){
     delayRamp = RampedValue().value(0.0).length(0.35).target(delayTarget);
 
     
+    reverbTime = tonicSynth.addParameter("revTime");
+    tonicSynth.setParameter("revTime", revTime);
+    
+    reverbSize = tonicSynth.addParameter("revSize");
+    tonicSynth.setParameter("revSize", revSize);
     
     bpmpara = tonicSynth.addParameter("BPM");
     tonicSynth.setParameter("BPM", bpm*4);
@@ -140,11 +155,7 @@ void ofApp::setup(){
     
     
     
-    dynamicVelo = true;
-    globalKey = 0;
-    globalVelo = 0.5;
-    soundDelay = true;
-    autoDelay = true;
+   
     synthButton[0] = 0;
     synthButton[1] = 1;
     synthButton[2] = 2;
@@ -452,22 +463,22 @@ void ofApp::setupAudio(){
     Tonic::StereoDelay delay = StereoDelay(0.60,0.65)
     .delayTimeRight(delayRamp*1.1)
     .delayTimeLeft(delayRamp)
-    .feedback(0.1+(delayRamp*0.25))
+    .feedback(0.2+(delayRamp*0.15))
     .dryLevel(0.95)
     .wetLevel(0.15);
     
-    /*
+    
     Tonic::Reverb rev = Reverb()
-    .decayTime(((1.0-(globalDelay/(BPM_MAX+22)))*4.0)+1)
-    .preDelayTime(((1.0-(globalDelay/(BPM_MAX+22)))*0.15))
-    .roomShape(0.125)
-    .roomSize(0.85)
-    //.inputLPFCutoff(7000)
-    .dryLevel(0.95)
-    .wetLevel(0.15)
+    .decayTime(reverbTime)
+    .preDelayTime(0.02)
+    .roomShape(0.425)
+    .roomSize(reverbSize)
+    .inputLPFCutoff(5000)
+    .dryLevel(0.0)
+    .wetLevel(0.25)
     .density(0.25)
-    .stereoWidth(1.0);
-*/
+    .stereoWidth(0.55);
+
     
     //compressor
     Tonic::Compressor compressor = Compressor()
@@ -479,12 +490,16 @@ void ofApp::setupAudio(){
     .makeupGain(4.5)
     .bypass(false);
     
-    if(soundDelay){
-    tonicSynth.setOutputGen( ((mainOut >>compressor >>delay)*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
-    }
+    Tonic::Generator revMix;
+    revMix = mainOut >> compressor >> rev;
     
-    
-    if(!soundDelay){
+    if(soundDelay && soundReverb){
+        tonicSynth.setOutputGen( ( (((mainOut >>compressor >>delay)*0.85)+(revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+    } else if(soundDelay){
+        tonicSynth.setOutputGen( ((mainOut  >>compressor >> delay )*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+    }else if(soundReverb){
+        tonicSynth.setOutputGen( ( (((mainOut  >>compressor)*0.85) + (revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+    } else {
         tonicSynth.setOutputGen( ((mainOut  >>compressor  )*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     }
 }
@@ -802,6 +817,13 @@ void ofApp::updateInterfaceMesh() {
     mainInterfaceData[143].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
     mainInterfaceData[144].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
 
+    mainInterfaceData[145].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
+
+    mainInterfaceData[146].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[147].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
+    
+    mainInterfaceData[148].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
+    mainInterfaceData[149].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
 
     for (int i = 0; i < 3; i++) {
         mainInterfaceData[132+i].updateMainMesh(mainInterface, designGrid[i][0],tweenFloat);
@@ -967,6 +989,27 @@ void ofApp::drawSliderPos(){
         ofSetColor(ofColor::fromHsb(255,0,195,255));
         ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(143).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(144).counter+3).y-lineOff,
                         rectLine.x, rectLine.y);
+        }
+        
+        
+        if (soundReverb){
+            ofSetColor(ofColor(21,21,21,80));
+            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(148).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(149).counter+3).y-lineOff,
+                            rectLine.x*2.0, rectLine.y);
+            
+            ofSetColor(ofColor::fromHsb(255,0,195,255));
+            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(148).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(149).counter+3).y-lineOff,
+                            rectLine.x, rectLine.y);
+        }
+        
+        if (soundReverb){
+            ofSetColor(ofColor(21,21,21,80));
+            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(146).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(147).counter+3).y-lineOff,
+                            rectLine.x*2.0, rectLine.y);
+            
+            ofSetColor(ofColor::fromHsb(255,0,195,255));
+            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(146).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(147).counter+3).y-lineOff,
+                            rectLine.x, rectLine.y);
         }
     }
     
@@ -1335,6 +1378,28 @@ void ofApp::replaceMouseDragged(int x, int y){
                     tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
                 }
                     cout << "bpm::" << getBpmValue(staticDelayValue) << endl;
+                }
+            }
+            else if (mainInterfaceData[146].isInside(ofVec2f(x,y))) {
+                if(soundReverb){
+                    if(!mainInterfaceData[146].touchDown){
+                        mainInterfaceData[146].touchDown = true;
+                    }
+                    float value = ofClamp(ofMap(x, mainInterfaceData[146].minX, mainInterfaceData[146].maxX, 0.0, 1.0), 0.0, 1.0);
+                    revTime = value;
+                    mainInterfaceData[146].setSlider(mainInterface, value);
+                    tonicSynth.setParameter("revTime",getRevTime(value));
+                }
+            }
+            else if (mainInterfaceData[148].isInside(ofVec2f(x,y))) {
+                if(soundReverb){
+                    if(!mainInterfaceData[148].touchDown){
+                        mainInterfaceData[148].touchDown = true;
+                    }
+                    float value = ofClamp(ofMap(x, mainInterfaceData[148].minX, mainInterfaceData[148].maxX, 0.0, 1.0), 0.0, 1.0);
+                    revSize = value;
+                    mainInterfaceData[148].setSlider(mainInterface, value);
+                    tonicSynth.setParameter("revSize",getRevSize(value));
                 }
             }
             
@@ -2257,6 +2322,39 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
                 }
             }
+            else if (mainInterfaceData[145].isInside(ofVec2f(x,y))) {
+                mainInterfaceData[145].blinkOn();
+                soundReverb = !soundReverb;
+                if(soundReverb) {
+                    mainInterfaceData[145].elementName = "REVERB ON";
+                    mainInterfaceData[145].setStringWidth();
+                    mainInterfaceData[147].activateOnColor();
+                    mainInterfaceData[149].activateOnColor();
+                    setupAudio();
+                } else {
+                    mainInterfaceData[145].elementName = "REVERB OFF";
+                    mainInterfaceData[145].setStringWidth();
+                    mainInterfaceData[147].activateDarkerColor();
+                    mainInterfaceData[149].activateDarkerColor();
+                    setupAudio();
+                }
+            }
+            else if (mainInterfaceData[146].isInside(ofVec2f(x,y))) {
+                if(soundReverb){
+                    float value = ofClamp(ofMap(x, mainInterfaceData[146].minX, mainInterfaceData[146].maxX, 0.0, 1.0), 0.0, 1.0);
+                    revTime = value;
+                    mainInterfaceData[146].setSlider(mainInterface, value);
+                    tonicSynth.setParameter("revTime",getRevTime(value));
+                }
+            }
+            else if (mainInterfaceData[148].isInside(ofVec2f(x,y))) {
+                if(soundReverb){
+                    float value = ofClamp(ofMap(x, mainInterfaceData[148].minX, mainInterfaceData[148].maxX, 0.0, 1.0), 0.0, 1.0);
+                    revSize = value;
+                    mainInterfaceData[148].setSlider(mainInterface, value);
+                    tonicSynth.setParameter("revSize",getRevSize(value));
+                }
+            }
             
         }
     }
@@ -2340,6 +2438,12 @@ void ofApp::replaceMouseReleased(int x,int y) {
             }
             if(mainInterfaceData[143].touchDown){
                 mainInterfaceData[143].touchDown = false;
+            }
+            if(mainInterfaceData[146].touchDown){
+                mainInterfaceData[146].touchDown = false;
+            }
+            if(mainInterfaceData[148].touchDown){
+                mainInterfaceData[148].touchDown = false;
             }
         }
     }
@@ -3349,6 +3453,36 @@ void ofApp::setupGlobalInterface() {
     offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
     temp = GlobalGUI(144,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
     mainInterfaceData.push_back(temp);
+    
+    //reverb toggle , STATE_SETTINGS
+    place = ofVec3f(0,designGrid[0][0].y*0.25,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    temp = GlobalGUI(145,string("REV"),smallButton,ofColor(63,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+    
+    //reverb time slider, STATE_SETTINGS
+    place = ofVec3f(0,designGrid[0][0].y*0.25,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    temp = GlobalGUI(146,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+    
+    //reverb time background, STATE_SETTINGS
+    place = ofVec3f(0,designGrid[0][0].y*0.25,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    temp = GlobalGUI(147,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+    
+    //reverb size slider, STATE_SETTINGS
+    place = ofVec3f(0,designGrid[0][0].y*0.25,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    temp = GlobalGUI(148,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
+    
+    //reverb size background, STATE_SETTINGS
+    place = ofVec3f(0,designGrid[0][0].y*0.25,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
+    temp = GlobalGUI(149,"",ofVec3f(gridRect.x*0.777, gridRect.y*hSliderYscale,0),ofColor(51,0,0),place,offPlace,fontBig,false,&tekoSemibold);
+    mainInterfaceData.push_back(temp);
 
     mainInterface.setMode(OF_PRIMITIVE_TRIANGLES);
     interfaceDraw.clear();
@@ -4151,6 +4285,9 @@ void ofApp::closeSlotInterface(){
 void ofApp::openSettingsInterface(){
     mainInterfaceData[139].sliderPct = ofMap( globalVelo, 0.0,1.0,-1.0,1.0);
     mainInterfaceData[143].sliderPct = ofMap( staticDelayValue,0.0,1.0,1.0,-1.0);
+    mainInterfaceData[146].sliderPct = ofMap( revTime,0.0,1.0,-1.0,1.0);
+    mainInterfaceData[148].sliderPct = ofMap( revSize,0.0,1.0,-1.0,1.0);
+
     
     mainInterfaceData[130].animation = true;
     mainInterfaceData[130].moveDir = 1;
@@ -4187,6 +4324,26 @@ void ofApp::openSettingsInterface(){
     mainInterfaceData[144].showString = false;
     mainInterfaceData[144].animation = true;
     mainInterfaceData[144].moveDir = 1;
+    
+    mainInterfaceData[145].showString = true;
+    mainInterfaceData[145].animation = true;
+    mainInterfaceData[145].moveDir = 1;
+    
+    mainInterfaceData[146].showString = false;
+    mainInterfaceData[146].animation = true;
+    mainInterfaceData[146].moveDir = 1;
+    
+    mainInterfaceData[147].showString = false;
+    mainInterfaceData[147].animation = true;
+    mainInterfaceData[147].moveDir = 1;
+    
+    mainInterfaceData[148].showString = false;
+    mainInterfaceData[148].animation = true;
+    mainInterfaceData[148].moveDir = 1;
+    
+    mainInterfaceData[149].showString = false;
+    mainInterfaceData[149].animation = true;
+    mainInterfaceData[149].moveDir = 1;
 }
 
 //--------------------------------------------------------------
@@ -4219,6 +4376,21 @@ void ofApp::closeSettingsInterface(){
     
     mainInterfaceData[144].animation = true;
     mainInterfaceData[144].moveDir = 0;
+    
+    mainInterfaceData[145].animation = true;
+    mainInterfaceData[145].moveDir = 0;
+    
+    mainInterfaceData[146].animation = true;
+    mainInterfaceData[146].moveDir = 0;
+    
+    mainInterfaceData[147].animation = true;
+    mainInterfaceData[147].moveDir = 0;
+
+    mainInterfaceData[148].animation = true;
+    mainInterfaceData[148].moveDir = 0;
+    
+    mainInterfaceData[149].animation = true;
+    mainInterfaceData[149].moveDir = 0;
 }
 
 //--------------------------------------------------------------
@@ -5422,6 +5594,19 @@ void ofApp::setNewGUI() {
             mainInterfaceData[144].activateOnColor();
         }
     }
+    if(soundReverb){
+        mainInterfaceData[145].elementName = "REVERB ON";
+        mainInterfaceData[145].setStringWidth();
+        mainInterfaceData[147].activateOnColor();
+        mainInterfaceData[149].activateOnColor();
+
+    } else {
+        mainInterfaceData[145].elementName = "REVERB OFF";
+        mainInterfaceData[145].setStringWidth();
+        mainInterfaceData[147].activateDarkerColor();
+        mainInterfaceData[149].activateDarkerColor();
+
+    }
 }
 
 //--------------------------------------------------------------
@@ -5707,10 +5892,7 @@ void ofApp::saveToXml(string path_){
     settings.addTag("global");
     settings.pushTag("global");
     settings.addValue("value", bpm);
-    settings.addValue("toggleDelay", soundDelay);
-    settings.addValue("autoDelay", autoDelay);
-    settings.addValue("staticDelay", staticDelayValue);
-    settings.addValue("dynamicDelay", dynamicDelayValue);
+   
   
     
     settings.popTag();
@@ -5729,6 +5911,21 @@ void ofApp::saveToXml(string path_){
     settings.pushTag("Velocity");
     settings.addValue("velo", globalVelo);
     settings.addValue("toggle", dynamicVelo);
+    settings.popTag();
+    
+    settings.addTag("delay");
+    settings.pushTag("delay");
+    settings.addValue("toggleDelay", soundDelay);
+    settings.addValue("autoDelay", autoDelay);
+    settings.addValue("staticDelay", staticDelayValue);
+    settings.addValue("dynamicDelay", dynamicDelayValue);
+    settings.popTag();
+    
+    settings.addTag("reverb");
+    settings.pushTag("reverb");
+    settings.addValue("toggleRev", soundReverb);
+    settings.addValue("revTime", revTime);
+    settings.addValue("revSize", revSize);
     settings.popTag();
     
     settings.addTag("GlobalKey");
@@ -5841,6 +6038,18 @@ void ofApp::loadFromXml(string path_, bool settings_){
     settings.pushTag("global");
     bpm =ofClamp(settings.getValue("value", 50), 0, 500);
     tonicSynth.setParameter("BPM", bpm*4);
+    settings.popTag();
+    settings.pushTag("slots");
+    for (int i = 0; i < 3; i++) {
+        settings.pushTag("slot",i);
+        synths[synthButton[i]].nextPulseDivision = settings.getValue("bpm", 4);
+        settings.popTag();
+    }
+    settings.popTag();
+    settings.popTag();
+    
+    //delay
+    settings.pushTag("delay");
     soundDelay = settings.getValue("toggleDelay", true);
     autoDelay = settings.getValue("autoDelay", true);
     staticDelayValue = settings.getValue("staticDelay", 0.5);
@@ -5850,17 +6059,13 @@ void ofApp::loadFromXml(string path_, bool settings_){
     } else {
         tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
     }
-   // mainInterfaceData[38].elementName = ofToString(bpm);
-   // mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
+    settings.popTag();
     
-    settings.popTag();
-    settings.pushTag("slots");
-    for (int i = 0; i < 3; i++) {
-        settings.pushTag("slot",i);
-        synths[synthButton[i]].nextPulseDivision = settings.getValue("bpm", 4);
-        settings.popTag();
-    }
-    settings.popTag();
+    //reverb
+    settings.pushTag("reverb");
+    soundReverb = settings.getValue("toggleRev", false);
+    revTime = settings.getValue("revTime", 0.5);
+    revSize = settings.getValue("revSize", 0.5);
     settings.popTag();
     
     //globalKey
@@ -6097,4 +6302,15 @@ float ofApp::getBpmValue(float in){
     return ofClamp(temp,0.0001,1.0);
 }
 
+float ofApp::getRevTime(float in){
+    float temp;
+    temp = ofMap(in, 0.0, 1.0, 0.15, 3.5);
+    return ofClamp(temp, 0.0, 2.5);
+}
+
+float ofApp::getRevSize(float in){
+    float temp;
+    temp = ofMap(in, 0.0, 1.0, 0.01, 1.0);
+    return ofClamp(temp, 0.0, 1.0);
+}
 

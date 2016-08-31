@@ -146,6 +146,9 @@ class ofApp : public ofxiOSApp{
         void loadPreset();
         
         float getBpmValue(float);
+        float getRevTime(float);
+        float getRevSize(float);
+
         //xml
         ofxXmlSettings settings;
         
@@ -167,7 +170,9 @@ class ofApp : public ofxiOSApp{
         Generator mainOut;
         Generator sineA, sineB;
         ControlParameter bpmpara;
-    
+        ControlParameter reverbTime;
+        ControlParameter reverbSize;
+        
         //scales
         GlobalScales scaleCollection;
         int globalScaleVecPos;
@@ -305,9 +310,11 @@ class ofApp : public ofxiOSApp{
         bool sendMidi;
         bool dynamicVelo;
         bool soundDelay, autoDelay;
+        bool soundReverb;
         float staticDelayValue, dynamicDelayValue;
         float globalVelo;
         float volumeRestart, volumeRestartTarget;
+        float revTime, revSize;
         
         string appVersion;
         
