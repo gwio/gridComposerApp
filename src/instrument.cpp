@@ -581,19 +581,18 @@ void Instrument::noteTriggerWest(){
                 midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                 it->second.midiPlaying = false;
             } else {
-                float rampTarget;
-                if(dynamicVelo){
-                rampTarget = float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles);
-                } else {
-                rampTarget = velocity;
-                }
+               float rampTarget = float(it->second.y_in_x_elements[*stepperPos]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 if(it->second.midiPlaying){
                     midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                     it->second.midiPlaying = false;
                 }
+                if(dynamicVelo){
                 midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                } else {
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,velocity*127);
+                }
                 it->second.midiNote = it->second.groupNote;
                 it->second.midiPlaying = true;
 
@@ -657,19 +656,18 @@ void Instrument::noteTriggerNorth() {
                 midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                 it->second.midiPlaying = false;
             } else {
-                float rampTarget;
-                if(dynamicVelo){
-                     rampTarget = float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
-                } else {
-                    rampTarget = velocity;
-                }
+                   float rampTarget = float(it->second.x_in_y_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 if(it->second.midiPlaying){
                     midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                     it->second.midiPlaying = false;
                 }
-                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                if(dynamicVelo){
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                } else {
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,velocity*127);
+                }
                 it->second.midiNote = it->second.groupNote;
                 it->second.midiPlaying = true;
             }
@@ -732,19 +730,18 @@ void Instrument::noteTriggerEast() {
                 midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                 it->second.midiPlaying = false;
             } else {
-                float rampTarget;
-                if (dynamicVelo) {
-                     rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
-                } else {
-                    rampTarget = velocity;
-                }
+                   float rampTarget = float( it->second.y_in_x_elements[gridTiles-*stepperPos-1]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 if(it->second.midiPlaying){
                     midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                     it->second.midiPlaying = false;
                 }
-                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                if(dynamicVelo){
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                } else {
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,velocity*127);
+                }
                 it->second.midiNote = it->second.groupNote;
                 it->second.midiPlaying = true;
             }
@@ -805,19 +802,18 @@ void Instrument::noteTriggerSouth() {
                 midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                 it->second.midiPlaying = false;
             } else {
-                float rampTarget;
-                if (dynamicVelo) {
-                     rampTarget =float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles);
-                } else {
-                    rampTarget = velocity;
-                }
+                     float rampTarget =float( it->second.x_in_y_elements[*stepperPos]) / float(gridTiles);
                 it->second.groupSynth.setParameter("rampVolumeTarget",rampTarget);
                 tempLog.volume[it->second.groupNote-keyNote] = rampTarget;
                 if(it->second.midiPlaying){
                     midiOutPtr->sendNoteOff(channel, it->second.midiNote,0);
                     it->second.midiPlaying = false;
                 }
-                midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                if(dynamicVelo){
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,rampTarget*127);
+                } else {
+                    midiOutPtr->sendNoteOn(channel, it->second.groupNote,velocity*127);
+                }
                 it->second.midiNote = it->second.groupNote;
                 it->second.midiPlaying = true;
             }
