@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.99.08"
+#define VERSION "0.99.20"
 
 
 
@@ -1400,7 +1400,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                     cout << "bpm::" << getBpmValue(staticDelayValue) << endl;
                 }
             }
-            else if (mainInterfaceData[146].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[146].isInside(ofVec2f(x,y)) || mainInterfaceData[146].touchDown) {
                 if(soundReverb){
                     if(!mainInterfaceData[146].touchDown){
                         mainInterfaceData[146].touchDown = true;
@@ -1411,7 +1411,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                     tonicSynth.setParameter("revTime",getRevTime(value));
                 }
             }
-            else if (mainInterfaceData[148].isInside(ofVec2f(x,y))) {
+            else if (mainInterfaceData[148].isInside(ofVec2f(x,y)) || mainInterfaceData[148].touchDown) {
                 if(soundReverb){
                     if(!mainInterfaceData[148].touchDown){
                         mainInterfaceData[148].touchDown = true;
@@ -2529,7 +2529,7 @@ void ofApp::gotFocus(){
     //volumeRestartTarget = mainVol;
     //volumeRestart = 0.0;
     //tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
-    
+    lastTouch = ofGetElapsedTimef();
     cout <<"gotfocus" << endl;
 }
 
