@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.055
 #define BPM (120)
-#define ANI_SPEED 0.025
+#define ANI_SPEED 0.0325
 #define BPM_MAX 220
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.99.20"
+#define VERSION "0.99.25"
 
 
 
@@ -47,6 +47,9 @@ void ofApp::setup(){
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [UIApplication sharedApplication].idleTimerDisabled = YES;
+    
+    swipping.setup();
+    ofAddListener(swipping.swipeRecognized, this, &ofApp::onSwipe);
 #else
     setSampleRate(44100);
     ofSoundStreamSetup(2, 0, this, 44100, 256*2, 4);
@@ -1616,12 +1619,6 @@ void ofApp::replaceMousePressed(int x, int y) {
     //for the sleeptimer
     if (!sleepMode){
         lastTouch = ofGetElapsedTimef();
-    } else {
-        sleepMode = false;
-        lastTouch = ofGetElapsedTimef();
-        for  (int i = 0; i < 8; i++){
-            mainInterfaceData.at(defaultStateIndex[i]).switchColor();
-        }
     }
     
   }
@@ -2542,6 +2539,95 @@ void ofApp::gotFocus(){
     //tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
     lastTouch = ofGetElapsedTimef();
     cout <<"gotfocus" << endl;
+}
+
+//--------------------------------------------------------------
+void ofApp::onSwipe(ofSwipeGestureRecognizerArgs & args){
+    
+    if(!interfaceMoving && !sleepMode){
+        
+        if (currentState == STATE_EDIT && !mainInterfaceData[136].touchDown){
+            //left
+            if(args.direction == 1){
+                if(synths[synthButton[0]].trackSwitchOn) {
+                    buttonOnePress();
+                } else {
+                    synths[synthButton[0]].trackSwitchOn = true;
+                }
+            }
+            //right
+            else if(args.direction == 2){
+                if(synths[synthButton[2]].trackSwitchOn) {
+                    buttonThreePress();
+                } else {
+                    synths[synthButton[2]].trackSwitchOn = true;
+                }
+            }
+            //up
+            else if(args.direction == 4 || args.direction == 8){
+                buttonTwoPress();
+                mainInterfaceData[43].blinkOn();
+            }
+        }
+        else if (currentState == STATE_VOLUME &&
+                 !(mainInterfaceData[0].touchDown ||
+                   mainInterfaceData[1].touchDown ||
+                   mainInterfaceData[2].touchDown ||
+                   mainInterfaceData[3].touchDown)
+                 ){
+            if(args.direction == 4 || args.direction == 8){
+                buttonFourPress();
+                mainInterfaceData[43].blinkOn();
+            }
+        }
+        else if (currentState == STATE_HARMONY){
+            if(args.direction == 4 || args.direction == 8){
+                harmonyButtonPress();
+                mainInterfaceData[43].blinkOn();
+            }
+        }
+        else if (currentState == STATE_BPM && !mainInterfaceData[45].touchDown){
+            if(args.direction == 4 || args.direction == 8){
+                bpmButtonPress();
+                mainInterfaceData[43].blinkOn();
+            }
+        }
+        else if (currentState == STATE_EDIT_DETAIL &&
+                 !(mainInterfaceData[136].touchDown ||
+                   mainInterfaceData[49].touchDown)
+                 ){
+            if(args.direction == 4 || args.direction == 8){
+                buttonEditDetail();
+                mainInterfaceData[11].blinkOn();
+            }
+        }
+        else if (currentState == STATE_SETTINGS &&
+                 !(mainInterfaceData[139].touchDown ||
+                   mainInterfaceData[143].touchDown ||
+                   mainInterfaceData[146].touchDown ||
+                   mainInterfaceData[148].touchDown)
+                 ){
+            if(args.direction == 1 || args.direction == 2){
+                mainInterfaceData[43].blinkOn();
+                settingsButtonPress();
+            }
+        }
+        else if (currentState == STATE_SAVE){
+            if(!saveManager.slotDetail){
+                if(args.direction == 1|| args.direction == 2){
+                    loadSaveButtonPress();
+                    mainInterfaceData[47].blinkOn();
+                    
+                }
+            }
+            else if(saveManager.slotDetail && !saveManager.animate){
+                if(args.direction == 4 || args.direction == 8){
+                    closeSlotInterface();
+                    mainInterfaceData[50].blinkOn();
+                }
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------

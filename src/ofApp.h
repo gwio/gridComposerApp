@@ -12,6 +12,7 @@
 #include "ofxMidi.h"
 #if TARGET_OS_IPHONE
 #include <AVFoundation/AVFoundation.h>
+#include "ofSwipeGestureRecognizer.h"
 #endif
 //#include "ofxFontStash.h"
 //#include "ofxXmlSettings.h"
@@ -51,6 +52,9 @@ class ofApp : public ofxiOSApp{
         void gotFocus();
         void gotMemoryWarning();
         void deviceOrientationChanged(int newOrientation);
+        
+        ofSwipeGestureRecognizer      swipping;
+        void onSwipe(ofSwipeGestureRecognizerArgs & args);
 #else
         void keyPressed(int key);
         void keyReleased(int key);
