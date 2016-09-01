@@ -3,7 +3,7 @@
 #define TILESIZE (100/TILES)
 #define TILEBORDER 0.055
 #define BPM (120)
-#define ANI_SPEED 0.0325
+#define ANI_SPEED 0.035
 #define BPM_MAX 220
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
@@ -20,7 +20,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "0.99.25"
+#define VERSION "1.00.00"
 
 
 
