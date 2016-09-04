@@ -5,6 +5,7 @@
 #define BPM (120)
 #define ANI_SPEED 0.035
 #define BPM_MAX 220
+#define BPM_DIVISION_MAX 12.0
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
 
@@ -124,29 +125,34 @@ void ofApp::setup(){
     tonicSynth.setParameter("revSize", revSize);
     
     bpmpara = tonicSynth.addParameter("BPM");
-    tonicSynth.setParameter("BPM", bpm*8);
+    tonicSynth.setParameter("BPM", bpm*BPM_DIVISION_MAX);
     ControlGenerator pulse = ControlMetro().bpm(bpmpara);
     //hmm
-    ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara/4*3);
+    //
+    //ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara/4*3);
     //ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara*0.666);
 
-
-    ControlMetroDivider pulseDiv2 = ControlMetroDivider().divisions(2).input(pulse);
-    //ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
-    ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(4).input(pulse);
+    //  1/4 -> 4x quarternote
+    ControlMetroDivider pulseDiv1 = ControlMetroDivider().divisions(3).input(pulse);
+    // 1/3  -> 3x  triads
+    ControlMetroDivider pulseDiv2 = ControlMetroDivider().divisions(4).input(pulse);
+    // 1/2 -> 2x halfnote
+    ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(6).input(pulse);
+    // 1/1 -> 1x wholenote
+    ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(12).input(pulse);
     
   
 
-    // 1/4   -> x4
-    ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulse);
+    //  1/4 -> 4x quarternote
+    ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulseDiv1);
     ofAddListener(*pulseEventDiv1, this, &ofApp::pulseEventDiv1, OF_EVENT_ORDER_AFTER_APP );
-    //triad -> x3
-    ofEvent<float>* pulseEventDiv2 = tonicSynth.createOFEvent(pulseTriad);
+    // 1/3  -> 3x  triads
+    ofEvent<float>* pulseEventDiv2 = tonicSynth.createOFEvent(pulseDiv2);
     ofAddListener(*pulseEventDiv2, this, &ofApp::pulseEventDiv2, OF_EVENT_ORDER_AFTER_APP );
-    //2/4 -> x2
-    ofEvent<float>* pulseEventDiv3 = tonicSynth.createOFEvent(pulseDiv2);
+    // 1/2 -> 2x halfnote
+    ofEvent<float>* pulseEventDiv3 = tonicSynth.createOFEvent(pulseDiv3);
     ofAddListener(*pulseEventDiv3, this, &ofApp::pulseEventDiv3, OF_EVENT_ORDER_AFTER_APP );
-    // 4/4 -> x1
+    // 1/1 -> 1x wholenote
     ofEvent<float>* pulseEventDiv4= tonicSynth.createOFEvent(pulseDiv4);
     ofAddListener(*pulseEventDiv4, this, &ofApp::pulseEventDiv4, OF_EVENT_ORDER_AFTER_APP );
     
@@ -1262,7 +1268,7 @@ void ofApp::replaceMouseDragged(int x, int y){
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX)+20;
                 dynamicDelayValue = value;
-                tonicSynth.setParameter("BPM",bpm*4);
+                tonicSynth.setParameter("BPM",bpm*BPM_DIVISION_MAX);
                 if (autoDelay){
                     tonicSynth.setParameter("delay", getBpmValue(dynamicDelayValue));
                 }
@@ -1455,7 +1461,7 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[45].setSlider(mainInterface,value);
                 bpm=ceil(value*BPM_MAX)+20;
                 dynamicDelayValue = value;
-                tonicSynth.setParameter("BPM",bpm*4);
+                tonicSynth.setParameter("BPM",bpm*BPM_DIVISION_MAX);
                 if (autoDelay){
                     tonicSynth.setParameter("delay", getBpmValue(dynamicDelayValue));
                 }
@@ -6181,7 +6187,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
     settings.pushTag("BPM");
     settings.pushTag("global");
     bpm =ofClamp(settings.getValue("value", 50), 0, 500);
-    tonicSynth.setParameter("BPM", bpm*4);
+    tonicSynth.setParameter("BPM", bpm*BPM_DIVISION_MAX);
     settings.popTag();
     settings.pushTag("slots");
     for (int i = 0; i < 3; i++) {
