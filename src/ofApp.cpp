@@ -124,9 +124,12 @@ void ofApp::setup(){
     tonicSynth.setParameter("revSize", revSize);
     
     bpmpara = tonicSynth.addParameter("BPM");
-    tonicSynth.setParameter("BPM", bpm*4);
+    tonicSynth.setParameter("BPM", bpm*8);
     ControlGenerator pulse = ControlMetro().bpm(bpmpara);
+    //hmm
     ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara/4*3);
+    //ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara*0.666);
+
 
     ControlMetroDivider pulseDiv2 = ControlMetroDivider().divisions(2).input(pulse);
     //ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(3).input(pulse);
@@ -512,11 +515,15 @@ void ofApp::setupAudio(){
     }
     
     tonicSynth.setParameter("revTime", getRevTime(revTime));
+    cout << "revTime:" << revTime << endl;
     tonicSynth.setParameter("revSize", getRevSize(revSize));
+    cout << "revSize:" << revSize << endl;
     if(autoDelay){
         tonicSynth.setParameter("delay",getBpmValue(dynamicDelayValue));
+        cout << "dynamic delay" << dynamicDelayValue << endl;
     } else {
         tonicSynth.setParameter("delay", getBpmValue(staticDelayValue));
+        cout << "static delay" << staticDelayValue << endl;
     }
 }
 
@@ -1261,7 +1268,6 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
-                cout << bpm << endl;
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
                 }
@@ -1373,7 +1379,6 @@ void ofApp::replaceMouseDragged(int x, int y){
                     if(!autoDelay){
                         tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
                     }
-                    cout << "bpm::" << getBpmValue(staticDelayValue) << endl;
                 }
             }
             
@@ -1456,7 +1461,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
                 //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
                 //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
-                cout << bpm << endl;
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
                 }
@@ -1583,7 +1587,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                     if(!autoDelay){
                         tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
                     }
-                    cout << "bpm::" << getBpmValue(staticDelayValue) << endl;
                 }
             }
             
@@ -1919,7 +1922,6 @@ void ofApp::replaceMouseReleased(int x,int y) {
                     
                     markScaleSteps(63);
                     hvSlotD.blink();
-                    // cout <<   synths[activeSynth].activeScale.steps[i] <<endl;
                 }
             }
             
@@ -2281,7 +2283,6 @@ void ofApp::replaceMouseReleased(int x,int y) {
                     synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
                     synths[activeSynth].setKeyNote( (globalKey%12) - (synths[activeSynth].keyNote%12));
                     hvSlotD.changeC(ofColor::fromHsb(255,0,195,255));
-                    // cout << notes[ synths[activeSynth].keyNote%12 ] << endl;
                     setNewGUI();
                 } else {
                     mainInterfaceData[111].elementName = "LOCAL HARMONY";
@@ -2528,7 +2529,6 @@ void ofApp::lostFocus(){
     for (int i = 0; i < 3; i++){
         synths[i].setAllNotesOff();
     }
-    cout << "lost focus"  << endl;
 }
 
 //--------------------------------------------------------------
@@ -2538,7 +2538,6 @@ void ofApp::gotFocus(){
     //volumeRestart = 0.0;
     //tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
     lastTouch = ofGetElapsedTimef();
-    cout <<"gotfocus" << endl;
 }
 
 //--------------------------------------------------------------
@@ -2904,7 +2903,6 @@ void ofApp::volumeRampValueChanged(float & volumeRampValue) {
     
     mainVol = volumeRampValue;
     
-    // cout << "main " << Tonic::mapLinToLog(mainVol,0.0,1.0) << endl;
     tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(mainVol,0.0,1.0));
     
 }
@@ -5795,7 +5793,6 @@ void ofApp::markSynthNotes(int index_){
         if(it->second.size > 0){
             mainInterfaceData[it->second.groupNote-synths[activeSynth].keyNote+index_].setColor(it->second.groupColor);
             mainInterfaceData[it->second.groupNote-synths[activeSynth].keyNote+index_].activateOnColor();
-            // cout << it->second.groupNote - synths[activeSynth].keyNote << endl;
         }
     }
 }
@@ -5841,7 +5838,6 @@ void ofApp::markSynthNotes(){
             if(it->second.size > 0){
                 mainInterfaceData[(it->second.groupNote-synths[synthButton[j]].keyNote)+75+(synths[synthButton[j]].ownSlot*12)].setColor(it->second.groupColor);
                 mainInterfaceData[(it->second.groupNote-synths[synthButton[j]].keyNote)+75+(synths[synthButton[j]].ownSlot*12)].activateOnColor();
-                // cout << it->second.groupNote - synths[activeSynth].keyNote << endl;
             }
         }
     }
@@ -6116,7 +6112,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
             //dont load old xmlsettings
             
             if (ofToString( settings.getValue("number", "") ) != appVersion) {
-                cout << "old xml settings" << endl;
+               // cout << "old xml settings" << endl;
                 saveManager.firstStart = true;
                 settings.popTag();
             } else {
@@ -6126,7 +6122,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
         
     }else if (settings.loadFile("settingsDefault.xml")) {
         saveManager.firstStart = true;
-        cout << "loadDefault" << endl;
+        //cout << "loadDefault" << endl;
     }
     
     settings.pushTag("presets");

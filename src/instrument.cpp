@@ -277,7 +277,6 @@ void Instrument::setup(int *stepperPos_, Tonic::ofxTonicSynth *mainTonicPtr_, of
     Tonic::ControlParameter lfvfTarget = mainTonicPtr_->addParameter("lfvf"+instrumentId);
     mainTonicPtr->setParameter("lfvf"+instrumentId, 1.0);
     lowFreqVolFac = Tonic::RampedValue().value(1.0).length(0.002).target(lfvfTarget);
-    //   cout << cubes.getNumVertices() << endl;
     instrumentOut = instrumentOut * outputRamp * lowFreqVolFac;
     globalStatePtr = globalState_;
     bpmPtr = bpm_;
@@ -415,14 +414,14 @@ void Instrument::cleanSoundsMap(){
     vector<unsigned long> tempList = soundsMapTrash;
     for (int i = 0; i < tempList.size(); i++){
         soundsMap.erase(tempList.at(i));
-        cout << "remove " << soundsMapTrash.at(i) << " from soundsmap in remove cube" << endl;
+        //cout << "remove " << soundsMapTrash.at(i) << " from soundsmap in remove cube" << endl;
     }
     if(tempList.size() > 0){
         updateTonicOut();
     }
     soundsMapTrash.clear();
     
-    cout << soundsMap.size() << endl;
+    //cout << soundsMap.size() << endl;
     //reallocate all synths to mainout
 }
 
@@ -522,7 +521,6 @@ void Instrument::nextDirection() {
     }
     
     
-    //  cout << scanDirection << endl;
 }
 
 //Index position is different for each direction!!!
@@ -937,7 +935,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
         
         setupOneSynth(soundsMap[soundsCounter]);
 
-        cout << "added " << soundsCounter << " to soundsmap" << endl;
+        //cout << "added " << soundsCounter << " to soundsmap" << endl;
         
         //reallocate all synths to mainout
         updateTonicOut();
@@ -980,7 +978,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
                 cubeVector[layerInfo.at(x_).at(y_).cubeVecNum].satOff();
             }
             */
-            cout << "added to" << soundMapIndex  << endl;
+            //cout << "added to" << soundMapIndex  << endl;
             updateGroupInfo(soundMapIndex, x_, y_);
         } else {
             layerInfo.at(x_).at(y_).cubeGroupId = soundMapIndex;
@@ -1485,7 +1483,6 @@ void Instrument::planeMovement(float pct_){
         pulsePlane.animationTransition(pct_);
         pulsePlane.positionMod = ofLerp(pulsePlane.positionModDef, pulsePlane.positionModTar,pct_);
         pulsePlane.scaleMod = ofLerp(pulsePlane.scaleModDef, pulsePlane.scaleModTar, pct_);
-        cout << ofLerp(pct_, pulsePlane.scaleModDef, pulsePlane.scaleModTar) << endl;
     }
     
     
@@ -1585,7 +1582,7 @@ void Instrument::getLayerInfo(vector< vector <bool> >& flipInfoPtr_) {
 float Instrument::getLfvf(int& preset_){
     float temp;
     temp =   0.95+ pow( 1-(1-ofMap(float(keyNote), 12, 127, 1.0, 0.0)),10 )*presetManager.getPresetLfvf(preset_);
-    cout << " lfvf " << ofClamp(temp,0.0,250.0) << endl;
+   // cout << " lfvf " << ofClamp(temp,0.0,250.0) << endl;
 
     return ofClamp(temp,0.0,250.0);
 }
@@ -1593,7 +1590,7 @@ float Instrument::getLfvf(int& preset_){
 float Instrument::getSynthRelease1(int& preset_){
     float tempR;
     tempR = (presetManager.getPresetRelease(preset_)  / (5-nextPulseDivision)) * attackSlider;
-    cout<< "release " << tempR<< endl;
+    //cout<< "release " << tempR<< endl;
 
     return tempR;
 }
@@ -1601,7 +1598,7 @@ float Instrument::getSynthRelease1(int& preset_){
 float Instrument::getSynthAttack1(int& preset_){
     float tempA;
     tempA = (presetManager.getPresetAttack(preset_)  / (5-nextPulseDivision)) * attackSlider;
-    cout << "attack  "<< tempA << endl;
+   // cout << "attack  "<< tempA << endl;
     
     return tempA;
 }
@@ -1609,7 +1606,7 @@ float Instrument::getSynthAttack1(int& preset_){
 float Instrument::getSynthRelease2(int& preset_){
     float tempR;
     tempR = (presetManager.getPresetRelease(preset_)  / (5-nextPulseDivision)) * attackSlider;
-    cout<< "release " << tempR<< endl;
+   // cout<< "release " << tempR<< endl;
     
     return tempR;
 }
@@ -1617,7 +1614,7 @@ float Instrument::getSynthRelease2(int& preset_){
 float Instrument::getSynthAttack2(int& preset_){
     float tempA;
     tempA = (presetManager.getPresetAttack(preset_)  / (5-nextPulseDivision)) * attackSlider;
-    cout << "attack  "<< tempA << endl;
+    //cout << "attack  "<< tempA << endl;
     
     return tempA;
 }
