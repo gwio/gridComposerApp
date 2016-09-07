@@ -21,7 +21,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 2.0
-#define VERSION "1.00.00"
+#define VERSION "1.00.10"
 
 
 
@@ -6232,6 +6232,7 @@ void ofApp::loadFromXml(string path_, bool settings_){
         synths[i].velocity = globalVelo;
         synths[i].dynamicVelo = dynamicVelo;
     }
+    settings.popTag();
   
     
     //globalScale
@@ -6449,13 +6450,13 @@ float ofApp::getBpmValue(float in){
     float bpmFac, temp;
     bpmFac = (ofClamp(in,0.0,1.0)*BPM_MAX)/BPM_MAX;
     temp = (1.0-bpmFac)*1.0;
-    return ofClamp(temp,0.0001,1.0);
+    return ofClamp(temp,0.0001,1.0)*0.85;
 }
 
 float ofApp::getRevTime(float in){
     float temp;
     temp = ofMap(in, 0.0, 1.0, 0.15, 3.5);
-    return ofClamp(temp, 0.0, 2.5);
+    return ofClamp(temp, 0.0, 2.75);
 }
 
 float ofApp::getRevSize(float in){
