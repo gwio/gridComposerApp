@@ -231,6 +231,8 @@ class ofApp : public ofxiOSApp{
         ofPolyline OneTimePathOff, TwoTimePathOff, ThreeTimePathOff;
         ofPolyline OneLoadPathOn, TwoLoadPathOn, ThreeLoadPathOn;
         ofPolyline OneLoadPathOff, TwoLoadPathOff, ThreeLoadPathOff;
+        ofPolyline OneSettingsPathOn, TwoSettingsPathOn, ThreeSettingsPathOn;
+        ofPolyline OneSettingsPathOff, TwoSettingsPathOff, ThreeSettingsPathOff;
         
         ofPolyline camEditToDetail, camDetailToEdit;
         
