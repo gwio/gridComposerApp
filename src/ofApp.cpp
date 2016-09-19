@@ -590,12 +590,12 @@ void ofApp::updateBpmMenuMesh(){
 void ofApp::update(){
     //fade in Volume at start
     if (startUp && volumeRestart < volumeRestartTarget) {
+        setMainVolume(volumeRestart);
         volumeRestart += .012;
-        mainVol = volumeRestart;
-        volumeRampValueChanged(mainVol);
+       // mainVol = volumeRestart;
     } else if (startUp && volumeRestart >= volumeRestartTarget) {
-        mainVol = volumeRestartTarget;
-        volumeRampValueChanged(mainVol);
+        //mainVol = volumeRestartTarget;
+        setMainVolume(mainVol);
         startUp = false;
     }
     
@@ -1320,7 +1320,8 @@ void ofApp::replaceMouseDragged(int x, int y){
             else if (mainInterfaceData[0].touchDown) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
-                volumeRampValueChanged(value);
+                setMainVolume(value);
+                mainVol = value;
                 //mainInterfaceData[51].elementName = ofToString(value,2);
                 //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
@@ -1528,7 +1529,8 @@ void ofApp::replaceMousePressed(int x, int y) {
                 }
                 float value = ofClamp(ofMap(x, mainInterfaceData[0].minX, mainInterfaceData[0].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[0].setSlider(mainInterface, value);
-                volumeRampValueChanged(value);
+                setMainVolume(value);
+                mainVol = value;
                 //mainInterfaceData[51].elementName = ofToString(value,2);
                 //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
@@ -2946,11 +2948,11 @@ void ofApp::pulseEventDiv4(float & val){
 
 
 
-void ofApp::volumeRampValueChanged(float & volumeRampValue) {
+void ofApp::setMainVolume(float & in_) {
+        
+    tonicSynth.setParameter("mainVolumeRamp", pow(in_,4)   );
     
-    mainVol = volumeRampValue;
-    
-    tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(mainVol,0.0,1.0));
+    cout << "logvol:"  <<   pow(in_,4)  << endl;;
     
 }
 
@@ -5483,6 +5485,8 @@ void ofApp::loadSaveButtonPress(){
         volumeRestartTarget = mainVol;
         volumeRestart = 0.0;
         volumeRamp.value(0.0);
+        cout <<"save button :" << volumeRestartTarget << endl;
+
         
     }
     
@@ -6169,10 +6173,7 @@ void ofApp::saveToXml(string path_){
 }
 
 void ofApp::loadFromXml(string path_, bool settings_){
-    startUp = true;
-    volumeRestartTarget = mainVol;
-    volumeRestart = 0.0;
-    // volumeRamp.value(0.0);
+ 
     
     //load grid presets from xml
     
@@ -6229,9 +6230,14 @@ void ofApp::loadFromXml(string path_, bool settings_){
     //load volume
     settings.pushTag("Volumes");
     settings.pushTag("global");
-    // volumeRampValueChanged(mainVol);
+    startUp = true;
+  
     volumeRestartTarget = settings.getValue("volume", 1.0);
+    volumeRestart = 0.0;
     mainVol = volumeRestartTarget;
+    setMainVolume(volumeRestart);
+
+    cout <<"load xml :" << volumeRestartTarget << endl;
     //mainInterfaceData[51].elementName = ofToString(volumeRestartTarget,2);
     //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
     settings.popTag();

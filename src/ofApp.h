@@ -282,7 +282,7 @@ class ofApp : public ofxiOSApp{
      
         float lastTouch, sleepTimer;
         
-        void volumeRampValueChanged(float&volumeRampValue);
+        void setMainVolume(float&volumeRampValue);
         
         //GlobalGui
         vector<GlobalGUI> mainInterfaceData;

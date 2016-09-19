@@ -1320,7 +1320,7 @@ void Instrument::setScale(float scale_){
 
 void Instrument::changeSynthVolume(float & vol_) {
     sVolume = vol_;
-    mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId,Tonic::mapLinToLog(vol_,0.0,1.0));
+    mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId,  pow(vol_,4) );
     //cout << instrumentId << Tonic::mapLinToLog(vol_,0.0,1.0) << endl;
     scanZ = ofClamp( (SCAN_Z*vol_), CUBE_Z_HEIGHT, SCAN_Z) ;
 }
