@@ -3342,7 +3342,7 @@ void ofApp::setupGlobalInterface() {
     
     //TOGLE VOLUME, STATE_DEFAULT
     place = ofVec3f(0,-designGrid[0][0].y/2,0);
-    offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
     temp = GlobalGUI(37, string("VOLUME"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
@@ -3366,7 +3366,7 @@ void ofApp::setupGlobalInterface() {
     
     //toggle bpm icon, STATE_DEFFAULT
     place = ofVec3f(0,-designGrid[0][0].y/2,0);
-    offPlace = ofVec3f(designGrid[0][0].x*6,0,0);
+    offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
     temp = GlobalGUI(41, string("TEMPO"), smallButton, ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
