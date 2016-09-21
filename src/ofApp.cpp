@@ -21,7 +21,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 1.8
-#define VERSION "1.00.20"
+#define VERSION "1.00.50"
 
 
 
@@ -3346,15 +3346,20 @@ void ofApp::setupGlobalInterface() {
     float offset = ((gridRect.x*0.888*2)+gridRect.x)/12;
     ofVec3f scaleButton = ofVec3f(offset,gridRect.y*hSliderYscale,0);
     
-    for (int i = 0; i < 12; i++) {
+    place = ofVec3f( -(offset*6)+(scaleButton.x/2),-designGrid[0][0].y,0);
+    temp = GlobalGUI(13,notes[0],scaleButton,ofColor(0,0,0),place,offPlace,fontDefault,false,&tekoBold);
+    mainInterfaceData.push_back(temp);
+    
+    for (int i = 1; i < 12; i++) {
         place = ofVec3f( -(offset*6)+(offset*i)+(scaleButton.x/2),-designGrid[0][0].y,0);
-        temp = GlobalGUI(13+i,notes[i],scaleButton,ofColor(0,0,0),place,offPlace,fontDefault,false,&tekoBold);
+        temp = GlobalGUI(13+i,notes[i],scaleButton,ofColor(0,0,0),place,offPlace,fontDefault,false,&tekoRegular);
         mainInterfaceData.push_back(temp);
     }
     
     //keynote; STATE_EDIT_DETAIL
     offPlace = ofVec3f(0,-designGrid[0][0].y*lowOff,0);
     ofVec3f keyButton = ofVec3f(offset,designGrid[0][0].y/32,0);
+    
     for (int i = 0; i < 12; i++) {
         place = ofVec3f( -(offset*6)+(offset*i)+(scaleButton.x/2),-(designGrid[0][0].y)+(scaleButton.y/2)+(keyButton.y/2)+2.0,0);
         temp = GlobalGUI(25+i,notes[i],keyButton,ofColor(0,0,0),place, offPlace, fontSmall,false,&tekoBold);
