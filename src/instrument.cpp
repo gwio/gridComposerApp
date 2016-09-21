@@ -1,9 +1,9 @@
 #include "instrument.h"
 
 //layer is 100x100
-#define CUBE_Z_HEIGHT 12
+#define CUBE_Z_HEIGHT 16
 #define EMPTY_Z 2
-#define SCAN_Z 24
+#define SCAN_Z 12
 #define HUE_VARIATION 12
 
 
@@ -1322,7 +1322,7 @@ void Instrument::changeSynthVolume(float & vol_) {
     sVolume = vol_;
     mainTonicPtr->setParameter("mainVolumeRamp"+instrumentId,  pow(vol_,4) );
     //cout << instrumentId << Tonic::mapLinToLog(vol_,0.0,1.0) << endl;
-    scanZ = ofClamp( (SCAN_Z*vol_), CUBE_Z_HEIGHT, SCAN_Z) ;
+    scanZ = ofClamp( (CUBE_Z_HEIGHT+ (SCAN_Z*vol_)), CUBE_Z_HEIGHT,CUBE_Z_HEIGHT+ SCAN_Z) ;
 }
 
 
