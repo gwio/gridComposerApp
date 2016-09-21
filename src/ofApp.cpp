@@ -4,7 +4,7 @@
 #define TILEBORDER 0.055
 #define BPM (120)
 #define ANI_SPEED 0.035
-#define BPM_MAX 220
+#define BPM_MAX 260
 #define BPM_DIVISION_MAX 12.0
 #define HISTORY_ROWS 35
 #define HARMONY_ROWS_SCALE 0.777
@@ -20,7 +20,7 @@
 
 
 #define attSldMin 0.25
-#define attSldMax 2.0
+#define attSldMax 1.8
 #define VERSION "1.00.20"
 
 
@@ -470,7 +470,7 @@ void ofApp::setupAudio(){
     
     Generator temp;
     for (int i = 0; i < synths.size(); i++) {
-        temp = temp + synths[i].instrumentOut;
+        temp = temp + (synths[i].instrumentOut*0.8);
     }
     mainOut = temp ;
     
@@ -502,7 +502,7 @@ void ofApp::setupAudio(){
     .threshold( dBToLin(-30) )
     .ratio(4)
     .lookahead(0.001)
-    .makeupGain(4.5)
+    .makeupGain(4.0)
     .bypass(false);
     
     
@@ -1656,55 +1656,11 @@ void ofApp::mouseReleased(int x, int y, int button){
 void ofApp::replaceMouseReleased(int x,int y) {
     
     if(!interfaceMoving){
-        if(mainInterfaceData[136].touchDown){
-            mainInterfaceData[136].touchDown = false;
-        }
-        if(mainInterfaceData[45].touchDown){
-            mainInterfaceData[45].touchDown = false;
-        }
-        if(mainInterfaceData[0].touchDown){
-            mainInterfaceData[0].touchDown = false;
-        }
-        if(mainInterfaceData[1].touchDown){
-            mainInterfaceData[1].touchDown = false;
-        }
-        if(mainInterfaceData[2].touchDown){
-            mainInterfaceData[2].touchDown = false;
-        }
-        if(mainInterfaceData[3].touchDown){
-            mainInterfaceData[3].touchDown = false;
-        }
-        if(mainInterfaceData[49].touchDown){
-            mainInterfaceData[49].touchDown = false;
-        }
-        if(mainInterfaceData[136].touchDown){
-            mainInterfaceData[136].touchDown = false;
-        }
-        if(mainInterfaceData[139].touchDown){
-            mainInterfaceData[139].touchDown = false;
-        }
-        if(mainInterfaceData[143].touchDown){
-            mainInterfaceData[143].touchDown = false;
-        }
-        if(mainInterfaceData[146].touchDown){
-            mainInterfaceData[146].touchDown = false;
-        }
-        if(mainInterfaceData[148].touchDown){
-            mainInterfaceData[148].touchDown = false;
-        }
         
-        if(saveManager.touchDown) {
-            saveManager.touchDown = false;
-        }
         
-        if (lastClick.x == x && lastClick.y == y){
-            if (!saveManager.slotDetail && !saveManager.animate) {
-                saveManager.isInside(ofVec3f(x,y,0));
-                if(saveManager.animate){
-                    openSlotInterface();
-                }
-            }
-        }
+       
+        
+      
         
         
         
@@ -1724,6 +1680,7 @@ void ofApp::replaceMouseReleased(int x,int y) {
     }
     
     if (!interfaceMoving && !sleepMode) {
+        
         
         if (currentState == STATE_DEFAULT) {
             
@@ -1775,6 +1732,57 @@ void ofApp::replaceMouseReleased(int x,int y) {
     
     if ( !interfaceMoving && !insideSynth && !sleepMode ){
         
+        bool touchUp = false;
+        if(mainInterfaceData[136].touchDown){
+            mainInterfaceData[136].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[45].touchDown){
+            mainInterfaceData[45].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[0].touchDown){
+            mainInterfaceData[0].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[1].touchDown){
+            mainInterfaceData[1].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[2].touchDown){
+            mainInterfaceData[2].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[3].touchDown){
+            mainInterfaceData[3].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[49].touchDown){
+            mainInterfaceData[49].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[136].touchDown){
+            mainInterfaceData[136].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[139].touchDown){
+            mainInterfaceData[139].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[143].touchDown){
+            mainInterfaceData[143].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[146].touchDown){
+            mainInterfaceData[146].touchDown = false;
+            touchUp = true;
+        }
+        if(mainInterfaceData[148].touchDown){
+            mainInterfaceData[148].touchDown = false;
+            touchUp = true;
+        }
+        
+        if (!touchUp) {
         if (currentState == STATE_DEFAULT) {
             
             if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
@@ -2337,7 +2345,18 @@ void ofApp::replaceMouseReleased(int x,int y) {
         
         else if (currentState == STATE_SAVE){
             
+            if(saveManager.touchDown) {
+                saveManager.touchDown = false;
+            }
             
+            if (lastClick.x == x && lastClick.y == y){
+                if (!saveManager.slotDetail && !saveManager.animate) {
+                    saveManager.isInside(ofVec3f(x,y,0));
+                    if(saveManager.animate){
+                        openSlotInterface();
+                    }
+                }
+            }
             
             if(!saveManager.slotDetail){
                 if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
@@ -2496,6 +2515,7 @@ void ofApp::replaceMouseReleased(int x,int y) {
             }
             
             
+        }
         }
     }
     
@@ -3253,23 +3273,24 @@ void ofApp::setupGlobalInterface() {
     
     ofVec3f gridRect = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2,0);
     float hSliderYscale = 0.25;
+    float hSLiderHandler = 0.5;
     
     //---------------------------------------------------------------------------
     
     //volume slider ,STATE_VOLUME
     ofVec3f place = ofVec3f(0,+gridRect.y*hSliderYscale/2,0);
     ofVec3f offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
-    GlobalGUI temp = GlobalGUI(0,string(""),ofVec3f( (gridRect.x*0.888*2)+gridRect.x,gridRect.y*0.25,0), ofColor(50,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    GlobalGUI temp = GlobalGUI(0,string(""),ofVec3f( (gridRect.x*0.888*2)+gridRect.x,gridRect.y*hSLiderHandler,0), ofColor(50,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //volume A B C, STATE_VOLUME
     place = ofVec3f(0,-designGrid[0][0].y/4,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*lowOff,0);
-    temp = GlobalGUI(1,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(1,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(2,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(52,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(2,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(52,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
-    temp = GlobalGUI(3,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(53,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(3,string(""),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(53,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     
     //slot a octave/note, STATE_HARMONY
@@ -3391,7 +3412,7 @@ void ofApp::setupGlobalInterface() {
     //bpm slider, STATE_BPM
     place = ofVec3f(0,gridRect.y*hSliderYscale/2,0);
     offPlace = ofVec3f(0,-designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(45, string(""), ofVec3f((gridRect.x*0.888*2)+gridRect.x, gridRect.y*0.25,0), ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoLight);
+    temp = GlobalGUI(45, string(""), ofVec3f((gridRect.x*0.888*2)+gridRect.x, gridRect.y*hSLiderHandler,0), ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoLight);
     mainInterfaceData.push_back(temp);
     
     // load save button STATE_DEFAULT
@@ -3415,7 +3436,7 @@ void ofApp::setupGlobalInterface() {
     //keynote slider, STATE_EDIT_DETAIL
     place = ofVec3f(0,gridRect.y*hSliderYscale/2,0);
     offPlace = ofVec3f(0 ,-designGrid[0][0].y*farOff,0);
-    temp = GlobalGUI(49, string(""), ofVec3f( (gridRect.x*0.888*2)+gridRect.x,gridRect.y*0.25,0), ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoLight);
+    temp = GlobalGUI(49, string(""), ofVec3f( (gridRect.x*0.888*2)+gridRect.x,gridRect.y*hSLiderHandler,0), ofColor(23,23,23), place, offPlace,fontDefault,true,&tekoLight);
     mainInterfaceData.push_back(temp);
     
     //return to load grid, STATE_SAVE
@@ -3617,7 +3638,7 @@ void ofApp::setupGlobalInterface() {
     //soft<->hard settings , STATE_EDIT
     place = ofVec3f(0,0,0);
     offPlace = ofVec3f(-designGrid[0][0].x*6,0,0);
-    temp = GlobalGUI(136,string("ATTACK"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoBold);
+    temp = GlobalGUI(136,string("ATTACK"),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoBold);
     mainInterfaceData.push_back(temp);
     
     //slider background, STATE_EDIT
@@ -3635,7 +3656,7 @@ void ofApp::setupGlobalInterface() {
     //velo slider, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y/4,0);
     offPlace = ofVec3f(designGrid[0][0].x*farOff,0,0);
-    temp = GlobalGUI(139,string("VELOCITY"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(139,string("VELOCITY"),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     mainInterfaceData.back().activateDarkerColor();
     
@@ -3661,7 +3682,7 @@ void ofApp::setupGlobalInterface() {
     //delay slider, STATE_SETTINGS
     place = ofVec3f(0,-designGrid[0][0].y*0.75,0);
     offPlace = ofVec3f(designGrid[0][0].x*farOff,0,0);
-    temp = GlobalGUI(143,string("DELAY TIME"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(143,string("DELAY TIME"),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     mainInterfaceData.back().activateDarkerColor();
     
@@ -3681,7 +3702,7 @@ void ofApp::setupGlobalInterface() {
     //reverb time slider, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
     offPlace = ofVec3f(designGrid[0][0].x*farOff,0,0);
-    temp = GlobalGUI(146,string("REVERB TIME"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(146,string("REVERB TIME"),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     mainInterfaceData.back().activateDarkerColor();
     
@@ -3694,7 +3715,7 @@ void ofApp::setupGlobalInterface() {
     //reverb size slider, STATE_SETTINGS
     place = ofVec3f(0,designGrid[0][0].y*0.25,0);
     offPlace = ofVec3f(designGrid[0][0].x*farOff,0,0);
-    temp = GlobalGUI(148,string("REVERB SIZE"),ofVec3f(gridRect.x*0.777, gridRect.y*0.25,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
+    temp = GlobalGUI(148,string("REVERB SIZE"),ofVec3f(gridRect.x*0.777, gridRect.y*hSLiderHandler,0),ofColor(51,0,0),place,offPlace,fontDefault,true,&tekoSemibold);
     mainInterfaceData.push_back(temp);
     mainInterfaceData.back().activateDarkerColor();
     
