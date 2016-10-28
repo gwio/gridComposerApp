@@ -23,8 +23,8 @@
 #define attSldMax 1.8
 #define VERSION "1.00.52"
 
-#define sWIDTH 2500
-#define sHEIGHT 1200
+#define sWIDTH 2208
+#define sHEIGHT 1242
 
 enum currentState {
     STATE_DEFAULT,
@@ -1238,14 +1238,25 @@ void ofApp::keyPressed(int key){
     
     if(key == '4'){
         buttonFourPress();
+        mainInterfaceData[131].elementName = "VOLUME";
+        mainInterfaceData[131].setStringWidth();
+        mainInterfaceData[131].activateDarkerColor();
+        mainInterfaceData[37].blinkOn();
     }
     
     if(key == '5'){
         harmonyButtonPress();
+        mainInterfaceData[42].blinkOn();
+        mainInterfaceData[131].elementName = "HARMONY";
+        mainInterfaceData[131].setStringWidth();
+        mainInterfaceData[131].activateDarkerColor();
     }
     
     if(key == '6'){
-        bpmButtonPress();
+        mainInterfaceData[41].blinkOn();
+        mainInterfaceData[131].elementName = "TEMPO";
+        mainInterfaceData[131].setStringWidth();
+        mainInterfaceData[131].activateDarkerColor();
     }
     
     if(key == '7'){
