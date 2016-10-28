@@ -23,7 +23,8 @@
 #define attSldMax 1.8
 #define VERSION "1.00.52"
 
-
+#define sWIDTH 2500
+#define sHEIGHT 1200
 
 enum currentState {
     STATE_DEFAULT,
@@ -1189,9 +1190,7 @@ void ofApp::drawStringAndIcons(){
 void ofApp::keyPressed(int key){
     
     if (key == 's') {
-        ofImage pix;
-        pix.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
-        pix.save(ofGetTimestampString()+"debug.png");
+        getFboScreen();
     }
     
     
@@ -1225,6 +1224,33 @@ void ofApp::keyPressed(int key){
         savePreset();
     }
     
+    if(key == '1'){
+        buttonOnePress();
+    }
+    
+    if(key == '2'){
+        buttonTwoPress();
+    }
+    
+    if(key == '3'){
+        buttonThreePress();
+    }
+    
+    if(key == '4'){
+        buttonFourPress();
+    }
+    
+    if(key == '5'){
+        harmonyButtonPress();
+    }
+    
+    if(key == '6'){
+        bpmButtonPress();
+    }
+    
+    if(key == '7'){
+        loadSaveButtonPress();
+    }
 }
 
 //--------------------------------------------------------------
@@ -2846,7 +2872,7 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     tempNode.setFov(camFov);
     tempNode.setPosition(camNotActivePos);
     tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
-    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), ofGetWidth(), ofGetHeight()));
+    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), sWIDTH, sHEIGHT));
     ofRay ray;
     ray.s = wMouse;
     ray.t = wMouse-tempNode.getPosition();
@@ -4650,7 +4676,7 @@ void ofApp::makePresetString() {
 
 void ofApp::makeDesignGrid() {
     
-    ofVec3f third = ofVec2f(ofGetWidth()/3,ofGetHeight()/3);
+    ofVec3f third = ofVec2f(sWIDTH/3,sHEIGHT/3);
     ofVec3f center = third/2;
     
     for (int i = 0; i < 3; i++) {
@@ -6578,4 +6604,68 @@ void ofApp::updateSleepTimer(){
             sleepMode = true;
         }
     }
+}
+
+void ofApp::getFboScreen(){
+    ofFbo screen;
+    screen.allocate(sWIDTH, sHEIGHT, GL_RGBA, 8);
+    
+    screen.begin();
+    ofClear(0,0,0,255);
+    ofBackground(19,19,19);
+    
+    glLineWidth(2);
+    
+    //glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    
+    glEnable(GL_MULTISAMPLE);
+    //ofEnableLighting();
+    //light.enable();
+    //material.begin();
+    
+    if (!debugCam) {
+        testCam.begin();
+    } else {
+        cam.begin();
+    }
+    //  thisIntersect.draw();
+    for (int i = 0; i < 3; i++) {
+        synths[i].myNode.transformGL();
+        
+        synths[i].draw();
+        
+        synths[i].myNode.restoreTransformGL();
+    }
+    
+    
+    if (!debugCam) {
+        testCam.end();
+    } else {
+        cam.end();
+    }
+    
+    // material.end();
+    //ofDisableLighting();
+    
+    if (drawInfo) {
+        drawDebug();
+    }
+    
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_MULTISAMPLE);
+    
+    drawInterface();
+    
+
+    screen.end();
+    
+    ofImage pix;
+    pix.allocate(sWIDTH, sHEIGHT, OF_IMAGE_COLOR_ALPHA);
+    screen.readToPixels(pix);
+    
+    ofImage out;
+    out.allocate(sWIDTH, sHEIGHT, OF_IMAGE_COLOR_ALPHA);
+    out.setFromPixels(pix);
+    out.save( ofGetTimestampString() +"5_5_screen.png");
 }

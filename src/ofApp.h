@@ -352,4 +352,6 @@ class ofApp : public ofxiOSApp{
         ofxMidiOut midiOut;
         
         ofVboMesh interfaceDraw;
+        
+        void getFboScreen();
     };
