@@ -470,7 +470,7 @@ void ofApp::setupAudio(){
     
     Generator temp;
     for (int i = 0; i < synths.size(); i++) {
-        temp = temp + (synths[i].instrumentOut*0.8);
+        temp = temp + (synths[i].instrumentOut*0.2);
     }
     mainOut = temp ;
     
@@ -488,11 +488,11 @@ void ofApp::setupAudio(){
     .preDelayTime(0.02)
     .roomShape(0.425)
     .roomSize(reverbSize)
-    .inputLPFCutoff(5000)
+    //.inputLPFCutoff(6000)
     .dryLevel(0.0)
     .wetLevel(0.25)
     .density(0.25)
-    .stereoWidth(0.55);
+    .stereoWidth(0.75);
     
     
     //compressor
@@ -512,11 +512,11 @@ void ofApp::setupAudio(){
     revMix = mainOut >> compressor >> rev;
     
     if(soundDelay && soundReverb){
-        tonicSynth.setOutputGen( ( (((mainOut >>compressor >>delay)*0.85)+(revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+        tonicSynth.setOutputGen( ( (((mainOut >>compressor >>delay)*0.825)+(revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     } else if(soundDelay){
         tonicSynth.setOutputGen( ((mainOut  >>compressor >> delay )*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     }else if(soundReverb){
-        tonicSynth.setOutputGen( ( (((mainOut  >>compressor)*0.85) + (revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
+        tonicSynth.setOutputGen( ( (((mainOut  >>compressor)*0.825) + (revMix)) *volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     } else {
         tonicSynth.setOutputGen( ((mainOut  >>compressor  )*volumeRamp)  >> HPF24().cutoff(35).Q(0.15) >> LPF24().cutoff(7500).Q(0.15)  );
     }
@@ -2720,7 +2720,7 @@ void ofApp::deviceOrientationChanged(int newOrientation){
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
     //  makeDesignGrid();
-    ofSetWindowShape(1280, 750);
+    ofSetWindowShape(w, h);
 }
 
 //--------------------------------------------------------------
@@ -6559,7 +6559,7 @@ float ofApp::getBpmValue(float in){
 float ofApp::getRevTime(float in){
     float temp;
     temp = ofMap(in, 0.0, 1.0, 0.15, 3.5);
-    return ofClamp(temp, 0.0, 2.75);
+    return ofClamp(temp, 0.0, 3.5);
 }
 
 float ofApp::getRevSize(float in){

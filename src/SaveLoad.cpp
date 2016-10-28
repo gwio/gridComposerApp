@@ -116,7 +116,7 @@ void SaveLoad::checkFirstStart(){
     
     if(firstStart){
         
-        int exCount = 12;
+        int exCount = 15;
         ofxXmlSettings example;
         for (int i = 0; i < exCount; i++){
             if(example.loadFile("ex"+ofToString(i+1)+".xml")){;
@@ -142,7 +142,7 @@ void SaveLoad::checkFirstStart(){
     
     if(firstStart){
         
-        int exCount = 12;
+        int exCount = 15;
         ofxXmlSettings example;
         for (int i = 0; i < exCount; i++){
             if(example.loadFile("ex"+ofToString(i+1)+".xml")){;
@@ -478,7 +478,7 @@ void SaveLoad::isInside(ofVec3f pos_) {
                     slot.offPos = ofVec3f(designGrid.x*3,designGrid.y*3,0)
                     -(slotSize/2)
                     -(slot.pos+ofVec3f(0,scrollLocation,0))
-                    +ofVec3f( (fsPtrSemi->getBBox(slot.name, fontDefault*1.25, 0, 0).width/2)+(rSize*1.5),0,0);
+                    +ofVec3f( (fsPtrSemi->getBBox(slot.name, fontDefault*1.25, 0, 0).width/2)+(rSize*0.95),0,0);
                 }
             }
                             datePosVec.at(counter).offPos = getOffPos(pos_, datePosVec.at(counter).defaultPos);

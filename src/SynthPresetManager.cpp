@@ -166,7 +166,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         TableLookupOsc sine2 = TableLookupOsc().setLookupTable(sineSynth2).freq(freq_);
         
         
-        tempGen = ((adsr1*sine) + (adsr2*sine2))*vol_*0.03;
+        tempGen = ((adsr1*sine) + (adsr2*sine2))*vol_*0.225;
         
     }
    
@@ -184,7 +184,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //output_ = ((bellAosc*adsr1)+(bellBosc*adsr2)) * vol_;
         
-        tempGen =  ((bellAosc*adsr1)+(bellBosc*adsr2))*vol_*0.08;
+        tempGen =  ((bellAosc*adsr1)+(bellBosc*adsr2))*vol_*0.25;
         
     }
     
@@ -203,7 +203,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         //  output_  =  (myTable  * adsr * (0.9+ ((*sineA_+1)/20) )) + ((myTable  * adsr2 * (0.8+ ((*sineA_+1)/10) ))*0.67>>BPF12().Q(10).cutoff(freq_*1.231));
         
-        tempGen  = ((myTable*adsr1)+(myTable2*adsr2))*vol_ *0.080;
+        tempGen  = ((myTable*adsr1)+(myTable2*adsr2))*vol_*0.25 ;
         
         
     }
@@ -213,15 +213,22 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
     
     else if (preset_ == 3) {
         
-      //  ADSR  adsr1 = ADSR().attack(attack1_*1.15).decay(attack1_).sustain(0.035).release(release1_).doesSustain(false).legato(false).trigger(trigger_).exponential(true);
-        ADSR  adsr2 = ADSR().attack(attack2_).decay(attack1_*0.25).sustain(0.80).release(release2_).doesSustain(false).legato(true).trigger(trigger_).exponential(true);
+        ADSR  adsr1 = ADSR().attack(attack1_*1.0).decay(attack1_*1.5).sustain(0.035).release(release1_).doesSustain(false).legato(false).trigger(trigger_).exponential(true);
+        ADSR  adsr2 = ADSR().attack(attack2_*0.88).decay(attack1_*0.88).sustain(0.05).release(release2_).doesSustain(false).legato(false).trigger(trigger_).exponential(true);
         
         
-        TableLookupOsc snareOsc = TableLookupOsc().setLookupTable(snare).freq(freq_);
-        TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(tableSaw2).freq(freq_);
+        TableLookupOsc sawOsc = TableLookupOsc().setLookupTable(tableSaw).freq(freq_);
+        TableLookupOsc snareOsc2 = TableLookupOsc().setLookupTable(tableNoiseSimple).freq(freq_*0.01);
         
         
-        tempGen  = ((snareOsc*adsr2*0.34*vol_))>>BPF12().cutoff(freq_).Q(0.6-(0.4*vol_));
+        //tempGen  = ((snareOsc*adsr2*0.34*vol_))>>BPF12().cutoff(1500).Q(0.7-(0.3*vol_));
+        
+        tempGen  = ((sawOsc*adsr2*0.5)+ ((snareOsc2*adsr1)>>BPF12().cutoff(1500).Q(0.85)) )*vol_*0.625;
+        
+        //tempGen  = ((snareOsc2*adsr1)>>BPF12().cutoff(1500).Q(0.85))*vol_*0.4;
+
+        //tempGen  = ((sawOsc*adsr2))*vol_*0.4;
+
     }
     
     

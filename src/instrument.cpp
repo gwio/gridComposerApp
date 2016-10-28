@@ -1211,6 +1211,9 @@ void Instrument::changePreset(bool test_) {
     } else {
         preset--;
     }
+    
+    preset = preset%presetManager.count;
+
     //colorHue = ofWrap( ofMap(preset%presetManager.count, 0, presetManager.count, 0, 255),0,255);
     colorHue =  ofWrap(presetManager.getPresetColor(colorHue, preset%presetManager.count),0,255 );
     pulsePlane.setColor(colorHue);
