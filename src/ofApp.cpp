@@ -1253,6 +1253,7 @@ void ofApp::keyPressed(int key){
     }
     
     if(key == '6'){
+        bpmButtonPress();
         mainInterfaceData[41].blinkOn();
         mainInterfaceData[131].elementName = "TEMPO";
         mainInterfaceData[131].setStringWidth();
