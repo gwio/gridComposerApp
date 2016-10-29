@@ -480,14 +480,14 @@ void ofApp::setupVideoGrabber(){
     // override the default codecs if you like
     // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
     vidRecorder.setVideoCodec("mpeg4");
-    vidRecorder.setVideoBitrate("800k");
+    vidRecorder.setVideoBitrate("3200k");
     vidRecorder.setAudioCodec("mp3");
     vidRecorder.setAudioBitrate("192k");
     
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
     bRecording = false;
     
-    recFbo.allocate(1280, 750, GL_RGBA);
+    recFbo.allocate(1280,750, GL_RGB);
     recPix.allocate(1280,750, OF_IMAGE_COLOR);
 }
 
@@ -1265,7 +1265,7 @@ void ofApp::keyPressed(int key){
     if(key=='r'){
         bRecording = !bRecording;
         if(bRecording && !vidRecorder.isInitialized()) {
-            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt,1280, 750, 30, sampleRate, channels);
+            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt,1280, 750, 60, 44100, 2);
             //          vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
             //            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
             //          vidRecorder.setupCustomOutput(vidGrabber.getWidth(), vidGrabber.getHeight(), 30, sampleRate, channels, "-vcodec mpeg4 -b 1600k -acodec mp2 -ab 128k -f mpegts udp://localhost:1234"); // for custom ffmpeg output string (streaming, etc)
