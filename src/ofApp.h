@@ -25,7 +25,7 @@
 
 using namespace Tonic;
 
-
+#include "ofxVideoRecorder.h"
 
 
 #if TARGET_OS_IPHONE
@@ -352,4 +352,18 @@ class ofApp : public ofxiOSApp{
         ofxMidiOut midiOut;
         
         ofVboMesh interfaceDraw;
+        
+        
+      //  ofVideoGrabber      vidGrabber;
+        bool bRecording;
+        int sampleRate;
+        int channels;
+        string fileName;
+        string fileExt;
+
+        ofxVideoRecorder    vidRecorder;
+        void setupVideoGrabber();
+        void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
+        ofFbo recFbo;
+        ofPixels recPix;
     };

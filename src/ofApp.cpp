@@ -448,6 +448,8 @@ void ofApp::setupFonts(){
     micon.setKerning(micon.getKerning());
     micon.setCharacterSpacing(fontSizeDefault/10);
     
+    setupVideoGrabber();
+    
 }
 //--------------------------------------------------------------
 
@@ -465,6 +467,33 @@ void ofApp::setupMidi(){
 #endif
 }
 //--------------------------------------------------------------
+
+
+void ofApp::setupVideoGrabber(){
+    
+  //  vidGrabber.setDesiredFrameRate(30);
+   // vidGrabber.initGrabber(1280, 750);
+    
+    fileName = "testMovie";
+    fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
+    
+    // override the default codecs if you like
+    // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
+    vidRecorder.setVideoCodec("mpeg4");
+    vidRecorder.setVideoBitrate("800k");
+    vidRecorder.setAudioCodec("mp3");
+    vidRecorder.setAudioBitrate("192k");
+    
+    ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+    bRecording = false;
+    
+    recFbo.allocate(1280, 750, GL_RGBA);
+    recPix.allocate(1280,750, OF_IMAGE_COLOR);
+}
+
+void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
+    cout << "The recoded video file is now complete." << endl;
+}
 
 void ofApp::setupAudio(){
     
@@ -890,6 +919,8 @@ void ofApp::updateInterfaceMesh() {
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    recFbo.begin();
+    ofClear(0, 0, 0);
     glLineWidth(2);
     
     //glShadeModel(GL_SMOOTH);
@@ -933,9 +964,14 @@ void ofApp::draw(){
     
     drawInterface();
     
+    recFbo.end();
     
+    recFbo.draw(0,0);
     
-    
+    if(bRecording){
+    recFbo.readToPixels(recPix);
+    vidRecorder.addFrame(recPix);
+    }
 }
 
 void ofApp::drawInterface(){
@@ -1199,7 +1235,7 @@ void ofApp::keyPressed(int key){
         drawInfo = !drawInfo;
     }
     
-    if (key == 'r') {
+    if (key == 'R') {
         
         for (int i = 0; i < TILES; i++) {
             for (int j = 0; j < TILES; j++) {
@@ -1225,6 +1261,29 @@ void ofApp::keyPressed(int key){
         savePreset();
     }
     
+    
+    if(key=='r'){
+        bRecording = !bRecording;
+        if(bRecording && !vidRecorder.isInitialized()) {
+            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt,1280, 750, 30, sampleRate, channels);
+            //          vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
+            //            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
+            //          vidRecorder.setupCustomOutput(vidGrabber.getWidth(), vidGrabber.getHeight(), 30, sampleRate, channels, "-vcodec mpeg4 -b 1600k -acodec mp2 -ab 128k -f mpegts udp://localhost:1234"); // for custom ffmpeg output string (streaming, etc)
+            
+            // Start recording
+            vidRecorder.start();
+        }
+        else if(!bRecording && vidRecorder.isInitialized()) {
+            vidRecorder.setPaused(true);
+        }
+        else if(bRecording && vidRecorder.isInitialized()) {
+            vidRecorder.setPaused(false);
+        }
+    }
+    if(key=='x'){
+        bRecording = false;
+        vidRecorder.close();
+    }
 }
 
 //--------------------------------------------------------------
@@ -2978,6 +3037,11 @@ void ofApp::setMainVolume(float & in_) {
 
 void ofApp::audioOut (float * output, int bufferSize, int nChannels){
     tonicSynth.fillBufferOfFloats(output, bufferSize, nChannels);
+    
+    if(bRecording) {
+        vidRecorder.addAudioSamples(output, bufferSize, nChannels);
+    }
+
 }
 
 
@@ -5955,6 +6019,9 @@ void ofApp::exit(){
     saveToXml("settings.xml");
     ofSoundStreamClose();
     midiOut.closePort();
+    
+    ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+    vidRecorder.close();
 }
 
 void ofApp::savePreset(){
