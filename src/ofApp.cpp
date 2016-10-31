@@ -966,7 +966,7 @@ void ofApp::draw(){
     
     recFbo.end();
     
-    recFbo.draw(0,0);
+    recFbo.draw(0,0, 1600,1200);
     
     if(bRecording){
     recFbo.readToPixels(recPix);
@@ -2913,7 +2913,7 @@ void ofApp::drawDebug() {
 
 void ofApp::intersectPlane(float x_,float y_){
     //raytesting
-    worldMouse = testCam.screenToWorld(ofVec3f(x_,y_,0.0));
+    worldMouse = testCam.screenToWorld(ofVec3f(x_,y_,0.0),ofRectangle(ofPoint(0,0), 1600, 1200));
     
     mouseRay.s = worldMouse;
     mouseRay.t = worldMouse-testCam.getPosition();
