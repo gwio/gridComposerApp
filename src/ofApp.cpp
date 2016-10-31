@@ -475,20 +475,20 @@ void ofApp::setupVideoGrabber(){
    // vidGrabber.initGrabber(1280, 750);
     
     fileName = "testMovie";
-    fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
+    fileExt = ".mp4"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
     // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
-    vidRecorder.setVideoCodec("mpeg4");
-    vidRecorder.setVideoBitrate("3200k");
+    vidRecorder.setVideoCodec("libx264");
+    vidRecorder.setVideoBitrate("2400k");
     vidRecorder.setAudioCodec("mp3");
     vidRecorder.setAudioBitrate("192k");
     
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
     bRecording = false;
     
-    recFbo.allocate(1280,750, GL_RGB);
-    recPix.allocate(1280,750, OF_IMAGE_COLOR);
+    recFbo.allocate(1600,1200, GL_RGB, 2);
+    recPix.allocate(1600,1200, OF_IMAGE_COLOR);
 }
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
@@ -920,7 +920,7 @@ void ofApp::updateInterfaceMesh() {
 void ofApp::draw(){
     
     recFbo.begin();
-    ofClear(0, 0, 0);
+    ofClear(19, 19, 19);
     glLineWidth(2);
     
     //glShadeModel(GL_SMOOTH);
@@ -1265,10 +1265,10 @@ void ofApp::keyPressed(int key){
     if(key=='r'){
         bRecording = !bRecording;
         if(bRecording && !vidRecorder.isInitialized()) {
-            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt,1280, 750, 60, 44100, 2);
-            //          vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
-            //            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
-            //          vidRecorder.setupCustomOutput(vidGrabber.getWidth(), vidGrabber.getHeight(), 30, sampleRate, channels, "-vcodec mpeg4 -b 1600k -acodec mp2 -ab 128k -f mpegts udp://localhost:1234"); // for custom ffmpeg output string (streaming, etc)
+            //vidRecorder.setup(fileName+ofGetTimestampString()+fileExt,1600, 1200, 60, 44100, 2);
+            //vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
+            //vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
+            vidRecorder.setupCustomOutput(1600,1200, 30, 44100, 2, "-vcodec libx264  -acodec aac -b:a 256k -preset ultrafast -b:v 1200k  -qp 0 -tune animation output.mp4"); // for custom ffmpeg output string (streaming, etc)
             
             // Start recording
             vidRecorder.start();
@@ -1284,6 +1284,42 @@ void ofApp::keyPressed(int key){
         bRecording = false;
         vidRecorder.close();
     }
+    
+    if(key == '1'){
+        buttonOnePress();
+    }
+    
+    if(key == '2'){
+        buttonTwoPress();
+    }
+    
+    if(key == '3'){
+        buttonThreePress();
+    }
+    
+    if(key == '4'){
+        buttonFourPress();
+    }
+    
+    if(key == '5'){
+        harmonyButtonPress();
+    }
+    
+    if(key == '6'){
+        bpmButtonPress();
+    }
+    
+    if(key == '7'){
+        loadSaveButtonPress();
+    }
+    
+    if(key=='8'){
+        mainInterfaceData[126].blinkOn();
+        loadPreset();
+        loadSaveButtonPress();
+        closeSlotInterface();
+    }
+
 }
 
 //--------------------------------------------------------------
@@ -2905,7 +2941,7 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     tempNode.setFov(camFov);
     tempNode.setPosition(camNotActivePos);
     tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
-    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), ofGetWidth(), ofGetHeight()));
+    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), 1600, 1200));
     ofRay ray;
     ray.s = wMouse;
     ray.t = wMouse-tempNode.getPosition();
@@ -4714,7 +4750,7 @@ void ofApp::makePresetString() {
 
 void ofApp::makeDesignGrid() {
     
-    ofVec3f third = ofVec2f(ofGetWidth()/3,ofGetHeight()/3);
+    ofVec3f third = ofVec2f(1600/3,1200/3);
     ofVec3f center = third/2;
     
     for (int i = 0; i < 3; i++) {
