@@ -23,7 +23,8 @@
 #define attSldMax 1.8
 #define VERSION "1.00.52"
 
-
+#define rWidth 1600
+#define rHeight 1200
 
 enum currentState {
     STATE_DEFAULT,
@@ -487,8 +488,8 @@ void ofApp::setupVideoGrabber(){
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
     bRecording = false;
     
-    recFbo.allocate(1600,1200, GL_RGB, 2);
-    recPix.allocate(1600,1200, OF_IMAGE_COLOR);
+    recFbo.allocate(rWidth,rHeight, GL_RGB, 2);
+    recPix.allocate(rWidth,rHeight, OF_IMAGE_COLOR);
 }
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
@@ -1268,7 +1269,7 @@ void ofApp::keyPressed(int key){
             //vidRecorder.setup(fileName+ofGetTimestampString()+fileExt,1600, 1200, 60, 44100, 2);
             //vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
             //vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
-            vidRecorder.setupCustomOutput(1600,1200, 30, 44100, 2, "-vcodec libx264  -acodec aac -b:a 256k -preset ultrafast -b:v 1200k  -qp 0 -tune animation output.mp4"); // for custom ffmpeg output string (streaming, etc)
+            vidRecorder.setupCustomOutput(rWidth,rHeight, 30, 44100, 2, "-vcodec libx264  -acodec aac -b:a 256k -preset ultrafast -b:v 1200k  -qp 0 -tune animation output.mp4"); // for custom ffmpeg output string (streaming, etc)
             
             // Start recording
             vidRecorder.start();
@@ -2913,7 +2914,7 @@ void ofApp::drawDebug() {
 
 void ofApp::intersectPlane(float x_,float y_){
     //raytesting
-    worldMouse = testCam.screenToWorld(ofVec3f(x_,y_,0.0),ofRectangle(ofPoint(0,0), 1600, 1200));
+    worldMouse = testCam.screenToWorld(ofVec3f(x_,y_,0.0),ofRectangle(ofPoint(0,0), rWidth, rHeight));
     
     mouseRay.s = worldMouse;
     mouseRay.t = worldMouse-testCam.getPosition();
@@ -2941,7 +2942,7 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     tempNode.setFov(camFov);
     tempNode.setPosition(camNotActivePos);
     tempNode.lookAt(ofVec3f(0,0,0)-tempNode.getZAxis());
-    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), 1600, 1200));
+    ofVec3f wMouse = tempNode.screenToWorld( ofVec3f(target_.x,target_.y,0.0), ofRectangle(ofPoint(0,0), rWidth, rHeight));
     ofRay ray;
     ray.s = wMouse;
     ray.t = wMouse-tempNode.getPosition();
@@ -4750,7 +4751,7 @@ void ofApp::makePresetString() {
 
 void ofApp::makeDesignGrid() {
     
-    ofVec3f third = ofVec2f(1600/3,1200/3);
+    ofVec3f third = ofVec2f(rWidth/3,rHeight/3);
     ofVec3f center = third/2;
     
     for (int i = 0; i < 3; i++) {
