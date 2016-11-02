@@ -883,9 +883,9 @@ void Instrument::updateCubeMesh(){
 void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
     
     //test neighbouring cubes 3x3
-    int tester[9];
-    int testerStart= 0;
-    int cCounter = 0;
+    //int tester[9];
+    //int testerStart= 0;
+    //int cCounter = 0;
     vector<unsigned long> neighbours;
     neighbours.clear();
     for (int x = -1; x <= 1; x++) {
@@ -1049,7 +1049,7 @@ void Instrument::updateSoundsMap(int x_, int y_, bool replace_) {
 void Instrument::resetCubeGroup(unsigned long group_, int originX, int originY) {
     
 
-    int minusCouter = 0;
+  //  int minusCouter = 0;
     cubeGroup *cgPtr = &soundsMap[group_];
     
 
@@ -1106,11 +1106,13 @@ void Instrument::updateGroupInfo(unsigned long key_, int x_, int y_) {
     //get noteOn noteOff infos for cubeGroup
     
     cubeGroup *groupPtr = &soundsMap[key_];
-    
+  
+    /*
     int lx = groupPtr->lowX;
     int ly = gridTiles+1;
     int hx = -1;
     int hy = -1;
+    */
     
     if(x_ >  groupPtr->highX){
         groupPtr->highX = x_;

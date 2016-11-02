@@ -467,7 +467,7 @@ void SaveLoad::isInside(ofVec3f pos_) {
         }
     }
     if(breaking){
-        bool breaking = false;
+       // bool breaking = false;
         counter = 0;
         for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
             for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {

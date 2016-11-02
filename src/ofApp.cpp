@@ -1104,7 +1104,7 @@ void ofApp::drawStringAndIcons(){
         
     }
     
-    float tempTrans = 0.5*scaleFac;
+    //float tempTrans = 0.5*scaleFac;
     
     //draw icons
     
@@ -1116,7 +1116,7 @@ void ofApp::drawStringAndIcons(){
     //button left-right
     ofSetColor(mainInterfaceData[58].displayColor);
     
-    ofVec3f tri = mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1);
+   // ofVec3f tri = mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1);
     
     ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1),
                    mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1)+ ofVec3f(0,-mainInterfaceData.at(58).elementSize.y,0),
@@ -3269,7 +3269,7 @@ void ofApp::setupGlobalInterface() {
     
     ofVec3f smallButton = ofVec3f(designGrid[0][0].y,designGrid[0][0].y,0);
     ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y,0);
-    ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
+   // ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
     ofVec3f gridRect = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2,0);
     float hSliderYscale = 0.25;
