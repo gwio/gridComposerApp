@@ -23,8 +23,8 @@
 #define attSldMax 1.8
 #define VERSION "1.00.52"
 
-#define rWidth 1600
-#define rHeight 1200
+#define rWidth 1920
+#define rHeight 1080
 
 enum currentState {
     STATE_DEFAULT,
@@ -62,7 +62,7 @@ void ofApp::setup(){
 #endif
     
     ofSetFrameRate(60);
-    ofSetVerticalSync(true);
+    ofSetVerticalSync(false);
     //ofEnableDepthTest();
     ofEnableAlphaBlending();
     
@@ -967,7 +967,7 @@ void ofApp::draw(){
     
     recFbo.end();
     
-    recFbo.draw(0,0, 1600,1200);
+    recFbo.draw(0,0, rWidth,rHeight);
     
     if(bRecording){
     recFbo.readToPixels(recPix);
