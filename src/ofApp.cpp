@@ -21,7 +21,7 @@
 
 #define attSldMin 0.25
 #define attSldMax 1.8
-#define VERSION "1.00.52"
+#define VERSION "1.00.60"
 
 
 
