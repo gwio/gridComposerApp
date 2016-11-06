@@ -19,10 +19,9 @@ void MusterFlip::setup(float size_,int tiles_){
         layerInfo.at(i).resize(tiles_);
     }
     
-    //makeTex(tempFbo);
-    
 }
 
+//--------------------------------------------------------------
 void MusterFlip::loadData(bool** data_, int tilesX_, int tilesY_) {
     for (int i = 0; i < tilesX_; i++) {
         for (int j = 0; j < tilesY_; j++) {
@@ -33,11 +32,13 @@ void MusterFlip::loadData(bool** data_, int tilesX_, int tilesY_) {
     makeTex();
 }
 
+//--------------------------------------------------------------
 void MusterFlip::draw(ofVec3f pos_){
     texture.draw(pos_);
     
 }
 
+//--------------------------------------------------------------
 void MusterFlip::makeBackTex(){
     ofPushStyle();
     ofFbo fbo_;
@@ -55,12 +56,11 @@ void MusterFlip::makeBackTex(){
     
     ofPopStyle();
     
-
-
 }
 
+//--------------------------------------------------------------
 void MusterFlip::makeTex(){
-
+    
     
     ofPushStyle();
     ofFbo fbo_;
@@ -68,16 +68,10 @@ void MusterFlip::makeTex(){
     fbo_.allocate( size, size, GL_RGBA);
     
     fbo_.begin();
-   
-    // ofEnableDepthTest();
+    
     ofClear(ofColor::fromHsb(0,0,0,0));
     float rSize = size/gridTiles;
-    //ofSetColor(ofColor::darkCyan);
-
-   // ofRect(0,0, rSize*gridTiles, rSize*gridTiles);
-    //ofNoFill();
-      // ofTranslate(size/10, size/10);
-    //ofScale(0.8, 0.8);
+    
     ofSetColor(255, 255, 255,255);
     for (int i = 0; i < gridTiles; i++) {
         for (int j =0 ; j < gridTiles ; j++) {
@@ -90,6 +84,6 @@ void MusterFlip::makeTex(){
     
     texture.clear();
     texture = fbo_.getTextureReference();
-  
+    
     ofPopStyle();
 }

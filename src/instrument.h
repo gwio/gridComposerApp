@@ -212,7 +212,7 @@ public:
     deque<float>tickTimes;
     float bpmTick;
     float lastTick;
-
+    
     int ownSlot;
     int *uiState;
     
@@ -229,7 +229,7 @@ public:
     float getSynthAttack1(int&);
     float getSynthRelease2(int&);
     float getSynthAttack2(int&);
-
+    
     void setAllADSR(int&);
     
     ofxMidiOut *midiOutPtr;

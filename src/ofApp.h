@@ -14,8 +14,6 @@
 #include <AVFoundation/AVFoundation.h>
 #include "ofSwipeGestureRecognizer.h"
 #endif
-//#include "ofxFontStash.h"
-//#include "ofxXmlSettings.h"
 
 #if TARGET_OS_IPHONE
 #include "ofxiOS.h"
@@ -24,9 +22,6 @@
 
 
 using namespace Tonic;
-
-
-
 
 #if TARGET_OS_IPHONE
 class ofApp : public ofxiOSApp{
@@ -81,7 +76,6 @@ class ofApp : public ofxiOSApp{
         ofVec3f intersectPlane(ofVec2f);
         
         
-        
         void setupStatesAndAnimation();
         
         void setupGlobalInterface();
@@ -116,7 +110,7 @@ class ofApp : public ofxiOSApp{
         
         void openSlotInterface();
         void closeSlotInterface();
-
+        
         void openSettingsInterface();
         void closeSettingsInterface();
         
@@ -152,7 +146,7 @@ class ofApp : public ofxiOSApp{
         float getBpmValue(float);
         float getRevTime(float);
         float getRevSize(float);
-
+        
         //xml
         ofxXmlSettings settings;
         
@@ -177,7 +171,7 @@ class ofApp : public ofxiOSApp{
         ControlParameter reverbTime;
         ControlParameter reverbSize;
         
-               //scales
+        //scales
         GlobalScales scaleCollection;
         int globalScaleVecPos;
         
@@ -255,13 +249,6 @@ class ofApp : public ofxiOSApp{
         ofPlane thisIntersect;
         ofPlanePrimitive planeForIntersect;
         
-        
-        
-        
-        //light
-        ofLight light;
-        ofMaterial material;
-        
         //misc tap
         unsigned long doubleClickTime, curTap, lastTap;
         bool mouseDragging;
@@ -279,7 +266,7 @@ class ofApp : public ofxiOSApp{
         //sound time
         int timeCounter;
         int bpm;
-     
+        
         float lastTouch, sleepTimer;
         
         void setMainVolume(float&volumeRampValue);
@@ -288,8 +275,6 @@ class ofApp : public ofxiOSApp{
         vector<GlobalGUI> mainInterfaceData;
         ofVboMesh mainInterface;
         ofVboMesh mainInterfaceFbo;
-        
-        
         
         //interface stuff
         bool focusCam;
@@ -332,7 +317,6 @@ class ofApp : public ofxiOSApp{
         
         ofVboMesh bpmFx;
         void updateBpmMenuMesh();
-        
         
         SaveLoad saveManager;
         

@@ -15,7 +15,7 @@ SaveLoad::SaveLoad(){
     highlight.setMode(OF_PRIMITIVE_TRIANGLES);
     datePosVec.clear();
     firstStart = false;
-
+    
     colorDef = ofColor::fromHsb(255,0,195,255);
     colorA = ofColor::fromHsb(9, 235, 180,255);
     colorB = ofColor::fromHsb(232, 235, 180,255);
@@ -23,6 +23,7 @@ SaveLoad::SaveLoad(){
     colorD = ofColor::fromHsb(137, 235, 180,255);
 }
 
+//--------------------------------------------------------------
 void SaveLoad::loadSaveFolder(string iosFolder_){
     
 #if TARGET_OS_IPHONE
@@ -75,7 +76,6 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
         loader.popTag();
         string xmlKeyDay = tempXml.year+tempXml.month+tempXml.day;
         
-        // tempXml.slotInfo.thumb.allocate(designGrid.x,designGrid.y,OF_IMAGE_COLOR_ALPHA);
         cout << tempXml.slotInfo.thumb.load(saveDir.getAbsolutePath()+"/"+xmlKeyDay+"#"+ofToString(tempXml.number)+".png") << endl;
         
         xmlSavesMap[xmlKeyDay][tempXml.number] = tempXml;
@@ -108,11 +108,11 @@ void SaveLoad::loadSaveFolder(string iosFolder_){
     checkFirstStart();
 }
 
+//--------------------------------------------------------------
 void SaveLoad::checkFirstStart(){
     
     
 #if TARGET_OS_IPHONE
-    
     
     if(firstStart){
         
@@ -136,7 +136,7 @@ void SaveLoad::checkFirstStart(){
         }
     }
     
-   
+    
     
 #else
     
@@ -167,6 +167,8 @@ void SaveLoad::checkFirstStart(){
     
 }
 
+
+//--------------------------------------------------------------
 void SaveLoad::checkDate(){
     
     string cYear = ofGetTimestampString("%Y");
@@ -187,10 +189,9 @@ void SaveLoad::checkDate(){
         saveLastNumber = 1;
     }
     
-
-    
 }
 
+//--------------------------------------------------------------
 void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     xmlSave tempXml;
     
@@ -202,7 +203,7 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     tempXml.number = xml_.getValue("number", 1);
     tempXml.hour = xml_.getValue("hour", "");
     tempXml.dateDisplay = getDateString(tempXml.day, tempXml.month, tempXml.year);
-
+    
     xml_.popTag();
     string xmlKey = tempXml.year+tempXml.month+tempXml.day;
     
@@ -215,23 +216,20 @@ void SaveLoad::addNewSave(ofxXmlSettings &xml_){
     velo += (scrollLocation*-1*0.3);
 }
 
+//--------------------------------------------------------------
 ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSize_){
-    // ofTexture tex;
-    // tex.allocate(designGrid.x, designGrid.y, GL_RGBA);
     ofPixels pix;
-
+    
     ofFbo fbo;
     fbo.allocate(slotSize_.x, slotSize_.y,GL_RGBA);
     
-    // int offset = (rSize*5)+((slotSize_.x-(rSize*15))/2);
-    
     float offset = (rSize*5)+rSize;
-
+    
     fbo.begin();
     ofClear(0, 0, 0, 0);
-
-    for (int i = 0; i < 3; i++) {
     
+    for (int i = 0; i < 3; i++) {
+        
         xml_.pushTag("currentGrids");
         xml_.pushTag("grid",i);
         string temp = xml_.getValue("info", "0");
@@ -243,23 +241,21 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
         
         ofSetColor(colorDef);
         glLineWidth(2);
-        //  ofDrawLine(0, slotSize_.y-offset, slotSize_.x, slotSize_.y-offset);
         ofFill();
         ofDrawRectangle(offset*i,0, rSize*5,rSize*5);
-
+        
         ofSetColor(tc);
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
                 if (temp.at(x+(5*y)) == '1') {
-    
+                    
                     ofVec2f point = ofVec2f(x*rSize+(offset*i), (rSize*4) - (y*rSize) );
                     ofDrawRectangle(point, rSize, rSize);
-        
-
+            
                 }
             }
         }
-   
+        
         xml_.popTag();
         xml_.popTag();
         
@@ -268,18 +264,16 @@ ofImage SaveLoad::makePng(ofxXmlSettings &xml_, string fileName_, ofVec3f slotSi
     fbo.end();
     
     pix.allocate(slotSize_.x,slotSize_.y,OF_PIXELS_RGBA);
-    // tex.allocate(pix);
     fbo.readToPixels(pix);
     
-    
     ofImage tempImg;
-    // tempImg.allocate(designGrid.x, designGrid.y, OF_IMAGE_COLOR_ALPHA);
     tempImg.setFromPixels(pix);
     
     tempImg.save(saveDir.getAbsolutePath()+"/"+fileName_+".png");
     return tempImg;
 }
 
+//--------------------------------------------------------------
 void SaveLoad::updatePosition(){
     float slotOffset = 0.333;
     int counterOut = 0;
@@ -291,8 +285,6 @@ void SaveLoad::updatePosition(){
         xmlSave& xmlName = outerIt->second.begin()->second;
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             saveSlot& slot = innerIt->second.slotInfo;
-            //slot.name = outerIt->first+" #"+ofToString(innerIt->first);
-            //slot.name = "# "+ofToString(innerIt->first);
             
             slot.size = slotSize;
             
@@ -310,35 +302,34 @@ void SaveLoad::updatePosition(){
         offsetDown.y +=  designGrid.y+ (slotSize.y+(slotSize.y*slotOffset));
         
         if( datePosVec.size() != counterOut+1 ){
-        dateInfo diTemp;
-        datePosVec.push_back(diTemp);
+            dateInfo diTemp;
+            datePosVec.push_back(diTemp);
         }
         
-       // string tempName = getDateString(xmlName.year,xmlName.month,xmlName.day);
-
+        
         if(outerIt == --xmlSavesMap.rend()){
             //examples name string instead date
-        datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox("EXAMPLES", fontDefault, 0, 0).width-rSize
-                                                       , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox("EXAMPLES", fontDefault, 0, 0).height/2)
-                                                       ,0);
+            datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox("EXAMPLES", fontDefault, 0, 0).width-rSize
+                                                           , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox("EXAMPLES", fontDefault, 0, 0).height/2)
+                                                           ,0);
         } else {
             datePosVec.at(counterOut).defaultPos = ofVec3f( (2*slotSize.x)+(designGrid.x*2*0.133*2)+(designGrid.x*4*0.133*2)+slotSize.x-fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).width-rSize
                                                            , outerIt->second.rbegin()->second.slotInfo.testRect.position.y-(designGrid.y/2)+(fsPtrBold->getBBox(xmlName.dateDisplay, fontDefault, 0, 0).height/2)
                                                            ,0);
-
+            
         }
         datePosVec.at(counterOut).displayPos =  datePosVec.at(counterOut).defaultPos;
         counterOut++;
-
+        
         
     }
     while (datePosVec.size() > counterOut+1){
         datePosVec.pop_back();
     }
-    //saveDir.listDir();
-    //cout << "new sizue" << saveDir.size() << endl;
     
 }
+
+//--------------------------------------------------------------
 void SaveLoad::setup(float fs_, float fd_, float fb_,ofVec3f dGrid_,
                      ofxFontStash* fsPtrLight_,
                      ofxFontStash* fsPtrReg_,
@@ -364,6 +355,7 @@ void SaveLoad::setup(float fs_, float fd_, float fb_,ofVec3f dGrid_,
     fontBig = fb_;
 }
 
+//--------------------------------------------------------------
 void SaveLoad::update(){
     
     velo+=ofClamp(pow((acc*0.5),1),-55,55);
@@ -383,12 +375,11 @@ void SaveLoad::update(){
         velo = 0.0;
     }
     
-    
     updateHighlightVertices();
-    
     
 }
 
+//--------------------------------------------------------------
 void SaveLoad::draw(){
     ofPushStyle();
     ofPushMatrix();
@@ -397,31 +388,23 @@ void SaveLoad::draw(){
     for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
         xmlSave &temp = outerIt->second.rbegin()->second;
         ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
-
+        
         if(outerIt == --xmlSavesMap.rend()){
             //example string instead date
-        fsPtrBold->draw("EXAMPLES", fontDefault, int(datePosVec.at(counter).displayPos.x), int(datePosVec.at(counter).displayPos.y));
+            fsPtrBold->draw("EXAMPLES", fontDefault, int(datePosVec.at(counter).displayPos.x), int(datePosVec.at(counter).displayPos.y));
         } else {
             fsPtrBold->draw(temp.dateDisplay, fontDefault, int(datePosVec.at(counter).displayPos.x), int(datePosVec.at(counter).displayPos.y));
         }
-
+        
         for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
             float tempLoc = innerIt->second.slotInfo.pos.y+scrollLocation;
             if(tempLoc > -designGrid.y*3 && tempLoc < designGrid.y*7) {
-                //ofNoFill();
                 ofSetColor(ofColor(255,255,255,255));
                 innerIt->second.slotInfo.thumb.draw(innerIt->second.slotInfo.testRect.position);
-                //ofDrawRectangle(innerIt->second.slotInfo.testRect);
-                //ofDrawEllipse(innerIt->second.slotInfo.testRect.position,10,10);
-                //ofFill();
-                 //ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
                 ofSetColor(innerIt->second.slotInfo.displayC);
                 fsPtrBold->draw(innerIt->second.slotInfo.name, fontDefault*1.25,
                                 int(innerIt->second.slotInfo.testRect.position.x-(fsPtrBold->getBBox(innerIt->second.slotInfo.name, fontDefault*1.25, 0, 0).width)-(rSize*2.5)),
                                 int(innerIt->second.slotInfo.testRect.position.y+slotSize.y-rSize));
-                //    float hourPos = (innerIt->second.slotInfo.testRect.position.x+slotSize.x)-fsPtrLight->getBBox(innerIt->second.hour,40, 0, 0).getWidth();
-                //    ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
-                //    fsPtrLight->draw(innerIt->second.hour, fontBig,hourPos ,innerIt->second.slotInfo.testRect.position.y+22);
                 
             }
         }
@@ -434,6 +417,7 @@ void SaveLoad::draw(){
     
 }
 
+//--------------------------------------------------------------
 void SaveLoad::isInside(ofVec3f pos_) {
     bool breaking = false;
     int counter = 0;
@@ -467,7 +451,6 @@ void SaveLoad::isInside(ofVec3f pos_) {
         }
     }
     if(breaking){
-       // bool breaking = false;
         counter = 0;
         for (outerIt = xmlSavesMap.rbegin(); outerIt != xmlSavesMap.rend(); ++outerIt){
             for (innerIt = outerIt->second.begin(); innerIt != outerIt->second.end(); ++innerIt) {
@@ -481,49 +464,44 @@ void SaveLoad::isInside(ofVec3f pos_) {
                     +ofVec3f( (fsPtrSemi->getBBox(slot.name, fontDefault*1.25, 0, 0).width/2)+(rSize*0.95),0,0);
                 }
             }
-                            datePosVec.at(counter).offPos = getOffPos(pos_, datePosVec.at(counter).defaultPos);
+            datePosVec.at(counter).offPos = getOffPos(pos_, datePosVec.at(counter).defaultPos);
             
             counter++;
         }
     }
 }
 
+//--------------------------------------------------------------
 void SaveLoad::deleteSave(){
     //dont delete examples
     if(selectOuterIt != --xmlSavesMap.rend()){
-    ofFile temp;
-    cout << saveDir.getAbsolutePath()+"/"+selectInnerIt->second.year+selectInnerIt->second.month+selectInnerIt->second.day+"#"+ofToString(selectInnerIt->second.number)+".xml" << endl;
-    //remove xml
-    temp.open(saveDir.getAbsolutePath()+"/"+
-              selectInnerIt->second.year+selectInnerIt->second.month+
-              selectInnerIt->second.day+"#"+
-              ofToString(selectInnerIt->second.number)+".xml");
-    temp.remove();
-    //remove png
-    temp.open(saveDir.getAbsolutePath()+"/"+
-              selectInnerIt->second.year+selectInnerIt->second.month+
-              selectInnerIt->second.day+"#"+
-              ofToString(selectInnerIt->second.number)+".png");
-    temp.remove();
-
-    selectOuterIt->second.erase(selectInnerIt);
-    if(selectOuterIt->second.size() == 0){
-        xmlSavesMap.erase(selectOuterIt->first);
-    }
-    updatePosition();
+        ofFile temp;
+        cout << saveDir.getAbsolutePath()+"/"+selectInnerIt->second.year+selectInnerIt->second.month+selectInnerIt->second.day+"#"+ofToString(selectInnerIt->second.number)+".xml" << endl;
+        //remove xml
+        temp.open(saveDir.getAbsolutePath()+"/"+
+                  selectInnerIt->second.year+selectInnerIt->second.month+
+                  selectInnerIt->second.day+"#"+
+                  ofToString(selectInnerIt->second.number)+".xml");
+        temp.remove();
+        //remove png
+        temp.open(saveDir.getAbsolutePath()+"/"+
+                  selectInnerIt->second.year+selectInnerIt->second.month+
+                  selectInnerIt->second.day+"#"+
+                  ofToString(selectInnerIt->second.number)+".png");
+        temp.remove();
+        
+        selectOuterIt->second.erase(selectInnerIt);
+        if(selectOuterIt->second.size() == 0){
+            xmlSavesMap.erase(selectOuterIt->first);
+        }
+        updatePosition();
     }
 }
 
+//--------------------------------------------------------------
 ofVec3f SaveLoad::getOffPos(ofVec3f& clicktarget_, ofVec3f& pos_) {
     ofVec3f temp = ofVec3f(0,0,0);
-    /*
-     if(clicktarget_.x > pos_.x){
-     temp.x = -(designGrid.x*10);
-     } else {
-     temp.x = +(designGrid.x*10);
-     }
-     */
-    
+
     if(clicktarget_.y-scrollLocation > pos_.y){
         temp.y = -(designGrid.y*10);
     } else {
@@ -533,6 +511,7 @@ ofVec3f SaveLoad::getOffPos(ofVec3f& clicktarget_, ofVec3f& pos_) {
     return temp;
 }
 
+//--------------------------------------------------------------
 void SaveLoad::animateGrid(float& tween_){
     
     ofVec3f tempPos;
@@ -570,6 +549,7 @@ void SaveLoad::animateGrid(float& tween_){
     }
 }
 
+//--------------------------------------------------------------
 void SaveLoad::updateHighlightVertices(){
     highlight.clear();
     ofVec3f temp;
@@ -581,15 +561,7 @@ void SaveLoad::updateHighlightVertices(){
                 temp = slot.testRect.position;
                 temp.y += slotSize.y-rSize;
                 temp.x -= rSize+(rSize/2);
-                /*
-                 highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
-                 highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,highlightLine,0));
-                 highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,0,0));
-                 
-                 highlight.addVertex(temp+ofVec3f(slotSize.x-rSize,0,0));
-                 highlight.addVertex(temp+ofVec3f(0,0,0));
-                 highlight.addVertex(temp+ofVec3f(0,highlightLine,0));
-                 */
+
                 highlight.addVertex(temp+ofVec3f(0,0,0));
                 highlight.addVertex(temp+ofVec3f(0,-rSize*5,0));
                 highlight.addVertex(temp+ofVec3f(rSize/2,-rSize*5,0));
@@ -615,15 +587,12 @@ void SaveLoad::updateHighlightVertices(){
                         slot.cycleColorNext = false;
                     }
                 }
-                
-                
-                
-                
             }
         }
     }
 }
 
+//--------------------------------------------------------------
 void SaveLoad::cycleHighlightColor(){
     
     saveSlot &slot = selectInnerIt->second.slotInfo;
@@ -649,11 +618,11 @@ void SaveLoad::cycleHighlightColor(){
         slot.targetC = colorD;
     }
     slot.displayC = ofColor::fromHsb(slot.displayC.getHue(), slot.displayC.getSaturation()-50, 255,255);
-    
     slot.cycleColorNext = true;
     
 }
 
+//--------------------------------------------------------------
 string SaveLoad::getDateString(string day_, string month_, string year_){
     string retString;
     string m;

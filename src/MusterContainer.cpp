@@ -15,11 +15,10 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     gridTiles = tiles_;
     designGrid.x = (designGrid_.x)/DISPLAY_NUMX;
     designGrid.y = (designGrid_.y)/DISPLAY_NUMY;
-    //designGrid*=0.8;
     
     flipSize = designGrid.y*FLIP_SIZE_FAC;
-     offsetX = ((designGrid_.x)-(flipSize*3))/2;
-     offsetY = ((designGrid_.y)-(flipSize*3))/2;
+    offsetX = ((designGrid_.x)-(flipSize*3))/2;
+    offsetY = ((designGrid_.y)-(flipSize*3))/2;
     
     displayGrid.clear();
     displayGrid.resize(DISPLAY_NUMX*DISPLAY_NUMY);
@@ -28,8 +27,6 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
         for (int y = 0; y < DISPLAY_NUMY; y++) {
             int index = x+(y*DISPLAY_NUMX);
             displayGrid.at(index).x =  (x*flipSize)+(offsetX*x);
-          //  displayGrid.at(index).y = (y*designGrid.x)+( (designGrid.x-flipSize)/2);
-
             displayGrid.at(index).y =  (y*flipSize)+(offsetY*y);
         }
     }
@@ -39,14 +36,13 @@ MusterContainer::MusterContainer(ofVec3f center_, ofVec2f designGrid_,int tiles_
     
     flipsBackground.clear();
     flipsBackground.resize(FLIP_MAX);
-  
+    
     
     saveReady = false;
 }
 
+//--------------------------------------------------------------
 void MusterContainer::setup() {
-    //uajjjai, 9presets
-    
     
     bool tempA[5][5] = {
         {1,1,1,1,1},
@@ -68,14 +64,15 @@ void MusterContainer::setup() {
         
         flipsBackground.at(i).setup(designGrid.y*FLIP_SIZE_FAC, gridTiles);
         flipsBackground.at(i).makeBackTex();
-
+        
     }
     
     makeBackgroundTex();
 }
 
+//--------------------------------------------------------------
 void MusterContainer::makeBackgroundTex(){
-        
+    
     ofFbo tempB;
     tempB.allocate((DISPLAY_NUMX*flipSize)+(DISPLAY_NUMX*offsetX), (DISPLAY_NUMY*flipSize)+(DISPLAY_NUMY*offsetY),  GL_RGBA);
     
@@ -83,30 +80,24 @@ void MusterContainer::makeBackgroundTex(){
     tempB.begin();
     ofClear(0, 0, 0,0);
     for (int i = 0; i < displayGrid.size(); i++) {
-        //ofSetColor(ofColor::fromHsb(255,0,204,255));
         ofSetColor(ofColor::fromHsb(255, 0, 51, 255));
         ofDrawRectangle(displayGrid.at(i).x, displayGrid.at(i).y, rSize, rSize);
     }
     tempB.end();
     backgroundTex.clear();
-  backgroundTex =   tempB.getTexture();
+    backgroundTex =   tempB.getTexture();
     
 }
 
 
+//--------------------------------------------------------------
 
 void MusterContainer::draw(){
-    //ofPushStyle();
-    
     
     ofSetColor(255, 255, 255,255);
-    /*
-    for (int i = 0; i < displayGrid.size(); i++) {
-        flipsBackground.at(i).draw(displayGrid.at(i)+centerPos);
-    }
-     */
-    backgroundTex.draw(centerPos);
 
+    backgroundTex.draw(centerPos);
+    
     if (saveReady) {
         elementColorTouch.setBrightness( ((sin(ofGetElapsedTimef()*8)+1)/2)*200 );
         if (displayColor != elementColorTouch) {
@@ -119,15 +110,15 @@ void MusterContainer::draw(){
             displayColor = displayColor.lerp(targetColor, 0.04);
         }
         ofSetColor(displayColor);
-
+        
     }
     for (int i = 0; i < displayGrid.size(); i++) {
         flips.at(i).draw(displayGrid.at(i)+centerPos);
     }
-    //ofPopStyle();
     
 }
 
+//--------------------------------------------------------------
 void MusterContainer::setColor(float hue_) {
     
     elementColorOn = ofColor::fromHsb(hue_, 235, 180,255);
@@ -135,7 +126,7 @@ void MusterContainer::setColor(float hue_) {
     elementColorOff = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness(), elementColorOn.getSaturation(), 0 );
     elementColorDarker = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 255 );
     elementColorDarkerTrans = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getBrightness()-60, elementColorOn.getSaturation(), 100 );
-     elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, 255, 255);
+    elementColorTouch = ofColor::fromHsb(elementColorOn.getHue(), elementColorOn.getSaturation()-50, 255, 255);
     
     targetColor = elementColorOn;
     displayColor = elementColorOn;
@@ -143,17 +134,20 @@ void MusterContainer::setColor(float hue_) {
 
 
 
-
+//--------------------------------------------------------------
 void MusterContainer::update(ofVec3f pos_) {
     
     centerPos = pos_;
-    }
+}
 
+//--------------------------------------------------------------
 void MusterContainer::saveToFlip(int index_) {
     
     
 }
 
+
+//--------------------------------------------------------------
 int MusterContainer::isInside(ofVec2f click_) {
     
     int temp = -1;

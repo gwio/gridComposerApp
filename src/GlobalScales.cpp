@@ -8,14 +8,12 @@ GlobalScales::GlobalScales() {
     
 }
 
+//--------------------------------------------------------------
 void GlobalScales::loadScales() {
     
     Scale temp;
     vector<int> tempNotes;
     
-    
-    
-   
     
     //___________________
     
@@ -130,8 +128,8 @@ void GlobalScales::loadScales() {
     }
     scaleVec.push_back(temp);
     scaleNotes.push_back(tempNotes);
-   
-  
+    
+    
     
     //_____________________
     

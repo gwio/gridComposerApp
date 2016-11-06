@@ -25,6 +25,7 @@ InterfacePlane::InterfacePlane(){
     }
 }
 
+//--------------------------------------------------------------
 InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], bool active_[]) {
     for (int i = 0; i < 4; i++) {
         nextDirs[i] = 1;
@@ -59,22 +60,18 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
     
     tileSize = tileSize_;
     
-    //posNode.setPosition(0, 0, 0);
     
     gridSize = (tileSize*tiles)*0.5+10;
     
     lineMesh.clear();
     lineMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
     
-    //float zH = 130;
-
-    
     connected = ofColor::fromHsb(73,135,178,255);
     active = ofColor::fromHsb(28,160,170,255);
     offColor = ofColor::fromHsb(255, 0, 51, 200);
     pulseColorA = ofColor::fromHsb(0, 0, 255,255);
     pulseColorC = ofColor::fromHsb(0, 0, 255,255);
-
+    
     flipCounter = 0;
     
     setupMeshes(connected_, active_);
@@ -82,17 +79,17 @@ InterfacePlane::InterfacePlane(int tiles_, float tileSize_, bool connected_[], b
 }
 
 
-
+//--------------------------------------------------------------
 void InterfacePlane::setColor(float hue_){
     connected = ofColor::fromHsb(hue_, 235, 230,200);
     active = ofColor::fromHsb(hue_, 150, 100 ,200);
     
     pulseColorC =  ofColor::fromHsb(connected.getHue(), connected.getSaturation()-200, 255, 220);
     pulseColorA =  ofColor::fromHsb(connected.getHue(), connected.getSaturation()-20, 200, 220);
-
     
 }
 
+//--------------------------------------------------------------
 void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     float zH = 0;
@@ -127,7 +124,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     tempVertices.at(6) = ofVec3f(arrow_width,arrow_width,0);
     tempVertices.at(7) = ofVec3f(arrow_width*2,0,0);
     tempVertices.at(8) = ofVec3f(arrow_width,-arrow_width,0);
-
+    
     
     
     tempM.setTranslation(ofVec3f(-gridSize*1.08,0,0));
@@ -284,7 +281,6 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
     
     
-    //tempM.setTranslation(ofVec3f(-gridSize,0,0));
     
     tempM.rotate(90, 0, 0, -1);
     tempMB.rotate(90, 0, 0, -1);
@@ -298,7 +294,6 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
         directionMeshOffBig.addColor(offColor);
     }
     
-    // tempM.newTranslationMatrix(ofVec3f(0,0,0));
     tempM.rotate(90, 0, 0, -1);
     tempMB.rotate(90, 0, 0, -1);
     
@@ -356,6 +351,7 @@ void InterfacePlane::setupMeshes(bool connected_[], bool active_[]){
     
 }
 
+//--------------------------------------------------------------
 void InterfacePlane::animationTransition(float pct_){
     
     if (animate && pct_ == 0.0){
@@ -395,7 +391,7 @@ void InterfacePlane::animationTransition(float pct_){
                     }
                 }
             }
-        }        
+        }
     }
     
     if(animate && meshBig) {
@@ -437,6 +433,7 @@ void InterfacePlane::animationTransition(float pct_){
     }
 }
 
+//--------------------------------------------------------------
 void InterfacePlane::transformButton(bool connected_[], bool active_[], int& globalState_) {
     
     
@@ -564,7 +561,6 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             if (meshState[i] == STATE_CONNECTED) {
                 for (int j = i*dirMeshVerts; j < (i*dirMeshVerts)+dirMeshVerts; j++) {
                     directionMesh.getVertices().at(j).z = directionMeshCon.getVertex(j).z - ((1.0-blinkPct[i])*6);
-                    //directionMesh.setVertex(j,directionMeshCon.getVertex(j) *(1+ (1-blinkPct[i])*0.1 ));
                 }
             }
         }
@@ -574,7 +570,6 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             if (meshState[i] == STATE_CONNECTED) {
                 for (int j = i*dirMeshVerts; j < (i*dirMeshVerts)+dirMeshVerts; j++) {
                     directionMesh.getVertices().at(j).z = directionMeshConBig.getVertex(j).z - ((1.0-blinkPct[i])*12);
-                    //directionMesh.setVertex(j,directionMeshConBig.getVertex(j) *(1+ (1-blinkPct[i])*0.1 ));
                 }
             }
             
@@ -588,9 +583,10 @@ void InterfacePlane::transformButton(bool connected_[], bool active_[], int& glo
             buttonMoving[i] = false;
         }
     }
-
+    
 }
 
+//--------------------------------------------------------------
 void InterfacePlane::blinkP(){
     
     //pulse blink
@@ -626,6 +622,7 @@ void InterfacePlane::blinkP(){
     }
 }
 
+//--------------------------------------------------------------
 void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool connected_[], bool active_[], bool& pause_, int& globalState_, float &hue_, int& pulseDiv_) {
     
     transformButton(connected_, active_, globalState_);
@@ -634,20 +631,14 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
     ofNode tempNode;
     lineMesh.clear();
     
-       
     lastTime = thisTime;
     thisTime = (ofGetElapsedTimeMillis()- lastTick) ;
-
-
+    
     if (!pause_ && !lineWaitForBeat) {
         
-       
         scanDir = scanDir_;
+        
 
-        
-        //cout << linePct << endl;
-        
-        
         float meshZ;
         
         if(meshBig){
@@ -673,8 +664,6 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
                 lineMeshQB.push_back(tempA);
             }
             
-            
-            
         }
         
         while (lineMeshQA.size() > (10*activeDirs) * (5-pulseDiv_) ) {
@@ -697,16 +686,13 @@ void InterfacePlane::update(int& stepper, float& tickTime_, int& scanDir_, bool 
         
         
     }
-    
-    
-    
-    
-    
+
 }
 
+//--------------------------------------------------------------
 float InterfacePlane::len(float tickTime_, int div_, int& pDiv_){
     float temp;
- 
+    
     if(thisTime >= tickTime_){
         temp = 1.0;
     } else {
@@ -715,30 +701,26 @@ float InterfacePlane::len(float tickTime_, int div_, int& pDiv_){
             timeDivision = thisTime;
         }
         float useTime = thisTime -  ((timeDivision/(5-pDiv_))*div_) ;
- 
+        
         useTime = ofWrap(useTime, 0.0, tickTime_);
         temp =ofMap( fmod(useTime, tickTime_ ), 0.0  , tickTime_ , 0.0, 1.0);
         
-        
-       // cout << "tickTime " << tickTime_ << "   timeDivision "<< timeDivision <<  "   thisTime " << thisTime <<   "   iterator " << div_ <<"   useTime " << useTime << "  map  " << temp << endl;
+        // cout << "tickTime " << tickTime_ << "   timeDivision "<< timeDivision <<  "   thisTime " << thisTime <<   "   iterator " << div_ <<"   useTime " << useTime << "  map  " << temp << endl;
     }
     
     
-     return temp;
+    return temp;
 }
 
+//--------------------------------------------------------------
 ofNode InterfacePlane::getRotNode(int& stepper, float& len, int& scanDir_ , bool connected_[],bool active_[]){
-    
-   
-    
+ 
     alphaPart = TWO_PI/((tiles+1)*4);
     
     pctBar = ofMap(stepper+len, 0, tiles+1, 0.0, 1.0);
     
     ofMatrix4x4 aaa;
-    
-    
-    
+  
     if (nextDirs[1] && nextDirs[0]) {
         alpha = ofMap( stepper, 0,  (tiles+1), 0.0, HALF_PI) + scanDir_*HALF_PI;
         alpha -= HALF_PI;
@@ -857,62 +839,29 @@ ofNode InterfacePlane::getRotNode(int& stepper, float& len, int& scanDir_ , bool
 }
 
 
+//--------------------------------------------------------------
 void InterfacePlane::draw( bool& pause_){
     
     if (!pause_) {
         
-        // ofPushStyle();
-       // posNode.transformGL();
-        
-        // ofSetColor(filterColor( ofColor( 255, 255, 255,lineAlpha)) );
-        
         glLineWidth(2);
 
-       // ofLine(-8, 0, 8, 0);
-        
-   
-        
-       // posNode.restoreTransformGL();
-        //  ofPopStyle();
         directionMesh.draw();
         
         lineMesh.draw();
-
-        /*
-        if (scanDir >=0) {
-            ofPushMatrix();
-         
-            for (int i = 1; i < tiles; i++) {
-                
-                if (scanDir == 0) {
-                    ofTranslate(0, tileSize);
-                    pulseLine.draw();
-                } else if (scanDir == 1) {
-                    ofTranslate(tileSize,0);
-                    pulseLine.draw();
-                } else if (scanDir == 2) {
-                    ofTranslate(0, -tileSize);
-                    pulseLine.draw();
-                } else if (scanDir == 3) {
-                    ofTranslate(-tileSize,0);
-                    pulseLine.draw();
-                }
-            }
-            
-            ofPopMatrix();
-        }
-        */
+        
     }
 }
 
 
+//--------------------------------------------------------------
 void InterfacePlane::pulseDir(int dir_) {
     
     blink[dir_] = true;
     blinkPct[dir_] = 0.01;
     for (int j = dir_*dirMeshVerts; j < (dir_*dirMeshVerts)+dirMeshVerts; j++) {
         if(meshState[dir_] == STATE_ACTIVE){
-        directionMesh.setColor(j, pulseColorA);
+            directionMesh.setColor(j, pulseColorA);
         } else {
             directionMesh.setColor(j, pulseColorC);
         }

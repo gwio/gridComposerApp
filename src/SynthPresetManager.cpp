@@ -1,8 +1,6 @@
 
 #include "SynthPresetManager.h"
 
-//SINE A & B global Generator from ofApp
-
 SynthPresetManager::SynthPresetManager() {
     //update manual
     count = 4;
@@ -67,7 +65,7 @@ SynthPresetManager::SynthPresetManager() {
         for (int j = 0; j < sums; j++) {
             amp*=0.77;
             if(j%4==0) {
-            sineA += sinf(phase*(j))*amp*2 ;
+                sineA += sinf(phase*(j))*amp*2 ;
             } else {
                 sineA += sinf(phase*(j*2))*amp*0.333 ;
             }
@@ -81,7 +79,7 @@ SynthPresetManager::SynthPresetManager() {
         
         
         *sineSynthData2++ = sineB;
-      
+        
         
         //2. saw________________________________________
         TonicFloat sawA = 0;
@@ -95,10 +93,7 @@ SynthPresetManager::SynthPresetManager() {
         sawB = ( (*(tableSineSimple.dataPointer()+i)*0.75) + (sinf(phase*2)*0.14)+ (sinf(phase*10)*0.125) + (*(tableNoiseSimple.dataPointer()+i)*0.035) + (sinf(phase*4)*0.05)   );
         
         *tableSawData2++ = sawB;
-        
-        
-        
-        
+    
         //6. snare
         
         TonicFloat snareA  = 0;
@@ -107,16 +102,11 @@ SynthPresetManager::SynthPresetManager() {
         
         
         *snareData++ = snareA*2.0;
-        
-        
-       
-        
+    
         snareB = (*(tableNoiseSimple.dataPointer()+i)*sinf(phase*4))*sinf(phase*2);
         
         *snareData2++ = snareB*3;
-        
-        
-        
+     
         //8. bell
         
         TonicFloat bellA = 0;
@@ -144,7 +134,7 @@ SynthPresetManager::SynthPresetManager() {
     
 }
 
-
+//--------------------------------------------------------------
 void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Generator& output_, RampedValue& freq_, RampedValue& vol_, ControlGenerator& trigger_, ADSR& adsr1_, ADSR& adsr2_,
                                      ControlParameter& attack1_, ControlParameter& attack2_, ControlParameter& release1_, ControlParameter& release2_) {
     
@@ -169,7 +159,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         tempGen = ((adsr1*sine) + (adsr2*sine2))*vol_*0.225;
         
     }
-   
+    
     
     //bell test
     
@@ -207,7 +197,7 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         
     }
-
+    
     
     //6. snare_______________________________________________
     
@@ -222,20 +212,16 @@ void SynthPresetManager::createSynth(int preset_,ofxTonicSynth& groupSynth_, Gen
         
         
         //tempGen  = ((snareOsc*adsr2*0.34*vol_))>>BPF12().cutoff(1500).Q(0.7-(0.3*vol_));
-        
         tempGen  = ((sawOsc*adsr2*0.5)+ ((snareOsc2*adsr1)>>BPF12().cutoff(1500).Q(0.85)) )*vol_*0.625;
-        
         //tempGen  = ((snareOsc2*adsr1)>>BPF12().cutoff(1500).Q(0.85))*vol_*0.4;
-
         //tempGen  = ((sawOsc*adsr2))*vol_*0.4;
-
+        
     }
-    
-    
-  
     
     output_ = tempGen;
 }
+
+//--------------------------------------------------------------
 float SynthPresetManager::getPresetLfvf(int preset_) {
     float temp;
     if (preset_%count == 0) {
@@ -250,13 +236,14 @@ float SynthPresetManager::getPresetLfvf(int preset_) {
     return temp;
 }
 
+//--------------------------------------------------------------
 float SynthPresetManager::getPresetColor(float hue_, int preset_){
     
     float hue;
     if (preset_ == 0) {
         hue = 9;
     } else if (preset_ == 1) {
-       // hue = 111;
+        // hue = 111;
         hue = 232;
     } else if (preset_ == 2) {
         //hue = 137;
@@ -267,6 +254,7 @@ float SynthPresetManager::getPresetColor(float hue_, int preset_){
     return hue;
 }
 
+//--------------------------------------------------------------
 float SynthPresetManager::getPresetRelease(int preset_){
     float rel;
     if (preset_%count == 0) {
@@ -281,6 +269,7 @@ float SynthPresetManager::getPresetRelease(int preset_){
     return rel;
 }
 
+//--------------------------------------------------------------
 float SynthPresetManager::getPresetAttack(int preset_){
     float att;
     if (preset_%count == 0) {

@@ -37,8 +37,6 @@ enum currentState {
 };
 
 
-
-
 //--------------------------------------------------------------
 void ofApp::setup(){
 #if TARGET_OS_IPHONE
@@ -48,7 +46,6 @@ void ofApp::setup(){
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [UIApplication sharedApplication].idleTimerDisabled = YES;
-    
     swipping.setup();
     ofAddListener(swipping.swipeRecognized, this, &ofApp::onSwipe);
 #else
@@ -64,11 +61,6 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     //ofEnableDepthTest();
     ofEnableAlphaBlending();
-    
-    
-    
-    
-    
     
     scaleCollection.loadScales();
     globalScaleVecPos = 0;
@@ -117,7 +109,6 @@ void ofApp::setup(){
     tonicSynth.setParameter("delay", 0.25);
     delayRamp = RampedValue().value(0.0).length(0.35).target(delayTarget);
     
-    
     reverbTime = tonicSynth.addParameter("revTime");
     tonicSynth.setParameter("revTime", revTime);
     
@@ -127,10 +118,6 @@ void ofApp::setup(){
     bpmpara = tonicSynth.addParameter("BPM");
     tonicSynth.setParameter("BPM", bpm*BPM_DIVISION_MAX);
     ControlGenerator pulse = ControlMetro().bpm(bpmpara);
-    //hmm
-    //
-    //ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara/4*3);
-    //ControlGenerator pulseTriad = ControlMetro().bpm(bpmpara*0.666);
     
     //  1/4 -> 4x quarternote
     ControlMetroDivider pulseDiv1 = ControlMetroDivider().divisions(3).input(pulse);
@@ -140,8 +127,6 @@ void ofApp::setup(){
     ControlMetroDivider pulseDiv3 = ControlMetroDivider().divisions(6).input(pulse);
     // 1/1 -> 1x wholenote
     ControlMetroDivider pulseDiv4 = ControlMetroDivider().divisions(12).input(pulse);
-    
-    
     
     //  1/4 -> 4x quarternote
     ofEvent<float>* pulseEventDiv1 = tonicSynth.createOFEvent(pulseDiv1);
@@ -165,10 +150,6 @@ void ofApp::setup(){
         temp.setPosition( intersectPlane( designGrid[i+1][1] ) );
         synthPos[i+1]=temp;
     }
-    
-    
-    
-    
     
     synthButton[0] = 0;
     synthButton[1] = 1;
@@ -196,7 +177,6 @@ void ofApp::setup(){
     
     activeSynth = 1;
     
-    
     makePresetString();
     
     setupStatesAndAnimation();
@@ -223,16 +203,8 @@ void ofApp::setup(){
     planeForIntersect.set(TILES*TILESIZE,TILES*TILESIZE);
     thisIntersect.setFrom(planeForIntersect);
     
-    
     ofBackground( ofColor(19,19,19) );
-    
-    light.setPosition(synthActivePos.getPosition()+ofVec3f(0,-100,1000));
-    light.setDiffuseColor( ofColor(100,100,100));
-    material.setShininess(55);
-    // material.setSpecularColor( filterColor(ofColor::white));
-    //temp sketch
-    // light.setAmbientColor( filterColor(ofColor::white) );
-    
+
     doubleClickTime = 300;
     curTap = 0;
     lastTap = 0;
@@ -245,21 +217,16 @@ void ofApp::setup(){
     
     focusCam = false;
     
-    
-    
-    //  aniPct = 1.0;
+    //aniPct = 1.0;
     aniCam = 1.0;
     
     animCam = false;
     interfaceMoving = false;
     debugCam = false;
     insideSynth = false;
-    
-    
-    // scaleFac = 1-(1/((designGrid[0][0].y*6)/144));
+
     scaleFac = designGrid[0][0].y/2;
     
-    // scaleFac *= 0.35;
     scaleFac *= 1.0;
     
     iconSize = fontSizeBigger*0.52;
@@ -294,8 +261,7 @@ void ofApp::setup(){
     tempImg.resize(iconSize*3.33, iconSize);
     play.loadData(tempImg.getPixelsRef(), GL_RGBA);
     
-    
-    
+ 
     muster = MusterContainer(mainInterfaceData[39].drawStringPos, ofVec2f( mainInterfaceData[39].elementSize), TILES);
     muster.setup();
     
@@ -316,14 +282,12 @@ void ofApp::setup(){
         directionClickZonesB[i].addVertex(testCam.worldToScreen((bMesh.getVertex((i*9)+4)*0.45*timeMatrix.getOrientationQuat())+TwoTimePathOn.getVertices().back()));
         directionClickZonesB[i].close();
         
-        
         ofVboMesh &cMesh = synths[2].pulsePlane.directionMeshConBig;
         directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+0)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+1)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+3)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].addVertex(testCam.worldToScreen((cMesh.getVertex((i*9)+4)*0.45*timeMatrix.getOrientationQuat())+ThreeTimePathOn.getVertices().back()));
         directionClickZonesC[i].close();
-        
     }
     
     //setup save manager, font files , size
@@ -359,8 +323,6 @@ void ofApp::setup(){
 #else
     saveManager.loadSaveFolder(";-)");
 #endif
-    
-    
     
     sendMidi = true;
     //setNewGUI();
@@ -453,8 +415,6 @@ void ofApp::setupFonts(){
 
 void ofApp::setupMidi(){
     
-    
-    
 #if TARGET_OS_IPHONE
     ofxMidi::enableNetworking();
     midiOut.listPorts();
@@ -477,7 +437,7 @@ void ofApp::setupAudio(){
     StereoDelay delay = StereoDelay(0.60,0.65)
     .delayTimeRight(delayRamp*1.1)
     .delayTimeLeft(delayRamp)
-   // .feedback(0.2+(delayRamp*0.15))
+    // .feedback(0.2+(delayRamp*0.15))
     .feedback(0.15)
     .dryLevel(0.95)
     .wetLevel(0.25);
@@ -504,9 +464,6 @@ void ofApp::setupAudio(){
     .lookahead(0.001)
     .makeupGain(4.0)
     .bypass(false);
-    
-    
-    
     
     Generator revMix;
     revMix = mainOut >> compressor >> rev;
@@ -586,13 +543,14 @@ void ofApp::updateBpmMenuMesh(){
     
     
 }
+
 //--------------------------------------------------------------
 void ofApp::update(){
     //fade in Volume at start
     if (startUp && volumeRestart < volumeRestartTarget) {
         setMainVolume(volumeRestart);
         volumeRestart += .012;
-       // mainVol = volumeRestart;
+        // mainVol = volumeRestart;
     } else if (startUp && volumeRestart >= volumeRestartTarget) {
         //mainVol = volumeRestartTarget;
         setMainVolume(mainVol);
@@ -601,8 +559,6 @@ void ofApp::update(){
     
     for (int i = 0; i < synths.size(); i++) {
         synths[i].update();
-        
-        
         if (synths[i].synthHasChanged == true){
             setupAudio();
             synths[i].synthHasChanged = false;
@@ -621,7 +577,6 @@ void ofApp::update(){
         }
         aniPct += ANI_SPEED;
     }
-    
     
     
     if (aniPct >= 1.0) {
@@ -650,14 +605,12 @@ void ofApp::update(){
             hvSlotB.update(synths[synthButton[1]].noteHistory, mainInterfaceData, mainInterface);
             hvSlotC.update(synths[synthButton[2]].noteHistory, mainInterfaceData, mainInterface);
         }
-        
         if (currentState == STATE_EDIT_DETAIL || currentState == STATE_EDIT || currentState == STATE_DEFAULT) {
             hvSlotD.updateStateEditDetail(synths[activeSynth].noteHistory, mainInterfaceData, mainInterface, 63);
         }
     }
     
     
-    // intersectPlane(ofGetMouseX(),ofGetMouseY());
     if (currentState == STATE_BPM) {
         updateBpmMenuMesh();
     }
@@ -677,187 +630,120 @@ void ofApp::update(){
     }
     
     updateSleepTimer();
-    
-    
-    //light.setPosition(  synths[activeSynth].myNode.getPosition()+ofVec3f(0,200,150));
 }
 
 void ofApp::updateInterfaceMesh() {
     
     // for index number reference see ofApp::setupGlobalInterface()
+    //updates the ui elements, yes this is bad ;)
     
-    mainInterfaceData[0].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
     mainInterfaceData[51].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
-    
-    
     mainInterfaceData[8].updateMainMesh(mainInterface,designGrid[0][2],tweenFloat);
     mainInterfaceData[9].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
     mainInterfaceData[10].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
-    
     mainInterfaceData[11].updateMainMesh(mainInterface, ofVec3f(designGrid[1][0].x, designGrid[1][2].y,0),tweenFloat);
-    
-    
     mainInterfaceData[37].updateMainMesh(mainInterface, designGrid[0][0], tweenFloat);
-    
     mainInterfaceData[38].updateMainMesh(mainInterface, designGrid[1][0], tweenFloat);
-    mainInterfaceData[45].updateMainMeshSlider(mainInterface, designGrid[1][0], tweenFloat);
-    
-    
-    mainInterfaceData[1].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
-    mainInterfaceData[2].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
-    mainInterfaceData[3].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
-    
-    
     mainInterfaceData[52].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
     mainInterfaceData[53].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[54].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
-    
-    // mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[0][1], tweenFloat);
-    
-    
     mainInterfaceData[39].updateMainMesh(mainInterface,designGrid[2][1], tweenFloat);
-    mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[2][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-                                          ,tweenFloat);
-    
-    mainInterfaceData[136].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
-    mainInterfaceData[136].updateMainMeshSliderB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-                                                 ,tweenFloat);
-    
+    mainInterfaceData[39].updateMainMeshB(mainInterface,ofVec3f(designGrid[2][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0),tweenFloat);
     mainInterfaceData[137].updateMainMesh(mainInterface,designGrid[0][1], tweenFloat);
-    mainInterfaceData[137].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-                                           ,tweenFloat);
-    
-    
-    
+    mainInterfaceData[137].updateMainMeshB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0),tweenFloat);
     mainInterfaceData[12].updateMainMesh(mainInterface,designGrid[2][0], tweenFloat);
-    
-    
-    for (int i = 0; i < 12; i++) {
-        mainInterfaceData[13+i].updateMainMesh(mainInterface,designGrid[1][1],tweenFloat);
-    }
-    for (int i = 0; i < 12; i++) {
-        mainInterfaceData[25+i].updateMainMesh(mainInterface,designGrid[1][1],tweenFloat);
-    }
-    
-    
-    
+    mainInterfaceData[135].updateMainMesh(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y,0) ,tweenFloat);
+    mainInterfaceData[135].updateMainMeshB(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
     mainInterfaceData[4].updateMainMesh(mainInterface,designGrid[0][1],tweenFloat);
-    
     mainInterfaceData[6].updateMainMesh(mainInterface,designGrid[1][1],tweenFloat);
-    
     mainInterfaceData[127].updateMainMesh(mainInterface,designGrid[2][1],tweenFloat);
-    
-    
-    // mainInterfaceData[5].updateMainMesh(mainInterface, ofVec3f(0, designGrid[0][1].y,0) ,tweenFloat);
-    
     mainInterfaceData[7].updateMainMesh(mainInterface,designGrid[0][1],tweenFloat);
-    
-    
-    //move in edit to detail state
-    /*
-     mainInterfaceData[5].updateMainMeshB(mainInterface, ofVec3f(0,designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-     ,tweenFloat);
-     */
-    
-    mainInterfaceData[7].updateMainMeshB(mainInterface,  ofVec3f(designGrid[0][1].x,designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0)
-                                         ,tweenFloat);
-    
-    
+    mainInterfaceData[7].updateMainMeshB(mainInterface,  ofVec3f(designGrid[0][1].x,designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0),tweenFloat);
     mainInterfaceData[43].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
     mainInterfaceData[44].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
-    
     mainInterfaceData[41].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
-    
     mainInterfaceData[42].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
-    
-    
-    mainInterfaceData[49].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
     mainInterfaceData[5].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
-    
-    
+    mainInterfaceData[111].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
+    mainInterfaceData[46].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
+    mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+    mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
+    mainInterfaceData[48].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
+    mainInterfaceData[50].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+    mainInterfaceData[124].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
+    mainInterfaceData[125].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
+    mainInterfaceData[126].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
+    mainInterfaceData[128].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
+    mainInterfaceData[129].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
+    mainInterfaceData[130].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
+    mainInterfaceData[131].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
+    mainInterfaceData[138].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
+    mainInterfaceData[140].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
+    mainInterfaceData[141].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
+    mainInterfaceData[142].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[144].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
+    mainInterfaceData[145].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
+    mainInterfaceData[147].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[149].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
+
+    mainInterfaceData[45].updateMainMeshSlider(mainInterface, designGrid[1][0], tweenFloat);
+    mainInterfaceData[1].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[2].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[3].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
+    mainInterfaceData[0].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
+    mainInterfaceData[136].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
+    mainInterfaceData[136].updateMainMeshSliderB(mainInterface,ofVec3f(designGrid[0][0].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0),tweenFloat);
+    mainInterfaceData[49].updateMainMeshSlider(mainInterface, designGrid[1][0],tweenFloat);
     mainInterfaceData[55].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
     mainInterfaceData[56].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[57].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
-    
-    
     mainInterfaceData[58].updateMainMeshSlider(mainInterface,designGrid[0][1], tweenFloat);
     mainInterfaceData[59].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
     mainInterfaceData[60].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
-    
     mainInterfaceData[61].updateMainMeshSlider(mainInterface, designGrid[0][2],tweenFloat);
-    
     mainInterfaceData[62].updateMainMeshSlider(mainInterface, designGrid[1][2],tweenFloat);
+    mainInterfaceData[139].updateMainMeshSlider(mainInterface, designGrid[2][0],tweenFloat);
+    mainInterfaceData[143].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
+    mainInterfaceData[146].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
+    mainInterfaceData[148].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
+
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[63+i].updateMainMesh(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y,0) ,tweenFloat);
         mainInterfaceData[63+i].updateMainMeshB(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
     }
     
-    mainInterfaceData[135].updateMainMesh(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y,0) ,tweenFloat);
-    mainInterfaceData[135].updateMainMeshB(mainInterface, ofVec3f(designGrid[0][1].x, designGrid[0][1].y+(abs((editDetailMoveDirection-tweenFloat))*(designGrid[0][0].y*1.5)),0) ,tweenFloat);
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[13+i].updateMainMesh(mainInterface,designGrid[1][1],tweenFloat);
+    }
     
+    for (int i = 0; i < 12; i++) {
+        mainInterfaceData[25+i].updateMainMesh(mainInterface,designGrid[1][1],tweenFloat);
+    }
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[75+i].updateMainMesh(mainInterface, designGrid[0][0] ,tweenFloat);
     }
+    
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[87+i].updateMainMesh(mainInterface,designGrid[1][0] ,tweenFloat);
     }
+    
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[99+i].updateMainMesh(mainInterface, designGrid[2][0] ,tweenFloat);
     }
     
-    mainInterfaceData[111].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
-    
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[112+i].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
     }
+    
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[116+i].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
     }
+    
     for (int i = 0; i < 4; i++) {
         mainInterfaceData[120+i].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     }
-    
-    mainInterfaceData[46].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
-    mainInterfaceData[40].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
-    
-    mainInterfaceData[47].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
-    mainInterfaceData[48].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
-    
-    mainInterfaceData[50].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
-    
-    mainInterfaceData[124].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
-    
-    mainInterfaceData[125].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
-    
-    mainInterfaceData[126].updateMainMesh(mainInterface, designGrid[2][2],tweenFloat);
-    
-    mainInterfaceData[128].updateMainMesh(mainInterface, designGrid[0][2],tweenFloat);
-    mainInterfaceData[129].updateMainMesh(mainInterface, designGrid[1][2],tweenFloat);
-    
-    mainInterfaceData[130].updateMainMesh(mainInterface, designGrid[0][0],tweenFloat);
-    
-    
-    mainInterfaceData[131].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
-    mainInterfaceData[138].updateMainMesh(mainInterface, designGrid[1][0],tweenFloat);
-    
-    mainInterfaceData[139].updateMainMeshSlider(mainInterface, designGrid[2][0],tweenFloat);
-    mainInterfaceData[140].updateMainMesh(mainInterface, designGrid[2][0],tweenFloat);
-    
-    mainInterfaceData[141].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
-    mainInterfaceData[142].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
-    
-    mainInterfaceData[143].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
-    mainInterfaceData[144].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
-    
-    mainInterfaceData[145].updateMainMesh(mainInterface, designGrid[0][1],tweenFloat);
-    
-    mainInterfaceData[146].updateMainMeshSlider(mainInterface, designGrid[1][1],tweenFloat);
-    mainInterfaceData[147].updateMainMesh(mainInterface, designGrid[1][1],tweenFloat);
-    
-    mainInterfaceData[148].updateMainMeshSlider(mainInterface, designGrid[2][1],tweenFloat);
-    mainInterfaceData[149].updateMainMesh(mainInterface, designGrid[2][1],tweenFloat);
     
     for (int i = 0; i < 3; i++) {
         mainInterfaceData[132+i].updateMainMesh(mainInterface, designGrid[i][0],tweenFloat);
@@ -870,20 +756,15 @@ void ofApp::updateInterfaceMesh() {
     for (int i = 0; i < mainInterfaceData.size(); i++) {
         if ((mainInterfaceData[i].drawStringPos.x >= (-mainInterfaceData[i].elementSize.x/2) &&  mainInterfaceData[i].drawStringPos.x <= ((designGrid[0][0].x*6)+(mainInterfaceData[i].elementSize.x/2) )) &&
             mainInterfaceData[i].drawStringPos.y >= (0-mainInterfaceData[i].elementSize.y/2) &&  mainInterfaceData[i].drawStringPos.y <= ((designGrid[0][0].y*6)+(mainInterfaceData[i].elementSize.y/2) )) {
-            
             for (int j = 0; j < 4; j++){
                 interfaceDraw.addVertex(mainInterface.getVertex((i*4)+j));
                 interfaceDraw.addColor(mainInterface.getColor((i*4)+j));
-                
             }
-            
             for (int j = 0; j < 6; j++) {
                 interfaceDraw.addIndex(mainInterfaceData.at(i).index[j]+(4*indexCounter));
             }
-            
             indexCounter++;
         }
-        
     }
 }
 
@@ -892,28 +773,22 @@ void ofApp::draw(){
     
     glLineWidth(2);
     
-    //glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     
     glEnable(GL_MULTISAMPLE);
-    //ofEnableLighting();
-    //light.enable();
-    //material.begin();
-    
+
     if (!debugCam) {
         testCam.begin();
     } else {
         cam.begin();
     }
-    //  thisIntersect.draw();
+    
+    //thisIntersect.draw();
     for (int i = 0; i < 3; i++) {
         synths[i].myNode.transformGL();
-        
         synths[i].draw();
-        
         synths[i].myNode.restoreTransformGL();
     }
-    
     
     if (!debugCam) {
         testCam.end();
@@ -921,23 +796,19 @@ void ofApp::draw(){
         cam.end();
     }
     
-    // material.end();
-    //ofDisableLighting();
-    
     if (drawInfo) {
         drawDebug();
     }
     
     glDisable(GL_DEPTH_TEST);
+    
     glDisable(GL_MULTISAMPLE);
     
     drawInterface();
     
-    
-    
-    
 }
 
+//--------------------------------------------------------------
 void ofApp::drawInterface(){
     //mainInterface.draw();
     interfaceDraw.draw();
@@ -973,6 +844,7 @@ void ofApp::drawInterface(){
     
 }
 
+//--------------------------------------------------------------
 void ofApp::drawSliderPos(){
     ofPushStyle();
     float sliderY = designGrid[0][0].y*2*0.25;
@@ -983,109 +855,86 @@ void ofApp::drawSliderPos(){
     if ( (currentState == STATE_VOLUME) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         for (int i = 0; i < 4; i++){
             ofSetColor(ofColor(21,21,21,80));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y,
-                            rectLine.x*2.0, sliderY);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y,rectLine.x*2.0, sliderY);
             
             ofSetColor(ofColor::fromHsb(255,0,195,255));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y-lineOff,
-                            rectLine.x, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(i).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(51+i).counter+3).y-lineOff,rectLine.x, rectLine.y);
         }
     }
     
     //bpm slider white line
     if ( (currentState == STATE_BPM) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         ofSetColor(ofColor(21,21,21,80));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
-                        rectLine.x*2.0, rectLine.y);
+        ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
         
         ofSetColor(ofColor::fromHsb(255,0,195,255));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,
-                        rectLine.x, rectLine.y);
+        ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(45).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(38).counter+3).y-lineOff,rectLine.x, rectLine.y);
     }
     
     //settings slider white line
     if ( (currentState == STATE_SETTINGS) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         if(!dynamicVelo){
             ofSetColor(ofColor(21,21,21,80));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(139).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(140).counter+3).y-lineOff,
-                            rectLine.x*2.0, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(139).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(140).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
             
             ofSetColor(ofColor::fromHsb(255,0,195,255));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(139).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(140).counter+3).y-lineOff,
-                            rectLine.x, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(139).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(140).counter+3).y-lineOff,rectLine.x, rectLine.y);
         }
         
         if (soundDelay && !autoDelay){
             ofSetColor(ofColor(21,21,21,80));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(143).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(144).counter+3).y-lineOff,
-                            rectLine.x*2.0, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(143).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(144).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
             
             ofSetColor(ofColor::fromHsb(255,0,195,255));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(143).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(144).counter+3).y-lineOff,
-                            rectLine.x, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(143).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(144).counter+3).y-lineOff,rectLine.x, rectLine.y);
         }
         
         
         if (soundReverb){
             ofSetColor(ofColor(21,21,21,80));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(148).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(149).counter+3).y-lineOff,
-                            rectLine.x*2.0, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(148).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(149).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
             
             ofSetColor(ofColor::fromHsb(255,0,195,255));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(148).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(149).counter+3).y-lineOff,
-                            rectLine.x, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(148).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(149).counter+3).y-lineOff,rectLine.x, rectLine.y);
         }
         
         if (soundReverb){
             ofSetColor(ofColor(21,21,21,80));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(146).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(147).counter+3).y-lineOff,
-                            rectLine.x*2.0, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(146).counter+3).x-(rectLine.x*2.0/2.0),mainInterface.getVertex(mainInterfaceData.at(147).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
             
             ofSetColor(ofColor::fromHsb(255,0,195,255));
-            ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(146).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(147).counter+3).y-lineOff,
-                            rectLine.x, rectLine.y);
+            ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(146).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(147).counter+3).y-lineOff,rectLine.x, rectLine.y);
         }
     }
     
     //STATE_EDT_DETAIL keynote slider white line
     if ( (currentState == STATE_EDIT_DETAIL) || (currentState == STATE_EDIT) || (interfaceMoving && currentState == STATE_DEFAULT) ){
         ofSetColor(ofColor(21,21,21,80));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x*2.0/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
-                        rectLine.x*2.0, rectLine.y);
+        ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x*2.0/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
         
         ofSetColor(ofColor::fromHsb(255,0,195,255));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,
-                        rectLine.x, rectLine.y);
+        ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(49).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(5).counter+3).y-lineOff,rectLine.x, rectLine.y);
         
         ofSetColor(ofColor(21,21,21,80));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(136).counter+3).x-(rectLine.x*2.0/2),mainInterface.getVertex(mainInterfaceData.at(137).counter+3).y-lineOff,
-                        rectLine.x*2.0, rectLine.y);
+        ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(136).counter+3).x-(rectLine.x*2.0/2),mainInterface.getVertex(mainInterfaceData.at(137).counter+3).y-lineOff,rectLine.x*2.0, rectLine.y);
         
         ofSetColor(ofColor::fromHsb(255,0,195,255));
-        ofDrawRectangle( mainInterface.getVertex(mainInterfaceData.at(136).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(137).counter+3).y-lineOff,
-                        rectLine.x, rectLine.y);
+        ofDrawRectangle(mainInterface.getVertex(mainInterfaceData.at(136).counter+3).x-(rectLine.x/2),mainInterface.getVertex(mainInterfaceData.at(137).counter+3).y-lineOff,rectLine.x, rectLine.y);
         
     }
     
     ofPopStyle();
 }
 
+//--------------------------------------------------------------
 void ofApp::drawStringAndIcons(){
     
     
     ofPushStyle();
-    // ofSetColor(ofColor::fromHsb(255,0,195,255));
     
     //drawStrings
     for (int i = 0; i < mainInterfaceData.size();i ++){
-        /*
-         if(i >= 13 && i <= 36) {
-         ofSetColor(255, 255, 255,190);
-         } else {
-         ofSetColor(255, 255, 255,255);
-         }
-         */
-        
+
         if ( mainInterfaceData[i].showString &&
             
             ((mainInterfaceData[i].drawStringPos.x >= (0-200) &&  mainInterfaceData[i].drawStringPos.x <= ((designGrid[0][0].x*6)+200 )) &&
@@ -1098,25 +947,15 @@ void ofApp::drawStringAndIcons(){
                 mainInterfaceData[i].drawFontString(0,-(fontSizeSmall/2)+(designGrid[0][0].y/4)  );
                 
             }
-            
         }
-        
-        
     }
-    
-    //float tempTrans = 0.5*scaleFac;
-    
+
     //draw icons
-    
-    
-    
-    
-    
-    
+   
     //button left-right
     ofSetColor(mainInterfaceData[58].displayColor);
     
-   // ofVec3f tri = mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1);
+    // ofVec3f tri = mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1);
     
     ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1),
                    mainInterface.getVertices().at(mainInterfaceData.at(58).counter+1)+ ofVec3f(0,-mainInterfaceData.at(58).elementSize.y,0),
@@ -1135,7 +974,6 @@ void ofApp::drawStringAndIcons(){
                    mainInterface.getVertices().at(mainInterfaceData.at(59).counter+2)+ ofVec3f(0,-mainInterfaceData.at(59).elementSize.y,0),
                    mainInterface.getVertices().at(mainInterfaceData.at(59).counter+2)+ ofVec3f(+12,-mainInterfaceData.at(59).elementSize.y/2,0));
     
-    
     ofSetColor(mainInterfaceData[60].displayColor);
     ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(60).counter+1),
                    mainInterface.getVertices().at(mainInterfaceData.at(60).counter+1)+ ofVec3f(0,-mainInterfaceData.at(60).elementSize.y,0),
@@ -1144,9 +982,7 @@ void ofApp::drawStringAndIcons(){
     ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(60).counter+2),
                    mainInterface.getVertices().at(mainInterfaceData.at(60).counter+2)+ ofVec3f(0,-mainInterfaceData.at(60).elementSize.y,0),
                    mainInterface.getVertices().at(mainInterfaceData.at(60).counter+2)+ ofVec3f(+12,-mainInterfaceData.at(60).elementSize.y/2,0));
-    
-    
-    
+ 
     ofSetColor(mainInterfaceData[61].displayColor);
     ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(61).counter+1),
                    mainInterface.getVertices().at(mainInterfaceData.at(61).counter+1)+ ofVec3f(0,-mainInterfaceData.at(61).elementSize.y,0),
@@ -1165,7 +1001,6 @@ void ofApp::drawStringAndIcons(){
                    mainInterface.getVertices().at(mainInterfaceData.at(62).counter+2)+ ofVec3f(0,-mainInterfaceData.at(62).elementSize.y,0),
                    mainInterface.getVertices().at(mainInterfaceData.at(62).counter+2)+ ofVec3f(+12,-mainInterfaceData.at(62).elementSize.y/2,0));
     
-    
     ofSetColor(mainInterfaceData[7].displayColor);
     ofDrawTriangle(mainInterface.getVertices().at(mainInterfaceData.at(7).counter+1),
                    mainInterface.getVertices().at(mainInterfaceData.at(7).counter+1)+ ofVec3f(0,-mainInterfaceData.at(7).elementSize.y,0),
@@ -1175,10 +1010,7 @@ void ofApp::drawStringAndIcons(){
                    mainInterface.getVertices().at(mainInterfaceData.at(7).counter+2)+ ofVec3f(0,-mainInterfaceData.at(7).elementSize.y,0),
                    mainInterface.getVertices().at(mainInterfaceData.at(7).counter+2)+ ofVec3f(+12,-mainInterfaceData.at(7).elementSize.y/2,0));
     
-    
-    
-    
-    
+   
     ofPopStyle();
     
 }
@@ -1215,16 +1047,14 @@ void ofApp::keyPressed(int key){
     }
     
     
-    
     if (key == 'c') {
         debugCam = !debugCam;
-        
     }
     
     if(key == 'p') {
         savePreset();
     }
-    
+
 }
 
 //--------------------------------------------------------------
@@ -1273,8 +1103,6 @@ void ofApp::replaceMouseDragged(int x, int y){
                 if (autoDelay){
                     tonicSynth.setParameter("delay", getBpmValue(dynamicDelayValue));
                 }
-                //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
-                //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
                 }
@@ -1297,24 +1125,18 @@ void ofApp::replaceMouseDragged(int x, int y){
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                //mainInterfaceData[52].elementName = ofToString(value,2);
-                //mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[2].touchDown) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                // mainInterfaceData[53].elementName = ofToString(value,2);
-                // mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[3].touchDown) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                //  mainInterfaceData[54].elementName = ofToString(value,2);
-                //  mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[0].touchDown) {
@@ -1322,8 +1144,6 @@ void ofApp::replaceMouseDragged(int x, int y){
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 setMainVolume(value);
                 mainVol = value;
-                //mainInterfaceData[51].elementName = ofToString(value,2);
-                //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
             
         }
@@ -1338,8 +1158,6 @@ void ofApp::replaceMouseDragged(int x, int y){
                 }
                 
                 else if(saveManager.touchDown){
-                    //scrollOffset.x == temp for y
-                    //saveManager.scrollOffset.y = ofClamp(y-saveManager.touchStart.y+saveManager.scrollOffset.x, -saveManager.offsetDown.y+designGrid[0][0].y*5,0);
                     saveManager.oldTouchPos = saveManager.touchPos;
                     saveManager.touchPos = y;
                     saveManager.acc = saveManager.touchPos-saveManager.oldTouchPos;
@@ -1426,8 +1244,6 @@ void ofApp::replaceMouseDragged(int x, int y){
     
 }
 
-
-
 #if TARGET_OS_IPHONE
 //--------------------------------------------------------------
 void ofApp::touchDown(ofTouchEventArgs & touch){
@@ -1467,8 +1283,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                 if (autoDelay){
                     tonicSynth.setParameter("delay", getBpmValue(dynamicDelayValue));
                 }
-                //mainInterfaceData[38].elementName = ofToString(ceil(value*BPM_MAX));
-                //mainInterfaceData[38].setStringWidth(mainInterfaceData[38].fsPtr->getBBox(mainInterfaceData[38].elementName, mainInterfaceData[38].fontSize, 0, 0).getWidth());
                 for (int i = 0; i < 3; i++){
                     synths[i].setAllADSR(synths[i].preset);
                 }
@@ -1497,8 +1311,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[1].minX, mainInterfaceData[1].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[1].setSlider(mainInterface, value);
                 synths[synthButton[0]].changeSynthVolume(value);
-                //mainInterfaceData[52].elementName = ofToString(value,2);
-                //mainInterfaceData[52].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[2].isInside(ofVec2f(x,y))) {
@@ -1508,8 +1320,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[2].minX, mainInterfaceData[2].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[2].setSlider(mainInterface, value);
                 synths[synthButton[1]].changeSynthVolume(value);
-                // mainInterfaceData[53].elementName = ofToString(value,2);
-                // mainInterfaceData[53].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[3].isInside(ofVec2f(x,y))) {
@@ -1519,8 +1329,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                 float value = ofClamp(ofMap(x, mainInterfaceData[3].minX, mainInterfaceData[3].maxX, 0.0, 1.0), 0.0, 1.0);
                 mainInterfaceData[3].setSlider(mainInterface, value);
                 synths[synthButton[2]].changeSynthVolume(value);
-                //  mainInterfaceData[54].elementName = ofToString(value,2);
-                //  mainInterfaceData[54].setStringWidth(mainInterfaceData[54].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
             }
             
             else if (mainInterfaceData[0].isInside(ofVec2f(x,y))) {
@@ -1531,8 +1339,6 @@ void ofApp::replaceMousePressed(int x, int y) {
                 mainInterfaceData[0].setSlider(mainInterface, value);
                 setMainVolume(value);
                 mainVol = value;
-                //mainInterfaceData[51].elementName = ofToString(value,2);
-                //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
             }
             
         }
@@ -1657,13 +1463,6 @@ void ofApp::replaceMouseReleased(int x,int y) {
     
     if(!interfaceMoving){
         
-        
-       
-        
-      
-        
-        
-        
     }
     //-------------------------
     if (!interfaceMoving && !sleepMode) {
@@ -1783,739 +1582,699 @@ void ofApp::replaceMouseReleased(int x,int y) {
         }
         
         if (!touchUp) {
-        if (currentState == STATE_DEFAULT) {
-            
-            if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[8].blinkOn();
+            if (currentState == STATE_DEFAULT) {
                 
-                if (!synths[synthButton[0]].pause) {
-                    synths[synthButton[0]].setSaturationOff();
-                    mainInterfaceData[8].elementName = "\uE039";
-                } else {
-                    synths[synthButton[0]].setSaturationOn();
-                    mainInterfaceData[8].elementName = "\uE036";
-                }
-                
-                mainInterfaceData[8].setStringWidth();
-                synths[synthButton[0]].pause = !synths[synthButton[0]].pause;
-            }
-            
-            else if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[9].blinkOn();
-                
-                if (!synths[synthButton[1]].pause) {
-                    synths[synthButton[1]].setSaturationOff();
-                    mainInterfaceData[9].elementName = "\uE039";
-                } else {
-                    synths[synthButton[1]].setSaturationOn();
-                    mainInterfaceData[9].elementName = "\uE036";
-                }
-                
-                mainInterfaceData[9].setStringWidth();
-                synths[synthButton[1]].pause = !synths[synthButton[1]].pause;
-                
-            }
-            
-            else if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[10].blinkOn();
-                
-                if (!synths[synthButton[2]].pause) {
-                    synths[synthButton[2]].setSaturationOff();
-                    mainInterfaceData[10].elementName = "\uE039";
-                } else {
-                    synths[synthButton[2]].setSaturationOn();
-                    mainInterfaceData[10].elementName = "\uE036";
-                }
-                
-                mainInterfaceData[10].setStringWidth();
-                synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
-            }
-            
-            else if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
-                buttonFourPress();
-                mainInterfaceData[131].elementName = "VOLUME";
-                mainInterfaceData[131].setStringWidth();
-                mainInterfaceData[131].activateDarkerColor();
-                mainInterfaceData[37].blinkOn();
-            }
-            
-            else if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[41].blinkOn();
-                mainInterfaceData[131].elementName = "TEMPO";
-                mainInterfaceData[131].setStringWidth();
-                mainInterfaceData[131].activateDarkerColor();
-                bpmButtonPress();
-            }
-            
-            else if (mainInterfaceData[42].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[42].blinkOn();
-                mainInterfaceData[131].elementName = "HARMONY";
-                mainInterfaceData[131].setStringWidth();
-                mainInterfaceData[131].activateDarkerColor();
-                harmonyButtonPress();
-            }
-            
-            else if (mainInterfaceData[46].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[46].blinkOn();
-                loadSaveButtonPress();
-            }
-            else if (mainInterfaceData[40].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[40].blinkOn();
-                settingsButtonPress();
-            }
-            
-        }
-        
-        else  if (currentState == STATE_VOLUME) {
-            
-            
-            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
-                buttonFourPress();
-                mainInterfaceData[43].blinkOn();
-            }
-        }
-        
-        else  if (currentState == STATE_EDIT_DETAIL) {
-            
-            //muster container
-            if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
-                int musterIndex =  muster.isInside(ofVec2f(x,y));
-                
-                if (!muster.saveReady) {
-                    if ( musterIndex >= 0) {
-                        synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
-                        markSynthNotes(63);
-                    }
-                } else if (musterIndex >= 0){
-                    synths[activeSynth].getLayerInfo(muster.flips.at(musterIndex).layerInfo);
-                    muster.flips.at(musterIndex).makeTex();
-                    muster.saveReady = false;
-                }
-            }
-            
-            //synth
-            else if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
-                if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
-                    synths[activeSynth].changePreset(true);
-                } else {
-                    synths[activeSynth].changePreset(false);
-                }
-                setNewGUI();
-                mainInterfaceData[7].blinkOn();
-            }
-            
-            else if(  mainInterfaceData[11].isInside(ofVec2f(x,y))) {
-                buttonEditDetail();
-                mainInterfaceData[11].blinkOn();
-            }
-            
-            else if(mainInterfaceData[135].isInside(ofVec2f(x,y))){
-                if (  (x-mainInterfaceData[135].minX) > ((mainInterfaceData[135].maxX-mainInterfaceData[135].minX)/2)) {
-                    synths[activeSynth].makeScaleStep(1);
-                } else {
-                    synths[activeSynth].makeScaleStep(-1);
-                }
-                hvSlotD.blink();
-                
-                markScaleSteps(63);
-            }
-            
-            
-            
-            for (int i = 1; i < 12; i++) {
-                
-                if (mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
-                    synths[activeSynth].changeMusicScale(i);
-                    if(!mainInterfaceData[13+i].onOff) {
-                        mainInterfaceData[13+i].blinkOn();
-                        mainInterfaceData[13+i].switchColor();
-                        // mainInterfaceData[25+i].blinkOn();
-                        mainInterfaceData[25+i].onOff = true;
-                        
+                if (mainInterfaceData[8].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[8].blinkOn();
+                    
+                    if (!synths[synthButton[0]].pause) {
+                        synths[synthButton[0]].setSaturationOff();
+                        mainInterfaceData[8].elementName = "\uE039";
                     } else {
-                        mainInterfaceData[13+i].switchColor();
-                        mainInterfaceData[25+i].onOff = false;
+                        synths[synthButton[0]].setSaturationOn();
+                        mainInterfaceData[8].elementName = "\uE036";
                     }
-                    synths[activeSynth].userScale = true;
                     
-                    markScaleSteps(63);
-                    hvSlotD.blink();
+                    mainInterfaceData[8].setStringWidth();
+                    synths[synthButton[0]].pause = !synths[synthButton[0]].pause;
                 }
-            }
-            
-            
-            
-            //toogle grid preset container
-            muster.isInside(ofVec2f(x,y));
-            
-        }
-        
-        else if (currentState == STATE_BPM){
-            
-            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
-                bpmButtonPress();
-                mainInterfaceData[43].blinkOn();
-            }
-            
-            
-            //bpm synth bpm metro factor
-            else if(mainInterfaceData[55].isInside(ofVec2f(x,y))) {
-                for (int i = 0; i < 4; i++) {
-                    if(mainInterfaceData[112+i].isInside(ofVec2f(x,y))) {
-                        synths[synthButton[0]].nextPulseDivision = 4-i;
-                        mainInterfaceData[112+i].setOn();
-                        mainInterfaceData[112+i].blinkOn();
-                        synths[synthButton[0]].setAllADSR(synths[synthButton[0]].preset);
+                
+                else if (mainInterfaceData[9].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[9].blinkOn();
+                    
+                    if (!synths[synthButton[1]].pause) {
+                        synths[synthButton[1]].setSaturationOff();
+                        mainInterfaceData[9].elementName = "\uE039";
                     } else {
-                        mainInterfaceData[112+i].setOff();
+                        synths[synthButton[1]].setSaturationOn();
+                        mainInterfaceData[9].elementName = "\uE036";
                     }
+                    
+                    mainInterfaceData[9].setStringWidth();
+                    synths[synthButton[1]].pause = !synths[synthButton[1]].pause;
+                    
                 }
-            }
-            
-            else if(mainInterfaceData[56].isInside(ofVec2f(x,y))) {
-                for (int i = 0; i < 4; i++) {
-                    if(mainInterfaceData[116+i].isInside(ofVec2f(x,y))) {
-                        synths[synthButton[1]].nextPulseDivision = 4-i;
-                        mainInterfaceData[116+i].setOn();
-                        mainInterfaceData[116+i].blinkOn();
-                        synths[synthButton[1]].setAllADSR(synths[synthButton[1]].preset);
+                
+                else if (mainInterfaceData[10].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[10].blinkOn();
+                    
+                    if (!synths[synthButton[2]].pause) {
+                        synths[synthButton[2]].setSaturationOff();
+                        mainInterfaceData[10].elementName = "\uE039";
                     } else {
-                        mainInterfaceData[116+i].setOff();
-                    }
-                }
-            }
-            
-            else if(mainInterfaceData[57].isInside(ofVec2f(x,y))) {
-                for (int i = 0; i < 4; i++) {
-                    if(mainInterfaceData[120+i].isInside(ofVec2f(x,y))) {
-                        synths[synthButton[2]].nextPulseDivision = 4-i;
-                        mainInterfaceData[120+i].setOn();
-                        mainInterfaceData[120+i].blinkOn();
-                        synths[synthButton[2]].setAllADSR(synths[synthButton[2]].preset);
-                    } else {
-                        mainInterfaceData[120+i].setOff();
-                    }
-                }
-            }
-            
-            //pulse direction
-            else if (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x){
-                for (int i = 0; i < 4; i++) {
-                    if(directionClickZonesA[i].inside(x,y)){
-                        if(synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i] ) {
-                            synths[synthButton[0]].connectedDirection[i] =  false;
-                        } else if (!synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i]) {
-                            synths[synthButton[0]].activeDirection[i] =  false;
-                            synths[synthButton[0]].pulsePlane.activeDirs--;
-                        } else {
-                            synths[synthButton[0]].connectedDirection[i] =  true;
-                            synths[synthButton[0]].activeDirection[i] =  true;
-                            synths[synthButton[0]].pulsePlane.activeDirs++;
-                        }
-                    }
-                }
-                synths[synthButton[0]].pulsePlane.lineMeshQA.clear();
-                synths[synthButton[0]].pulsePlane.lineMeshQB.clear();
-                synths[synthButton[0]].pulsePlane.lineMesh.clear();
-                synths[synthButton[0]].pulsePlane.lineWaitForBeat = true;
-            }
-            
-            else if (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) {
-                for (int i = 0; i < 4; i++) {
-                    if (directionClickZonesB[i].inside(x, y)){
-                        if(synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i] ) {
-                            synths[synthButton[1]].connectedDirection[i] =  false;
-                        } else if (!synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i]) {
-                            synths[synthButton[1]].activeDirection[i] =  false;
-                            synths[synthButton[1]].pulsePlane.activeDirs--;
-                        } else {
-                            synths[synthButton[1]].connectedDirection[i] =  true;
-                            synths[synthButton[1]].activeDirection[i] =  true;
-                            synths[synthButton[1]].pulsePlane.activeDirs++;
-                        }
-                    }
-                }
-                synths[synthButton[1]].pulsePlane.lineMeshQA.clear();
-                synths[synthButton[1]].pulsePlane.lineMeshQB.clear();
-                synths[synthButton[1]].pulsePlane.lineMesh.clear();
-                synths[synthButton[1]].pulsePlane.lineWaitForBeat = true;
-            }
-            
-            else if (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) {
-                for (int i = 0; i < 4; i++) {
-                    if (directionClickZonesC[i].inside(x, y)){
-                        if(synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i] ) {
-                            synths[synthButton[2]].connectedDirection[i] =  false;
-                        } else if (!synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i]) {
-                            synths[synthButton[2]].activeDirection[i] =  false;
-                            synths[synthButton[2]].pulsePlane.activeDirs--;
-                        } else {
-                            synths[synthButton[2]].connectedDirection[i] =  true;
-                            synths[synthButton[2]].activeDirection[i] =  true;
-                            synths[synthButton[2]].pulsePlane.activeDirs++;
-                        }
-                    }
-                }
-                synths[synthButton[2]].pulsePlane.lineMeshQA.clear();
-                synths[synthButton[2]].pulsePlane.lineMeshQB.clear();
-                synths[synthButton[2]].pulsePlane.lineMesh.clear();
-                synths[synthButton[2]].pulsePlane.lineWaitForBeat = true;
-                
-            }
-        }
-        
-        else if (currentState == STATE_HARMONY) {
-            
-            for(int i = 0; i < 3; i++) {
-                if(  mainInterfaceData[58+i].isInside(ofVec2f(x,y))) {
-                    if (  (x-mainInterfaceData[58+i].minX) > ((mainInterfaceData[58+i].maxX-mainInterfaceData[58+i].minX)/2)) {
-                        if(synths[synthButton[i]].globalHarmony){
-                            synths[synthButton[i]].setKeyNote(12);
-                        } else {
-                            synths[synthButton[i]].setKeyNote(1);
-                        }
-                    } else {
-                        if(synths[synthButton[i]].globalHarmony){
-                            synths[synthButton[i]].setKeyNote(-12);
-                        } else {
-                            synths[synthButton[i]].setKeyNote(-1);
-                        }
+                        synths[synthButton[2]].setSaturationOn();
+                        mainInterfaceData[10].elementName = "\uE036";
                     }
                     
-                    mainInterfaceData[58+i].elementName = ofToString(notes[synths[synthButton[i]].keyNote%12]) +" / "+ofToString(synths[synthButton[i]].keyNote);
-                    mainInterfaceData[58+i].setStringWidth();
-                    
-                    mainInterfaceData[58+i].blinkOn();
-                    //setNewGUI();
-                    
-                    if(i==0) {
-                        hvSlotA.blink();
-                    }
-                    
-                    if(i==1) {
-                        hvSlotB.blink();
-                    }
-                    
-                    if(i==2) {
-                        hvSlotC.blink();
-                    }
-                }
-            }
-            
-            for (int i = 132; i < 132+3; i++){
-                if(mainInterfaceData[i].isInside(ofVec2f(x,y))){
-                    if (  (x-mainInterfaceData[i].minX) > ((mainInterfaceData[i].maxX-mainInterfaceData[i].minX)/2)) {
-                        synths[synthButton[i-132]].makeScaleStep(1);
-                    } else {
-                        synths[synthButton[i-132]].makeScaleStep(-1);
-                    }
-                    
-                    if(i-132 == 0){
-                        hvSlotA.blink();
-                    } else if(i-132 == 1) {
-                        hvSlotB.blink();
-                    }else if(i -132 == 2) {
-                        hvSlotC.blink();
-                    }
-                    markScaleSteps();
-                }
-            }
-            
-            if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
-                harmonyButtonPress();
-                mainInterfaceData[43].blinkOn();
-            }
-            
-            else if (mainInterfaceData[61].isInside(ofVec2f(x,y))) {
-                if (  (x-mainInterfaceData[61].minX) > ((mainInterfaceData[61].maxX-mainInterfaceData[61].minX)/2)) {
-                    globalKey = ofWrap(globalKey+1,0,12);
-                } else {
-                    globalKey = ofWrap(globalKey-1,0,12);
+                    mainInterfaceData[10].setStringWidth();
+                    synths[synthButton[2]].pause = !synths[synthButton[2]].pause;
                 }
                 
-                
-                for (int i = 0; i < 3; i++) {
-                    if(synths[synthButton[i]].globalHarmony){
-                        //synths[synthButton[i]].setKeyNote( ((synths[synthButton[i]].keyNote)-( (synths[synthButton[i]].keyNote/12)*12 +(globalKey%12) ))*-1 );
-                        if (synths[synthButton[i]].keyNote == 96) {
-                            synths[synthButton[i]].setKeyNote(    (globalKey%12) - (synths[synthButton[i]].keyNote%12) -12 );
-                        } else {
-                            synths[synthButton[i]].setKeyNote(    (globalKey%12) - (synths[synthButton[i]].keyNote%12) );
-                        }
-                        mainInterfaceData[58+i].elementName = ofToString(notes[synths[synthButton[i]].keyNote%12]) +" / "+ofToString(synths[synthButton[i]].keyNote);
-                        mainInterfaceData[58+i].setStringWidth();
-                        mainInterfaceData[58+i].blinkOn();
-                    }
-                }
-                
-                mainInterfaceData[61].elementName = ofToString(notes[globalKey%12]);
-                mainInterfaceData[61].setStringWidth();
-                mainInterfaceData[61].blinkOn();
-                
-                
-                if(synths[synthButton[0]].globalHarmony) {
-                    hvSlotA.blink();
-                }
-                
-                if(synths[synthButton[1]].globalHarmony) {
-                    hvSlotB.blink();
-                }
-                
-                if(synths[synthButton[2]].globalHarmony) {
-                    hvSlotC.blink();
-                }
-                
-            }
-            
-            else if(  mainInterfaceData[62].isInside(ofVec2f(x,y))) {
-                if (  (x-mainInterfaceData[62].minX) > ((mainInterfaceData[62].maxX-mainInterfaceData[62].minX)/2)) {
-                    globalScaleVecPos = ofWrap(globalScaleVecPos+1, 0, scaleCollection.scaleVec.size());
-                    
-                    for (int i = 0; i < 3; i++) {
-                        if(synths[synthButton[i]].globalHarmony){
-                            synths[synthButton[i]].currentScaleVecPos = globalScaleVecPos;
-                            synths[synthButton[i]].userScale = false;
-                            synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos%scaleCollection.scaleVec.size() );
-                        }
-                    }
-                    
-                } else {
-                    globalScaleVecPos = ofWrap(globalScaleVecPos-1, 0, scaleCollection.scaleVec.size());
-                    
-                    for (int i = 0; i < 3; i++) {
-                        if(synths[synthButton[i]].globalHarmony){
-                            synths[synthButton[i]].currentScaleVecPos = globalScaleVecPos;
-                            synths[synthButton[i]].userScale = false;
-                            synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos%scaleCollection.scaleVec.size() );
-                        }
-                    }
-                }
-                //setNewGUI();
-                markScaleSteps();
-                mainInterfaceData[62].elementName = scaleCollection.scaleVec.at(globalScaleVecPos).name;
-                mainInterfaceData[62].setStringWidth();
-                
-                mainInterfaceData[62].blinkOn();
-                
-                if(synths[synthButton[0]].globalHarmony) {
-                    hvSlotA.blink();
-                    mainInterfaceData[58].blinkOn();
-                }
-                
-                if(synths[synthButton[1]].globalHarmony) {
-                    hvSlotB.blink();
-                    mainInterfaceData[59].blinkOn();
-                }
-                
-                if(synths[synthButton[2]].globalHarmony) {
-                    hvSlotC.blink();
-                    mainInterfaceData[60].blinkOn();
-                }
-                
-            }
-            
-        }
-        
-        else if (currentState == STATE_EDIT) {
-            
-            
-            //muster container
-            if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
-                int musterIndex =  muster.isInside(ofVec2f(x,y));
-                
-                if (!muster.saveReady) {
-                    if (musterIndex >= 0) {
-                        synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
-                        markSynthNotes(63);
-                    }
-                } else if (musterIndex >= 0){
-                    synths[activeSynth].getLayerInfo(muster.flips.at(musterIndex).layerInfo);
-                    muster.flips.at(musterIndex).makeTex();
-                    muster.saveReady = false;
-                }
-            }
-            
-            //back to State_default
-            else if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
-                buttonTwoPress();
-                mainInterfaceData[43].blinkOn();
-            }
-            
-            /*
-             //scale
-             if(  mainInterfaceData[5].isInside(ofVec2f(x,y))) {
-             if (  (x-mainInterfaceData[5].minX) > ((mainInterfaceData[5].maxX-mainInterfaceData[5].minX)/2)) {
-             synths[activeSynth].currentScaleVecPos = ofWrap(synths[activeSynth].currentScaleVecPos+1,0,scaleCollection.scaleVec.size());
-             } else {
-             synths[activeSynth].currentScaleVecPos = ofWrap(synths[activeSynth].currentScaleVecPos-1,0,scaleCollection.scaleVec.size());
-             }
-             synths[activeSynth].userScale = false;
-             synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
-             setNewGUI();
-             mainInterfaceData[5].blinkOn();
-             // detailEditInterfaceOn();
-             cout << synths[activeSynth].activeScale.name  << endl;
-             }
-             */
-            
-            //synth
-            else if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
-                if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
-                    synths[activeSynth].changePreset(true);
-                } else {
-                    synths[activeSynth].changePreset(false);
-                }
-                setNewGUI();
-                mainInterfaceData[7].blinkOn();
-            }
-            
-            //toggle state_edit_detail
-            else if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
-                if(!synths[activeSynth].globalHarmony) {
-                    buttonEditDetail();
-                    mainInterfaceData[44].blinkOn();
-                    
-                    mainInterfaceData[131].elementName = "LOCAL SETTINGS";
+                else if (mainInterfaceData[37].isInside(ofVec2f(x,y))) {
+                    buttonFourPress();
+                    mainInterfaceData[131].elementName = "VOLUME";
                     mainInterfaceData[131].setStringWidth();
                     mainInterfaceData[131].activateDarkerColor();
-                }
-            }
-            
-            //toggle save grid
-            else if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
-                //leer
-                muster.saveReady = true;
-                mainInterfaceData[12].blinkOn();
-            }
-            
-            //toggle synth-> globalHarmony
-            else if(  mainInterfaceData[111].isInside(ofVec2f(x,y))) {
-                synths[activeSynth].globalHarmony = !synths[activeSynth].globalHarmony;
-                mainInterfaceData[111].blinkOn();
-                if (synths[activeSynth].globalHarmony){
-                    mainInterfaceData[111].elementName = "GLOBAL HARMONY";
-                    mainInterfaceData[111].setStringWidth();
-                    mainInterfaceData[44].activateDarkerColor();
-                    synths[activeSynth].currentScaleVecPos = globalScaleVecPos;
-                    synths[activeSynth].userScale = false;
-                    synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
-                    synths[activeSynth].setKeyNote( (globalKey%12) - (synths[activeSynth].keyNote%12));
-                    hvSlotD.changeC(ofColor::fromHsb(255,0,195,255));
-                    setNewGUI();
-                } else {
-                    mainInterfaceData[111].elementName = "LOCAL HARMONY";
-                    mainInterfaceData[111].setStringWidth();
-                    mainInterfaceData[44].activateOnColor();
-                    hvSlotD.changeC(ofColor::fromHsb(synths[activeSynth].colorHue, 235, 180,255));
-                    setNewGUI();
+                    mainInterfaceData[37].blinkOn();
                 }
                 
-            }
-            
-            else if(mainInterfaceData[135].isInside(ofVec2f(x,y))){
-                if (  (x-mainInterfaceData[135].minX) > ((mainInterfaceData[135].maxX-mainInterfaceData[135].minX)/2)) {
-                    synths[activeSynth].makeScaleStep(1);
-                } else {
-                    synths[activeSynth].makeScaleStep(-1);
+                else if (mainInterfaceData[41].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[41].blinkOn();
+                    mainInterfaceData[131].elementName = "TEMPO";
+                    mainInterfaceData[131].setStringWidth();
+                    mainInterfaceData[131].activateDarkerColor();
+                    bpmButtonPress();
                 }
-                hvSlotD.blink();
-                markScaleSteps(63);
-            }
-            
-            
-            
-            //toggle get random grid
-            /*
-             if(  mainInterfaceData[40].isInside(ofVec2f(x,y))) {
-             //leer
-             for (int i = 0; i < TILES; i++) {
-             for (int j = 0; j < TILES; j++) {
-             if (ofRandom(100)>60) {
-             synths[activeSynth].tapEvent(i, j);
-             }
-             }
-             }
-             mainInterfaceData[40].blinkOn();
-             markSynthNotes(63);
-             }
-             */
-            
-            
-        }
-        
-        else if (currentState == STATE_SAVE){
-            
-            if(saveManager.touchDown) {
-                saveManager.touchDown = false;
-            }
-            
-            if (lastClick.x == x && lastClick.y == y){
-                if (!saveManager.slotDetail && !saveManager.animate) {
-                    saveManager.isInside(ofVec3f(x,y,0));
-                    if(saveManager.animate){
-                        openSlotInterface();
-                    }
+                
+                else if (mainInterfaceData[42].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[42].blinkOn();
+                    mainInterfaceData[131].elementName = "HARMONY";
+                    mainInterfaceData[131].setStringWidth();
+                    mainInterfaceData[131].activateDarkerColor();
+                    harmonyButtonPress();
                 }
-            }
-            
-            if(!saveManager.slotDetail){
-                if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
+                
+                else if (mainInterfaceData[46].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[46].blinkOn();
                     loadSaveButtonPress();
-                    mainInterfaceData[47].blinkOn();
-                    
+                }
+                else if (mainInterfaceData[40].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[40].blinkOn();
+                    settingsButtonPress();
                 }
                 
-                else if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
-                    savePreset();
-                    mainInterfaceData[125].blinkOn();
+            }
+            
+            else  if (currentState == STATE_VOLUME) {
+                
+                
+                if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                    buttonFourPress();
+                    mainInterfaceData[43].blinkOn();
                 }
             }
             
-            if(saveManager.slotDetail && !saveManager.animate) {
-                if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
-                    closeSlotInterface();
-                    mainInterfaceData[50].blinkOn();
-                    if(saveManager.confirmDel) {
-                        mainInterfaceData[124].setColor( ofColor::fromHsb(255,0,195,255) );
-                        mainInterfaceData[124].activateOnColor();
-                        mainInterfaceData[124].blinkOn();
-                        saveManager.confirmDel = false;
+            else  if (currentState == STATE_EDIT_DETAIL) {
+                
+                //muster container
+                if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
+                    int musterIndex =  muster.isInside(ofVec2f(x,y));
+                    
+                    if (!muster.saveReady) {
+                        if ( musterIndex >= 0) {
+                            synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                            markSynthNotes(63);
+                        }
+                    } else if (musterIndex >= 0){
+                        synths[activeSynth].getLayerInfo(muster.flips.at(musterIndex).layerInfo);
+                        muster.flips.at(musterIndex).makeTex();
+                        muster.saveReady = false;
                     }
                 }
                 
-                else if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
-                    mainInterfaceData[126].blinkOn();
-                    loadPreset();
-                    loadSaveButtonPress();
-                    closeSlotInterface();
-                }
-                
-                else  if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
-                    if (saveManager.confirmDel){
-                        saveManager.deleteSave();
-                        mainInterfaceData[124].blinkOn();
-                        closeSlotInterface();
-                        saveManager.confirmDel = false;
-                        mainInterfaceData[124].setColor( ofColor::fromHsb(255,0,195,255) );
-                        mainInterfaceData[124].activateOnColor();
-                        mainInterfaceData[124].blinkOn();
+                //synth
+                else if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+                    if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
+                        synths[activeSynth].changePreset(true);
                     } else {
-                        mainInterfaceData[124].setColor(0);
-                        mainInterfaceData[124].activateOnColor();
-                        mainInterfaceData[124].blinkOn();
-                        saveManager.confirmDel = true;
+                        synths[activeSynth].changePreset(false);
                     }
-                    
-                } else if (saveManager.selectInnerIt->second.slotInfo.testRect.inside(ofVec2f(x,y-saveManager.scrollLocation))) {
-                    saveManager.cycleHighlightColor();
+                    setNewGUI();
+                    mainInterfaceData[7].blinkOn();
                 }
-            }
-        }
-        
-        else if (currentState == STATE_SETTINGS){
-            
-            if (mainInterfaceData[130].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[130].blinkOn();
-                sendMidi = !sendMidi;
-                if(sendMidi) {
-                    mainInterfaceData[130].elementName = "MIDI ON";
-                    mainInterfaceData[130].setStringWidth();
-                    setupMidi();
-                } else {
-                    for (int i = 0; i < 3; i++){
-                        synths[i].setAllNotesOff();
-                    }
-                    midiOut.closePort();
-                    mainInterfaceData[130].elementName = "MIDI OFF";
-                    mainInterfaceData[130].setStringWidth();
+                
+                else if(  mainInterfaceData[11].isInside(ofVec2f(x,y))) {
+                    buttonEditDetail();
+                    mainInterfaceData[11].blinkOn();
                 }
-            } else if (mainInterfaceData[138].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[138].blinkOn();
-                dynamicVelo = !dynamicVelo;
-                if(dynamicVelo) {
-                    mainInterfaceData[138].elementName = "DYNAMIC VELOCITY";
-                    mainInterfaceData[138].setStringWidth();
-                    mainInterfaceData[140].activateDarkerColor();
-                    for (int i = 0; i < 3; i++) {
-                        synths[i].dynamicVelo = true;
-                    }
-                    
-                } else {
-                    mainInterfaceData[138].elementName = "STATIC VELOCITY";
-                    mainInterfaceData[138].setStringWidth();
-                    mainInterfaceData[140].activateOnColor();
-                    for (int i = 0; i < 3; i++) {
-                        synths[i].dynamicVelo = false;
-                    }
-                }
-            }
-            
-            else if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[43].blinkOn();
-                settingsButtonPress();
-            }
-            else if (mainInterfaceData[141].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[141].blinkOn();
-                soundDelay = !soundDelay;
-                if(soundDelay) {
-                    mainInterfaceData[141].elementName = "DELAY ON";
-                    mainInterfaceData[141].setStringWidth();
-                    mainInterfaceData[142].activateOnColor();
-                    if(!autoDelay){
-                        mainInterfaceData[144].activateOnColor();
-                    }
-                    setupAudio();
-                } else {
-                    mainInterfaceData[141].elementName = "DELAY OFF";
-                    mainInterfaceData[141].setStringWidth();
-                    mainInterfaceData[142].activateDarkerColor();
-                    if(!autoDelay){
-                        mainInterfaceData[144].activateDarkerColor();
-                    }
-                    setupAudio();
-                }
-            }
-            else if (mainInterfaceData[142].isInside(ofVec2f(x,y))) {
-                if(soundDelay){
-                    mainInterfaceData[142].blinkOn();
-                    autoDelay = !autoDelay;
-                    if(autoDelay) {
-                        mainInterfaceData[142].elementName = "DYNAMIC DELAY";
-                        mainInterfaceData[142].setStringWidth();
-                        tonicSynth.setParameter("delay",getBpmValue(dynamicDelayValue));
-                        mainInterfaceData[144].activateDarkerColor();
+                
+                else if(mainInterfaceData[135].isInside(ofVec2f(x,y))){
+                    if (  (x-mainInterfaceData[135].minX) > ((mainInterfaceData[135].maxX-mainInterfaceData[135].minX)/2)) {
+                        synths[activeSynth].makeScaleStep(1);
                     } else {
-                        mainInterfaceData[142].elementName = "STATIC DELAY";
-                        mainInterfaceData[142].setStringWidth();
-                        mainInterfaceData[144].activateOnColor();
-                        if(!autoDelay){
-                            tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
+                        synths[activeSynth].makeScaleStep(-1);
+                    }
+                    hvSlotD.blink();
+                    
+                    markScaleSteps(63);
+                }
+                
+                
+                
+                for (int i = 1; i < 12; i++) {
+                    
+                    if (mainInterfaceData[13+i].isInside(ofVec2f(x,y))) {
+                        synths[activeSynth].changeMusicScale(i);
+                        if(!mainInterfaceData[13+i].onOff) {
+                            mainInterfaceData[13+i].blinkOn();
+                            mainInterfaceData[13+i].switchColor();
+                            // mainInterfaceData[25+i].blinkOn();
+                            mainInterfaceData[25+i].onOff = true;
+                            
+                        } else {
+                            mainInterfaceData[13+i].switchColor();
+                            mainInterfaceData[25+i].onOff = false;
+                        }
+                        synths[activeSynth].userScale = true;
+                        
+                        markScaleSteps(63);
+                        hvSlotD.blink();
+                    }
+                }
+                
+                //toogle grid preset container
+                muster.isInside(ofVec2f(x,y));
+                
+            }
+            
+            else if (currentState == STATE_BPM){
+                
+                if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                    bpmButtonPress();
+                    mainInterfaceData[43].blinkOn();
+                }
+                
+                
+                //bpm synth bpm metro factor
+                else if(mainInterfaceData[55].isInside(ofVec2f(x,y))) {
+                    for (int i = 0; i < 4; i++) {
+                        if(mainInterfaceData[112+i].isInside(ofVec2f(x,y))) {
+                            synths[synthButton[0]].nextPulseDivision = 4-i;
+                            mainInterfaceData[112+i].setOn();
+                            mainInterfaceData[112+i].blinkOn();
+                            synths[synthButton[0]].setAllADSR(synths[synthButton[0]].preset);
+                        } else {
+                            mainInterfaceData[112+i].setOff();
                         }
                     }
                 }
                 
-            }
-            
-            else if (mainInterfaceData[145].isInside(ofVec2f(x,y))) {
-                mainInterfaceData[145].blinkOn();
-                soundReverb = !soundReverb;
-                if(soundReverb) {
-                    mainInterfaceData[145].elementName = "REVERB ON";
-                    mainInterfaceData[145].setStringWidth();
-                    mainInterfaceData[147].activateOnColor();
-                    mainInterfaceData[149].activateOnColor();
-                    setupAudio();
-                } else {
-                    mainInterfaceData[145].elementName = "REVERB OFF";
-                    mainInterfaceData[145].setStringWidth();
-                    mainInterfaceData[147].activateDarkerColor();
-                    mainInterfaceData[149].activateDarkerColor();
-                    setupAudio();
+                else if(mainInterfaceData[56].isInside(ofVec2f(x,y))) {
+                    for (int i = 0; i < 4; i++) {
+                        if(mainInterfaceData[116+i].isInside(ofVec2f(x,y))) {
+                            synths[synthButton[1]].nextPulseDivision = 4-i;
+                            mainInterfaceData[116+i].setOn();
+                            mainInterfaceData[116+i].blinkOn();
+                            synths[synthButton[1]].setAllADSR(synths[synthButton[1]].preset);
+                        } else {
+                            mainInterfaceData[116+i].setOff();
+                        }
+                    }
+                }
+                
+                else if(mainInterfaceData[57].isInside(ofVec2f(x,y))) {
+                    for (int i = 0; i < 4; i++) {
+                        if(mainInterfaceData[120+i].isInside(ofVec2f(x,y))) {
+                            synths[synthButton[2]].nextPulseDivision = 4-i;
+                            mainInterfaceData[120+i].setOn();
+                            mainInterfaceData[120+i].blinkOn();
+                            synths[synthButton[2]].setAllADSR(synths[synthButton[2]].preset);
+                        } else {
+                            mainInterfaceData[120+i].setOff();
+                        }
+                    }
+                }
+                
+                //pulse direction
+                else if (x > designGrid[0][1].x-designGrid[0][0].x && x < designGrid[0][1].x+designGrid[0][0].x){
+                    for (int i = 0; i < 4; i++) {
+                        if(directionClickZonesA[i].inside(x,y)){
+                            if(synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i] ) {
+                                synths[synthButton[0]].connectedDirection[i] =  false;
+                            } else if (!synths[synthButton[0]].connectedDirection[i] && synths[synthButton[0]].activeDirection[i]) {
+                                synths[synthButton[0]].activeDirection[i] =  false;
+                                synths[synthButton[0]].pulsePlane.activeDirs--;
+                            } else {
+                                synths[synthButton[0]].connectedDirection[i] =  true;
+                                synths[synthButton[0]].activeDirection[i] =  true;
+                                synths[synthButton[0]].pulsePlane.activeDirs++;
+                            }
+                        }
+                    }
+                    synths[synthButton[0]].pulsePlane.lineMeshQA.clear();
+                    synths[synthButton[0]].pulsePlane.lineMeshQB.clear();
+                    synths[synthButton[0]].pulsePlane.lineMesh.clear();
+                    synths[synthButton[0]].pulsePlane.lineWaitForBeat = true;
+                }
+                
+                else if (x > designGrid[1][1].x-designGrid[0][0].x && x < designGrid[1][1].x+designGrid[0][0].x) {
+                    for (int i = 0; i < 4; i++) {
+                        if (directionClickZonesB[i].inside(x, y)){
+                            if(synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i] ) {
+                                synths[synthButton[1]].connectedDirection[i] =  false;
+                            } else if (!synths[synthButton[1]].connectedDirection[i] && synths[synthButton[1]].activeDirection[i]) {
+                                synths[synthButton[1]].activeDirection[i] =  false;
+                                synths[synthButton[1]].pulsePlane.activeDirs--;
+                            } else {
+                                synths[synthButton[1]].connectedDirection[i] =  true;
+                                synths[synthButton[1]].activeDirection[i] =  true;
+                                synths[synthButton[1]].pulsePlane.activeDirs++;
+                            }
+                        }
+                    }
+                    synths[synthButton[1]].pulsePlane.lineMeshQA.clear();
+                    synths[synthButton[1]].pulsePlane.lineMeshQB.clear();
+                    synths[synthButton[1]].pulsePlane.lineMesh.clear();
+                    synths[synthButton[1]].pulsePlane.lineWaitForBeat = true;
+                }
+                
+                else if (x > designGrid[2][1].x-designGrid[0][0].x && x < designGrid[2][1].x+designGrid[0][0].x) {
+                    for (int i = 0; i < 4; i++) {
+                        if (directionClickZonesC[i].inside(x, y)){
+                            if(synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i] ) {
+                                synths[synthButton[2]].connectedDirection[i] =  false;
+                            } else if (!synths[synthButton[2]].connectedDirection[i] && synths[synthButton[2]].activeDirection[i]) {
+                                synths[synthButton[2]].activeDirection[i] =  false;
+                                synths[synthButton[2]].pulsePlane.activeDirs--;
+                            } else {
+                                synths[synthButton[2]].connectedDirection[i] =  true;
+                                synths[synthButton[2]].activeDirection[i] =  true;
+                                synths[synthButton[2]].pulsePlane.activeDirs++;
+                            }
+                        }
+                    }
+                    synths[synthButton[2]].pulsePlane.lineMeshQA.clear();
+                    synths[synthButton[2]].pulsePlane.lineMeshQB.clear();
+                    synths[synthButton[2]].pulsePlane.lineMesh.clear();
+                    synths[synthButton[2]].pulsePlane.lineWaitForBeat = true;
+                    
                 }
             }
             
+            else if (currentState == STATE_HARMONY) {
+                
+                for(int i = 0; i < 3; i++) {
+                    if(  mainInterfaceData[58+i].isInside(ofVec2f(x,y))) {
+                        if (  (x-mainInterfaceData[58+i].minX) > ((mainInterfaceData[58+i].maxX-mainInterfaceData[58+i].minX)/2)) {
+                            if(synths[synthButton[i]].globalHarmony){
+                                synths[synthButton[i]].setKeyNote(12);
+                            } else {
+                                synths[synthButton[i]].setKeyNote(1);
+                            }
+                        } else {
+                            if(synths[synthButton[i]].globalHarmony){
+                                synths[synthButton[i]].setKeyNote(-12);
+                            } else {
+                                synths[synthButton[i]].setKeyNote(-1);
+                            }
+                        }
+                        
+                        mainInterfaceData[58+i].elementName = ofToString(notes[synths[synthButton[i]].keyNote%12]) +" / "+ofToString(synths[synthButton[i]].keyNote);
+                        mainInterfaceData[58+i].setStringWidth();
+                        
+                        mainInterfaceData[58+i].blinkOn();
+                        
+                        if(i==0) {
+                            hvSlotA.blink();
+                        }
+                        
+                        if(i==1) {
+                            hvSlotB.blink();
+                        }
+                        
+                        if(i==2) {
+                            hvSlotC.blink();
+                        }
+                    }
+                }
+                
+                for (int i = 132; i < 132+3; i++){
+                    if(mainInterfaceData[i].isInside(ofVec2f(x,y))){
+                        if (  (x-mainInterfaceData[i].minX) > ((mainInterfaceData[i].maxX-mainInterfaceData[i].minX)/2)) {
+                            synths[synthButton[i-132]].makeScaleStep(1);
+                        } else {
+                            synths[synthButton[i-132]].makeScaleStep(-1);
+                        }
+                        
+                        if(i-132 == 0){
+                            hvSlotA.blink();
+                        } else if(i-132 == 1) {
+                            hvSlotB.blink();
+                        }else if(i -132 == 2) {
+                            hvSlotC.blink();
+                        }
+                        markScaleSteps();
+                    }
+                }
+                
+                if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                    harmonyButtonPress();
+                    mainInterfaceData[43].blinkOn();
+                }
+                
+                else if (mainInterfaceData[61].isInside(ofVec2f(x,y))) {
+                    if (  (x-mainInterfaceData[61].minX) > ((mainInterfaceData[61].maxX-mainInterfaceData[61].minX)/2)) {
+                        globalKey = ofWrap(globalKey+1,0,12);
+                    } else {
+                        globalKey = ofWrap(globalKey-1,0,12);
+                    }
+                    
+                    
+                    for (int i = 0; i < 3; i++) {
+                        if(synths[synthButton[i]].globalHarmony){
+                            if (synths[synthButton[i]].keyNote == 96) {
+                                synths[synthButton[i]].setKeyNote(    (globalKey%12) - (synths[synthButton[i]].keyNote%12) -12 );
+                            } else {
+                                synths[synthButton[i]].setKeyNote(    (globalKey%12) - (synths[synthButton[i]].keyNote%12) );
+                            }
+                            mainInterfaceData[58+i].elementName = ofToString(notes[synths[synthButton[i]].keyNote%12]) +" / "+ofToString(synths[synthButton[i]].keyNote);
+                            mainInterfaceData[58+i].setStringWidth();
+                            mainInterfaceData[58+i].blinkOn();
+                        }
+                    }
+                    
+                    mainInterfaceData[61].elementName = ofToString(notes[globalKey%12]);
+                    mainInterfaceData[61].setStringWidth();
+                    mainInterfaceData[61].blinkOn();
+                    
+                    
+                    if(synths[synthButton[0]].globalHarmony) {
+                        hvSlotA.blink();
+                    }
+                    
+                    if(synths[synthButton[1]].globalHarmony) {
+                        hvSlotB.blink();
+                    }
+                    
+                    if(synths[synthButton[2]].globalHarmony) {
+                        hvSlotC.blink();
+                    }
+                    
+                }
+                
+                else if(  mainInterfaceData[62].isInside(ofVec2f(x,y))) {
+                    if (  (x-mainInterfaceData[62].minX) > ((mainInterfaceData[62].maxX-mainInterfaceData[62].minX)/2)) {
+                        globalScaleVecPos = ofWrap(globalScaleVecPos+1, 0, scaleCollection.scaleVec.size());
+                        
+                        for (int i = 0; i < 3; i++) {
+                            if(synths[synthButton[i]].globalHarmony){
+                                synths[synthButton[i]].currentScaleVecPos = globalScaleVecPos;
+                                synths[synthButton[i]].userScale = false;
+                                synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                            }
+                        }
+                        
+                    } else {
+                        globalScaleVecPos = ofWrap(globalScaleVecPos-1, 0, scaleCollection.scaleVec.size());
+                        
+                        for (int i = 0; i < 3; i++) {
+                            if(synths[synthButton[i]].globalHarmony){
+                                synths[synthButton[i]].currentScaleVecPos = globalScaleVecPos;
+                                synths[synthButton[i]].userScale = false;
+                                synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                            }
+                        }
+                    }
+                    markScaleSteps();
+                    mainInterfaceData[62].elementName = scaleCollection.scaleVec.at(globalScaleVecPos).name;
+                    mainInterfaceData[62].setStringWidth();
+                    
+                    mainInterfaceData[62].blinkOn();
+                    
+                    if(synths[synthButton[0]].globalHarmony) {
+                        hvSlotA.blink();
+                        mainInterfaceData[58].blinkOn();
+                    }
+                    
+                    if(synths[synthButton[1]].globalHarmony) {
+                        hvSlotB.blink();
+                        mainInterfaceData[59].blinkOn();
+                    }
+                    
+                    if(synths[synthButton[2]].globalHarmony) {
+                        hvSlotC.blink();
+                        mainInterfaceData[60].blinkOn();
+                    }
+                    
+                }
+                
+            }
             
-        }
+            else if (currentState == STATE_EDIT) {
+                
+                
+                //muster container
+                if (mainInterfaceData[39].isInside(ofVec2f(x,y))) {
+                    int musterIndex =  muster.isInside(ofVec2f(x,y));
+                    
+                    if (!muster.saveReady) {
+                        if (musterIndex >= 0) {
+                            synths[activeSynth].loadMuster(muster.flips.at(musterIndex).layerInfo);
+                            markSynthNotes(63);
+                        }
+                    } else if (musterIndex >= 0){
+                        synths[activeSynth].getLayerInfo(muster.flips.at(musterIndex).layerInfo);
+                        muster.flips.at(musterIndex).makeTex();
+                        muster.saveReady = false;
+                    }
+                }
+                
+                //back to State_default
+                else if(  mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                    buttonTwoPress();
+                    mainInterfaceData[43].blinkOn();
+                }
+                
+
+                //synth
+                else if(  mainInterfaceData[7].isInside(ofVec2f(x,y))) {
+                    if (  (x-mainInterfaceData[7].minX) > ((mainInterfaceData[7].maxX-mainInterfaceData[7].minX)/2)) {
+                        synths[activeSynth].changePreset(true);
+                    } else {
+                        synths[activeSynth].changePreset(false);
+                    }
+                    setNewGUI();
+                    mainInterfaceData[7].blinkOn();
+                }
+                
+                //toggle state_edit_detail
+                else if(  mainInterfaceData[44].isInside(ofVec2f(x,y))) {
+                    if(!synths[activeSynth].globalHarmony) {
+                        buttonEditDetail();
+                        mainInterfaceData[44].blinkOn();
+                        
+                        mainInterfaceData[131].elementName = "LOCAL SETTINGS";
+                        mainInterfaceData[131].setStringWidth();
+                        mainInterfaceData[131].activateDarkerColor();
+                    }
+                }
+                
+                //toggle save grid
+                else if(  mainInterfaceData[12].isInside(ofVec2f(x,y))) {
+                    //leer
+                    muster.saveReady = true;
+                    mainInterfaceData[12].blinkOn();
+                }
+                
+                //toggle synth-> globalHarmony
+                else if(  mainInterfaceData[111].isInside(ofVec2f(x,y))) {
+                    synths[activeSynth].globalHarmony = !synths[activeSynth].globalHarmony;
+                    mainInterfaceData[111].blinkOn();
+                    if (synths[activeSynth].globalHarmony){
+                        mainInterfaceData[111].elementName = "GLOBAL HARMONY";
+                        mainInterfaceData[111].setStringWidth();
+                        mainInterfaceData[44].activateDarkerColor();
+                        synths[activeSynth].currentScaleVecPos = globalScaleVecPos;
+                        synths[activeSynth].userScale = false;
+                        synths[activeSynth].setMusicScale(scaleCollection, synths[activeSynth].currentScaleVecPos%scaleCollection.scaleVec.size() );
+                        synths[activeSynth].setKeyNote( (globalKey%12) - (synths[activeSynth].keyNote%12));
+                        hvSlotD.changeC(ofColor::fromHsb(255,0,195,255));
+                        setNewGUI();
+                    } else {
+                        mainInterfaceData[111].elementName = "LOCAL HARMONY";
+                        mainInterfaceData[111].setStringWidth();
+                        mainInterfaceData[44].activateOnColor();
+                        hvSlotD.changeC(ofColor::fromHsb(synths[activeSynth].colorHue, 235, 180,255));
+                        setNewGUI();
+                    }
+                    
+                }
+                
+                else if(mainInterfaceData[135].isInside(ofVec2f(x,y))){
+                    if (  (x-mainInterfaceData[135].minX) > ((mainInterfaceData[135].maxX-mainInterfaceData[135].minX)/2)) {
+                        synths[activeSynth].makeScaleStep(1);
+                    } else {
+                        synths[activeSynth].makeScaleStep(-1);
+                    }
+                    hvSlotD.blink();
+                    markScaleSteps(63);
+                }
+                
+            }
+            
+            else if (currentState == STATE_SAVE){
+                
+                if(saveManager.touchDown) {
+                    saveManager.touchDown = false;
+                }
+                
+                if (lastClick.x == x && lastClick.y == y){
+                    if (!saveManager.slotDetail && !saveManager.animate) {
+                        saveManager.isInside(ofVec3f(x,y,0));
+                        if(saveManager.animate){
+                            openSlotInterface();
+                        }
+                    }
+                }
+                
+                if(!saveManager.slotDetail){
+                    if (mainInterfaceData[47].isInside(ofVec2f(x,y))) {
+                        loadSaveButtonPress();
+                        mainInterfaceData[47].blinkOn();
+                        
+                    }
+                    
+                    else if (mainInterfaceData[125].isInside(ofVec2f(x,y))) {
+                        savePreset();
+                        mainInterfaceData[125].blinkOn();
+                    }
+                }
+                
+                if(saveManager.slotDetail && !saveManager.animate) {
+                    if (mainInterfaceData[50].isInside(ofVec2f(x,y))) {
+                        closeSlotInterface();
+                        mainInterfaceData[50].blinkOn();
+                        if(saveManager.confirmDel) {
+                            mainInterfaceData[124].setColor( ofColor::fromHsb(255,0,195,255) );
+                            mainInterfaceData[124].activateOnColor();
+                            mainInterfaceData[124].blinkOn();
+                            saveManager.confirmDel = false;
+                        }
+                    }
+                    
+                    else if (mainInterfaceData[126].isInside(ofVec2f(x,y))) {
+                        mainInterfaceData[126].blinkOn();
+                        loadPreset();
+                        loadSaveButtonPress();
+                        closeSlotInterface();
+                    }
+                    
+                    else  if (mainInterfaceData[124].isInside(ofVec2f(x,y))) {
+                        if (saveManager.confirmDel){
+                            saveManager.deleteSave();
+                            mainInterfaceData[124].blinkOn();
+                            closeSlotInterface();
+                            saveManager.confirmDel = false;
+                            mainInterfaceData[124].setColor( ofColor::fromHsb(255,0,195,255) );
+                            mainInterfaceData[124].activateOnColor();
+                            mainInterfaceData[124].blinkOn();
+                        } else {
+                            mainInterfaceData[124].setColor(0);
+                            mainInterfaceData[124].activateOnColor();
+                            mainInterfaceData[124].blinkOn();
+                            saveManager.confirmDel = true;
+                        }
+                        
+                    } else if (saveManager.selectInnerIt->second.slotInfo.testRect.inside(ofVec2f(x,y-saveManager.scrollLocation))) {
+                        saveManager.cycleHighlightColor();
+                    }
+                }
+            }
+            
+            else if (currentState == STATE_SETTINGS){
+                
+                if (mainInterfaceData[130].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[130].blinkOn();
+                    sendMidi = !sendMidi;
+                    if(sendMidi) {
+                        mainInterfaceData[130].elementName = "MIDI ON";
+                        mainInterfaceData[130].setStringWidth();
+                        setupMidi();
+                    } else {
+                        for (int i = 0; i < 3; i++){
+                            synths[i].setAllNotesOff();
+                        }
+                        midiOut.closePort();
+                        mainInterfaceData[130].elementName = "MIDI OFF";
+                        mainInterfaceData[130].setStringWidth();
+                    }
+                } else if (mainInterfaceData[138].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[138].blinkOn();
+                    dynamicVelo = !dynamicVelo;
+                    if(dynamicVelo) {
+                        mainInterfaceData[138].elementName = "DYNAMIC VELOCITY";
+                        mainInterfaceData[138].setStringWidth();
+                        mainInterfaceData[140].activateDarkerColor();
+                        for (int i = 0; i < 3; i++) {
+                            synths[i].dynamicVelo = true;
+                        }
+                        
+                    } else {
+                        mainInterfaceData[138].elementName = "STATIC VELOCITY";
+                        mainInterfaceData[138].setStringWidth();
+                        mainInterfaceData[140].activateOnColor();
+                        for (int i = 0; i < 3; i++) {
+                            synths[i].dynamicVelo = false;
+                        }
+                    }
+                }
+                
+                else if (mainInterfaceData[43].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[43].blinkOn();
+                    settingsButtonPress();
+                }
+                else if (mainInterfaceData[141].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[141].blinkOn();
+                    soundDelay = !soundDelay;
+                    if(soundDelay) {
+                        mainInterfaceData[141].elementName = "DELAY ON";
+                        mainInterfaceData[141].setStringWidth();
+                        mainInterfaceData[142].activateOnColor();
+                        if(!autoDelay){
+                            mainInterfaceData[144].activateOnColor();
+                        }
+                        setupAudio();
+                    } else {
+                        mainInterfaceData[141].elementName = "DELAY OFF";
+                        mainInterfaceData[141].setStringWidth();
+                        mainInterfaceData[142].activateDarkerColor();
+                        if(!autoDelay){
+                            mainInterfaceData[144].activateDarkerColor();
+                        }
+                        setupAudio();
+                    }
+                }
+                else if (mainInterfaceData[142].isInside(ofVec2f(x,y))) {
+                    if(soundDelay){
+                        mainInterfaceData[142].blinkOn();
+                        autoDelay = !autoDelay;
+                        if(autoDelay) {
+                            mainInterfaceData[142].elementName = "DYNAMIC DELAY";
+                            mainInterfaceData[142].setStringWidth();
+                            tonicSynth.setParameter("delay",getBpmValue(dynamicDelayValue));
+                            mainInterfaceData[144].activateDarkerColor();
+                        } else {
+                            mainInterfaceData[142].elementName = "STATIC DELAY";
+                            mainInterfaceData[142].setStringWidth();
+                            mainInterfaceData[144].activateOnColor();
+                            if(!autoDelay){
+                                tonicSynth.setParameter("delay",getBpmValue(staticDelayValue));
+                            }
+                        }
+                    }
+                    
+                }
+                
+                else if (mainInterfaceData[145].isInside(ofVec2f(x,y))) {
+                    mainInterfaceData[145].blinkOn();
+                    soundReverb = !soundReverb;
+                    if(soundReverb) {
+                        mainInterfaceData[145].elementName = "REVERB ON";
+                        mainInterfaceData[145].setStringWidth();
+                        mainInterfaceData[147].activateOnColor();
+                        mainInterfaceData[149].activateOnColor();
+                        setupAudio();
+                    } else {
+                        mainInterfaceData[145].elementName = "REVERB OFF";
+                        mainInterfaceData[145].setStringWidth();
+                        mainInterfaceData[147].activateDarkerColor();
+                        mainInterfaceData[149].activateDarkerColor();
+                        setupAudio();
+                    }
+                }
+                
+                
+            }
         }
     }
     
@@ -2552,10 +2311,7 @@ void ofApp::lostFocus(){
     volumeRestart = 0.0;
     tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
     saveToXml("settings.xml");
-    //volumeRampValueChanged(mainVol);
-    
-    //    mainVol = 0.0;
-    
+
     for (int i = 0; i < 3; i++){
         synths[i].setAllNotesOff();
     }
@@ -2563,11 +2319,7 @@ void ofApp::lostFocus(){
 
 //--------------------------------------------------------------
 void ofApp::gotFocus(){
-    // startUp = true;
-    //volumeRestartTarget = mainVol;
-    //volumeRestart = 0.0;
-    //tonicSynth.setParameter("mainVolumeRamp",Tonic::mapLinToLog(0.0,0.0,1.0));
-    lastTouch = ofGetElapsedTimef();
+      lastTouch = ofGetElapsedTimef();
 }
 
 //--------------------------------------------------------------
@@ -2692,7 +2444,7 @@ void ofApp::onSwipe(ofSwipeGestureRecognizerArgs & args){
                         buttonThreePress();
                     }
                 }
-                
+
             }
         }
     }
@@ -2735,6 +2487,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 #endif
 
+//--------------------------------------------------------------
 void ofApp::drawDebug() {
     
     
@@ -2751,7 +2504,6 @@ void ofApp::drawDebug() {
         
         synthPos[i].draw();
     }
-    
     
     synthActivePos.draw();
     // camActiveSynth.draw();
@@ -2816,6 +2568,7 @@ void ofApp::drawDebug() {
     }
 }
 
+//--------------------------------------------------------------
 void ofApp::intersectPlane(float x_,float y_){
     //raytesting
     worldMouse = testCam.screenToWorld(ofVec3f(x_,y_,0.0));
@@ -2838,6 +2591,7 @@ void ofApp::intersectPlane(float x_,float y_){
     vectorPosY = int((intersectPos.y/ float(TILESIZE)));
 }
 
+//--------------------------------------------------------------
 ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     
     ofCamera tempNode;
@@ -2862,9 +2616,7 @@ ofVec3f ofApp::intersectPlane(ofVec2f target_) {
     return cord;
 }
 
-
-
-
+//--------------------------------------------------------------
 bool ofApp::pointInsideGrid(ofVec3f p_) {
     bool rVal;
     if( (abs(p_.x) <= (TILES*TILESIZE/2) ) && (abs(p_.y) <= (TILES*TILESIZE/2)) ) {
@@ -2876,16 +2628,6 @@ bool ofApp::pointInsideGrid(ofVec3f p_) {
 }
 
 void ofApp::pulseEvent(int div){
-    
-    /*
-     if (currentState == STATE_BPM) {
-     for (int i = 0; i < 3; i++) {
-     if (synths[synthButton[i]].pulseDivision == div) {
-     mainInterfaceData[55+i].blinkOn();
-     }
-     }
-     }
-     */
     
     if(currentState == STATE_HARMONY){
         if (synths[synthButton[0]].pulseDivision == div) {
@@ -2910,7 +2652,6 @@ void ofApp::pulseEvent(int div){
             if (synths[i].timeCounter > TILES) {
                 synths[i].timeCounter = 0;
                 synths[i].nextDirection();
-                
             }
             
             synths[i].noteTrigger();
@@ -2924,16 +2665,11 @@ void ofApp::pulseEvent(int div){
             synths[i].bpmTick = ofGetElapsedTimeMillis() - synths[i].lastTick;
             synths[i].lastTick = ofGetElapsedTimeMillis();
             
-            
             synths[i].pulsePlane.lastTick = synths[i].lastTick;
-            
             
             synths[i].tickTimes.pop_back();
             synths[i].tickTimes.push_front(synths[i].bpmTick);
-            
-            
-            
-            
+       
             synths[i].bpmTick = 0.0;
             
             for (int j = 0; j < synths[i].tickTimes.size(); j++) {
@@ -2948,30 +2684,32 @@ void ofApp::pulseEvent(int div){
     
 }
 
+//--------------------------------------------------------------
 void ofApp::pulseEventDiv1(float& val) {
     pulseEvent(1);
 }
 
 
+//--------------------------------------------------------------
 void ofApp::pulseEventDiv2(float & val){
     pulseEvent(2);
 }
 
+//--------------------------------------------------------------
 void ofApp::pulseEventDiv3(float & val){
     pulseEvent(3);
 }
 
+//--------------------------------------------------------------
 void ofApp::pulseEventDiv4(float & val){
     pulseEvent(4);
 }
 
 
-
-
+//--------------------------------------------------------------
 void ofApp::setMainVolume(float & in_) {
-        
-    tonicSynth.setParameter("mainVolumeRamp", pow(in_,4)   );
     
+    tonicSynth.setParameter("mainVolumeRamp", pow(in_,4)   );
     cout << "logvol:"  <<   pow(in_,4)  << endl;;
     
 }
@@ -2980,8 +2718,7 @@ void ofApp::audioOut (float * output, int bufferSize, int nChannels){
     tonicSynth.fillBufferOfFloats(output, bufferSize, nChannels);
 }
 
-
-
+//--------------------------------------------------------------
 void ofApp::updateCamera(float pct_){
     
     if (animCam && pct_ == 1.0) {
@@ -3004,14 +2741,11 @@ void ofApp::updateCamera(float pct_){
         ofQuaternion tempRot;
         tempRot.slerp(pct_, camQuatDefault,camQuatTarget);
         testCam.setOrientation(tempRot);
-        
-        
     }
-    
     
 }
 
-
+//--------------------------------------------------------------
 float ofApp::easeInOut(float input_, float a_) {
     
     
@@ -3032,6 +2766,7 @@ float ofApp::easeInOut(float input_, float a_) {
     
 }
 
+//--------------------------------------------------------------
 void ofApp::setupStatesAndAnimation() {
     
     cam.setNearClip(nearClip);
@@ -3129,11 +2864,9 @@ void ofApp::setupStatesAndAnimation() {
     
     TwoHarmonyPathOn.addVertex(ofVec3f(0,0,0));
     TwoHarmonyPathOn.bezierTo(ofVec3f(0,0,0), ofVec3f(0,0,0), ofVec3f(0,(TILES*TILESIZE)/5.0,-(TILES*TILESIZE)/4));
-    // TwoVolumeLayerPathOn = TwoVolumeLayerPathOn.getResampledByCount(80);
     
     TwoHarmonyPathOff.addVertex(ofVec3f(0,(TILES*TILESIZE)/5.0,-(TILES*TILESIZE)/4));
     TwoHarmonyPathOff.bezierTo(ofVec3f(0,0,0), ofVec3f(0,0,0), ofVec3f(0,0,0));
-    // TwoVolumeLayerPathOff = TwoVolumeLayerPathOff.getResampledByCount(80);
     
     OneHarmonyPathOn = TwoHarmonyPathOn;
     OneHarmonyPathOff = TwoHarmonyPathOff;
@@ -3269,7 +3002,6 @@ void ofApp::setupGlobalInterface() {
     
     ofVec3f smallButton = ofVec3f(designGrid[0][0].y,designGrid[0][0].y,0);
     ofVec3f horizontalSlider = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y,0);
-   // ofVec3f verticalSlider = ofVec3f(designGrid[0][0].x*2/12,designGrid[0][0].y*2,0);
     
     ofVec3f gridRect = ofVec3f(designGrid[0][0].x*2,designGrid[0][0].y*2,0);
     float hSliderYscale = 0.25;
@@ -3738,7 +3470,6 @@ void ofApp::setupGlobalInterface() {
         
         for (int j = 0; j < 4; j++) {
             mainInterface.addVertex(ofVec3f(-500,-500,0));
-            // mainInterfaceFbo.addVertex(ofVec3f(0,0,0));
             mainInterface.addColor(ofColor(0,0,0,0));
             mainInterfaceFbo.addColor(ofColor(50+i,0,0));
         }
@@ -3752,11 +3483,6 @@ void ofApp::setupGlobalInterface() {
         
     }
     
-    //offset for scale key string
-    // mainInterfaceData[50].stringHeight-=scaleButton.y/3;
-    
-    
-    
     
     pauseInterfaceOn();
     
@@ -3764,16 +3490,9 @@ void ofApp::setupGlobalInterface() {
 }
 
 //--------------------------------------------------------------
-
-
 void ofApp::editInterfaceOn(){
     
-    /*
-     mainInterfaceData[5].showString = true;
-     mainInterfaceData[5].moveDir = 1;
-     mainInterfaceData[5].animation = true;
-     */
-    
+
     mainInterfaceData[7].showString = true;
     mainInterfaceData[7].moveDir = 1;
     mainInterfaceData[7].animation = true;
@@ -3781,12 +3500,6 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[39].showString = false;
     mainInterfaceData[39].moveDir = 1;
     mainInterfaceData[39].animation = true;
-    
-    /*
-     mainInterfaceData[40].showString = true;
-     mainInterfaceData[40].moveDir = 1;
-     mainInterfaceData[40].animation = true;
-     */
     
     mainInterfaceData[12].showString = true;
     mainInterfaceData[12].moveDir = 1;
@@ -3803,13 +3516,6 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[111].showString = true;
     mainInterfaceData[111].moveDir = 1;
     mainInterfaceData[111].animation = true;
-    
-    /*
-     for (int i = 45; i < 45+4; i++) {
-     mainInterfaceData[i].moveDir = 1;
-     mainInterfaceData[i].animation = true;
-     }
-     */
     
     if (currentState != STATE_EDIT && currentState != STATE_EDIT_DETAIL ) {
         mainInterfaceData[37].moveDir = 0;
@@ -3831,29 +3537,16 @@ void ofApp::editInterfaceOn(){
     mainInterfaceData[137].moveDir = 1;
     mainInterfaceData[137].animation = true;
     
-    
 }
 
 //--------------------------------------------------------------
-
 void ofApp::editInterfaceOff(){
-    
     
     mainInterfaceData[7].moveDir = 0;
     mainInterfaceData[7].animation = true;
     
-    /*
-     mainInterfaceData[5].moveDir = 0;
-     mainInterfaceData[5].animation = true;
-     */
-    
     mainInterfaceData[39].moveDir = 0;
     mainInterfaceData[39].animation = true;
-    
-    /*
-     mainInterfaceData[40].moveDir = 0;
-     mainInterfaceData[40].animation = true;
-     */
     
     mainInterfaceData[12].moveDir = 0;
     mainInterfaceData[12].animation = true;
@@ -3866,19 +3559,6 @@ void ofApp::editInterfaceOff(){
     
     mainInterfaceData[111].moveDir = 0;
     mainInterfaceData[111].animation = true;
-    
-    /*
-     mainInterfaceData[37].showString = false;
-     mainInterfaceData[37].moveDir = 1;
-     mainInterfaceData[37].animation = true;
-     */
-    
-    /*
-     for (int i = 45; i < 45+4; i++) {
-     mainInterfaceData[i].moveDir = 0;
-     mainInterfaceData[i].animation = true;
-     }
-     */
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[63+i].moveDir = 0;
@@ -3896,13 +3576,10 @@ void ofApp::editInterfaceOff(){
 }
 
 //--------------------------------------------------------------
-
 void ofApp::detailEditInterfaceOn() {
     
     mainInterfaceData[49].setSlider(mainInterface, ofMap(synths[activeSynth].keyNote, 12, 95, 0.0, 1.0));
-    
-    
-    
+  
     mainInterfaceData[131].showString = true;
     mainInterfaceData[131].moveDir = 1;
     mainInterfaceData[131].animation = true;
@@ -3910,13 +3587,7 @@ void ofApp::detailEditInterfaceOn() {
     mainInterfaceData[11].showString = true;
     mainInterfaceData[11].moveDir = 1;
     mainInterfaceData[11].animation = true;
-    
-    /*
-     mainInterfaceData[5].showString = true;
-     mainInterfaceData[5].moveDir = 1;
-     mainInterfaceData[5].animation = true;
-     */
-    
+
     mainInterfaceData[49].showString = false;
     mainInterfaceData[49].moveDir = 1;
     mainInterfaceData[49].animation = true;
@@ -3946,28 +3617,14 @@ void ofApp::detailEditInterfaceOn() {
         mainInterfaceData[25+i].showString = true;
         mainInterfaceData[25+i].moveDir = 1;
         mainInterfaceData[25+i].animation = true;
-        
     }
     
-    /*
-     mainInterfaceData[50].moveDir = 1;
-     mainInterfaceData[50].showString = true;
-     mainInterfaceData[50].animation = true;
-     */
 }
 
 
 //--------------------------------------------------------------
-
 void ofApp::detailEditInterfaceOff() {
-    
-    /*
-     mainInterfaceData[5].moveDir = 0;
-     mainInterfaceData[5].animation = true;
-     */
-    
-    
-    
+
     mainInterfaceData[11].moveDir = 0;
     mainInterfaceData[11].animation = true;
     
@@ -3976,7 +3633,6 @@ void ofApp::detailEditInterfaceOff() {
     
     mainInterfaceData[49].moveDir = 0;
     mainInterfaceData[49].animation = true;
-    
     
     mainInterfaceData[5].moveDir = 0;
     mainInterfaceData[5].animation = true;
@@ -3991,12 +3647,6 @@ void ofApp::detailEditInterfaceOff() {
         mainInterfaceData[25+i].animation = true;
         mainInterfaceData[25+i].moveDir = 0;
     }
-    
-    /*
-     mainInterfaceData[50].animation = true;
-     mainInterfaceData[50].moveDir = 0;
-     */
-    
     
     mainInterfaceData[43].showString = true;
     mainInterfaceData[43].moveDir = 1;
@@ -4015,15 +3665,9 @@ void ofApp::detailEditInterfaceOff() {
     mainInterfaceData[111].moveDir = 1;
     mainInterfaceData[111].animation = true;
     
-    /*
-     mainInterfaceData[39].showString = true;
-     mainInterfaceData[39].moveDir = 1;
-     mainInterfaceData[39].animation = true;
-     */
 }
 
 //--------------------------------------------------------------
-
 void ofApp::volumeInterfacOn() {
     mainInterfaceData[0].sliderPct = ofMap( mainVol, 0.0,1.0,-1.0,1.0);
     mainInterfaceData[1].sliderPct = ofMap( synths[synthButton[0]].sVolume, 0.0,1.0,-1.0,1.0);
@@ -4052,17 +3696,6 @@ void ofApp::volumeInterfacOn() {
     mainInterfaceData[54].animation = true;
     mainInterfaceData[54].moveDir = 1;
     
-    /*
-     mainInterfaceData[37].showString = true;
-     mainInterfaceData[37].animation = true;
-     mainInterfaceData[37].moveDir = 0;
-     */
-    /*
-     mainInterfaceData[41].showString = false;
-     mainInterfaceData[41].animation = true;
-     mainInterfaceData[41].moveDir = 0;
-     */
-    
     mainInterfaceData[0].showString = false;
     mainInterfaceData[0].moveDir = 1;
     mainInterfaceData[0].animation = true;
@@ -4075,11 +3708,9 @@ void ofApp::volumeInterfacOn() {
     mainInterfaceData[131].animation = true;
     mainInterfaceData[131].moveDir = 1;
     
-    
 }
 
 //--------------------------------------------------------------
-
 void ofApp::volumeInterfaceOff() {
     
     mainInterfaceData[1].animation = true;
@@ -4107,20 +3738,9 @@ void ofApp::volumeInterfaceOff() {
     
     mainInterfaceData[131].moveDir = 0;
     mainInterfaceData[131].animation = true;
-    /*
-     mainInterfaceData[37].showString = true;
-     mainInterfaceData[37].animation = true;
-     mainInterfaceData[37].moveDir = 1;
-     
-     
-     mainInterfaceData[41].showString = true;
-     mainInterfaceData[41].animation = true;
-     mainInterfaceData[41].moveDir = 1;
-     */
 }
 
 //--------------------------------------------------------------
-
 void ofApp::pauseInterfaceOn() {
     
     mainInterfaceData[8].showString = true;
@@ -4135,14 +3755,10 @@ void ofApp::pauseInterfaceOn() {
     mainInterfaceData[10].moveDir = 1;
     mainInterfaceData[10].animation = true;
     
-    //  if (currentState == !STATE_VOLUME){
     mainInterfaceData[37].showString = true;
     mainInterfaceData[37].moveDir = 1;
     mainInterfaceData[37].animation = true;
-    // }
-    
-    
-    
+   
     mainInterfaceData[41].showString = true;
     mainInterfaceData[41].moveDir = 1;
     mainInterfaceData[41].animation = true;
@@ -4151,11 +3767,9 @@ void ofApp::pauseInterfaceOn() {
     mainInterfaceData[42].moveDir = 1;
     mainInterfaceData[42].animation = true;
     
-    
     mainInterfaceData[46].showString = true;
     mainInterfaceData[46].moveDir = 1;
     mainInterfaceData[46].animation = true;
-    
     
     mainInterfaceData[40].showString = true;
     mainInterfaceData[40].moveDir = 1;
@@ -4164,7 +3778,6 @@ void ofApp::pauseInterfaceOn() {
 
 
 //--------------------------------------------------------------
-
 void ofApp::pauseInterfaceOff() {
     
     mainInterfaceData[8].moveDir = 0;
@@ -4175,7 +3788,6 @@ void ofApp::pauseInterfaceOff() {
     
     mainInterfaceData[10].moveDir = 0;
     mainInterfaceData[10].animation = true;
-    
     
     mainInterfaceData[37].animation = true;
     mainInterfaceData[37].moveDir = 0;
@@ -4226,17 +3838,10 @@ void ofApp::bpmInterfaceOn() {
     mainInterfaceData[57].animation = true;
     mainInterfaceData[57].moveDir = 1;
     
-    
     mainInterfaceData[131].animation = true;
     mainInterfaceData[131].moveDir = 1;
     mainInterfaceData[131].showString = true;
     
-    
-    /*
-     mainInterfaceData[55].sliderPct =ofMap( (1/(4/float(synths[synthButton[0]].nextPulseDivision))), 0.0,1.0,-1.0,1.0);
-     mainInterfaceData[56].sliderPct =ofMap( (1/(4/float(synths[synthButton[1]].nextPulseDivision))), 0.0, 1.0, -1.0, 1.0);
-     mainInterfaceData[57].sliderPct =ofMap( (1/(4/float(synths[synthButton[2]].nextPulseDivision))), 0.0, 1.0, -1.0, 1.0);
-     */
 }
 
 
@@ -4245,9 +3850,6 @@ void ofApp::bpmInterfaceOff(){
     
     mainInterfaceData[43].animation = true;
     mainInterfaceData[43].moveDir = 0;
-    
-    //   mainInterfaceData[37].animation = true;
-    //  mainInterfaceData[37].moveDir = 1;
     
     mainInterfaceData[38].animation = true;
     mainInterfaceData[38].moveDir = 0;
@@ -4411,56 +4013,6 @@ void ofApp::loadSaveInterfaceOff(){
     }
 }
 
-/*
- void ofApp::bothEditInterfaceOff() {
- 
- 
- mainInterfaceData[7].moveDir = 0;
- mainInterfaceData[7].animation = true;
- 
- 
- 
- mainInterfaceData[4].moveDir = 0;
- mainInterfaceData[4].animation = true;
- 
- mainInterfaceData[5].moveDir = 0;
- mainInterfaceData[5].animation = true;
- 
- mainInterfaceData[6].moveDir = 0;
- mainInterfaceData[6].animation = true;
- 
- 
- mainInterfaceData[49].moveDir = 0;
- mainInterfaceData[49].animation = true;
- 
- for (int i = 0; i < 12; i++) {
- mainInterfaceData[13+i].moveDir = 0;
- mainInterfaceData[13+i].animation = true;
- 
- }
- for (int i = 0; i < 12; i++) {
- 
- mainInterfaceData[25+i].animation = true;
- mainInterfaceData[25+i].moveDir = 0;
- }
- 
- mainInterfaceData[43].moveDir = 0;
- mainInterfaceData[43].animation = true;
- 
- mainInterfaceData[44].moveDir = 0;
- mainInterfaceData[44].animation = true;
- 
- for (int i = 45; i < 45+4; i++) {
- mainInterfaceData[i].moveDir = 0;
- mainInterfaceData[i].animation = true;
- }
- 
- mainInterfaceData[37].showString = false;
- mainInterfaceData[37].moveDir = 1;
- mainInterfaceData[37].animation = true;
- }
- 
- */
 
 //--------------------------------------------------------------
 
@@ -4491,7 +4043,6 @@ void ofApp::openSlotInterface(){
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 1;
     
-    
 }
 
 //--------------------------------------------------------------
@@ -4503,17 +4054,14 @@ void ofApp::closeSlotInterface(){
     saveManager.moveDir = 1;
     saveManager.slotDetail = false;
     
-    
     mainInterfaceData[50].animation = true;
     mainInterfaceData[50].moveDir = 0;
     
     mainInterfaceData[124].animation = true;
     mainInterfaceData[124].moveDir = 0;
     
-    
     mainInterfaceData[126].animation = true;
     mainInterfaceData[126].moveDir = 0;
-    
     
     if (currentState != STATE_DEFAULT) {
         mainInterfaceData[47].animation = true;
@@ -4533,7 +4081,6 @@ void ofApp::openSettingsInterface(){
     mainInterfaceData[143].sliderPct = ofMap( staticDelayValue,0.0,1.0,1.0,-1.0);
     mainInterfaceData[146].sliderPct = ofMap( revTime,0.0,1.0,-1.0,1.0);
     mainInterfaceData[148].sliderPct = ofMap( revSize,0.0,1.0,-1.0,1.0);
-    
     
     mainInterfaceData[130].animation = true;
     mainInterfaceData[130].moveDir = 1;
@@ -4648,6 +4195,7 @@ void ofApp::makePresetString() {
     
 }
 
+//--------------------------------------------------------------
 void ofApp::makeDesignGrid() {
     
     ofVec3f third = ofVec2f(ofGetWidth()/3,ofGetHeight()/3);
@@ -4658,7 +4206,6 @@ void ofApp::makeDesignGrid() {
             designGrid[i][j] = ofVec2f(third.x*i+center.x,third.y*j+center.y);
         }
     }
-    
     
 }
 
@@ -4674,11 +4221,8 @@ void ofApp::buttonOnePress(){
         synths[synthButton[1]].myTarget = synthPos[0].getOrientationQuat();
         synths[synthButton[1]].myDefault = synthActivePos.getOrientationQuat();
         
-        
-        
         synths[synthButton[1]].inFocus = false ;
         synths[synthButton[1]].animate = true ;
-        
         
         synths[temp].inFocus = true;
         synths[temp].animate = true;
@@ -4693,8 +4237,6 @@ void ofApp::buttonOnePress(){
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[1]].myScaleTarget = 0.5;
         
-        
-        
         synths[synthButton[0]].pulsePlane.positionModDef = ppPosModDefault;
         synths[synthButton[0]].pulsePlane.positionModTar = ppPosModFocus;
         synths[synthButton[0]].pulsePlane.scaleModDef = ppScaleModDefault;
@@ -4704,8 +4246,7 @@ void ofApp::buttonOnePress(){
         synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
         synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModFocus;
         synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
-        
-        
+
         synthButton[0] = synthButton[1];
         synths[synthButton[0]].ownSlot = 0;
         
@@ -4715,16 +4256,6 @@ void ofApp::buttonOnePress(){
         aniPct = 0.0;
         interfaceMoving = true;
         
-        /*
-         if (
-         scaleCollection.scaleVec.at(synths[synthButton[0]].currentScaleVecPos%scaleCollection.scaleVec.size()).name !=
-         scaleCollection.scaleVec.at(synths[synthButton[1]].currentScaleVecPos%scaleCollection.scaleVec.size()).name
-         )
-         {
-         mainInterfaceData[5].blinkOn();
-         }
-         */
-        
         if (
             presetNames[synths[synthButton[0]].preset%presetNames.size()] !=
             presetNames[synths[synthButton[1]].preset%presetNames.size()]
@@ -4732,7 +4263,6 @@ void ofApp::buttonOnePress(){
         {
             mainInterfaceData[7].blinkOn();
         }
-        
         
         setNewGUI();
         
@@ -4742,7 +4272,6 @@ void ofApp::buttonOnePress(){
         synths[temp].aniPath = oneToActive;
         synths[temp].myTarget = synthActivePos.getOrientationQuat();
         synths[temp].myDefault = synthPos[0].getOrientationQuat();
-        
         
         synths[temp].animate = true;
         
@@ -4758,21 +4287,16 @@ void ofApp::buttonOnePress(){
         synths[synthButton[1]].myScaleTarget = 0.5;
         synths[synthButton[2]].myScaleTarget = 0.5;
         
-        
         synths[temp].pulsePlane.positionModDef = ppPosModDefault;
         synths[temp].pulsePlane.positionModTar = ppPosModFocus;
         synths[temp].pulsePlane.scaleModDef = ppScaleModDefault;
         synths[temp].pulsePlane.scaleModTar = ppScaleModFocus;
         
-        
-        
         synthButton[0] = synthButton[1];
         synths[synthButton[0]].ownSlot = 0;
         synthButton[1] = temp;
         synths[synthButton[1]].ownSlot = 1;
-        
-        
-        
+   
         //camani
         camQuatDefault = camNotActiveSynth.getOrientationQuat();
         camQuatTarget = camActiveSynth.getOrientationQuat();
@@ -4783,7 +4307,6 @@ void ofApp::buttonOnePress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
-        
         
         setNewGUI();
         
@@ -4802,7 +4325,6 @@ void ofApp::buttonTwoPress(){
     int temp = synthButton[1];
     activeSynth = synthButton[1];
     
-    
     if (synths[synthButton[1]].inFocus) {
         
         synths[synthButton[1]].aniPath = twoToBack;
@@ -4812,7 +4334,6 @@ void ofApp::buttonTwoPress(){
         synths[synthButton[1]].inFocus = false ;
         synths[synthButton[1]].animate = true ;
         
-        
         synths[synthButton[0]].scaling = true;
         synths[synthButton[2]].scaling = true;
         synths[synthButton[0]].myScaleDefault = 0.5;
@@ -4820,12 +4341,10 @@ void ofApp::buttonTwoPress(){
         synths[synthButton[0]].myScaleTarget = 1.0;
         synths[synthButton[2]].myScaleTarget = 1.0;
         
-        
         synths[synthButton[1]].pulsePlane.positionModDef = ppPosModFocus;
         synths[synthButton[1]].pulsePlane.positionModTar = ppPosModDefault;
         synths[synthButton[1]].pulsePlane.scaleModDef = ppScaleModFocus;
         synths[synthButton[1]].pulsePlane.scaleModTar = ppScaleModDefault;
-        
         
         //camani
         camQuatDefault = camActiveSynth.getOrientationQuat();
@@ -4845,9 +4364,8 @@ void ofApp::buttonTwoPress(){
         }
         
         if (currentState == STATE_EDIT_DETAIL) {
-            //  bothEditInterfaceOff();
+            //bothEditInterfaceOff();
         }
-        
         
         currentState = STATE_DEFAULT;
         
@@ -4912,7 +4430,6 @@ void ofApp::buttonThreePress(){
         synths[synthButton[1]].inFocus = false ;
         synths[synthButton[1]].animate = true ;
         
-        
         synths[temp].inFocus = true;
         synths[temp].animate = true;
         synths[ temp ].aniPath = threeToActive;
@@ -4946,15 +4463,6 @@ void ofApp::buttonThreePress(){
         aniPct = 0.0;
         interfaceMoving = true;
         
-        /*
-         if (
-         scaleCollection.scaleVec.at(synths[synthButton[1]].currentScaleVecPos%scaleCollection.scaleVec.size()).name !=
-         scaleCollection.scaleVec.at(synths[synthButton[2]].currentScaleVecPos%scaleCollection.scaleVec.size()).name
-         )
-         {
-         mainInterfaceData[5].blinkOn();
-         }
-         */
         if (
             presetNames[synths[synthButton[1]].preset%presetNames.size()] !=
             presetNames[synths[synthButton[2]].preset%presetNames.size()]
@@ -4964,7 +4472,7 @@ void ofApp::buttonThreePress(){
         }
         
         setNewGUI();
-    }else {
+    }else{
         synths[temp].inFocus = true;
         synths[temp].aniPath = threeToActive;
         synths[temp].myTarget = synthActivePos.getOrientationQuat();
@@ -5005,9 +4513,6 @@ void ofApp::buttonThreePress(){
         
         aniPct = 0.0;
         interfaceMoving = true;
-        
-        //  mainInterfaceData[2].setSlider(mainInterface, mainInterfaceData[3].sliderPos);
-        // mainInterfaceData[3].setSlider(mainInterface, mainInterfaceData[2].sliderPos);
         
         
         setNewGUI();
@@ -5222,7 +4727,6 @@ void ofApp::buttonEditDetail() {
         interfaceMoving = true;
         editDetailMoveDirection = 1;
         
-        //  mainInterfaceData[5].animationB = true;
         mainInterfaceData[7].animationB = true;
         mainInterfaceData[39].animationB = true;
         mainInterfaceData[12].animationB = true;
@@ -5457,10 +4961,7 @@ void ofApp::bpmButtonPress() {
 //--------------------------------------------------------------
 
 void ofApp::loadSaveButtonPress(){
-    
-    
-    
-    
+   
     if(currentState == STATE_DEFAULT) {
         synths[synthButton[0]].aniPath = OneLoadPathOn;
         synths[synthButton[0]].myDefault = synthPos[0].getOrientationQuat();
@@ -5512,7 +5013,7 @@ void ofApp::loadSaveButtonPress(){
         volumeRestart = 0.0;
         volumeRamp.value(0.0);
         cout <<"save button :" << volumeRestartTarget << endl;
-
+        
         
     }
     
@@ -5568,8 +5069,6 @@ void ofApp::settingsButtonPress(){
         closeSettingsInterface();
         aniPct = 0.0;
         currentState = STATE_DEFAULT;
-        
-        
     }
     
     
@@ -5577,9 +5076,6 @@ void ofApp::settingsButtonPress(){
 
 //--------------------------------------------------------------
 void ofApp::setNewGUI() {
-    
-    
-    
     
     for (int i = 0; i < 12; i++) {
         mainInterfaceData[13+i].setColor(synths[activeSynth].colorHue);
@@ -5598,12 +5094,6 @@ void ofApp::setNewGUI() {
             mainInterfaceData[25+i].onOff = false;
         }
     }
-    
-    //preset information
-    /*
-     mainInterfaceData[7].elementName = presetNames[synths[activeSynth].preset%presetNames.size()];
-     mainInterfaceData[7].setStringWidth(mainInterfaceData[7].fsPtr->getBBox(mainInterfaceData[7].elementName, mainInterfaceData[7].fontSize, 0, 0).getWidth());
-     */
     
     mainInterfaceData[7].setColor(synths[activeSynth].colorHue);
     mainInterfaceData[7].activateOnColor();
@@ -5639,18 +5129,12 @@ void ofApp::setNewGUI() {
     //volume slider
     mainInterfaceData[52].setColor(synths[synthButton[0]].colorHue);
     mainInterfaceData[52].activateOnColor();
-    // mainInterfaceData[52].elementName = ofToString(synths[synthButton[0]].sVolume,2);
-    // mainInterfaceData[52].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[52].elementName, mainInterfaceData[52].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[53].setColor(synths[synthButton[1]].colorHue);
     mainInterfaceData[53].activateOnColor();
-    // mainInterfaceData[53].elementName = ofToString(synths[synthButton[1]].sVolume,2);
-    // mainInterfaceData[53].setStringWidth(mainInterfaceData[52].fsPtr->getBBox(mainInterfaceData[53].elementName, mainInterfaceData[53].fontSize, 0, 0).getWidth());
     
     mainInterfaceData[54].setColor(synths[synthButton[2]].colorHue);
     mainInterfaceData[54].activateOnColor();
-    //mainInterfaceData[54].elementName = ofToString(synths[synthButton[2]].sVolume,2);
-    //mainInterfaceData[54].setStringWidth(mainInterfaceData[53].fsPtr->getBBox(mainInterfaceData[54].elementName, mainInterfaceData[54].fontSize, 0, 0).getWidth());
     
     
     //sof-hard slider
@@ -5859,20 +5343,6 @@ void ofApp::setNewGUI() {
 
 //--------------------------------------------------------------
 void ofApp::markScaleSteps(int index_) {
-    
-    /*
-     for (int i = 0; i < 12; i++){
-     if (synths[activeSynth].activeScale.steps[i] ) {
-     mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-     mainInterfaceData[index_+i].setOn();
-     //mainInterfaceData[index_+i].activateDarkerColor();
-     }else{
-     mainInterfaceData[index_+i].setOff();
-     //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-     //mainInterfaceData[index_+i].activateOnColor(mainInterface);
-     }
-     }
-     */
     markSynthNotes(index_);
 }
 
@@ -5882,12 +5352,9 @@ void ofApp::markSynthNotes(int index_){
     for (int i = 0; i < 12; i++){
         if (synths[activeSynth].activeScale.steps[i] ) {
             mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-            //mainInterfaceData[index_+i].setOn();
             mainInterfaceData[index_+i].activateDarkerColor();
         }else{
             mainInterfaceData[index_+i].setOff();
-            //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-            //mainInterfaceData[index_+i].activateOnColor(mainInterface);
         }
     }
     
@@ -5901,23 +5368,7 @@ void ofApp::markSynthNotes(int index_){
 
 //--------------------------------------------------------------
 void ofApp::markScaleSteps() {
-    
-    /*
-     for (int j = 0; j < 3; j++) {
-     for (int i = 0; i < 12; i++){
-     if (synths[synthButton[j]].activeScale.steps[i] ) {
-     mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setColor(synths[synthButton[j]].colorHue);
-     mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOn();
-     // mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].activateDarkerColor();
-     }else{
-     mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOff();
-     //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-     //mainInterfaceData[index_+i].activateOnColor(mainInterface);
-     }
-     }
-     }
-     */
-    markSynthNotes();
+      markSynthNotes();
 }
 
 //--------------------------------------------------------------
@@ -5926,13 +5377,9 @@ void ofApp::markSynthNotes(){
     for (int j = 0; j < 3; j++) {
         for (int i = 0; i < 12; i++){
             if (synths[synthButton[j]].activeScale.steps[i] ) {
-                //mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setColor(synths[synthButton[j]].colorHue);
-                //mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOn();
                 mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].activateDarkerColor();
             } else{
                 mainInterfaceData[75+(synths[synthButton[j]].ownSlot*12)+i].setOff();
-                //mainInterfaceData[index_+i].setColor(synths[activeSynth].colorHue);
-                //mainInterfaceData[index_+i].activateOnColor(mainInterface);
             }
         }
         
@@ -5946,7 +5393,7 @@ void ofApp::markSynthNotes(){
 }
 
 
-
+//--------------------------------------------------------------
 void ofApp::exit(){
     startUp = true;
     for (int i = 0; i < 3; i++){
@@ -5957,21 +5404,19 @@ void ofApp::exit(){
     midiOut.closePort();
 }
 
+//--------------------------------------------------------------
 void ofApp::savePreset(){
     saveManager.checkDate();
-    
-    
     saveToXml("saves/"+saveManager.saveLastYear+saveManager.saveLastMonth+saveManager.saveLastDay+"#"+ofToString(saveManager.saveLastNumber)+".xml");
-    
     saveManager.addNewSave(settings);
 }
 
+//--------------------------------------------------------------
 void ofApp::loadPreset(){
-    
     loadFromXml(saveManager.loadString, false);
 }
 
-
+//--------------------------------------------------------------
 void ofApp::saveToXml(string path_){
     settings.clear();
     //date
@@ -6061,7 +5506,6 @@ void ofApp::saveToXml(string path_){
     
     
     //--------------------------------
-    
     
     
     //synth globals
@@ -6199,7 +5643,7 @@ void ofApp::saveToXml(string path_){
 }
 
 void ofApp::loadFromXml(string path_, bool settings_){
- 
+    
     
     //load grid presets from xml
     
@@ -6257,15 +5701,13 @@ void ofApp::loadFromXml(string path_, bool settings_){
     settings.pushTag("Volumes");
     settings.pushTag("global");
     startUp = true;
-  
+    
     volumeRestartTarget = settings.getValue("volume", 1.0);
     volumeRestart = 0.0;
     mainVol = volumeRestartTarget;
     setMainVolume(volumeRestart);
-
+    
     cout <<"load xml :" << volumeRestartTarget << endl;
-    //mainInterfaceData[51].elementName = ofToString(volumeRestartTarget,2);
-    //mainInterfaceData[51].setStringWidth(mainInterfaceData[51].fsPtr->getBBox(mainInterfaceData[51].elementName, mainInterfaceData[51].fontSize, 0, 0).getWidth());
     settings.popTag();
     settings.pushTag("slots");
     for (int i = 0; i < 3; i++) {
@@ -6276,7 +5718,6 @@ void ofApp::loadFromXml(string path_, bool settings_){
     }
     settings.popTag();
     settings.popTag();
-    
     
     
     //--------------------------------
@@ -6346,7 +5787,6 @@ void ofApp::loadFromXml(string path_, bool settings_){
     for (int i = 0; i < 3; i++) {
         settings.pushTag("synth",i);
         synths[synthButton[i]].currentScaleVecPos = settings.getValue("ScaleVecPos", 0);
-        //   synths[synthButton[i]].setMusicScale(scaleCollection, synths[synthButton[i]].currentScaleVecPos);
         
         synths[synthButton[i]].userScale = settings.getValue("userScaleBool", 0);
         
@@ -6544,30 +5984,29 @@ void ofApp::loadFromXml(string path_, bool settings_){
     setNewGUI();
 }
 
+//--------------------------------------------------------------
 float ofApp::getBpmValue(float in){
     float bpmFac, temp;
-    /*
-    bpmFac = (ofClamp(in,0.0,1.0)*BPM_MAX)/BPM_MAX;
-    temp = (1.0-bpmFac)*1.0;
-    return ofClamp(temp,0.0001,1.0)*0.85;
-     */
     bpmFac = ofMap(in, 0.0, 1.0, 20.0, BPM_MAX+20);
     temp = 60000/bpmFac/2;
     return temp/1000;
 }
 
+//--------------------------------------------------------------
 float ofApp::getRevTime(float in){
     float temp;
     temp = ofMap(in, 0.0, 1.0, 0.15, 3.5);
     return ofClamp(temp, 0.0, 3.5);
 }
 
+//--------------------------------------------------------------
 float ofApp::getRevSize(float in){
     float temp;
     temp = ofMap(in, 0.0, 1.0, 0.01, 1.0);
     return ofClamp(temp, 0.0, 1.0);
 }
 
+//--------------------------------------------------------------
 void ofApp::updateSleepTimer(){
     if (currentState == STATE_DEFAULT){
         sleepTimer = ofGetElapsedTimef() - lastTouch;

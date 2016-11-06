@@ -9,8 +9,6 @@ class GlobalGUI{
     
 public:
     GlobalGUI();
-        
-    
     
     GlobalGUI(int,string,ofVec3f,ofColor,ofVec3f,ofVec3f, int, bool,ofxFontStash*);
     ofxFontStash* fsPtr;
@@ -35,7 +33,7 @@ public:
     
     void setStringWidth();
     void setAuxStringWidth();
-
+    
     float stringWidth, auxStringWidth, stringHeight;
     
     int moveDir;
@@ -53,15 +51,15 @@ public:
     void setColor(ofColor);
     void activateOnColor();
     void activateDarkerColor();
-
+    
     
     void updateMainMesh(ofVboMesh&, ofVec3f);
     void updateMainMesh(ofVboMesh&, ofVec3f, float&);
     void updateMainMeshB(ofVboMesh&, ofVec3f, float&);
-
+    
     void updateMainMeshSlider(ofVboMesh&, ofVec3f, float&);
     void updateMainMeshSliderB(ofVboMesh&, ofVec3f, float&);
-
+    
     
     void setSlider(ofVboMesh&, float);
     float sliderPos;
@@ -71,7 +69,7 @@ public:
     void drawFontString();
     void drawFontString(float,float);
     void drawAuxString(float,float);
-
+    
     
     bool isInside(ofVec2f);
     bool onOff;
