@@ -2,7 +2,7 @@
 GridComposer is an musical sequencer for iOS. 
 
 ####Website:
-http://gridcomposer.gwiozda.net/
+http://www.gridcomposer.net/
 
 ####Appstore:
 https://itunes.apple.com/us/app/gridcomposer/id993489006?ls=1&mt=8
